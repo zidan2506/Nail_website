@@ -509,3 +509,45 @@ def get_customer_invoices(customer_id):
     conn.close()
     #convert sang dict cho dễ xử lý 
     return [dict(row) for row in rows]
+
+# Thêm vào app/database/db.py
+
+def get_invoice_detail_by_id(invoice_id):
+    """Lấy full invoice detail bằng cách join invoices -> bookings -> customers, staff, services"""
+    db = get_connection()
+    row = db.execute("""
+        SELECT
+            i.id,
+            i.invoice_number,
+            i.amount,
+            i.payment_method,
+            i.status,
+            i.issued_at,
+
+            b.booking_date,
+            b.start_time,
+            b.end_time,
+
+            c.id        AS customer_id,
+            c.full_name AS customer_name,
+            c.email     AS customer_email,
+            c.phone     AS customer_phone,
+
+            st.full_name AS staff_name,
+
+            sv.name             AS service_name,
+            sv.duration_minutes AS service_duration,
+            sv.price            AS service_price,
+
+            sc.name AS category_name
+
+        FROM invoices i
+        JOIN bookings b  ON b.id  = i.booking_id
+        JOIN customers c ON c.id  = b.customer_id
+        JOIN staff st    ON st.id = b.staff_id
+        JOIN services sv ON sv.id = b.service_id
+        JOIN service_categories sc ON sc.id = sv.category_id
+        WHERE i.id = ?
+    """, (invoice_id,)).fetchone()
+
+    return dict(row) if row else None

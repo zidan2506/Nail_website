@@ -1,5 +1,5 @@
 from flask import Blueprint, flash,render_template, request, jsonify, redirect, url_for, session
-from app.database.db import get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date
+from app.database.db import get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date
 from datetime import datetime, timedelta, UTC, date
 from app.services.email_authentication import send_verification_email, send_thank_you_email, generate_verification_code
 from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days
@@ -144,6 +144,16 @@ def my_bookings():
 
     ##Add calendar btn solve
     next_visit_calendar_url = build_calendar_url( next_visit_service_name, next_visit_staff_name, next_visit_booking_date_raw, next_visit_start_time_raw,next_visit_end_time_raw)
+
+    # Recent history
+    appointment_history = get_customer_appointment_history(customer_id) or []
+    invoices = get_customer_invoices(customer_id) or []
+    invoice_by_booking = {inv["booking_id"]: inv["invoice_id"] for inv in invoices}
+    recent_history = []
+    for appt in appointment_history[:5]:
+        appt["invoice_id"] = invoice_by_booking.get(appt["booking_id"])
+        recent_history.append(appt)
+
     return render_template(
         "/customer/my_bookings.html",
         nevi_status=next_visit_status,
@@ -157,6 +167,7 @@ def my_bookings():
         upcoming_bookings=upcoming_bookings,
         pending_bookings=pending_bookings,
         cancelled_bookings=cancelled_bookings,
+        recent_history=recent_history,
     )
 
 @main.route("/customer/my-booking/booking_id=<int:booking_id>")
@@ -509,6 +520,52 @@ def customer_history():
         invoices=invoices,
         stylists=stylists,
         services=services
+    )
+
+# Thêm vào import của routes.py:
+# from app.database.db import get_invoice_detail_by_id
+
+@main.route("/customer/history/invoice/<int:invoice_id>")
+@customer_login_required
+def invoice_detail(invoice_id):
+    user_id = session.get("user_id")
+    customer = get_customer_by_user_id(user_id)
+    if not customer:
+        flash("Customer profile not found!", "error")
+        return redirect(url_for('main.customer_history'))
+
+    invoice = get_invoice_detail_by_id(invoice_id)
+    if not invoice:
+        flash("Invoice not found!", "error")
+        return redirect(url_for('main.customer_history'))
+
+    # Bảo vệ: chỉ cho xem invoice của chính mình
+    if invoice["customer_id"] != customer["id"]:
+        flash("Invoice not found!", "error")
+        return redirect(url_for('main.customer_history'))
+
+    # Format date/time để hiển thị
+    booking_date_obj = datetime.strptime(invoice["booking_date"], "%Y-%m-%d")
+    booking_date_display = booking_date_obj.strftime("%B %d, %Y")   # October 02, 2025
+
+    issued_at_obj = datetime.strptime(invoice["issued_at"], "%Y-%m-%d %H:%M:%S")
+    issued_at_display = issued_at_obj.strftime("%B %d, %Y")
+
+    start_time_display = format_booking_time(invoice["start_time"])  # 10:00 AM
+    end_time_display = format_booking_time(invoice["end_time"])      # 10:45 AM
+
+    # Initials cho stylist avatar
+    name_parts = invoice["staff_name"].split()
+    staff_initials = "".join(p[0].upper() for p in name_parts[:2])
+
+    return render_template(
+        "/customer/invoice_detail.html",
+        invoice=invoice,
+        booking_date_display=booking_date_display,
+        issued_at_display=issued_at_display,
+        start_time_display=start_time_display,
+        end_time_display=end_time_display,
+        staff_initials=staff_initials,
     )
 
 @main.route("/customer/create-booking", methods=['POST'])

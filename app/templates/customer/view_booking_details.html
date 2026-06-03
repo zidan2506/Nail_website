@@ -79,12 +79,18 @@
           </div>
 
           <div class="booking-actions">
-            {% if status == 'pending' or status == 'confirmed' %}
+            {% if status == 'confirmed' %}
             <a href="{{ url_for('main.customer_reschedule', booking_id=booking['id']) }}" class="btn btn-dark">Reschedule</a>
-            {% endif %}
-            <form action="#" method="post" class="inline-form">
+            <form action="{{ url_for('main.cancel_booking', booking_id=booking['id']) }}" method="post" class="inline-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="btn btn-text-danger">Cancel</button>
             </form>
+            {% elif status == 'pending' %}
+            <form action="{{ url_for('main.cancel_booking', booking_id=booking['id']) }}" method="post" class="inline-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-text-danger">Cancel</button>
+            </form>
+            {% endif %}
           </div>
         </div>
       </article>

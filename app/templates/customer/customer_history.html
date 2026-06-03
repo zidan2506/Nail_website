@@ -185,6 +185,8 @@
                     data-service-id="{{ appt.service_id }}"
                     data-date="{{ appt.booking_date}}"
                     data-amount="{{ appt.service_price }}"
+                    onclick="window.location.href='{{ url_for('main.view_booking_details', booking_id=appt.booking_id) }}'"
+                    style="cursor: pointer;"
                 >
                     <td>
                         <div class="cell-title cell-strike">{{ appt.service_name }}</div>
@@ -193,7 +195,7 @@
                     <td class="cell-medium cell-dim">N/A</td>
                     <td class="cell-bold cell-dim">$0.00</td>
                     <td><span class="badge badge-cancelled">Cancelled</span></td>
-                    <td class="cell-actions">
+                    <td class="cell-actions" onclick="event.stopPropagation()">
                         <button class="btn-rebook">Rebook</button>
                     </td>
                 </tr>
@@ -204,6 +206,8 @@
                     data-service-id="{{ appt.service_id }}"
                     data-date="{{ appt.booking_date}}"
                     data-amount="{{ appt.service_price }}"
+                    onclick="window.location.href='{{ url_for('main.view_booking_details', booking_id=appt.booking_id) }}'"
+                    style="cursor: pointer;"
                 >
                     <td>
                         <div class="cell-title">{{ appt.service_name }}</div>
@@ -212,7 +216,7 @@
                     <td class="cell-medium">{{ appt.stylist_name | short_name }}</td>
                     <td class="cell-bold">{{ appt.service_price | format_currency }}</td>
                     <td><span class="badge badge-completed">Completed</span></td>
-                    <td class="cell-actions">
+                    <td class="cell-actions" onclick="event.stopPropagation()">
                         <span class="reviewed-tag">✓ Reviewed</span>
                         <button class="btn-rebook">Rebook</button>
                     </td>
@@ -224,6 +228,8 @@
                     data-service-id="{{ appt.service_id }}"
                     data-date="{{ appt.booking_date}}"
                     data-amount="{{ appt.service_price }}"
+                    onclick="window.location.href='{{ url_for('main.view_booking_details', booking_id=appt.booking_id) }}'"
+                    style="cursor: pointer;"
                 >
                     <td>
                         <div class="cell-title">{{ appt.service_name }}</div>
@@ -232,7 +238,7 @@
                     <td class="cell-medium">{{ appt.stylist_name | short_name }}</td>
                     <td class="cell-bold">{{ appt.service_price | format_currency }}</td>
                     <td><span class="badge badge-completed">Completed</span></td>
-                    <td class="cell-actions">
+                    <td class="cell-actions" onclick="event.stopPropagation()">
                         <button class="btn-review">Leave Review</button>
                         <button class="btn-rebook">Rebook</button>
                     </td>
@@ -270,6 +276,8 @@
                     data-payment-method="{{ invoice.payment_method }}"
                     data-date="{{ invoice.booking_date }}"
                     data-amount="{{ invoice.amount }}"
+                    onclick="window.location.href='{{ url_for('main.invoice_detail', invoice_id=invoice.invoice_id) }}'"
+                    style="cursor: pointer;"
                 >
                     <td>
                         <div class="invoice-cell">
@@ -288,7 +296,7 @@
                     </td>
                     <td class="cell-bold">{{ invoice.amount | format_currency }}</td>
                     <td><span class="badge badge-{{ invoice.invoice_status }}">{{ invoice.invoice_status}}</span></td>
-                    <td class="cell-actions">
+                    <td class="cell-actions" onclick="event.stopPropagation()">
                         <button class="btn-download">⤓ Download PDF</button>
                         <button class="btn-more">⋮</button>
                     </td>
@@ -700,11 +708,25 @@ function getPageNumbers(current, total) {
     // ========== filter clear ==============
     clearBtn.addEventListener('click', resetFilters)
 
+    // ========== Auto-activate tab from URL hash ==============
+    const hash = window.location.hash.replace('#', '');
+    if (hash && panels[hash]) {
+        tabs.forEach(t => t.classList.remove('active'));
+        const targetTab = document.querySelector(`.history-tab[data-tab="${hash}"]`);
+        if (targetTab) targetTab.classList.add('active');
 
+        Object.keys(panels).forEach(key => {
+            panels[key].style.display = (key === hash) ? 'block' : 'none';
+        });
 
+        updateStatusOptions(hash);
 
-
-    
+        if (hash === 'invoices') {
+            filterAppointments.forEach(f => f.style.display = 'none');
+            filterInvoices.forEach(f => f.style.display = '');
+        }
+        resetFilters();
+    }
 
 });
 </script>

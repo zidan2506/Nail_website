@@ -1,0 +1,156 @@
+{% extends "customer_base.html" %}
+
+{% block title %}{{ invoice.invoice_number }} — Invoice Detail{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer/invoice_detail.css') }}">
+{% endblock %}
+
+{% block nav_history %}active{% endblock %}
+
+{% block customer_content %}
+<div class="invoice-detail-page">
+
+    <!-- Back link -->
+    <a href="{{ url_for('main.customer_history') }}" class="back-link">
+        ← Back to Invoices
+    </a>
+
+    <!-- Header -->
+    <div class="invoice-header">
+        <h1 class="invoice-number">{{ invoice.invoice_number }}</h1>
+        <div class="invoice-meta">
+            <span class="service-badge">{{ invoice.service_name }}</span>
+            <span class="meta-dot"></span>
+            <span class="invoice-date-meta">{{ booking_date_display }}</span>
+        </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stat-cards">
+        <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info">
+                <p class="stat-label">Invoice Date</p>
+                <p class="stat-value">{{ issued_at_display }}</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+                <p class="stat-label">Total Amount</p>
+                <p class="stat-value">${{ "%.2f"|format(invoice.amount) }}</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💳</div>
+            <div class="stat-info">
+                <p class="stat-label">Payment Method</p>
+                <p class="stat-value">{{ invoice.payment_method | title }}</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-icon--status">✓</div>
+            <div class="stat-info">
+                <p class="stat-label">Status</p>
+                <span class="status-badge status-badge--{{ invoice.status }}">
+                    {{ invoice.status | upper }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details grid -->
+    <div class="details-grid">
+
+        <!-- Service Details -->
+        <div class="detail-card">
+            <div class="detail-card__header">
+                <span class="detail-card__icon">✦</span>
+                <h3 class="detail-card__title">Service Details</h3>
+            </div>
+            <div class="detail-rows">
+                <div class="detail-row">
+                    <span class="detail-row__label">Service Name</span>
+                    <span class="detail-row__value">{{ invoice.service_name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-row__label">Category</span>
+                    <span class="category-tag">{{ invoice.category_name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-row__label">Duration</span>
+                    <span class="detail-row__value">{{ invoice.service_duration }} min</span>
+                </div>
+                <div class="detail-row detail-row--last">
+                    <span class="detail-row__label">Base Price</span>
+                    <span class="detail-row__value detail-row__value--price">${{ "%.2f"|format(invoice.service_price) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Details -->
+        <div class="detail-card">
+            <div class="detail-card__header">
+                <span class="detail-card__icon">📆</span>
+                <h3 class="detail-card__title">Appointment Details</h3>
+            </div>
+            <div class="detail-rows">
+                <div class="detail-row">
+                    <span class="detail-row__label">Date</span>
+                    <span class="detail-row__value">{{ booking_date_display }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-row__label">Time Window</span>
+                    <span class="detail-row__value">{{ start_time_display }} – {{ end_time_display }}</span>
+                </div>
+                <div class="detail-row detail-row--last">
+                    <span class="detail-row__label">Assigned Stylist</span>
+                    <div class="stylist-info">
+                        <span class="detail-row__value">{{ invoice.staff_name }}</span>
+                        <div class="stylist-avatar">{{ staff_initials }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Payment Summary -->
+    <div class="payment-summary">
+        <h3 class="payment-summary__title">Payment Summary</h3>
+
+        <div class="payment-rows">
+            <div class="payment-row">
+                <span class="payment-row__label">{{ invoice.service_name }}</span>
+                <span class="payment-row__value">${{ "%.2f"|format(invoice.service_price) }}</span>
+            </div>
+            <div class="payment-divider"></div>
+            <div class="payment-total-row">
+                <div class="payment-total-left">
+                    <p class="payment-total-label">Total Paid Amount</p>
+                    <p class="payment-total-amount">${{ "%.2f"|format(invoice.amount) }}</p>
+                </div>
+                <div class="payment-total-right">
+                    <div class="payment-method-tag">
+                        💳 {{ invoice.payment_method | title }}
+                    </div>
+                    <span class="status-badge status-badge--{{ invoice.status }}">
+                        {% if invoice.status == 'paid' %}● FULLY PAID
+                        {% elif invoice.status == 'refunded' %}● REFUNDED
+                        {% else %}{{ invoice.status | upper }}{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download btn -->
+        <div class="payment-footer">
+            <button class="btn-download" onclick="window.print()">
+                ↓ Download PDF Invoice
+            </button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

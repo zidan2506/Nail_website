@@ -301,89 +301,47 @@
         <p class="section-description">Your completed appointments.</p>
       </div>
 
-      <a href="#" class="section-link">View All History</a>
+      <a href="{{ url_for('main.customer_history') }}" class="section-link">View All History</a>
     </div>
 
     <div class="history-list">
+      {% if recent_history %}
+        {% for appt in recent_history %}
+        <article class="history-row history-row--{{ appt['status'] }}"
+                 onclick="window.location.href='{{ url_for('main.view_booking_details', booking_id=appt['booking_id']) }}'"
+                 style="cursor: pointer;">
+          <div class="history-row__status">
+            <span class="status-icon">{{ '✔' if appt['status'] == 'completed' else '✕' }}</span>
+          </div>
 
-      <article class="history-row history-row--completed">
-        <div class="history-row__status">
-          <span class="status-icon">✔</span>
-        </div>
+          <div class="history-row__service">
+            <h3 class="history-row__title">{{ appt['service_name'] }}</h3>
+            <p class="history-row__meta">
+              {{ appt['status'] | capitalize }} on {{ appt['booking_date'] | format_date }}
+            </p>
+          </div>
 
-        <div class="history-row__service">
-          <h3 class="history-row__title">Acrylic Full Set</h3>
-          <p class="history-row__meta">Completed on Oct 02, 2023</p>
-        </div>
+          <div class="history-row__stylist">
+            <span class="history-label">Stylist</span>
+            <span class="history-value">{{ appt['stylist_name'] | short_name if appt['stylist_name'] else '-' }}</span>
+          </div>
 
-        <div class="history-row__stylist">
-          <span class="history-label">Stylist</span>
-          <span class="history-value">Elena R.</span>
-        </div>
+          <div class="history-row__amount">
+            <span class="history-label">Amount</span>
+            <span class="history-value">{{ appt['service_price'] | format_currency if appt['status'] == 'completed' else '$0.00' }}</span>
+          </div>
 
-        <div class="history-row__amount">
-          <span class="history-label">Amount</span>
-          <span class="history-value">$85.00</span>
-        </div>
-
-        <div class="history-row__actions">
-          <a href="#" class="btn btn-dark">Rebook</a>
-          <a href="#" class="text-link">Invoice</a>
-        </div>
-      </article>
-
-      <article class="history-row history-row--completed">
-        <div class="history-row__status">
-          <span class="status-icon">✔</span>
-        </div>
-
-        <div class="history-row__service">
-          <h3 class="history-row__title">Gel Removal &amp; Polish</h3>
-          <p class="history-row__meta">Completed on Sep 14, 2023</p>
-        </div>
-
-        <div class="history-row__stylist">
-          <span class="history-label">Stylist</span>
-          <span class="history-value">Sarah W.</span>
-        </div>
-
-        <div class="history-row__amount">
-          <span class="history-label">Amount</span>
-          <span class="history-value">$45.00</span>
-        </div>
-
-        <div class="history-row__actions">
-          <a href="#" class="btn btn-dark">Rebook</a>
-          <a href="#" class="text-link">Invoice</a>
-        </div>
-      </article>
-
-      <article class="history-row history-row--cancelled">
-        <div class="history-row__status">
-          <span class="status-icon">✕</span>
-        </div>
-
-        <div class="history-row__service">
-          <h3 class="history-row__title">Luxury Pedicure</h3>
-          <p class="history-row__meta">Cancelled on Aug 28, 2023</p>
-        </div>
-
-        <div class="history-row__stylist">
-          <span class="history-label">Stylist</span>
-          <span class="history-value">-</span>
-        </div>
-
-        <div class="history-row__amount">
-          <span class="history-label">Amount</span>
-          <span class="history-value">$0.00</span>
-        </div>
-
-        <div class="history-row__actions">
-          <a href="#" class="btn btn-dark">Rebook</a>
-          <a href="#" class="text-link">Support</a>
-        </div>
-      </article>
-
+          <div class="history-row__actions" onclick="event.stopPropagation()">
+            <a href="{{ url_for('main.customer_booking') }}" class="btn btn-dark">Rebook</a>
+            {% if appt['status'] == 'completed' and appt['invoice_id'] %}
+            <a href="{{ url_for('main.invoice_detail', invoice_id=appt['invoice_id']) }}" class="text-link">Invoice</a>
+            {% endif %}
+          </div>
+        </article>
+        {% endfor %}
+      {% else %}
+        <p class="empty-state">No history yet.</p>
+      {% endif %}
     </div>
   </section>
 </main>
