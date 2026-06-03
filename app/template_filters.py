@@ -1,0 +1,112 @@
+from datetime import datetime
+
+PAYMENT_METHOD_LABELS = {
+    'visa': 'Visa',
+    'mastercard': 'Mastercard',
+    'mobile_pay': 'Mobile Pay',
+    'apple_pay': 'Apple Pay',
+    'google_pay': 'Google Pay',
+    'cash': 'Cash',
+    'bank_transfer': 'Bank Transfer',
+}
+
+PAYMENT_METHOD_ICONS = {
+    'visa': '💳',
+    'mastercard': '💳',
+    'mobile_pay': '📱',
+    'apple_pay': '📱',
+    'google_pay': '📱',
+    'cash': '💵',
+    'bank_transfer': '🏦',
+}
+
+def format_date(value, format='%b %d, %Y'):
+    """
+    Convert date string từ DB → readable format.
+    
+    '2025-10-02' → 'Oct 02, 2025'
+    Hoặc tùy chỉnh: format_date('2025-10-02', '%d/%m/%Y') → '02/10/2025'
+    """
+    if not value:
+        return ''
+    if isinstance(value, str):
+        try:
+            value = datetime.strptime(value, '%Y-%m-%d')
+        except ValueError:
+            return value  # Trả về string gốc nếu parse lỗi
+    return value.strftime(format)
+
+
+def format_time(value, format='%I:%M %p'):
+    """
+    Convert time string → readable format.
+    
+    '10:00' → '10:00 AM'
+    '14:30' → '2:30 PM'
+    """
+    if not value:
+        return ''
+    if isinstance(value, str):
+        try:
+            value = datetime.strptime(value, '%H:%M')
+        except ValueError:
+            try:
+                value = datetime.strptime(value, '%H:%M:%S')
+            except ValueError:
+                return value
+    return value.strftime(format).lstrip('0')
+
+
+def format_currency(value, currency='$'):
+    """
+    Format số → tiền tệ.
+    
+    25 → '$25.00'
+    25.5 → '$25.50'
+    """
+    if value is None:
+        return f'{currency}0.00'
+    try:
+        return f'{currency}{float(value):.2f}'
+    except (ValueError, TypeError):
+        return f'{currency}0.00'
+
+
+def short_name(value):
+    """
+    Convert tên đầy đủ → tên rút gọn.
+    
+    'Anna Nguyen' → 'Anna N.'
+    'Mon' → 'Mon'
+    """
+    if not value:
+        return ''
+    parts = value.strip().split()
+    if len(parts) == 1:
+        return parts[0]
+    return f'{parts[0]} {parts[-1][0]}.'
+
+def payment_label(value):
+    """'mobile_pay' → 'Mobile Pay'"""
+    if not value:
+        return ''
+    return PAYMENT_METHOD_LABELS.get(value, value.replace('_', ' ').title())
+
+
+def payment_icon(value):
+    """'mobile_pay' → '📱'"""
+    if not value:
+        return '💳'   # default
+    return PAYMENT_METHOD_ICONS.get(value, '💳')
+    
+
+def register_filters(app):
+    """Đăng ký tất cả filters với Flask app"""
+    app.template_filter('format_date')(format_date)
+    app.template_filter('format_time')(format_time)
+    app.template_filter('format_currency')(format_currency)
+    app.template_filter('short_name')(short_name)
+    app.template_filter('payment_icon')(payment_icon)
+    app.template_filter('payment_label')(payment_label)
+
+    

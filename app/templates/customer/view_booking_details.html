@@ -1,0 +1,156 @@
+{% extends "customer_base.html" %}
+
+{% block title %}Book Details{% endblock %}
+
+{% block nav_bookings %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer/booking_details.css') }}">
+{% endblock %}
+{% block customer_content %}
+
+<div class="booking-details-page">
+  <!-- Page top bar -->
+  <section class="booking-details-header">
+    <div class="booking-details-header__left">
+      <a href="{{ url_for('main.my_bookings') }}" class="back-link">
+        ← Back to Appointments
+      </a>
+      <h1 class="booking-details-title">Booking Details</h1>
+    </div>
+
+    <div class="booking-details-header__right">
+      {% if status == 'confirmed' or status == 'pending' %}
+      <a href="{{ calendar_url }}" target="_blank" class="btn btn-outline-pink">
+        <span class="btn-icon">📅</span>
+        Add to Calendar
+      </a>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="booking-details-layout">
+    <!-- LEFT COLUMN -->
+    <div class="booking-main-column">
+      <article class="booking-summary-card">
+        <div class="booking-summary-card__top">
+          <span class="status-badge status-badge--{{status}}">{{ status }}</span>
+
+          <h2 class="booking-service-title">{{ service }}</h2>
+
+          <div class="booking-meta-inline">
+            <div class="booking-meta-inline__item">
+              <span class="meta-icon">🕒</span>
+              <span>{{ duration }} mins</span>
+            </div>
+
+            <div class="booking-meta-inline__item">
+              <span class="meta-icon">💳</span>
+              <span>€{{ price }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-summary-card__middle">
+          <div class="date-tile">
+            <div class="date-tile__monthday">{{ date1 }}</div>
+            <div class="date-tile__time">{{ date2 }} • {{ time }}</div>
+          </div>
+
+          <div class="service-description-box">
+            <p class="service-description-box__label">Service Description</p>
+            <p class="service-description-box__text">{{ service_description }}</p>
+          </div>
+        </div>
+
+        <div class="booking-summary-card__bottom">
+          <div class="technician-box">
+            <div class="technician-box__avatar">
+              <img src="https://via.placeholder.com/64x64" alt="Technician avatar">
+            </div>
+
+            <div class="technician-box__info">
+              <p class="technician-box__label">Artist</p>
+              <h3 class="technician-box__name">{{ staff }}</h3>
+              <!-- staff title -->
+              <p class="technician-box__role">Senior Artist • ★ 4.9</p>
+            </div>
+          </div>
+
+          <div class="booking-actions">
+            {% if status == 'pending' or status == 'confirmed' %}
+            <a href="{{ url_for('main.customer_reschedule', booking_id=booking['id']) }}" class="btn btn-dark">Reschedule</a>
+            {% endif %}
+            <form action="#" method="post" class="inline-form">
+              <button type="submit" class="btn btn-text-danger">Cancel</button>
+            </form>
+          </div>
+        </div>
+      </article>
+
+      <section class="booking-notes-section">
+        <div class="section-title-row">
+          <span class="section-title-row__icon">🗒️</span>
+          <h2 class="section-title-row__title">Appointment Notes</h2>
+        </div>
+
+        <div class="notes-card">
+          <p>
+            Please arrive 5 minutes early to select your polish color.
+            Soak-off for previous gel application is included in your service time.
+            Refreshments are available at the lounge area.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <aside class="booking-side-column">
+      <article class="location-card">
+        <div class="location-card__map">
+          <img src="https://via.placeholder.com/420x220" alt="Salon location map">
+          <div class="location-card__overlay">
+            <h3>Brand name</h3>
+            <p>Branch</p>
+          </div>
+        </div>
+
+        <div class="location-card__body">
+          <div class="address-block">
+            <div class="address-block__icon">📍</div>
+
+            <div class="address-block__content">
+              <p class="address-block__label">Address</p>
+              <p class="address-block__text">
+                82 Rue du Faubourg Saint-Honoré,<br>
+                75008 Paris, France
+              </p>
+            </div>
+          </div>
+
+          <a href="{{ map_url }}" target="_blank" class="btn btn-outline-dark btn-full">
+            Get Directions
+          </a>
+        </div>
+      </article>
+
+      <article class="contact-card">
+        <h3 class="contact-card__title">Salon Contact</h3>
+
+        <div class="contact-list">
+          <div class="contact-item">
+            <span class="contact-item__icon">📞</span>
+            <span>+33 1 42 65 30 30</span>
+          </div>
+
+          <div class="contact-item">
+            <span class="contact-item__icon">✉️</span>
+            <span>concierge@velvetpetal.fr</span>
+          </div>
+        </div>
+      </article>
+    </aside>
+  </section>
+</div>
+{% endblock %}

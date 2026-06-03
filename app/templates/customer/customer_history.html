@@ -1,0 +1,711 @@
+{% extends "customer_base.html" %}
+
+{% block title %}History - Daha Care{% endblock %}
+
+{% block nav_history %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer/customer_history.css') }}">
+{% endblock %}
+
+{% block customer_content %}
+<!-- Page header -->
+<div class="dashboard-header">
+    <p class="dashboard-label">Your records</p>
+    <h1>History</h1>
+    <p class="dashboard-subtitle">Review your past visits and invoices.</p>
+</div>
+
+<!-- Stats Summary -->
+<div class="history-stats">
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-label">Total Visits</span>
+            <div class="stat-icon stat-icon-pink">📅</div>
+        </div>
+        <h3 class="stat-value">{{ total_visits }}</h3>
+        <p class="stat-sublabel"></p>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-label">Total Spent</span>
+            <div class="stat-icon stat-icon-pink">$</div>
+        </div>
+        <h3 class="stat-value">${{ total_spent }}</h3>
+        <p class="stat-sublabel stat-sublabel-accent"></p>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-label">Favorite Stylist</span>
+            <div class="stat-icon stat-icon-avatar"></div>
+        </div>
+        <h3 class="stat-value stat-value-md">{{ fav_stylist['name'] }}</h3>
+        <p class="stat-sublabel">{{fav_stylist['count']}} visits</p>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-label">Top Service</span>
+            <div class="stat-icon stat-icon-pink">✦</div>
+        </div>
+        <h3 class="stat-value stat-value-md">{{ top_service['name'] }}</h3>
+        <p class="stat-sublabel">{{ top_service['count'] }} times</p>
+    </div>
+</div>
+
+<!-- Tab Switcher -->
+<div class="history-tabs">
+    <button class="history-tab active" data-tab="appointments">Appointments</button>
+    <button class="history-tab" data-tab="invoices">Invoices</button>
+</div>
+
+<!-- Filters Bar -->
+<div class="history-filters">
+
+    <!-- Date range - shared -->
+    <div class="filter-dropdown" data-filter="date">
+        <button class="filter-chip">
+            <span class="filter-icon">📅</span>
+            <span class="filter-value">All times</span>
+            <span class="filter-caret">▾</span>
+        </button>
+        <div class="filter-panel" hidden>
+            <div class="filter-option" data-value="">All</div>
+            <div class="filter-option" data-value="30_days">Last 30 days</div>
+            <div class="filter-option" data-value="3_months">Last 3 months</div>
+            <div class="filter-option" data-value="year">Last year</div>
+        </div>
+    </div>
+
+    <!-- status - half_shared -->
+    <div class="filter-dropdown" data-filter="status">
+        <button class="filter-chip">
+            <span class="filter-label">Status:</span>
+            <span class="filter-value">All</span>
+            <span class="filter-caret">▾</span>
+        </button>
+        <div class="filter-panel" hidden>
+            <!-- Để js render option -->
+        </div>
+    </div>
+
+    <!-- stylist - only appointments -->
+    <div class="filter-dropdown" data-filter="stylist">
+        <button class="filter-chip filter-chip-appointments">
+            <span class="filter-label">Stylist:</span>
+            <span class="filter-value">All</span>
+            <span class="filter-caret">▾</span>
+        </button>
+        <div class="filter-panel" hidden>
+        <div class="filter-option" data-value="">All</div>
+        {% for stylist in stylists %}
+            <div class="filter-option" data-value="{{ stylist.id }}">{{ stylist.full_name }}</div>
+        {% endfor %}
+        </div>
+    </div>
+
+    <!-- service  - only appointments -->
+    <div class="filter-dropdown" data-filter="service">
+        <button class="filter-chip filter-chip-appointments">
+            <span class="filter-label">Service:</span>
+            <span class="filter-value">All</span>
+            <span class="filter-caret">▾</span>
+        </button>
+        <div class="filter-panel" hidden>
+            <div class="filter-option" data-value="">All</div>
+            {% for service in services %}
+            <div class="filter-option" data-value="{{ service.id }}">{{ service.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- payment method - only invoices  -->
+    <div class="filter-dropdown" data-filter="payment_method">
+        <button class="filter-chip filter-chip-invoices" style="display:none;">
+            <span class="filter-label">Payment:</span>
+            <span class="filter-value">All</span>
+            <span class="filter-caret">▾</span>
+        </button>
+        <div class="filter-panel" hidden>
+            <div class="filter-option" data-value="">All</div>
+            <div class="filter-option" data-value="visa">Visa</div>
+            <div class="filter-option" data-value="mastercard">Mastercard</div>
+            <div class="filter-option" data-value="mobile_pay">Mobile Pay</div>
+            <div class="filter-option" data-value="apple_pay">Apple Pay</div>
+            <div class="filter-option" data-value="google_pay">Google Pay</div>
+            <div class="filter-option" data-value="cash">Cash</div>
+            <div class="filter-option" data-value="bank_transfer">Bank Transfer</div>
+        </div>
+    </div>
+
+        <div class="filter-spacer"></div>
+
+        <!-- sort - shared -->
+    <div class="filter-dropdown filter-sort-dropdown" data-filter="sort">
+        <button class="filter-chip filter-sort">
+            <span class="filter-label">⇅</span>
+            <span class="filter-value">Newest first</span>
+            <span class="filter-caret">▾</span>
+        </button>
+
+        <div class="filter-panel" hidden>
+            <div class="filter-option" data-value="date_desc">Newest first</div>
+            <div class="filter-option" data-value="date_asc">Oldest first</div>
+            <div class="filter-option" data-value="amount_desc">Amount: High to Low</div>
+            <div class="filter-option" data-value="amount_asc">Amount: Low to High</div>
+        </div>
+    </div>
+        
+        <!-- clear - shared -->
+        <button class="filter-clear">Clear all</button>
+</div>
+
+<!-- ===== Appointments Tab Content ===== -->
+<div class="history-panel" id="panel-appointments">
+    <div class="history-table-wrapper">
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Service &amp; Date</th>
+                    <th>Stylist</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th class="th-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                    {% if appt.display_type == 'cancelled' %}
+
+                <tr class="row-cancelled"
+                    data-status="cancelled"
+                    data-stylist-id="{{ appt.staff_id }}"
+                    data-service-id="{{ appt.service_id }}"
+                    data-date="{{ appt.booking_date}}"
+                    data-amount="{{ appt.service_price }}"
+                >
+                    <td>
+                        <div class="cell-title cell-strike">{{ appt.service_name }}</div>
+                        <div class="cell-sub">{{ appt.booking_date | format_date}} • {{ appt.start_time | format_time }}</div>
+                    </td>
+                    <td class="cell-medium cell-dim">N/A</td>
+                    <td class="cell-bold cell-dim">$0.00</td>
+                    <td><span class="badge badge-cancelled">Cancelled</span></td>
+                    <td class="cell-actions">
+                        <button class="btn-rebook">Rebook</button>
+                    </td>
+                </tr>
+                    {% elif appt.display_type == 'reviewed' %}
+                <tr
+                    data-status="completed"
+                    data-stylist-id="{{ appt.staff_id }}"
+                    data-service-id="{{ appt.service_id }}"
+                    data-date="{{ appt.booking_date}}"
+                    data-amount="{{ appt.service_price }}"
+                >
+                    <td>
+                        <div class="cell-title">{{ appt.service_name }}</div>
+                        <div class="cell-sub">{{ appt.booking_date | format_date }} • {{ appt.start_time | format_time }}</div>
+                    </td>
+                    <td class="cell-medium">{{ appt.stylist_name | short_name }}</td>
+                    <td class="cell-bold">{{ appt.service_price | format_currency }}</td>
+                    <td><span class="badge badge-completed">Completed</span></td>
+                    <td class="cell-actions">
+                        <span class="reviewed-tag">✓ Reviewed</span>
+                        <button class="btn-rebook">Rebook</button>
+                    </td>
+                </tr>
+                    {% else %}
+                <tr
+                    data-status="completed"
+                    data-stylist-id="{{ appt.staff_id }}"
+                    data-service-id="{{ appt.service_id }}"
+                    data-date="{{ appt.booking_date}}"
+                    data-amount="{{ appt.service_price }}"
+                >
+                    <td>
+                        <div class="cell-title">{{ appt.service_name }}</div>
+                        <div class="cell-sub">{{ appt.booking_date | format_date }} • {{ appt.start_time | format_time }}</div>
+                    </td>
+                    <td class="cell-medium">{{ appt.stylist_name | short_name }}</td>
+                    <td class="cell-bold">{{ appt.service_price | format_currency }}</td>
+                    <td><span class="badge badge-completed">Completed</span></td>
+                    <td class="cell-actions">
+                        <button class="btn-review">Leave Review</button>
+                        <button class="btn-rebook">Rebook</button>
+                    </td>
+                </tr>
+                    {% endif %}
+                {% endfor %}
+                
+            </tbody>
+        </table>
+
+        <div class="history-pagination">
+            <span class="pagination-info">-</span>
+            <div class="pagination-controls">-</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Invoices Tab Content ===== -->
+<div class="history-panel" id="panel-invoices" style="display:none;">
+    <div class="history-table-wrapper">
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Invoice &amp; Service</th>
+                    <th>Payment</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th class="th-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices%}
+                <tr
+                    data-status="{{ invoice.invoice_status}}"
+                    data-payment-method="{{ invoice.payment_method }}"
+                    data-date="{{ invoice.booking_date }}"
+                    data-amount="{{ invoice.amount }}"
+                >
+                    <td>
+                        <div class="invoice-cell">
+                            <div class="invoice-icon">🧾</div>
+                            <div>
+                                <div class="cell-title">{{ invoice.invoice_number }}</div>
+                                <div class="cell-sub">{{ invoice.service_name }} • {{ invoice.booking_date | format_date }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="payment-cell">
+                            <span class="payment-icon">{{ invoice.payment_method | payment_icon}}</span>
+                            <span>{{ invoice.payment_method | payment_label }}</span>
+                        </div>
+                    </td>
+                    <td class="cell-bold">{{ invoice.amount | format_currency }}</td>
+                    <td><span class="badge badge-{{ invoice.invoice_status }}">{{ invoice.invoice_status}}</span></td>
+                    <td class="cell-actions">
+                        <button class="btn-download">⤓ Download PDF</button>
+                        <button class="btn-more">⋮</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="history-pagination">
+            <span class="pagination-info"></span>
+            <div class="pagination-controls"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    
+    // ============== HELPER ===============
+    function resetFilters() {
+
+        document.querySelectorAll('.filter-dropdown').forEach(wrapper =>{
+
+            const chip = wrapper.querySelector('.filter-chip');
+            const panel = wrapper.querySelector('.filter-panel');
+            
+            const firstOption = panel.querySelector('.filter-option')
+
+            chip.querySelector('.filter-value').textContent = firstOption.textContent;
+
+            panel.querySelectorAll('.filter-option').forEach(option =>{
+                option.classList.remove('active')
+            });
+
+            firstOption.classList.add('active');
+            panel.hidden = true;
+            chip.classList.remove('is-open');
+            })
+
+        //Reset filter state
+        filterState.date = '';
+        filterState.status = '';
+        filterState.stylist = '';
+        filterState.service = '';
+        filterState.payment_method = '';
+        filterState.sort = 'date_desc';
+
+        //Reset pagination to page 1 for current tab
+        const activeTab = document.querySelector('.history-tab.active').dataset.tab;
+        paginationState[activeTab].currentPage = 1;
+        
+        applyFilter()
+    }
+
+    function matchDateFilter(row, dateFilterValue) {
+        const rowDate = new Date(row.dataset.date);
+        const now  = new Date();
+
+        let cutoff;
+        if (dateFilterValue === '30_days') {
+            cutoff = new Date(now.getTime() - 30*24*60*60*1000);
+        } else if (dateFilterValue === '3_months') {
+            cutoff = new Date(now);
+            cutoff.setMonth(cutoff.getMonth() - 3);
+        } else if (dateFilterValue === 'year' ) {
+            cutoff = new Date(now)
+            cutoff.setFullYear(cutoff.getFullYear() - 1);
+        } else {
+            return true;
+        }
+
+        return rowDate >= cutoff;
+    }
+
+    function sortRow(tabPanel) {
+        const tbody = tabPanel.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a,b) => {
+            if (filterState.sort === 'date_desc') {
+                return new Date(b.dataset.date) - new Date(a.dataset.date);
+            }
+            if (filterState.sort === 'date_asc') {
+                return new Date(a.dataset.date) - new Date(b.dataset.date);
+            }
+            if (filterState.sort === 'amount_desc') {
+                return parseFloat(b.dataset.amount) - parseFloat(a.dataset.amount);
+            }
+            if (filterState.sort === 'amount_asc') {
+                return parseFloat(a.dataset.amount) - parseFloat(b.dataset.amount);
+            }
+            return 0;
+        });
+
+        rows.forEach(row => {
+            tbody.appendChild(row); 
+        });
+    }
+    function updateStatusOptions(activeTab) {
+        const panel = document.querySelector("[data-filter='status'] .filter-panel");
+        panel.innerHTML = statusOptionByTab[activeTab].map(opt => `<div class="filter-option" data-value="${opt.value}">${opt.label}</div>`).join('');
+    }
+
+    function applyPagination(activeTab, visibleRows) {
+        const totalPages = Math.ceil(visibleRows.length / ROW_PER_PAGE);
+
+        if (paginationState[activeTab].currentPage > totalPages && totalPages > 0) {
+            paginationState[activeTab].currentPage = 1;
+        }
+
+        const currentPage = paginationState[activeTab].currentPage;
+
+        const startIdx = (currentPage - 1) * ROW_PER_PAGE;
+        const endIdx = currentPage * ROW_PER_PAGE;
+
+        visibleRows.forEach((row, idx) => {
+            if (idx >= startIdx && idx <  endIdx) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none'; 
+            }
+        });
+        
+        updatePaginationUI(activeTab, visibleRows.length, currentPage, totalPages)
+    
+    }
+
+
+    function updatePaginationUI(activeTab, totalRows, currentPage, totalPages) {
+        const tabPanel = document.getElementById(`panel-${activeTab}`);
+        const info = tabPanel.querySelector('.pagination-info');
+        const controls = tabPanel.querySelector('.pagination-controls');
+
+        const startIdx = (currentPage -1) * ROW_PER_PAGE +1;
+        const endIdx = Math.min(currentPage* ROW_PER_PAGE, totalRows);
+
+        info.textContent = totalRows === 0
+            ? 'No result'
+            : `Showing ${startIdx}-${endIdx} of ${totalRows}`;
+        
+        controls.innerHTML = buildPageButtons(currentPage, totalPages)
+    }
+
+function buildPageButtons(current, total) {
+    if (total === 0) return '';
+    
+    let html = '';
+    
+    // Prev button
+    html += `<button class="page-btn" data-page="${current - 1}" ${current === 1 ? 'disabled' : ''}>‹</button>`;
+    
+    // Page numbers - logic: hiển thị 1, current-1, current, current+1, total + ellipsis
+    const pages = getPageNumbers(current, total);
+    
+    pages.forEach(p => {
+        if (p === '...') {
+            html += `<span class="page-ellipsis">…</span>`;
+        } else {
+            const active = p === current ? 'active' : '';
+            html += `<button class="page-btn ${active}" data-page="${p}">${p}</button>`;
+        }
+    });
+    
+    // Next button
+    html += `<button class="page-btn" data-page="${current + 1}" ${current === total ? 'disabled' : ''}>›</button>`;
+    
+    return html;
+}
+
+
+function getPageNumbers(current, total) {
+    // Nếu ≤ 7 pages, show hết
+    if (total <= 7) {
+        return Array.from({length: total}, (_, i) => i + 1);
+    }
+    
+    const pages = [];
+    
+    // Luôn show page 1
+    pages.push(1);
+    
+    // Ellipsis trái nếu current xa page 1
+    if (current > 4) {
+        pages.push('...');
+    }
+    
+    // Pages quanh current
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+    for (let i = start; i <= end; i++) {
+        pages.push(i);
+    }
+    
+    // Ellipsis phải nếu current xa page cuối
+    if (current < total - 3) {
+        pages.push('...');
+    }
+    
+    // Luôn show page cuối
+    pages.push(total);
+    
+    return pages;
+}
+    //Filter logic
+    function applyFilter(){
+        const activeTab = document.querySelector('.history-tab.active').dataset.tab;
+        const tabPanel = document.getElementById(`panel-${activeTab}`);
+        const rows = tabPanel.querySelectorAll('tbody tr');
+
+
+        const matchedRowsSet = new Set();
+
+
+        rows.forEach(row => {
+            let show = true;
+
+
+            //check date filter
+            if (filterState.date && !matchDateFilter(row, filterState.date)) {
+                show = false;
+            }
+
+            //check status
+            if (filterState.status && row.dataset.status !== filterState.status) {
+                show = false;
+            }
+
+            //check stylist
+            if (filterState.stylist && row.dataset.stylistId !== filterState.stylist) {
+                show = false;
+            }
+
+            //check service
+            if (filterState.service && row.dataset.serviceId !== filterState.service) {
+                show = false;
+            }
+
+            if (filterState.payment_method && row.dataset.paymentMethod !== filterState.payment_method) {
+                show = false;
+            }
+
+            if (show) {
+                matchedRowsSet.add(row);
+            }
+
+            row.style.display = show ? '' : 'none';
+        })
+            sortRow(tabPanel);
+
+            const visibleRows = Array.from(tabPanel.querySelectorAll('tbody tr')).filter(row => matchedRowsSet.has(row));
+
+            applyPagination(activeTab, visibleRows);
+    }   
+    
+    //================== VARIABLE ======================    
+    const filterState = {
+        date: '',
+        status: '',
+        stylist: '',
+        service: '',
+        payment_method: '',
+        sort: 'date_desc',
+}
+
+    const tabs = document.querySelectorAll(".history-tab");
+    const panels = {
+        appointments: document.getElementById("panel-appointments"),
+        invoices: document.getElementById("panel-invoices")
+    };
+
+    const filterAppointments = document.querySelectorAll(".filter-chip-appointments");
+    const filterInvoices = document.querySelectorAll(".filter-chip-invoices");
+
+    const statusOptionByTab = {
+        appointments: [
+            {value: '', label: 'All'},
+            {value: 'completed', label: 'Completed'},
+            {value: 'cancelled', label: 'Cancelled'},
+        ],
+        invoices: [
+            {value: '', label: 'All'},
+            {value: 'paid', label: 'Paid'},
+            {value: 'refunded', label: 'Refunded'},
+            {value: 'pending', label: 'Pending'},
+        ]
+    };
+
+    // Pagination page render
+    const paginationState = {
+        appointments: {currentPage: 1},
+        invoices: {currentPage: 1}
+    }
+    
+    const ROW_PER_PAGE = 8;
+    
+    const clearBtn = document.querySelector('.filter-clear');
+
+    const filterChips = document.querySelectorAll('.filter-chip');
+
+    //================== INIT ======================    
+    
+    updateStatusOptions("appointments");
+    resetFilters();
+
+    //================== Pagination Bar ======================    
+    document.addEventListener('click', (e)=>{
+        const pageBtn = e.target.closest('.page-btn');
+        
+        if (!pageBtn || pageBtn.disabled) return;
+
+        e.stopPropagation();
+
+        const targetPage = parseInt(pageBtn.dataset.page);
+        if (isNaN(targetPage)) return;
+
+        const activeTab = document.querySelector('.history-tab.active').dataset.tab;
+        paginationState[activeTab].currentPage = targetPage;
+
+        applyFilter()
+    })
+    //================== Tab switcher ======================    
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            const target = tab.dataset.tab;
+
+            updateStatusOptions(target)
+            tabs.forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+
+            Object.keys(panels).forEach(key => {
+                panels[key].style.display = (key === target) ? "block" : "none";
+            });
+
+            // Swap context-specific filter chips
+            if (target === "appointments") {
+                filterAppointments.forEach(f => f.style.display = "");
+                filterInvoices.forEach(f => f.style.display = "none");
+            } else {
+                filterAppointments.forEach(f => f.style.display = "none");
+                filterInvoices.forEach(f => f.style.display = "");
+            }
+
+            resetFilters()
+        });
+    });
+
+    // =========== Filter dropdown toggle ===============
+    filterChips.forEach(chip => {
+        chip.addEventListener("click", (e) => {
+            e.stopPropagation();
+            
+            const wrapper = chip.closest('.filter-dropdown');
+            const panel = wrapper.querySelector('.filter-panel');
+
+            const willOpen = panel.hidden;
+
+            // reset others
+            document.querySelectorAll('.filter-panel').forEach(p => p.hidden = true);
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('is-open'));
+
+            if (willOpen) {
+                panel.hidden = false;
+                chip.classList.add('is-open');
+            }
+        })
+    });
+
+    document.addEventListener("click", (e) =>{
+        
+        if(e.target.closest('.filter-dropdown')) {
+                return;
+        }
+
+        document.querySelectorAll('.filter-panel').forEach(p => p.hidden = true);
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('is-open'));
+    
+    })
+
+    // ========== Choose filter option ==============
+    document.addEventListener('click', (e)=>{
+        const option = e.target.closest('.filter-option');
+        if (!option) {return};
+
+        e.stopPropagation();
+
+        const wrapper = option.closest('.filter-dropdown');
+        const chip = wrapper.querySelector('.filter-chip');
+        const valueSpan = chip.querySelector('.filter-value');
+        const panel = wrapper.querySelector('.filter-panel');
+
+        panel.querySelectorAll('.filter-option').forEach(opt =>{
+            opt.classList.remove('active');
+            
+        });
+
+        option.classList.add('active');
+        valueSpan.textContent = option.textContent;
+        panel.hidden = true;
+        chip.classList.remove('is-open');
+
+        const filterKey = wrapper.dataset.filter;
+        const filterValue = option.dataset.value;
+        filterState[filterKey] = filterValue;
+
+        applyFilter()
+    })
+    // ========== filter clear ==============
+    clearBtn.addEventListener('click', resetFilters)
+
+
+
+
+
+    
+
+});
+</script>
+{% endblock %}

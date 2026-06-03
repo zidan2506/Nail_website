@@ -1,0 +1,85 @@
+{% extends "customer_base.html" %}
+
+{% block title %}Customer Dashboard{% endblock %}
+
+{% block nav_dashboard %}active{% endblock %}
+
+{% block customer_content %}
+<header class="dashboard-header">
+    <p class="dashboard-label">PERSONAL DASHBOARD</p>
+
+    <!-- sau nay xu ly lay bien customer_name gan vao day -->
+    <h1>Welcome back, {{ customer.full_name}}</h1>
+
+    <p class="dashboard-subtitle">
+        Manage your appointment and book your next visit!
+    </p>
+</header>
+
+<section class="dashboard-grid">
+
+    <!-- upcoming appointment -->
+    <div class="card upcoming-card">
+        <span class="status-badge">Confirmed Appointment</span>
+
+        <h2>Basic nail care and polish</h2>
+
+        <div class="appointment-info">
+            <p><strong>Date:</strong> Tuesday, Oct 24</p>
+            <p><strong>Time:</strong> 2:30 PM</p>
+            <p><strong>Stylist:</strong> Alice Ha</p>
+        </div>
+    </div>
+
+    <!-- Quick action card -->
+    <div class="card action-card">
+        <h2>Ready for your next glow up?</h2>
+        <p>
+            Book your next visit now and enjoy a smooth booking experience.
+        </p>
+        <a href="{{ url_for('main.customer_booking')}}" class="primary-btn">Book your next treatment</a>
+    </div>
+
+    <!-- recent activity -->
+    <div class="card recent-card">
+        <div class="card-top">
+            <h2>Recent activity</h2>
+            <a href="{{ url_for('main.my_bookings')}}">View all</a>
+        </div>
+
+        <div class="recent-booking-list">
+            <div class="recent-booking-item">
+                <div>
+                    <h3>Service 1</h3>
+                    <p>Date - Artist</p>
+                </div>
+                <span>Price</span>
+            </div>
+
+            <div class="recent-booking-item">
+                <div>
+                    <h3>Service 2</h3>
+                    <p>Date - Artist</p>
+                </div>
+                <span>Price</span>
+            </div>
+
+            <div class="recent-booking-item">
+                <div>
+                    <h3>Service 3</h3>
+                    <p>Date - Artist</p>
+                </div>
+                <span>Price</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile summary -->
+    <div class="card profile-card">
+        <h2>My profile</h2>
+        <p><strong>Full name:</strong> Mon</p>
+        <p><strong>Email:</strong> mon@customer.com</p>
+        <p><strong>Phone:</strong> +358 40 123 4567</p>
+    </div>
+</section>
+{% endblock %}

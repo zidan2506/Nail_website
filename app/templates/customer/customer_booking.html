@@ -1,0 +1,324 @@
+{% extends "customer_base.html" %}
+
+{% block title %}Book appointment{% endblock %}
+
+{% block nav_book_appointment %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer/customer_booking.css') }}">
+{% endblock %}
+
+{% block customer_content %}
+<!-- 
+BACKEND NOTE:
+Form này submit booking cuối cùng.
+Đổi route create_booking theo route thật của m.
+Ví dụ:
+@booking_bp.route("/booking", methods=["GET", "POST"])
+def booking():
+    ...
+-->
+<form 
+    method="POST"
+    action="{{ url_for('main.create_customer_booking') }}"
+>
+    <!-- Nếu m dùng Flask-WTF / CSRFProtect thì giữ dòng này -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="booking-layout">
+
+        <!-- ================= LEFT CONTENT ================= -->
+        <main class="booking-main">
+
+            <!-- Breadcrumb -->
+            <div class="booking-breadcrumb">
+                <span class="active">Service</span>
+                <span>›</span>
+                <span>Staff</span>
+                <span>›</span>
+                <span>Time</span>
+                <span>›</span>
+                <span>Review</span>
+            </div>
+
+            <!-- Header row -->
+            <div class="step-header">
+                <h1>1. Select Service</h1>
+            </div>
+
+            <!-- Service tabs -->
+            <!-- 
+            BACKEND NOTE:
+            Cách đơn giản: tab là link GET filter category.
+            /booking?category=manicure
+            class của các tab = tab active và không active
+            -->
+            <div class="service-tabs">
+                {% for category in categories %}
+                    <button
+                        type="button"
+                        class="service-tab {% if loop.first %}service-tab--active{% endif %}"
+                        data-service-tab-target="{{ category['slug'] }}"
+                    >
+                        {{ category['name'] }}
+                    </button>
+                {% endfor %}
+            </div>
+
+            <!-- Service panel -->
+            {% for category in categories %}
+                <section
+                    id="{{ category['slug'] }}"
+                    class="service-list service-tab-panel {% if loop.first %}service-tab-panel--active{% endif %}"
+                >
+                    {% for service in services_by_category[category['slug']] %}
+                        <label class="service-option">
+                            <input 
+                                type="radio" 
+                                name="service_id" 
+                                value="{{ service['id'] }}"
+                                class="option-input service-radio"
+                                data-name="{{ service['name'] }}"
+                                data-duration="{{ service['duration_minutes'] }}"
+                                data-price="{{ service['price'] }}"
+                                required
+                            >
+
+                            <div class="service-card">
+                                <div>
+                                    <h3>{{ service['name'] }}</h3>
+                                    <p>
+                                        Price: ${{ service['price'] }}
+                                    </p>
+                                    
+                                    <p>
+                                        Durations: {{ service['duration_minutes'] }} mins
+                                    </p>
+                                </div>
+
+                                <div class="radio-check">✓</div>
+                            </div>
+                        </label>
+                    {% endfor %}
+                </section>
+            {% endfor %}
+            <!-- Staff section -->
+            <section class="booking-section">
+                <h2>2. Select Professional</h2>
+
+                <div class="staff-grid">
+
+                    <!-- 
+                    BACKEND NOTE:
+                    value="" nghĩa là no preference.
+                    Backend nhận staff_id = 0 thì tự assign staff available.
+                    -->
+                    <label class="staff-option">
+                        <input 
+                            type="radio" 
+                            name="staff_id" 
+                            value="0" 
+                            checked
+                            class="option-input"
+                            data-name="No Preference"
+                        >
+                        <div class="staff-card">
+                            <div class="staff-avatar no-preference">
+                                👥
+                            </div>
+                            <strong>No Preference</strong>
+                        </div>
+                    </label>
+
+                    <!-- 
+                    BACKEND NOTE:
+                    Sau này loop staff:
+                    {% for staff in staff_members %}
+                        value="{{ staff.id }}"
+                        {{ staff.name }}
+                    {% endfor %}
+                    -->
+                    {% for staff in staffs%}
+                    <label class="staff-option">
+                        <input 
+                            type="radio" 
+                            name="staff_id" 
+                            value="{{ staff['id'] }}"
+                            class="option-input"
+                            data-name="{{ staff['full_name'] }}"
+                        >
+                        <div class="staff-card">
+                            <div class="staff-avatar">
+                                <img src="#" alt="{{ staff['full_name'] }}">
+                            </div>
+                            <strong>{{ staff['full_name'] }}</strong>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Date & Time section -->
+            <section class="booking-section">
+                <h2>3. Choose Date & Time</h2>
+
+                <div class="calendar-card">
+
+                    <div class="calendar-header">
+                        <h3>October 2023</h3>
+
+                        <div class="calendar-actions">
+                            <!-- 
+                            BACKEND NOTE:
+                            Nếu chưa làm JS calendar thì để button disabled hoặc link GET.
+                            Sau này có thể đổi thành:
+                            /booking?week=previous
+                            /booking?week=next
+                            -->
+                            <button type="button" id="prevMonth" aria-label="Previous month">‹</button>
+                            <p id="calendarMonthLabel"></p>
+                            <button type="button" id="nextMonth" aria-label="Next month">›</button>
+                        </div>
+                    </div>
+
+                <div class="calendar-days">
+                    
+                    <div class="weekday-grid">
+                        <span>Mo</span>
+                        <span>Tu</span>
+                        <span>We</span>
+                        <span>Th</span>
+                        <span>Fr</span>
+                        <span>Sa</span>
+                        <span>Su</span>
+                    </div>
+                    
+                    
+                    <div id="calendar" class="date-grid">
+
+                        <!-- 
+                        BACKEND NOTE:
+                        name="booking_date" là ngày backend nhận.
+                        value nên dùng format YYYY-MM-DD.
+                        -->
+                        <label class="date-option">
+                            <input 
+                                type="radio" 
+                                name="booking_date" 
+                                value="2023-10-12"
+                                class="option-input"
+                            >
+                            <div class="date-pill">
+                                <strong>12</strong>
+                            </div>
+                        </label>
+
+                    </div>
+
+                </div>
+                    
+
+                    <div class="available-times">
+                        <h4>Available Times</h4>
+
+                        <div id="timeSlotGrid" class="time-grid">
+
+                            <!-- 
+                            BACKEND NOTE:
+                            name="start_time" là giờ backend nhận.
+                            value nên dùng format HH:MM.
+                            Backend sẽ combine:
+                            booking_date + start_time
+                            -->
+                            <!-- <label class="time-option">
+                                <input 
+                                    type="radio" 
+                                    name="start_time" 
+                                    value="09:00"
+                                    class="option-input"
+                                >
+                                <span>09:0 AM</span>
+                            </label> -->
+                            
+
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ================= RIGHT SUMMARY ================= -->
+        <aside class="booking-sidebar">
+
+            <div class="summary-card">
+
+                <div class="summary-title">
+                    <span class="summary-icon">🛍️</span>
+                    <h2>Booking Summary</h2>
+                </div>
+
+                <!-- 
+                BACKEND NOTE:
+                Phần này trước mắt có thể render theo default selected service.
+                Sau này nếu muốn update live khi user chọn service/staff/time thì thêm JS.
+                -->
+                <div class="summary-service">
+                    <div>
+                        <h3 id="summary-service-name">-</h3>
+                        <p id="summary-service-duration">- minutes</p>
+                    </div>
+                    <strong id="summary-service-price">$0.00</strong>
+                </div>
+
+                <div class="summary-meta">
+                    <p id="summary-staff">👤 No Preference</p>
+                    <p id="summary-date">📅 -</p>
+                    <p id="summary-time">🕐 -</p>
+                </div>
+
+                <hr>
+
+                <div class="summary-line">
+                    <span>VAT - 25.5%</span>
+                    <span id="summary-vat">$0.00</span>
+                </div>
+
+                <div class="summary-total">
+                    <span>Total</span>
+                    <strong id="summary-total">$0.00</strong>
+                </div>
+
+                <button type="submit" class="confirm-btn">
+                    Confirm Booking
+                </button>
+
+                <p class="policy-note">
+                    By clicking "Confirm Booking" you agree to our 24h cancellation policy.
+                </p>
+
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">🏷️</div>
+                <div>
+                    <h3>Member Benefit</h3>
+                    <p>You'll gain 45 loyalty points with this booking.</p>
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+</form>
+
+<script>
+    const CALENDAR_CONFIG = {
+        today: "{{ today.isoformat() }}",
+        maxDate: "{{ max_date.isoformat() }}",
+        availableSlotUrl: "{{ url_for('main.check_available_slot')}}"
+    }
+</script>
+<script src="{{ url_for('static', filename='js/customer/customer_booking.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Services - Nail Salon{% endblock %}
+
+{% block content %}
+<h1>Our Services</h1>
+
+<div class="card-grid">
+    {% for service in services %}
+    <div class="card">
+        <h2>{{ service.name }}</h2>
+        <p>{{ service.description }}</p>
+        <p><strong>Duration:</strong> {{ service.duration_minutes }} minutes</p>
+        <p><strong>Price:</strong> €{{ service.price }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,665 @@
+/* =========================================================
+   BOOKING DETAILS PAGE
+   ---------------------------------------------------------
+   Structure:
+   1. Page wrapper
+   2. Header
+   3. Main 2-column layout
+   4. Left summary card
+   5. Notes section
+   6. Right sidebar cards
+   7. Buttons
+   8. Responsive
+   ========================================================= */
+
+
+/* =========================================================
+   1) PAGE WRAPPER
+   ========================================================= */
+.booking-details-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 32px 48px;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  color: #22151b;
+  box-sizing: border-box;
+}
+
+.booking-details-page *,
+.booking-details-page *::before,
+.booking-details-page *::after {
+  box-sizing: border-box;
+}
+
+.booking-details-page img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.booking-details-page a {
+  text-decoration: none;
+}
+
+.booking-details-page form {
+  margin: 0;
+}
+
+.inline-form {
+  display: inline-block;
+}
+
+
+/* =========================================================
+   2) HEADER
+   ---------------------------------------------------------
+   Top row:
+   - back link + title
+   - add to calendar button
+   ========================================================= */
+.booking-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 34px;
+}
+
+.booking-details-header__left {
+  min-width: 0;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #f43f84;
+}
+
+.back-link:hover {
+  opacity: 0.8;
+}
+
+.booking-details-title {
+  margin: 0;
+  font-size: 4rem;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  font-weight: 800;
+  color: #221015;
+}
+
+.booking-details-header__right {
+  flex-shrink: 0;
+  padding-top: 6px;
+}
+
+
+/* =========================================================
+   3) MAIN 2-COLUMN LAYOUT
+   ---------------------------------------------------------
+   Left = main booking content
+   Right = location/contact sidebar
+   ========================================================= */
+.booking-details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(280px, 0.9fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.booking-main-column,
+.booking-side-column {
+  min-width: 0;
+}
+
+
+/* =========================================================
+   4) LEFT MAIN SUMMARY CARD
+   ---------------------------------------------------------
+   Big card with:
+   - status
+   - service title
+   - duration / price
+   - date tile
+   - technician + action buttons
+   ========================================================= */
+.booking-summary-card {
+  background: #ffffff;
+  border: 1px solid #efe6ea;
+  border-radius: 34px;
+  padding: 42px 42px 30px;
+  box-shadow: 0 8px 28px rgba(34, 21, 27, 0.03);
+}
+
+.booking-summary-card__top {
+  margin-bottom: 28px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.status-badge--confirmed {
+  background: #dff3e6;
+  color: #2f8a57;
+}
+
+.status-badge--pending {
+  background: #f4dc8a;
+  color: #6f4900;
+}
+
+.status-badge--cancelled {
+  background: #f2c7cf;
+  color: #7f2f3f;
+}
+
+.booking-service-title {
+  margin: 18px 0 18px;
+  font-size: 2.65rem;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #221015;
+}
+
+.booking-meta-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.booking-meta-inline__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #47373d;
+}
+
+.meta-icon {
+  font-size: 1.05rem;
+}
+
+.booking-summary-card__middle {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  padding: 10px 0 34px;
+
+}
+
+.date-tile {
+  width: 200px;
+  min-height: 140px;
+  padding: 26px 25px;
+  border-radius: 24px;
+  background: #fdf0f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.date-tile__monthday {
+  margin-bottom: 10px;
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #ef3d82;
+}
+
+.date-tile__time {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #47373d;
+}
+
+.service-description-box {
+  min-height: 140px;
+  padding: 26px 25px;
+  border-radius: 24px;
+  background: #fdf0f5;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.service-description-box__label {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #ef3d82;
+}
+
+.service-description-box__text {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #47373d;
+  line-height: 0;
+}
+
+.booking-summary-card__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 22px;
+  padding-top: 28px;
+  border-top: 1px solid #f0e6ea;
+}
+
+
+/* =========================================================
+   5) TECHNICIAN + ACTIONS
+   ========================================================= */
+.technician-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.technician-box__avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f1e8ec;
+  flex-shrink: 0;
+}
+
+.technician-box__info {
+  min-width: 0;
+}
+
+.technician-box__label {
+  margin: 0 0 6px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #f43f84;
+}
+
+.technician-box__name {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #221015;
+}
+
+.technician-box__role {
+  margin: 0;
+  font-size: 0.98rem;
+  color: #6c5a61;
+}
+
+.booking-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 54px;
+  padding: 0 24px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-dark {
+  background: #1d0f15;
+  color: #ffffff;
+  min-width: 154px;
+}
+
+.btn-dark,
+.btn-dark:link,
+.btn-dark:visited,
+.btn-dark:hover,
+.btn-dark:active {
+  color: #ffffff;
+}
+
+.btn-dark:hover {
+  background: #13090d;
+}
+
+.btn-outline-pink {
+  border: 1px solid #f1c8d9;
+  background: #ffffff;
+  color: #f43f84;
+}
+
+.btn-outline-pink:hover {
+  background: #fff8fb;
+}
+
+.btn-outline-dark {
+  border: 1px solid #f0dbe3;
+  background: #ffffff;
+  color: #221015;
+}
+
+.btn-outline-dark:hover {
+  background: #fffafc;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-text-danger {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #b12f46;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-text-danger:hover {
+  color: #8e2338;
+}
+
+.btn-icon {
+  font-size: 1rem;
+}
+
+
+/* =========================================================
+   6) NOTES SECTION
+   ---------------------------------------------------------
+   Lower section under main card
+   ========================================================= */
+.booking-notes-section {
+  margin-top: 36px;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.section-title-row__icon {
+  font-size: 1.15rem;
+  color: #f43f84;
+}
+
+.section-title-row__title {
+  margin: 0;
+  font-size: 1.9rem;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #221015;
+}
+
+.notes-card {
+  padding: 28px 28px;
+  border-radius: 24px;
+  background: #fffafc;
+  border: 1px solid #f2e5ea;
+}
+
+.notes-card p {
+  margin: 0;
+  font-size: 1.06rem;
+  line-height: 1.8;
+  color: #5f4f56;
+}
+
+
+/* =========================================================
+   7) RIGHT COLUMN SIDEBAR
+   ---------------------------------------------------------
+   Contains:
+   - location card
+   - contact card
+   ========================================================= */
+.booking-side-column {
+  display: grid;
+  gap: 28px;
+}
+
+.location-card {
+  overflow: hidden;
+  border-radius: 32px;
+  background: #ffffff;
+  border: 1px solid #efe6ea;
+  box-shadow: 0 8px 24px rgba(34, 21, 27, 0.03);
+}
+
+.location-card__map {
+  position: relative;
+  height: 220px;
+  background: #ece5e8;
+  overflow: hidden;
+}
+
+.location-card__overlay {
+  position: absolute;
+  left: 24px;
+  bottom: 18px;
+  color: #ffffff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
+}
+
+.location-card__overlay h3 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.location-card__overlay p {
+  margin: 0;
+  font-size: 0.96rem;
+}
+
+.location-card__body {
+  padding: 26px 24px 24px;
+}
+
+.address-block {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 26px;
+}
+
+.address-block__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background: #fdeef4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.08rem;
+  color: #f43f84;
+  flex-shrink: 0;
+}
+
+.address-block__label {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #f43f84;
+}
+
+.address-block__text {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: #4b3b42;
+}
+
+.contact-card {
+  padding: 30px 30px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #101015 0%, #2b151d 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 28px rgba(34, 21, 27, 0.08);
+}
+
+.contact-card__title {
+  margin: 0 0 24px;
+  font-size: 1.85rem;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.contact-list {
+  display: grid;
+  gap: 18px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 1.04rem;
+  color: #fff5f8;
+}
+
+.contact-item__icon {
+  font-size: 1.1rem;
+}
+
+
+/* =========================================================
+   8) FOCUS STATES
+   ========================================================= */
+.btn:focus-visible,
+.back-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(244, 63, 132, 0.14);
+}
+
+
+/* =========================================================
+   9) RESPONSIVE
+   ---------------------------------------------------------
+   Tablet and mobile stacking
+   ========================================================= */
+@media (max-width: 1100px) {
+  .booking-details-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-side-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 820px) {
+  .booking-details-page {
+    padding: 28px 20px 40px;
+  }
+
+  .booking-details-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .booking-details-title {
+    font-size: 3rem;
+  }
+
+  .booking-summary-card {
+    padding: 28px 24px 24px;
+  }
+
+  .booking-service-title {
+    font-size: 2rem;
+  }
+
+  .booking-summary-card__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .booking-side-column {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .booking-details-page {
+    padding: 22px 14px 30px;
+  }
+
+  .booking-details-title {
+    font-size: 2.35rem;
+  }
+
+  .booking-service-title {
+    font-size: 1.65rem;
+  }
+
+  .section-title-row__title {
+    font-size: 1.5rem;
+  }
+
+  .booking-actions,
+  .booking-meta-inline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn,
+  .btn-dark,
+  .btn-outline-pink,
+  .btn-outline-dark {
+    width: 100%;
+  }
+
+  .date-tile {
+    width: 100%;
+    max-width: 180px;
+  }
+}
+

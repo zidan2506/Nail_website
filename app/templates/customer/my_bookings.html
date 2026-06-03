@@ -1,0 +1,395 @@
+{% extends "customer_base.html" %}
+
+{% block title %}My bookings{% endblock %}
+
+{% block nav_bookings %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer/my_bookings.css') }}">
+{% endblock%}
+
+{% block customer_content %}
+
+<main class="customer-appointments-page">
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="page-header__left">
+      <h1 class="page-title">Appointments</h1>
+      <p class="page-subtitle">Manage your upcoming visits and booking history.</p>
+    </div>
+
+    <div class="page-header__right">
+      <form class="appointment-search-form" action="#" method="get">
+        <input
+          type="text"
+          name="q"
+          class="appointment-search-input"
+          placeholder="Search appointments..."
+        />
+        <button type="submit" class="appointment-search-btn">Search</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Top Overview -->
+  <section class="appointments-overview">
+    <!-- Next Visit Card -->
+<div class="next-visit-card">
+  {% if next_visit %}
+    <div class="next-visit-card__content">
+      <p class="section-label">Next Visit</p>
+
+      <div class="appointment-status-badge appointment-status-badge--{{ nevi_status }}">
+        {{ nevi_status }}
+      </div>
+
+      <h2 class="next-visit-card__title">{{ nevi_service }}</h2>
+
+      <p class="next-visit-card__meta">
+        {{ nevi_date }} • {{ nevi_start }} with {{ nevi_staff }}.
+      </p>
+
+      <div class="next-visit-card__actions">
+        <a href="{{ calendar_url }}" class="btn btn-primary" target="{{ url_target }}">Add to Calendar</a>
+        <a href="{{ url_for('main.view_booking_details', booking_id=next_visit['id']) }}" class="btn btn-secondary">View Details</a>
+      </div>
+    </div>
+
+    <div class="next-visit-card__icon">
+      <span>📅</span>
+    </div>
+
+  {% else %}
+    <div class="next-visit-card__content">
+      <p class="section-label">Next Visit</p>
+
+      <h2 class="next-visit-card__title">No upcoming visits scheduled</h2>
+
+      <p class="next-visit-card__meta">
+        Ready for a new look? Book your next treatment today.
+      </p>
+
+      <div class="next-visit-card__actions">
+        <a href="#" class="btn btn-primary">Book new appointment</a>
+      </div>
+    </div>
+
+    <div class="next-visit-card__icon">
+      <span>📅</span>
+    </div>
+  {% endif %}
+</div>
+    <!-- Loyalty Reward Card -->
+    <aside class="loyalty-reward-card">
+      <p class="section-label section-label--light">Loyalty Reward</p>
+
+      <h3 class="loyalty-reward-card__title">
+        You're 2 visits away from a complimentary paraffin wax treatment.
+      </h3>
+
+      <div class="reward-progress">
+        <div class="reward-progress__bar">
+          <div class="reward-progress__fill" style="width: 80%;"></div>
+        </div>
+
+        <div class="reward-progress__meta">
+          <span>8 / 10 Visits</span>
+          <span>Level: Rose Gold</span>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- Appointment Manager -->
+  <section class="appointment-manager">
+    <div class="section-heading">
+      <div>
+        <h2 class="section-title">Manage Appointments</h2>
+        <p class="section-description">View your confirmed, pending, and cancelled bookings.</p>
+      </div>
+
+      <a href=" {{url_for('main.customer_booking')}}" class="btn btn-primary">Book New Appointment</a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="appointment-tabs">
+      <button
+        type="button"
+        class="appointment-tab appointment-tab--active"
+        data-tab-target="upcoming"
+      >
+        Upcoming <span class="tab-count">({{ upcoming_bookings|length }})</span>
+      </button>
+
+      <button
+        type="button"
+        class="appointment-tab"
+        data-tab-target="pending"
+      >
+        Pending <span class="tab-count">({{ pending_bookings|length }})</span>
+      </button>
+
+      <button
+        type="button"
+        class="appointment-tab"
+        data-tab-target="cancelled"
+      >
+        Cancelled <span class="tab-count">({{ cancelled_bookings|length }})</span>
+      </button>
+    </div>
+
+    <!-- Tab Panels -->
+    <div class="appointment-tab-panels">
+
+      <!-- Upcoming Panel -->
+      <div
+        class="appointment-tab-panel appointment-tab-panel--active"
+        id="upcoming"
+      >
+        <div class="appointment-card-list">
+        {% for booking in upcoming_bookings %}
+          <!-- Appointment Card -->
+          <article class="appointment-card">
+            <div class="appointment-card__image">
+              <img src="/static/images/service-1.jpg" alt="{{ booking['booking']['service_name'] }}" />
+            </div>
+
+            <div class="appointment-card__body">
+              <div class="appointment-card__top">
+                <span class="appointment-status-badge appointment-status-badge--confirmed">
+                  Confirmed
+                </span>
+
+                <div class="appointment-card__menu">
+                  <button type="button" class="icon-btn">⋮</button>
+                </div>
+              </div>
+
+              <h3 class="appointment-card__title">{{ booking['booking']['service_name'] }}</h3>
+
+              <div class="appointment-card__details">
+                <p class="appointment-card__detail">
+                  <span class="detail-label">Date:</span>
+                  <span class="detail-value">{{ booking["booking_date"] }} • {{ booking["booking_time"] }}</span>
+                </p>
+
+                <p class="appointment-card__detail">
+                  <span class="detail-label">Stylist:</span>
+                  <span class="detail-value">{{ booking['booking']['staff_name'] }}</span>
+                </p>
+
+                <p class="appointment-card__detail">
+                  <span class="detail-label">Duration:</span>
+                  <span class="detail-value">{{ booking['booking']['service_duration'] }}</span>
+                </p>
+              </div>
+
+              <div class="appointment-card__actions">
+                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">View Details</a>
+                <a href="{{ url_for('main.customer_reschedule', booking_id=booking['booking']['id']) }}" class="btn btn-soft">Reschedule</a>
+                <form action=" {{ url_for('main.cancel_booking', booking_id=booking['booking']['id']) }}" method="post" class="inline-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-primary">Cancel</button>
+                </form>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+        </div>
+      </div>
+
+      <!-- Pending Panel -->
+      <div class="appointment-tab-panel" id="pending">
+        <div class="appointment-card-list">
+{% for booking in pending_bookings %}
+          <article class="appointment-card">
+            <div class="appointment-card__image">
+              <img src="/static/images/service-3.jpg" alt="{{ booking['booking']['service_name'] }}" />
+            </div>
+
+            <div class="appointment-card__body">
+              <div class="appointment-card__top">
+                <span class="appointment-status-badge appointment-status-badge--pending">
+                  Pending
+                </span>
+
+                <div class="appointment-card__menu">
+                  <button type="button" class="icon-btn">⋮</button>
+                </div>
+              </div>
+
+              <h3 class="appointment-card__title">{{ booking['booking']['service_name'] }}</h3>
+
+              <div class="appointment-card__details">
+                <p class="appointment-card__detail">
+                  <span class="detail-label">Date:</span>
+                  <span class="detail-value">{{ booking['booking_date']}} • {{ booking['booking_time'] }}</span>
+                </p>
+
+                <p class="appointment-card__detail">
+                  <span class="detail-label">Stylist:</span>
+                  <span class="detail-value">{{ booking['booking']['staff_name']}}</span>
+                </p>
+
+                <p class="appointment-card__detail">
+                  <span class="detail-label">Status:</span>
+                  <span class="detail-value">Awaiting confirmation</span>
+                </p>
+              </div>
+
+              <div class="appointment-card__actions">
+                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">View Details</a>
+                <form action="{{ url_for('main.cancel_booking', booking_id=booking['booking']['id']) }}" method="post" class="inline-form">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-primary">Cancel</button>
+                </form>
+              </div>
+            </div>
+          </article>
+{% endfor %}
+        </div>
+      </div>
+
+      <!-- Cancelled Panel -->
+      <div class="appointment-tab-panel" id="cancelled">
+        <div class="appointment-card-list">
+{% for booking in cancelled_bookings %}
+          <article class="appointment-card appointment-card--cancelled">
+            <div class="appointment-card__image">
+              <img src="/static/images/service-4.jpg" alt="{{ booking['booking']['service_name'] }}" />
+            </div>
+
+            <div class="appointment-card__body">
+              <div class="appointment-card__top">
+                <span class="appointment-status-badge appointment-status-badge--cancelled">
+                  Cancelled
+                </span>
+              </div>
+
+              <h3 class="appointment-card__title">{{ booking['booking']['service_name'] }}</h3>
+
+              <div class="appointment-card__details">
+                <p class="appointment-card__detail">
+                  <span class="detail-label">Date:</span>
+                  <span class="detail-value">{{ booking['booking_date'] }} • {{ booking['booking_time'] }}</span>
+                </p>
+
+                <p class="appointment-card__detail">
+                  <span class="detail-label">Cancelled on:</span>
+                  <span class="detail-value">{{ booking['cancelled_date'] }}</span>
+                </p>
+              </div>
+
+              <div class="appointment-card__actions">
+                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">View Details</a>
+                <a href=" {{ url_for('main.customer_booking')}}" class="btn btn-primary">Rebook</a>
+              </div>
+            </div>
+          </article>
+{% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Recent History -->
+  <section class="recent-history">
+    <div class="section-heading">
+      <div>
+        <h2 class="section-title">Recent History</h2>
+        <p class="section-description">Your completed appointments.</p>
+      </div>
+
+      <a href="#" class="section-link">View All History</a>
+    </div>
+
+    <div class="history-list">
+
+      <article class="history-row history-row--completed">
+        <div class="history-row__status">
+          <span class="status-icon">✔</span>
+        </div>
+
+        <div class="history-row__service">
+          <h3 class="history-row__title">Acrylic Full Set</h3>
+          <p class="history-row__meta">Completed on Oct 02, 2023</p>
+        </div>
+
+        <div class="history-row__stylist">
+          <span class="history-label">Stylist</span>
+          <span class="history-value">Elena R.</span>
+        </div>
+
+        <div class="history-row__amount">
+          <span class="history-label">Amount</span>
+          <span class="history-value">$85.00</span>
+        </div>
+
+        <div class="history-row__actions">
+          <a href="#" class="btn btn-dark">Rebook</a>
+          <a href="#" class="text-link">Invoice</a>
+        </div>
+      </article>
+
+      <article class="history-row history-row--completed">
+        <div class="history-row__status">
+          <span class="status-icon">✔</span>
+        </div>
+
+        <div class="history-row__service">
+          <h3 class="history-row__title">Gel Removal &amp; Polish</h3>
+          <p class="history-row__meta">Completed on Sep 14, 2023</p>
+        </div>
+
+        <div class="history-row__stylist">
+          <span class="history-label">Stylist</span>
+          <span class="history-value">Sarah W.</span>
+        </div>
+
+        <div class="history-row__amount">
+          <span class="history-label">Amount</span>
+          <span class="history-value">$45.00</span>
+        </div>
+
+        <div class="history-row__actions">
+          <a href="#" class="btn btn-dark">Rebook</a>
+          <a href="#" class="text-link">Invoice</a>
+        </div>
+      </article>
+
+      <article class="history-row history-row--cancelled">
+        <div class="history-row__status">
+          <span class="status-icon">✕</span>
+        </div>
+
+        <div class="history-row__service">
+          <h3 class="history-row__title">Luxury Pedicure</h3>
+          <p class="history-row__meta">Cancelled on Aug 28, 2023</p>
+        </div>
+
+        <div class="history-row__stylist">
+          <span class="history-label">Stylist</span>
+          <span class="history-value">-</span>
+        </div>
+
+        <div class="history-row__amount">
+          <span class="history-label">Amount</span>
+          <span class="history-value">$0.00</span>
+        </div>
+
+        <div class="history-row__actions">
+          <a href="#" class="btn btn-dark">Rebook</a>
+          <a href="#" class="text-link">Support</a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+</main>
+
+{% endblock %}
+
+{% block script%}
+<script src=" {{ url_for('static', filename='js/my_booking.js') }}"></script>
+{% endblock %}

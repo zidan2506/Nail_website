@@ -1,0 +1,278 @@
+{% extends "customer_base.html" %}
+
+{% block title %} Reschedule {% endblock %}
+
+{% block nav_bookings %}active{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer/reschedule.css') }}">
+{% endblock %}
+
+{% block customer_content %}
+<main class="reschedule-page">
+
+
+    <!-- =========================
+         HERO / PAGE TITLE
+         ========================= -->
+    <section class="reschedule-hero">
+      <span class="reschedule-badge">APPOINTMENT MANAGEMENT</span>
+
+      <h1 class="reschedule-title">Reschedule</h1>
+
+      <p class="reschedule-subtitle">
+        Modify your session with ease. Please note our 24-hour rescheduling
+        window to ensure we can accommodate all guests.
+      </p>
+    </section>
+
+    <!-- =========================
+         CURRENT SESSION CARD
+         =========================
+         BACKEND NOTE:
+         Đây là nơi show booking hiện tại.
+         Các field backend thường cần:
+         - service_name
+         - staff_name
+         - booking_date
+         - booking_time
+         - image_url (optional)
+    -->
+    <section class="current-session-card">
+      <div class="current-session-left">
+        <div class="current-session-image-wrap">
+          <!--
+            Nếu có ảnh:
+            <img src="{ss{ booking.image_url }ss}" alt="Service image" class="current-session-image">
+
+            Nếu chưa có ảnh thật thì giữ placeholder này.
+          -->
+          <img
+            src="https://via.placeholder.com/84x84"
+            alt="Service image"
+            class="current-session-image"
+          />
+        </div>
+
+        <div class="current-session-info">
+          <p class="current-session-label">CURRENT SESSION</p>
+          <h2 class="current-session-service">{{ service['name'] }}</h2>
+          <p class="current-session-staff">Technician: {{ staff['full_name'] }}</p>
+        </div>
+      </div>
+
+      <div class="current-session-meta">
+        <div class="session-meta-box">
+          <span class="session-meta-label">DATE</span>
+          <span class="session-meta-value">{{ booking_date }}</span>
+        </div>
+
+        <div class="session-meta-box">
+          <span class="session-meta-label">TIME</span>
+          <span class="session-meta-value"> {{ booking_time }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================
+         DATE + TIME SECTION
+         ========================= -->
+    <section class="reschedule-grid">
+
+      <!-- =========================
+           DATE CARD
+           =========================
+           BACKEND / JS NOTE:
+           Đây mới là khung.
+           Sau này m có thể:
+           - render calendar bằng Jinja loop
+           - hoặc JS build calendar
+           - hoặc giữ layout này và thay data thật
+      -->
+      <div class="panel-card calendar-card">
+        <div class="panel-card-header">
+          <h3 class="panel-card-title">Select New Date</h3>
+
+          <div class="calendar-nav">
+            <button type="button" class="calendar-nav-btn" id="prevCalendarBtn" aria-label="Previous month">
+              &#8249;
+            </button>
+            <p id="calendarMonthLabel" class="calendar-month-label"></p>
+            <button type="button" class="calendar-nav-btn" id="nextCalendarBtn" aria-label="Next month">
+              &#8250;
+            </button>
+          </div>
+        </div>
+
+        <!--
+          Nếu backend render dynamic:
+          Ví dụ month_label = "October 2023"
+          M có thể add thêm 1 dòng ở đây nếu muốn.
+        -->
+
+        <div class="calendar-weekdays">
+          <span>MO</span>
+          <span>TU</span>
+          <span>WE</span>
+          <span>TH</span>
+          <span>FR</span>
+          <span>SA</span>
+          <span>SU</span>
+        </div>
+
+        <!--
+          BACKEND NOTE:
+          Mỗi ngày là 1 button.
+          Các class trạng thái gợi ý:
+          - is-muted     : ngày thuộc tháng trước/sau
+          - is-selected  : ngày user đang chọn
+          - is-disabled  : ngày không cho chọn
+          - is-today     : nếu muốn highlight hôm nay
+
+          Nếu render Jinja:
+          {% for day in calendar_days %}
+            <button class="calendar-day ...">{{ day.label }}</button>
+          {% endfor %}
+        -->
+        <div id="miniCalendar" class="calendar-grid"></div>
+      </div>
+
+      <!-- =========================
+           TIME CARD
+           =========================
+           BACKEND NOTE:
+           Đây là khu timeslot.
+           Sau này m loop available slots từ backend.
+
+           Gợi ý data:
+           available_slots = [
+             {"label": "09:00 AM", "disabled": False, "selected": False},
+             {"label": "10:30 AM", "disabled": False, "selected": True},
+             ...
+           ]
+      -->
+      <div class="panel-card time-card">
+        <div class="panel-card-header">
+          <h3 class="panel-card-title">Available Times</h3>
+        </div>
+
+        <div id="timeSlotGrid" class="time-slot-grid">
+          <p class="empty-text">Please select a date first.</p>
+        </div>
+
+        <p class="session-duration-note">
+          <span class="duration-icon"></span>
+          Session duration: 60 mins
+        </p>
+      </div>
+    </section>
+
+    <!-- =========================
+         POLICY NOTICE
+         =========================
+         BACKEND NOTE:
+         Nếu policy thay đổi theo config thì chỉ cần thay text này.
+    -->
+    <section class="policy-notice-card">
+      <div class="policy-icon-wrap">
+        <span class="policy-icon">i</span>
+      </div>
+
+      <div class="policy-content">
+        <h3 class="policy-title">Policy Notice</h3>
+        <p class="policy-text">
+          Bookings can only be rescheduled at least 24 hours in advance and can
+          only be changed once. Further changes may require a new deposit.
+        </p>
+      </div>
+    </section>
+
+    <!-- =========================
+         COMPARISON
+         =========================
+         BACKEND / JS NOTE:
+         Bên trái = booking cũ
+         Bên phải = lựa chọn mới
+
+         Rất hợp để:
+         - render giá trị cũ từ backend
+         - update giá trị mới bằng JS khi user chọn date/time
+    -->
+    <section class="comparison-section">
+      <h3 class="comparison-title">Comparison</h3>
+
+      <div class="comparison-card">
+        <div class="comparison-column comparison-column-old">
+          <p class="comparison-label">FROM</p>
+
+          <div class="comparison-row">
+            <span class="comparison-key">Date</span>
+            <span class="comparison-value">{{ cp_booking_date }}</span>
+          </div>
+
+          <div class="comparison-row">
+            <span class="comparison-key">Time</span>
+            <span class="comparison-value">{{ booking_time }}</span>
+          </div>
+        </div>
+
+        <div class="comparison-divider"></div>
+
+        <div class="comparison-column comparison-column-new">
+          <p class="comparison-label comparison-label-new">TO (NEW)</p>
+
+          <div class="comparison-row">
+            <span class="comparison-key">Date</span>
+            <span class="comparison-value comparison-value-new" id="newDatePreview">Please select a date</span>
+          </div>
+
+          <div class="comparison-row">
+            <span class="comparison-key">Time</span>
+            <span class="comparison-value comparison-value-new" id="newTimePreview">Please select a time</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================
+         ACTIONS
+         =========================
+         BACKEND NOTE:
+         Nếu dùng form submit thật:
+         - nút Confirm là submit
+         - date/time selected nên map vào hidden input
+         Ví dụ:
+         <input type="hidden" name="new_booking_date" value="">
+         <input type="hidden" name="new_start_at" value="">
+    -->
+    <form method="POST" id="rescheduleForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" id="newDateInput" name="new_date">
+      <input type="hidden" id="newTimeInput" name="new_time">'
+    
+      <section class="reschedule-actions">
+        <a href="{{ url_for('main.view_booking_details', booking_id=booking['id']) }}"
+           class="btn btn-cancel">
+          Cancel
+          </a>
+
+          <button type="submit" class="btn btn-confirm">
+            Confirm Reschedule
+          </button>
+      </section>
+    </form>
+
+
+  </main>
+
+<script>
+  const RESCHEDULE_CONFIG = {
+    today: "{{ today.isoformat() }}",
+    maxDate: "{{ max_reschedule_date.isoformat() }}",
+    selectedDate: "{{ selected_date.isoformat() }}",
+    availableSlotUrl: "{{ url_for('main.get_reschedule_available_slots', booking_id=booking['id']) }}"
+  };
+</script>
+
+<script src="{{ url_for('static', filename='js/customer/reschedule_calendar.js') }}"></script>
+{% endblock %}

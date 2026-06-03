@@ -1,0 +1,62 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/email_verify.css') }}">
+</head>
+<body> -->
+{% extends "base.html" %}
+{% block title %} Verification {% endblock%}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/email_verify.css') }}">
+{% endblock %}
+
+{%block content%}
+    <div class="verify-page">
+        <div class="verify-card">
+            <h1>Email Verification</h1>
+            <p class="subtitle">
+                We have sent a verification code to your email.
+                Please enter the code below to confirm your booking.
+            </p>
+
+            <form id="verifyForm" class="verify-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <label for="1">Verification Code</label>
+                <input
+                    type="text"
+                    id="verification_code"
+                    name="verification_code"
+                    placeholder="Enter your code"
+                    maxlength="6"
+                    autocomplete="one-time-code"
+                    required
+                >
+
+                <button type="submit" id="verifyBtn">Verify Code</button>
+            </form>
+
+            <p id="message" class="message"></p>
+
+            <div class="extra-actions">
+                <button type="button" id="resendBtn" class="secondary-btn">
+                    Resend Code
+                </button>
+                <!-- <button type="button" id="changeBtn" class="third-btn">
+                    Change Booking!
+                </button> -->
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/email_verify.js') }}"></script>
+{% endblock%}
+
+<!-- </body>
+</html> -->

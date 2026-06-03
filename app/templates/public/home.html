@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Nail Salon{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Welcome to Our Nail Salon</h1>
+    <p>Book your favorite nail services quickly and easily.</p>
+    <div class="hero-buttons">
+        <a class="btn" href="{{ url_for('main.services') }}">View Services</a>
+        <a class="btn btn-outline" href="{{ url_for('main.public_booking') }}">Book Now</a>
+    </div>
+</section>
+{% endblock %}
