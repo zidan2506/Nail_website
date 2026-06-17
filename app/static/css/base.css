@@ -1,197 +1,471 @@
+/* =============================================================================
+   BASE.CSS — DahaCare Global Styles
+   Áp dụng cho tất cả public pages kế thừa base.html
+   Tương thích với design system của index.html (Plus Jakarta Sans, pink brand)
+   ============================================================================= */
+
+
+/* ─── DESIGN TOKENS ─────────────────────────────────────────────────────────
+   Giữ màu và spacing nhất quán với Tailwind config trong index.html
+   Cập nhật tại đây để thay đổi toàn bộ site
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+    /* Brand colors — match index.html Tailwind config */
+    --color-primary:         #ab2261;   /* main pink — buttons, accents */
+    --color-primary-hover:   #cc3e7a;   /* hover state */
+    --color-primary-light:   #ffd9e2;   /* very light pink — badge bg */
+    --color-primary-vivid:   #ef3976;   /* vivid pink — used in old CSS, kept for compat */
+
+    /* Surface / background */
+    --color-bg:              #fff8f8;   /* page background */
+    --color-surface:         #ffffff;   /* card background */
+    --color-surface-low:     #fff0f5;   /* subtle section bg */
+    --color-surface-mid:     #fbeaf0;   /* footer / container bg */
+    --color-surface-variant: #efdee4;   /* dividers, skeleton */
+    --color-stone-white:     #F8F9FA;   /* nav background */
+
+    /* Text */
+    --color-text-primary:    #22191d;   /* main body text */
+    --color-text-secondary:  #574147;   /* muted / secondary */
+    --color-text-tertiary:   #8a7077;   /* placeholder, captions */
+    --color-deep-plum:       #3E1F47;   /* headings */
+
+    /* Border */
+    --color-border:          rgba(239, 57, 118, 0.15);  /* default border tint */
+    --color-border-subtle:   #efdee4;
+
+    /* Nav */
+    --nav-height:            72px;
+
+    /* Typography */
+    --font-base:             'Plus Jakarta Sans', Arial, sans-serif;
+
+    /* Radius */
+    --radius-sm:             8px;
+    --radius-md:             12px;
+    --radius-lg:             16px;
+    --radius-xl:             24px;
+    --radius-full:           9999px;
+
+    /* Shadow */
+    --shadow-sm:             0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md:             0 4px 14px rgba(239, 57, 118, 0.18);
+}
+
+
+/* ─── RESET & BASE ───────────────────────────────────────────────────────────*/
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: var(--font-base);
     margin: 0;
-    background-color: #fff7f9;
-    color: #333;
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+button {
+    cursor: pointer;
+    font-family: var(--font-base);
+    border: none;
+    background: none;
+}
+
+
+/* ─── NAV BAR ────────────────────────────────────────────────────────────────
+   Match với nav trong index.html:
+   - Sticky top, semi-transparent stone-white + backdrop-blur
+   - Logo: Plus Jakarta Sans bold, primary pink accent
+   - Links: muted color → primary on hover
+   - Buttons: outline ghost + solid primary (pill shape)
+   ─────────────────────────────────────────────────────────────────────────── */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(to right, #fff0f4, #ffe4ed);
+    /* semi-transparent trắng + blur — match index.html bg-stone-white/80 backdrop-blur-md */
+    background: rgba(248, 249, 250, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 0 40px;
-    height: 68px;
-    border-bottom: 1px solid rgba(239, 57, 118, 0.15);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    padding: 0 80px;       /* match margin-desktop token */
+    height: var(--nav-height);
+    border-bottom: 0.5px solid rgba(62, 31, 71, 0.1);  /* border-deep-plum/10 */
 }
 
+/* Logo */
 .logo {
     display: flex;
     align-items: center;
-    gap: 6px;
     text-decoration: none;
-}
-
-.logo-icon {
-    color: #ef3976;
-    font-size: 20px;
-    line-height: 1;
 }
 
 .logo-text {
     font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.5px;
-    color: #1a1a1a;
+    color: var(--color-text-primary);
 }
 
 .logo-accent {
-    color: #ef3976;
+    color: var(--color-primary);
 }
 
+/* Desktop nav links */
 .nav-links {
     display: flex;
-    list-style: none;
     gap: 32px;
     margin: 0;
     padding: 0;
+    list-style: none;
 }
 
 .nav-links a {
     text-decoration: none;
-    color: #444;
+    color: var(--color-text-secondary);
     font-weight: 600;
     font-size: 15px;
     transition: color 0.2s ease;
 }
 
 .nav-links a:hover {
-    color: #ef3976;
+    color: var(--color-primary);
 }
 
+/* Right action buttons */
 .nav-actions {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
+/* Ghost outlined button — Register */
 .btn-nav-outline {
     display: inline-block;
     padding: 8px 20px;
-    border: 1.5px solid #ef3976;
-    border-radius: 999px;
-    color: #ef3976;
+    border: 1.5px solid var(--color-text-secondary);
+    border-radius: var(--radius-full);
+    color: var(--color-text-primary);
     font-weight: 600;
     font-size: 14px;
-    text-decoration: none;
+    font-family: var(--font-base);
     background: transparent;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition: border-color 0.2s ease, color 0.2s ease;
     white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .btn-nav-outline:hover {
-    background: rgba(239, 57, 118, 0.06);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
+/* Solid primary button — Book Now */
 .btn-nav-solid {
     display: inline-block;
     padding: 8px 20px;
-    border: 1.5px solid #ef3976;
-    border-radius: 999px;
-    color: #fff;
+    border: 1.5px solid var(--color-primary);
+    border-radius: var(--radius-full);
+    color: #ffffff;
     font-weight: 700;
     font-size: 14px;
-    text-decoration: none;
-    background: #ef3976;
-    box-shadow: 0 4px 14px rgba(239, 57, 118, 0.25);
-    transition: opacity 0.2s ease, transform 0.15s ease;
+    font-family: var(--font-base);
+    background: var(--color-primary);
+    box-shadow: var(--shadow-md);
+    transition: background 0.2s ease, opacity 0.2s ease, transform 0.15s ease;
     white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .btn-nav-solid:hover {
-    opacity: 0.9;
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
     transform: translateY(-1px);
+}
+
+/* Mobile hamburger — hidden on desktop */
+.nav-hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    cursor: pointer;
+    padding: 4px;
+}
+
+/* Mobile dropdown menu — hidden by default */
+.nav-mobile-menu {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 24px;
+    background: rgba(248, 249, 250, 0.97);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--color-border);
+}
+
+.nav-mobile-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-mobile-links a {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    padding: 6px 0;
+    border-bottom: 0.5px solid var(--color-border-subtle);
+    transition: color 0.2s ease;
+}
+
+.nav-mobile-links a:hover {
+    color: var(--color-primary);
+}
+
+.nav-mobile-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* header.nav-open — JS toggles this to show mobile menu */
+header.nav-open .nav-mobile-menu {
+    display: flex;
+}
+
+
+/* ─── CONTAINERS ─────────────────────────────────────────────────────────────
+   .extra-container: fullbleed, no max-width — dùng cho hero, hero carousel
+   .container:       max-width 1280px centered — dùng cho main page content
+   ─────────────────────────────────────────────────────────────────────────── */
+.extra-container {
+    width: 100%;
 }
 
 .container {
     max-width: 1280px;
-    margin: 40px auto;
+    margin: 0 auto;
     padding: 0 20px;
 }
 
-.hero {
-    text-align: center;
-    padding: 60px 20px;
-}
 
-.hero h1 {
-    font-size: 42px;
-    margin-bottom: 16px;
-}
-
-.hero p {
-    font-size: 18px;
-    margin-bottom: 24px;
-}
-
-.hero-buttons {
+/* ─── FLASH MESSAGES ─────────────────────────────────────────────────────────
+   Fixed top-center, z-index cao nhất
+   .flash-error → đỏ, .flash-success → xanh
+   Auto-dismiss animation: slide down in → fade up out
+   ─────────────────────────────────────────────────────────────────────────── */
+.flash-wrapper {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+}
+
+/* Shared flash box styles */
+.flash-error,
+.flash-success {
+    position: relative;
+    min-width: 260px;
+    max-width: 999px;
+    height: 46px;
+    padding: 0 20px 0 56px;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 16px;
+    border-radius: var(--radius-full);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.1px;
+    white-space: nowrap;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    pointer-events: auto;
+    /* Slide down in animation */
+    opacity: 0;
+    transform: translateY(-18px) scale(0.96);
+    animation: flashSlideDown 0.38s ease forwards;
 }
 
-.btn {
-    display: inline-block;
-    background-color: #e78fb3;
-    color: white;
-    padding: 10px 18px;
-    text-decoration: none;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+/* Icon circle left */
+.flash-error::before,
+.flash-success::before {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 900;
+    box-sizing: border-box;
 }
 
-.btn-outline {
-    background-color: white;
-    color: #e78fb3;
-    border: 2px solid #e78fb3;
+.flash-error {
+    color: #f3f4f6;
+    background: rgba(71, 78, 91, 0.92);
+    border: 1px solid rgba(255, 90, 90, 0.14);
 }
 
+.flash-error::before {
+    content: "✕";
+    color: #fff;
+    background: linear-gradient(180deg, #ff6767 0%, #ef4444 100%);
+}
+
+.flash-success {
+    color: #f3f4f6;
+    background: rgba(38, 66, 49, 0.92);
+    border: 1px solid rgba(34, 197, 94, 0.18);
+}
+
+.flash-success::before {
+    content: "✓";
+    color: #fff;
+    background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+}
+
+.flash-hide {
+    animation: flashFadeOut 0.3s ease forwards;
+}
+
+@keyframes flashSlideDown {
+    from { opacity: 0; transform: translateY(-18px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes flashFadeOut {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to   { opacity: 0; transform: translateY(-10px) scale(0.96); }
+}
+
+
+/* ─── GENERAL UTILITY CLASSES ────────────────────────────────────────────────
+   Dùng chung cho các public pages, tương thích với style của index.html
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Section spacing */
+.section {
+    padding: 80px 0;
+}
+
+/* Section headings */
+.section-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--color-deep-plum);
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    margin: 0 0 40px;
+}
+
+/* Card — white raised surface */
+.card {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Card grid — auto fit columns */
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
 }
 
-.card {
-    background-color: white;
-    border: 1px solid #f0d9e2;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+/* Primary button (full element) */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 15px;
+    font-family: var(--font-base);
+    background: var(--color-primary);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+    text-decoration: none;
 }
 
-.booking-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 500px;
+.btn:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
 }
 
-.booking-form input,
-.booking-form select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+/* Outline button */
+.btn-outline {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
 }
 
-/*Book.html css */
+.btn-outline:hover {
+    background: rgba(171, 34, 97, 0.06);
+    transform: translateY(-1px);
+}
+
+
+/* ─── BOOKING PAGE ────────────────────────────────────────────────────────────
+   Giữ nguyên booking styles từ base.css cũ (booking.html dùng)
+   ─────────────────────────────────────────────────────────────────────────── */
 .booking-page {
     min-height: 100vh;
     padding: 40px 20px;
-    background: #f7f8fb;
+    background: var(--color-bg);
 }
 
 .booking-card {
     max-width: 900px;
     margin: 0 auto;
-    background: #ffffff;
-    border-radius: 16px;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
     padding: 32px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
@@ -200,12 +474,12 @@ body {
     margin: 0 0 8px;
     font-size: 32px;
     font-weight: 700;
-    color: #222;
+    color: var(--color-text-primary);
 }
 
 .booking-subtitle {
     margin: 0 0 28px;
-    color: #666;
+    color: var(--color-text-tertiary);
     font-size: 15px;
 }
 
@@ -213,19 +487,20 @@ body {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    max-width: 500px;
 }
 
 .booking-section {
     padding: 20px;
     border: 1px solid #e8e8e8;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     background: #fcfcfc;
 }
 
 .booking-section h2 {
     margin: 0 0 16px;
     font-size: 20px;
-    color: #222;
+    color: var(--color-text-primary);
 }
 
 .option-grid {
@@ -238,9 +513,10 @@ body {
     padding: 12px 18px;
     border: 1px solid #d7d7d7;
     border-radius: 10px;
-    background: #fff;
+    background: var(--color-surface);
     cursor: pointer;
     font-size: 14px;
+    font-family: var(--font-base);
     transition: 0.2s ease;
 }
 
@@ -250,9 +526,9 @@ body {
 }
 
 .option-btn.active {
-    background: #222;
+    background: var(--color-text-primary);
     color: #fff;
-    border-color: #222;
+    border-color: var(--color-text-primary);
 }
 
 .form-group {
@@ -268,32 +544,36 @@ body {
 
 .form-group label {
     font-weight: 600;
-    color: #333;
+    color: var(--color-text-primary);
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.booking-form input,
+.booking-form select {
     padding: 12px 14px;
     border: 1px solid #d8d8d8;
     border-radius: 10px;
     font-size: 14px;
+    font-family: var(--font-base);
     outline: none;
-    background: #fff;
+    background: var(--color-surface);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-    border-color: #222;
+    border-color: var(--color-text-primary);
 }
 
 .submit-btn {
     padding: 14px 20px;
     border: none;
-    border-radius: 12px;
-    background: #222;
+    border-radius: var(--radius-md);
+    background: var(--color-text-primary);
     color: #fff;
     font-size: 16px;
     font-weight: 600;
+    font-family: var(--font-base);
     cursor: pointer;
     transition: 0.2s ease;
 }
@@ -321,7 +601,63 @@ body {
     border-color: #abefc6;
 }
 
-@media (max-width: 640px) {
+/* Booking summary card middle layout */
+.booking-summary-card__middle {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.service-description-box {
+    flex: 1;
+    background: #faf7f8;
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    border: 1px solid #f0e6ea;
+}
+
+.service-description-box__label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-primary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.service-description-box__text {
+    font-size: 14px;
+    color: var(--color-text-primary);
+    line-height: 1.5;
+}
+
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────────────────*/
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 24px;
+    }
+
+    /* Ẩn desktop nav links + actions trên mobile */
+    .nav-links,
+    .nav-actions {
+        display: none;
+    }
+
+    /* Hiện hamburger button trên mobile */
+    .nav-hamburger {
+        display: flex;
+    }
+
+    .section {
+        padding: 48px 0;
+    }
+
+    .section-title {
+        font-size: 26px;
+    }
+
     .booking-card {
         padding: 20px;
     }
@@ -337,133 +673,6 @@ body {
     .option-btn {
         width: 100%;
         text-align: center;
-    }
-}
-
-/* =========================
-   FLASH MESSAGE
-   ========================= */
-
-.flash-wrapper {
-    position: fixed;
-    top: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-
-    pointer-events: none;
-}
-
-/* box chung */
-.flash-error,
-.flash-success {
-    position: relative;
-    min-width: 260px;
-    max-width: 999px;
-    height: 46px;
-    padding: 0 20px 0 56px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 999px;
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0.1px;
-    white-space: nowrap;
-
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    pointer-events: auto;
-
-    /* animation */
-    opacity: 0;
-    transform: translateY(-18px) scale(0.96);
-    animation: flashSlideDown 0.38s ease forwards;
-}
-
-/* icon tròn bên trái */
-.flash-error::before,
-.flash-success::before {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 16px;
-    font-weight: 900;
-    box-sizing: border-box;
-}
-
-/* ERROR */
-.flash-error {
-    color: #f3f4f6;
-    background: rgba(71, 78, 91, 0.92);
-    border: 1px solid rgba(255, 90, 90, 0.14);
-}
-
-.flash-error::before {
-    content: "✕";
-    color: #fff;
-    background: linear-gradient(180deg, #ff6767 0%, #ef4444 100%);
-}
-
-/* SUCCESS */
-.flash-success {
-    color: #f3f4f6;
-    background: rgba(38, 66, 49, 0.92);
-    border: 1px solid rgba(34, 197, 94, 0.18);
-}
-
-.flash-success::before {
-    content: "✓";
-    color: #fff;
-    background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
-}
-
-/* trạng thái ẩn */
-.flash-hide {
-    animation: flashFadeOut 0.3s ease forwards;
-}
-
-@keyframes flashSlideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-18px) scale(0.96);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-@keyframes flashFadeOut {
-    from {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(-10px) scale(0.96);
     }
 }
 
@@ -490,38 +699,4 @@ body {
         height: 24px;
         font-size: 14px;
     }
-}
-
-/* Layout middle section (date + description) */
-.booking-summary-card__middle {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-top: 20px;
-}
-
-/* Service description box */
-.service-description-box {
-  flex: 1;
-  background: #faf7f8;
-  border-radius: 16px;
-  padding: 16px 18px;
-  border: 1px solid #f0e6ea;
-}
-
-/* Label */
-.service-description-box__label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #d16b86; /* tone hồng giống theme */
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-/* Text */
-.service-description-box__text {
-  font-size: 14px;
-  color: #333;
-  line-height: 1.5;
 }

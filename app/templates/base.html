@@ -3,72 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Nail Salon{% endblock %}</title>
+    <title>{% block title %}DahaCare{% endblock %}</title>
+
+    <!-- Plus Jakarta Sans — brand font dùng trong index.html -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Material Symbols — icon font dùng trong index.html -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         NAV BAR
+         - Sticky top, semi-transparent trắng + backdrop blur
+         - Logo: DahaCare text (không icon ✦) — match với index.html
+         - Links: Services / Gallery / Membership / About / Contact
+         - Right actions: thay đổi theo session state:
+             · Chưa login  → [Register] [Book Now]
+             · Customer    → [My Dashboard] [Book Now]
+             · Staff       → [My Schedule] [Book Now]
+             · Admin       → [Management] [Book Now]
+         - Flask: session.get("user_id") và session.get("role") kiểm soát nhánh
+    ════════════════════════════════════════════════════════════════════ -->
     {% block navbar %}
     <header>
         <nav class="navbar">
-            <div class="logo">
-                <span class="logo-icon">✦</span>
+
+            <!-- Logo — Flask: href="{{ url_for('main.home') }}" -->
+            <a href="{{ url_for('main.home') }}" class="logo">
                 <span class="logo-text">Daha<span class="logo-accent">Care</span></span>
-            </div>
+            </a>
+
+            <!-- Desktop nav links -->
             <ul class="nav-links">
-                <li><a href="{{ url_for('main.home') }}">Home</a></li>
                 <li><a href="{{ url_for('main.services') }}">Services</a></li>
-                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#">Gallery</a></li>
+                <li><a href="#">Membership</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#contact">Contact</a></li>
             </ul>
+
+            <!-- Right action buttons — conditional on login state -->
             <div class="nav-actions">
                 {% if not session.get("user_id") %}
+                    <!-- Guest: Register + Book Now -->
                     <a href="{{ url_for('main.register') }}" class="btn-nav-outline">Register</a>
-                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">Book Appointment</a>
+                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">Book Now</a>
+                {% else %}
+                    <!-- Logged in: role-based dashboard link + Book Now -->
+                    {% if session.get("role") == "customer" %}
+                        <a href="{{ url_for('main.customer_dashboard') }}" class="btn-nav-outline">My Dashboard</a>
+                    {% elif session.get("role") == "staff" %}
+                        <a href="{{ url_for('main.staff_dashboard') }}" class="btn-nav-outline">My Schedule</a>
+                    {% elif session.get("role") == "admin" %}
+                        <a href="{{ url_for('main.admin_dashboard') }}" class="btn-nav-outline">Management</a>
+                    {% endif %}
+                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">Book Now</a>
+                {% endif %}
+            </div>
+
+            <!-- Mobile hamburger button — JS toggles .nav-open on <nav> -->
+            <button class="nav-hamburger" aria-label="Open menu">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+
+        </nav>
+
+        <!-- Mobile dropdown menu — hidden by default, toggled via .nav-open -->
+        <div class="nav-mobile-menu">
+            <ul class="nav-mobile-links">
+                <li><a href="{{ url_for('main.services') }}">Services</a></li>
+                <li><a href="#">Gallery</a></li>
+                <li><a href="#">Membership</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="nav-mobile-actions">
+                {% if not session.get("user_id") %}
+                    <a href="{{ url_for('main.register') }}" class="btn-nav-outline">Register</a>
+                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">Book Now</a>
                 {% else %}
                     {% if session.get("role") == "customer" %}
                         <a href="{{ url_for('main.customer_dashboard') }}" class="btn-nav-outline">My Dashboard</a>
                     {% elif session.get("role") == "staff" %}
-                        <a href="{{ url_for('main.staff_dashboard') }}" class="btn-nav-outline">Schedule</a>
+                        <a href="{{ url_for('main.staff_dashboard') }}" class="btn-nav-outline">My Schedule</a>
                     {% elif session.get("role") == "admin" %}
                         <a href="{{ url_for('main.admin_dashboard') }}" class="btn-nav-outline">Management</a>
                     {% endif %}
-                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">Book Appointment</a>
+                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">Book Now</a>
                 {% endif %}
             </div>
-        </nav>
+        </div>
     </header>
-    {% endblock%}
-<!-- nhận gói messages thông qua session từ server và vứt lên frontend render ra -->
-<div class="flash-wrapper">
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="flash-{{ category }} auto-dismiss-flash">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const flashes = document.querySelectorAll(".auto-dismiss-flash");
+    {% endblock %}
 
-    flashes.forEach((flash) => {
-        setTimeout(() => {
-            flash.classList.add("flash-hide");
+    <!-- ═══════════════════════════════════════════════════════════════
+         FLASH MESSAGES
+         - Nhận messages từ Flask flash() qua session
+         - Auto-dismiss sau 3 giây với animation fade out
+         - Styles: .flash-error (đỏ) và .flash-success (xanh)
+         - Đặt fixed top-center, z-index cao nhất
+    ════════════════════════════════════════════════════════════════════ -->
+    <div class="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-{{ category }} auto-dismiss-flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
 
-            flash.addEventListener("animationend", () => {
-                flash.remove();
-            }, { once: true });
-        }, 3000);
+    <script>
+    /* Auto-dismiss flash messages sau 3 giây */
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".auto-dismiss-flash").forEach((flash) => {
+            setTimeout(() => {
+                flash.classList.add("flash-hide");
+                flash.addEventListener("animationend", () => flash.remove(), { once: true });
+            }, 3000);
+        });
     });
-});
-</script>
-</div>
+
+    /* Mobile hamburger toggle */
+    document.addEventListener("DOMContentLoaded", function () {
+        const hamburger = document.querySelector(".nav-hamburger");
+        const header   = document.querySelector("header");
+        if (hamburger && header) {
+            hamburger.addEventListener("click", () => header.classList.toggle("nav-open"));
+        }
+    });
+    </script>
+
+    <!-- extra_content: dùng cho các page cần inject content ngoài .container (ví dụ: hero fullbleed) -->
     <main class="extra-container">
         {% block extra_content %}{% endblock %}
     </main>
 
+    <!-- content: main page content trong max-width container -->
     <main class="container">
         {% block content %}{% endblock %}
     </main>
