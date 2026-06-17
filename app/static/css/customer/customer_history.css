@@ -3,6 +3,11 @@
    Matches customer_base design system
    ========================= */
 
+.ch-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
 /* ===== Stats Summary ===== */
 .history-stats {
     display: grid;
@@ -443,12 +448,12 @@
 
 /* ===== Action Buttons ===== */
 .btn-rebook {
+    display: inline-block;
     background: #24161c;
     color: #ffffff;
-    border: none;
+    text-decoration: none;
     padding: 9px 18px;
     border-radius: 12px;
-    font-family: inherit;
     font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
@@ -480,18 +485,17 @@
 }
 
 .btn-download {
-    background: #24161c;
-    color: #ffffff;
-    border: none;
-    padding: 9px 16px;
-    border-radius: 12px;
-    font-family: inherit;
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    background: #24161c;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 9px 16px;
+    border-radius: 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
     transition: 0.2s ease;
 }
 

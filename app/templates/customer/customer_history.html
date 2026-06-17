@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block customer_content %}
+<div class="ch-wrapper">
 <!-- Page header -->
 <div class="dashboard-header">
     <p class="dashboard-label">Your records</p>
@@ -196,7 +197,7 @@
                     <td class="cell-bold cell-dim">$0.00</td>
                     <td><span class="badge badge-cancelled">Cancelled</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
-                        <button class="btn-rebook">Rebook</button>
+                        <a class="btn-rebook" href="{{ url_for('main.customer_booking') }}">Rebook</a>
                     </td>
                 </tr>
                     {% elif appt.display_type == 'reviewed' %}
@@ -218,7 +219,7 @@
                     <td><span class="badge badge-completed">Completed</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
                         <span class="reviewed-tag">✓ Reviewed</span>
-                        <button class="btn-rebook">Rebook</button>
+                        <a class="btn-rebook" href="{{ url_for('main.customer_booking') }}">Rebook</a>
                     </td>
                 </tr>
                     {% else %}
@@ -240,7 +241,7 @@
                     <td><span class="badge badge-completed">Completed</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
                         <button class="btn-review">Leave Review</button>
-                        <button class="btn-rebook">Rebook</button>
+                        <a class="btn-rebook" href="{{ url_for('main.customer_booking') }}">Rebook</a>
                     </td>
                 </tr>
                     {% endif %}
@@ -297,7 +298,7 @@
                     <td class="cell-bold">{{ invoice.amount | format_currency }}</td>
                     <td><span class="badge badge-{{ invoice.invoice_status }}">{{ invoice.invoice_status}}</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
-                        <button class="btn-download">⤓ Download PDF</button>
+                        <a class="btn-download" href="{{ url_for('main.download_invoice', invoice_id=invoice.invoice_id) }}">⤓ Download PDF</a>
                         <button class="btn-more">⋮</button>
                     </td>
                 </tr>
@@ -311,6 +312,7 @@
         </div>
     </div>
 </div>
+</div>{# end ch-wrapper #}
 {% endblock %}
 
 {% block script %}

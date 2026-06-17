@@ -1,96 +1,139 @@
+-- ============================================
+-- SERVICE CATEGORIES
+-- ============================================
 INSERT INTO service_categories (name, slug, is_active, sort_order)
 VALUES
 ('Manicure', 'manicure', 1, 1),
 ('Pedicure', 'pedicure', 1, 2),
 ('Nail Art', 'nail_art', 1, 3);
 
-INSERT INTO services (category_id, name, description, duration_minutes, price)
+-- ============================================
+-- SERVICES (có thêm points)
+-- Classic Manicure → 50 pts
+-- Gel Manicure     → 80 pts
+-- Spa Pedicure     → 120 pts
+-- ============================================
+INSERT INTO services (category_id, name, description, duration_minutes, price, points, image)
 VALUES
-(1, 'Classic Manicure', 'Basic nail care and polish', 45, 25),
-(1, 'Gel Manicure', 'Long-lasting gel polish', 60, 35),
-(2, 'Spa Pedicure', 'Relaxing foot care treatment', 75, 45);
-
-INSERT INTO staff (full_name, email, phone, hourly_rate, commission_rate, user_id)
-VALUES
-('Anna Nguyen', 'anna@example.com', '0401234567', 18, 10, NULL),
-('Linh Tran', 'linh@example.com', '0402345678', 19, 12, NULL),
-('Mon', 'mon@staff.com', '0399222999', 999, 999, 2);
-
-INSERT INTO customers (user_id, full_name, email, phone, notes)
-VALUES
-(3, 'Mon', 'mon@customer.com', '0409998888', 'Test customer');
-
-INSERT INTO users (password_hash, email, role)
-VALUES
-("scrypt:32768:8:1$WjbfcQVhEJ2iH7Cu$ac3742bf7abcdf8fca4cb76fdbd2d4d6bb5e16e603750d0f57602c503cca37ba1c6e4cf0b9b8250925f94156936c3f36c593ee77467ae461e684d0218e6d8d04","mon@admin.com", "admin" ),
-("scrypt:32768:8:1$WjbfcQVhEJ2iH7Cu$ac3742bf7abcdf8fca4cb76fdbd2d4d6bb5e16e603750d0f57602c503cca37ba1c6e4cf0b9b8250925f94156936c3f36c593ee77467ae461e684d0218e6d8d04","mon@staff.com", "staff" ),
-("scrypt:32768:8:1$eyrwAm1eM5x8ogfP$ecf8bf2a308643a63aee46c6eb3af307d3b93dd046cf8fd9623daa4266ca8f4490ab107a5311bb1a63ada539bae8d98daa4e9ccc32a95968f60b441a16581ac9","mon@customer.com", "customer" );
-
+(1, 'Classic Manicure', 'Basic nail care and polish',      45, 25, 50, 'Classic Manicure.png'),
+(1, 'Gel Manicure',     'Long-lasting gel polish',         60, 35, 80, 'Classic Manicure.png'),
+(2, 'Spa Pedicure',     'Relaxing foot care treatment',    75, 45, 120, 'Classic Manicure.png');
 
 -- ============================================
--- 30 BOOKINGS for customer_id = 1
--- Insert order: 22 completed FIRST (id 1-22) → 4 cancelled (23-26) → 2 pending (27-28) → 2 confirmed (29-30)
+-- USERS
+-- id=1 admin | id=2 staff | id=3 customer
+-- ============================================
+INSERT INTO users (password_hash, email, role)
+VALUES
+("scrypt:32768:8:1$WjbfcQVhEJ2iH7Cu$ac3742bf7abcdf8fca4cb76fdbd2d4d6bb5e16e603750d0f57602c503cca37ba1c6e4cf0b9b8250925f94156936c3f36c593ee77467ae461e684d0218e6d8d04", "mon@admin.com",    "admin"),
+("scrypt:32768:8:1$WjbfcQVhEJ2iH7Cu$ac3742bf7abcdf8fca4cb76fdbd2d4d6bb5e16e603750d0f57602c503cca37ba1c6e4cf0b9b8250925f94156936c3f36c593ee77467ae461e684d0218e6d8d04", "mon@staff.com",    "staff"),
+("scrypt:32768:8:1$eyrwAm1eM5x8ogfP$ecf8bf2a308643a63aee46c6eb3af307d3b93dd046cf8fd9623daa4266ca8f4490ab107a5311bb1a63ada539bae8d98daa4e9ccc32a95968f60b441a16581ac9", "mon@customer.com", "customer");
+
+-- ============================================
+-- STAFF
+-- ============================================
+INSERT INTO staff (full_name, email, phone, hourly_rate, commission_rate, user_id)
+VALUES
+('Anna Nguyen', 'anna@example.com', '0401234567', 18,  10,  NULL),
+('Linh Tran',   'linh@example.com', '0402345678', 19,  12,  NULL),
+('Mon',         'mon@staff.com',    '0399222999', 999, 999, 2);
+
+-- ============================================
+-- CUSTOMERS (có thêm date_of_birth)
+-- ============================================
+INSERT INTO customers (user_id, full_name, email, phone, notes, date_of_birth)
+VALUES
+(3, 'Mon', 'mon@customer.com', '0409998888', 'Test customer', '1998-06-15');
+
+-- ============================================
+-- MEMBERSHIP TIERS
+-- id=1 Silver | id=2 Gold | id=3 VIP
+-- ============================================
+INSERT INTO membership_tiers (name, price, point_multiplier, duration_days, description, is_active)
+VALUES
+('Silver',  0.00,  1.0, 365, 'Basic membership - standard points earning',       1),
+('Gold',   49.99,  1.5, 365, 'Gold membership - 1.5x points on all bookings',    1),
+('Diamond', 99.99,  2.0, 365, 'Diamond membership - 2x points + exclusive perks', 1);
+
+-- ============================================
+-- CUSTOMER MEMBERSHIPS
+-- Mon đang là Gold (tier_id=2)
+-- ============================================
+INSERT INTO customer_memberships (customer_id, tier_id, started_at, expires_at, is_active)
+VALUES
+(1, 2, '2026-01-01 00:00:00', '2026-12-31 23:59:59', 1);
+
+-- ============================================
+-- REWARDS (sorted by cost asc)
+-- ============================================
+-- max_redeems_per_customer | cooldown_days | stock
+INSERT INTO rewards (name, cost, description, is_active, max_redeems_per_customer, cooldown_days, stock)
+VALUES
+('Free Nail Art (2 nails)',  300,  'Complimentary nail art on 2 nails of your choice', 1, 5,    7,   NULL),
+('Free Classic Manicure',   600,  'One free Classic Manicure session',                 1, 3,    7,   5),
+('Free Gel Manicure',       1000, 'One free Gel Manicure session',                     1, 4,    7,   6),
+('Free Spa Pedicure',       1500, 'One free Spa Pedicure session',                     1, NULL, 7, 10),
+('Free Luxury Treatment',   2500, 'One free premium treatment of your choice',         1, 1,    7, 3),
+('VIP Day Package',         4000, 'Full day of premium nail treatments',               1, 1,    7, 2);
+
+-- ============================================
+-- LOYALTY CONFIG
+-- ============================================
+INSERT INTO loyalty_config (key, value, description)
+VALUES
+('review_bonus',        '50',  'Points awarded for writing a review'),
+('birthday_bonus',      '100', 'Points awarded during birthday month'),
+('first_booking_bonus', '99', 'Points awarded on first completed booking'),
+('streak_bonus',        '100', 'Points awarded for booking 3 months in a row'),
+('referral_bonus',      '200', 'Points awarded when referred friend completes first booking'),
+('double_points_day',   '2',   'Day of week for double points: 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat 7=Sun');
+
+-- ============================================
+-- BOOKINGS (giữ nguyên từ seed cũ)
+-- 22 completed | 4 cancelled | 2 pending | 2 confirmed
 -- ============================================
 INSERT INTO bookings (customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes)
 VALUES
--- ===== id 1-22: completed (sẽ có invoice) =====
--- Dates rải từ 2024-03 đến 2026-05 để test date filter
+-- id 1-22: completed
+(1, 1, 1, '2024-03-15', '10:00', '10:45', 'completed', 'Visa paid'),
+(1, 2, 2, '2024-05-20', '14:00', '15:00', 'completed', 'Mastercard paid'),
+(1, 3, 3, '2024-07-08', '09:00', '10:15', 'completed', 'Mobile pay paid'),
+(1, 1, 2, '2024-09-12', '11:00', '12:00', 'completed', 'Apple pay paid'),
+(1, 2, 1, '2024-11-25', '13:30', '14:15', 'completed', 'Google pay refunded'),
+(1, 3, 3, '2025-01-18', '15:00', '16:15', 'completed', 'Cash paid'),
+(1, 1, 1, '2025-02-14', '10:00', '10:45', 'completed', 'Bank transfer paid'),
+(1, 2, 2, '2025-03-22', '14:30', '15:30', 'completed', 'Visa pending'),
+(1, 3, 3, '2025-04-10', '09:00', '10:15', 'completed', 'Mastercard paid'),
+(1, 1, 2, '2025-05-19', '11:00', '12:00', 'completed', 'Mobile pay refunded'),
+(1, 2, 1, '2025-07-08', '13:00', '13:45', 'completed', 'Apple pay paid'),
+(1, 3, 3, '2025-08-15', '15:00', '16:15', 'completed', 'Google pay paid'),
+(1, 1, 1, '2025-09-20', '10:00', '10:45', 'completed', 'Cash paid'),
+(1, 2, 2, '2025-10-12', '14:00', '15:00', 'completed', 'Bank transfer refunded'),
+(1, 3, 3, '2025-11-25', '09:30', '10:45', 'completed', 'Visa paid'),
+(1, 1, 2, '2025-12-18', '11:00', '12:00', 'completed', 'Mastercard paid'),
+(1, 2, 1, '2026-02-22', '13:30', '14:15', 'completed', 'Mobile pay paid'),
+(1, 3, 3, '2026-03-15', '15:00', '16:15', 'completed', 'Apple pay paid'),
+(1, 1, 1, '2026-04-05', '10:00', '10:45', 'completed', 'Google pay pending'),
+(1, 2, 2, '2026-04-20', '14:00', '15:00', 'completed', 'Cash paid'),
+(1, 3, 2, '2026-05-08', '11:00', '12:00', 'completed', 'Visa paid'),
+(1, 1, 3, '2026-05-22', '09:00', '10:15', 'completed', 'Mastercard pending'),
 
--- Old dates (>1 year ago, để filter "Last year" loại)
-(1, 1, 1, "2024-03-15", "10:00", "10:45", "completed", "Visa paid"),
-(1, 2, 2, "2024-05-20", "14:00", "15:00", "completed", "Mastercard paid"),
-(1, 3, 3, "2024-07-08", "09:00", "10:15", "completed", "Mobile pay paid"),
-(1, 1, 2, "2024-09-12", "11:00", "12:00", "completed", "Apple pay paid"),
+-- id 23-26: cancelled
+(1, 1, 1, '2024-08-15', '10:00', '10:45', 'cancelled', 'Customer cancelled - old'),
+(1, 2, 2, '2025-06-20', '14:00', '15:00', 'cancelled', 'Staff unavailable'),
+(1, 3, 3, '2026-01-12', '09:00', '10:15', 'cancelled', 'Customer cancelled'),
+(1, 1, 2, '2026-05-15', '11:00', '12:00', 'cancelled', 'Cancelled last minute'),
 
--- Within last year, > 3 months ago
-(1, 2, 1, "2024-11-25", "13:30", "14:15", "completed", "Google pay refunded"),
-(1, 3, 3, "2025-01-18", "15:00", "16:15", "completed", "Cash paid"),
-(1, 1, 1, "2025-02-14", "10:00", "10:45", "completed", "Bank transfer paid"),
-(1, 2, 2, "2025-03-22", "14:30", "15:30", "completed", "Visa pending"),
+-- id 27-28: pending
+(1, 2, 1, '2026-06-20', '13:00', '13:45', 'pending', 'Awaiting confirmation'),
+(1, 3, 2, '2026-07-10', '10:00', '11:00', 'pending',  'New booking'),
 
--- Within last 3 months, > 30 days ago (giả sử current ~ May 2026)
-(1, 3, 3, "2025-04-10", "09:00", "10:15", "completed", "Mastercard paid"),
-(1, 1, 2, "2025-05-19", "11:00", "12:00", "completed", "Mobile pay refunded"),
-(1, 2, 1, "2025-07-08", "13:00", "13:45", "completed", "Apple pay paid"),
-(1, 3, 3, "2025-08-15", "15:00", "16:15", "completed", "Google pay paid"),
-(1, 1, 1, "2025-09-20", "10:00", "10:45", "completed", "Cash paid"),
-(1, 2, 2, "2025-10-12", "14:00", "15:00", "completed", "Bank transfer refunded"),
-(1, 3, 3, "2025-11-25", "09:30", "10:45", "completed", "Visa paid"),
-(1, 1, 2, "2025-12-18", "11:00", "12:00", "completed", "Mastercard paid"),
-
--- Within last 3 months (Feb-May 2026)
-(1, 2, 1, "2026-02-22", "13:30", "14:15", "completed", "Mobile pay paid"),
-(1, 3, 3, "2026-03-15", "15:00", "16:15", "completed", "Apple pay paid"),
-(1, 1, 1, "2026-04-05", "10:00", "10:45", "completed", "Google pay pending"),
-(1, 2, 2, "2026-04-20", "14:00", "15:00", "completed", "Cash paid"),
-
--- Within last 30 days
-(1, 3, 2, "2026-05-08", "11:00", "12:00", "completed", "Visa paid"),
-(1, 1, 3, "2026-05-22", "09:00", "10:15", "completed", "Mastercard pending"),
-
-
--- ===== id 23-26: cancelled =====
-(1, 1, 1, "2024-08-15", "10:00", "10:45", "cancelled", "Customer cancelled - old"),
-(1, 2, 2, "2025-06-20", "14:00", "15:00", "cancelled", "Staff unavailable"),
-(1, 3, 3, "2026-01-12", "09:00", "10:15", "cancelled", "Customer cancelled"),
-(1, 1, 2, "2026-05-15", "11:00", "12:00", "cancelled", "Cancelled last minute"),
-
-
--- ===== id 27-28: pending (chưa diễn ra) =====
-(1, 2, 1, "2026-06-20", "13:00", "13:45", "pending", "Awaiting confirmation"),
-(1, 3, 2, "2026-07-10", "10:00", "11:00", "pending", "New booking"),
-
-
--- ===== id 29-30: confirmed (chưa diễn ra) =====
-(1, 1, 3, "2026-06-25", "14:00", "15:15", "confirmed", "Upcoming visit"),
-(1, 2, 1, "2026-07-05", "11:00", "11:45", "confirmed", "Birthday treat");
-
+-- id 29-30: confirmed
+(1, 1, 3, '2026-06-25', '14:00', '15:15', 'confirmed', 'Upcoming visit'),
+(1, 2, 1, '2026-07-05', '11:00', '11:45', 'confirmed', 'Birthday treat');
 
 -- ============================================
--- INVOICES for 22 completed bookings (id 1-22)
--- Phân bổ:
---   visa: 4, mastercard: 4, mobile_pay: 3, apple_pay: 3, google_pay: 3, cash: 3, bank_transfer: 2
---   paid: 14, refunded: 5, pending: 3
+-- INVOICES (giữ nguyên)
 -- ============================================
 INSERT INTO invoices (booking_id, invoice_number, amount, payment_method, status)
 VALUES
@@ -117,11 +160,8 @@ VALUES
 (21, 'INV-2026-0021', 35.00, 'visa',          'paid'),
 (22, 'INV-2026-0022', 35.00, 'mastercard',    'pending');
 
-
 -- ============================================
--- REVIEWS: ~12 đã review, 10 chưa review
--- Reviewed bookings: 1, 2, 4, 6, 9, 11, 13, 15, 16, 17, 20, 21
--- Not reviewed: 3, 5, 7, 8, 10, 12, 14, 18, 19, 22
+-- REVIEWS (giữ nguyên)
 -- ============================================
 INSERT INTO reviews (booking_id, customer_id, rating, comment)
 VALUES
@@ -137,3 +177,94 @@ VALUES
 (17, 1, 5, 'Mobile pay + great service = win.'),
 (20, 1, 4, 'Solid pedicure, relaxing atmosphere.'),
 (21, 1, 5, 'Quick, clean, and professional.');
+
+-- ============================================
+-- LOYALTY POINTS LOG
+--
+-- Gold tier multiplier = 1.5
+-- service points:
+--   service_id=1 (Classic) → 50 × 1.5 = 75
+--   service_id=2 (Gel)     → 80 × 1.5 = 120
+--   service_id=3 (Spa)     → 120 × 1.5 = 180
+--
+-- Booking map (service_id → points):
+--   1→75, 2→120, 3→180, 4→120, 5→75,
+--   6→180, 7→75, 8→120, 9→180, 10→120,
+--   11→75, 12→180, 13→75, 14→120, 15→180,
+--   16→120, 17→75, 18→180, 19→75, 20→120,
+--   21→120, 22→180
+--
+-- Subtotal bookings : 2,670
+-- first_booking     :  +200
+-- reviews (×12)     :  +600
+-- birthday (×2)     :  +200
+-- streak (×1)       :  +100
+-- redeem            :  -600
+-- TOTAL             : 3,170
+-- Next reward       : Free Gel Manicure (1,000 pts) → already passed
+--                     Free Spa Pedicure (1,500 pts) → already passed
+--                     Free Luxury Treatment (2,500 pts) → already passed
+--                     VIP Day Package (4,000 pts) → next! 3,170/4,000 = 79%
+-- ============================================
+INSERT INTO loyalty_points_log (customer_id, points, source, reference_id, note, created_at)
+VALUES
+-- first booking bonus
+(1, 200, 'first_booking', 1,    'First booking bonus',              '2024-03-15 10:45:00'),
+
+-- completed bookings
+(1,  75, 'booking', 1,  'Classic Manicure × Gold (×1.5)',           '2024-03-15 10:45:00'),
+(1, 120, 'booking', 2,  'Gel Manicure × Gold (×1.5)',               '2024-05-20 15:00:00'),
+(1, 180, 'booking', 3,  'Spa Pedicure × Gold (×1.5)',               '2024-07-08 10:15:00'),
+(1, 120, 'booking', 4,  'Gel Manicure × Gold (×1.5)',               '2024-09-12 12:00:00'),
+(1,  75, 'booking', 5,  'Classic Manicure × Gold (×1.5)',           '2024-11-25 14:15:00'),
+(1, 180, 'booking', 6,  'Spa Pedicure × Gold (×1.5)',               '2025-01-18 16:15:00'),
+(1,  75, 'booking', 7,  'Classic Manicure × Gold (×1.5)',           '2025-02-14 10:45:00'),
+(1, 120, 'booking', 8,  'Gel Manicure × Gold (×1.5)',               '2025-03-22 15:30:00'),
+(1, 180, 'booking', 9,  'Spa Pedicure × Gold (×1.5)',               '2025-04-10 10:15:00'),
+(1, 120, 'booking', 10, 'Gel Manicure × Gold (×1.5)',               '2025-05-19 12:00:00'),
+(1,  75, 'booking', 11, 'Classic Manicure × Gold (×1.5)',           '2025-07-08 13:45:00'),
+(1, 180, 'booking', 12, 'Spa Pedicure × Gold (×1.5)',               '2025-08-15 16:15:00'),
+(1,  75, 'booking', 13, 'Classic Manicure × Gold (×1.5)',           '2025-09-20 10:45:00'),
+(1, 120, 'booking', 14, 'Gel Manicure × Gold (×1.5)',               '2025-10-12 15:00:00'),
+(1, 180, 'booking', 15, 'Spa Pedicure × Gold (×1.5)',               '2025-11-25 10:45:00'),
+(1, 120, 'booking', 16, 'Gel Manicure × Gold (×1.5)',               '2025-12-18 12:00:00'),
+(1,  75, 'booking', 17, 'Classic Manicure × Gold (×1.5)',           '2026-02-22 14:15:00'),
+(1, 180, 'booking', 18, 'Spa Pedicure × Gold (×1.5)',               '2026-03-15 16:15:00'),
+(1,  75, 'booking', 19, 'Classic Manicure × Gold (×1.5)',           '2026-04-05 10:45:00'),
+(1, 120, 'booking', 20, 'Gel Manicure × Gold (×1.5)',               '2026-04-20 15:00:00'),
+(1, 120, 'booking', 21, 'Gel Manicure × Gold (×1.5)',               '2026-05-08 12:00:00'),
+(1, 180, 'booking', 22, 'Spa Pedicure × Gold (×1.5)',               '2026-05-22 10:15:00'),
+
+-- review bonuses (12 reviews)
+(1, 50, 'review', 1,  'Review bonus - booking #1',                  '2024-03-16 09:00:00'),
+(1, 50, 'review', 2,  'Review bonus - booking #2',                  '2024-05-21 10:00:00'),
+(1, 50, 'review', 4,  'Review bonus - booking #4',                  '2024-09-13 10:00:00'),
+(1, 50, 'review', 6,  'Review bonus - booking #6',                  '2025-01-19 10:00:00'),
+(1, 50, 'review', 9,  'Review bonus - booking #9',                  '2025-04-11 10:00:00'),
+(1, 50, 'review', 11, 'Review bonus - booking #11',                 '2025-07-09 10:00:00'),
+(1, 50, 'review', 13, 'Review bonus - booking #13',                 '2025-09-21 10:00:00'),
+(1, 50, 'review', 15, 'Review bonus - booking #15',                 '2025-11-26 10:00:00'),
+(1, 50, 'review', 16, 'Review bonus - booking #16',                 '2025-12-19 10:00:00'),
+(1, 50, 'review', 17, 'Review bonus - booking #17',                 '2026-02-23 10:00:00'),
+(1, 50, 'review', 20, 'Review bonus - booking #20',                 '2026-04-21 10:00:00'),
+(1, 50, 'review', 21, 'Review bonus - booking #21',                 '2026-05-09 10:00:00'),
+
+-- Admin Debug --
+(1, 9999, 'admin', NULL, 'Admin debug',                 '2026-05-09 10:00:00'),
+
+-- birthday bonus (tháng 6 = tháng sinh nhật Mon)
+(1, 100, 'birthday', NULL, 'Birthday bonus - June 2024',            '2024-06-15 00:00:00'),
+(1, 100, 'birthday', NULL, 'Birthday bonus - June 2025',            '2025-06-15 00:00:00'),
+
+-- streak bonus (Jan → Feb → Mar 2025 liên tiếp)
+(1, 100, 'streak', NULL, 'Streak bonus - 3 months Jan-Mar 2025',    '2025-03-22 15:30:00'),
+
+-- redeem: đổi Free Gel Manicure (reward_id=3, cost=1000)
+(1, -600, 'redeem', 3, 'Redeemed: Free Gel Manicure',               '2026-04-01 12:00:00');
+
+-- ============================================
+-- REWARD REDEMPTIONS
+-- ============================================
+INSERT INTO reward_redemptions (customer_id, reward_id, points_spent, voucher_code, is_used, redeemed_at)
+VALUES
+(1, 3, 600, 'DAHA-K7MN-2QXP', 0, '2026-04-01 12:00:00');

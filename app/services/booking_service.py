@@ -1,7 +1,7 @@
 from app.utils.helpers import parse_time
 from datetime import timedelta, date, UTC
 from datetime import datetime
-from app.services.email_authentication import generate_verification_code, send_verification_email
+from app.services.email_system import generate_verification_code, send_verification_email
 from app.database.db import get_staff_by_id, get_available_staff_for_slot , get_customer_by_email , create_customer, create_verification, create_booking, get_customer_id
 import random
 
@@ -122,7 +122,7 @@ class VerificationService:
     @staticmethod
     def create_booking_verification(email):
         code = generate_verification_code()
-        send_verification_email(email, code)
+        send_verification_email(email, code, "booking")
         expires_at = (datetime.now(UTC) + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
         verification_id = create_verification(code, "booking", expires_at)
         return verification_id

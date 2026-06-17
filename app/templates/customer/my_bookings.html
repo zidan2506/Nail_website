@@ -18,17 +18,6 @@
       <p class="page-subtitle">Manage your upcoming visits and booking history.</p>
     </div>
 
-    <div class="page-header__right">
-      <form class="appointment-search-form" action="#" method="get">
-        <input
-          type="text"
-          name="q"
-          class="appointment-search-input"
-          placeholder="Search appointments..."
-        />
-        <button type="submit" class="appointment-search-btn">Search</button>
-      </form>
-    </div>
   </section>
 
   <!-- Top Overview -->
@@ -70,7 +59,7 @@
       </p>
 
       <div class="next-visit-card__actions">
-        <a href="#" class="btn btn-primary">Book new appointment</a>
+        <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">Book new appointment</a>
       </div>
     </div>
 
@@ -83,20 +72,33 @@
     <aside class="loyalty-reward-card">
       <p class="section-label section-label--light">Loyalty Reward</p>
 
+      {% if next_reward %}
       <h3 class="loyalty-reward-card__title">
-        You're 2 visits away from a complimentary paraffin wax treatment.
+        {{ points_needed }} points to {{ next_reward.name }}
       </h3>
-
       <div class="reward-progress">
         <div class="reward-progress__bar">
-          <div class="reward-progress__fill" style="width: 80%;"></div>
+          <div class="reward-progress__fill" style="width: {{ progress_pct }}%;"></div>
         </div>
-
         <div class="reward-progress__meta">
-          <span>8 / 10 Visits</span>
-          <span>Level: Rose Gold</span>
+          <span>{{ loyalty_points }} pts</span>
+          <span>{{ progress_pct }}% Complete</span>
         </div>
       </div>
+      {% else %}
+      <h3 class="loyalty-reward-card__title">
+        You've unlocked all rewards!
+      </h3>
+      <div class="reward-progress">
+        <div class="reward-progress__bar">
+          <div class="reward-progress__fill" style="width: 100%;"></div>
+        </div>
+        <div class="reward-progress__meta">
+          <span>{{ loyalty_points }} pts</span>
+          <span>100% Complete</span>
+        </div>
+      </div>
+      {% endif %}
     </aside>
   </section>
 
@@ -160,9 +162,6 @@
                   Confirmed
                 </span>
 
-                <div class="appointment-card__menu">
-                  <button type="button" class="icon-btn">⋮</button>
-                </div>
               </div>
 
               <h3 class="appointment-card__title">{{ booking['booking']['service_name'] }}</h3>
@@ -292,6 +291,57 @@
 
     </div>
   </section>
+
+  <!-- Cancel Confirm Modal -->
+  <div id="cancel-modal" class="cancel-modal-overlay">
+    <div class="cancel-modal">
+
+      <div class="cancel-modal__header">
+        <div class="cancel-modal__header-left">
+          <span class="cancel-modal__icon-badge">✕</span>
+          <h3 class="cancel-modal__title">Cancel appointment?</h3>
+        </div>
+        <button type="button" class="cancel-modal__close" id="cancel-modal-close" aria-label="Close">✕</button>
+      </div>
+
+      <div class="cancel-modal__details">
+        <p class="cancel-modal__details-eyebrow">Appointment details</p>
+        <p class="cancel-modal__service" id="cancel-modal-service"></p>
+        <div class="cancel-modal__detail-row">
+          <span class="cancel-modal__row-icon">📅</span>
+          <span id="cancel-modal-date"></span>
+        </div>
+        <div class="cancel-modal__detail-row">
+          <span class="cancel-modal__row-icon">👤</span>
+          <span id="cancel-modal-stylist"></span>
+        </div>
+      </div>
+
+      <div class="cancel-modal__warning">
+        <span class="cancel-modal__warning-icon">⚠</span>
+        <p>Cancellation Policy</p>
+      </div>
+
+      <div class="cancel-modal__reason-group">
+        <label class="cancel-modal__reason-label" for="cancel-modal-reason">
+          Reason for cancellation <span class="cancel-modal__optional">(optional)</span>
+        </label>
+        <select class="cancel-modal__reason-select" id="cancel-modal-reason">
+          <option value="">Select a reason...</option>
+          <option value="change_of_plans">Change of plans</option>
+          <option value="feeling_unwell">Feeling unwell</option>
+          <option value="reschedule">Want to reschedule instead</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="cancel-modal__footer">
+        <button type="button" id="cancel-modal-keep" class="btn btn-secondary">Keep appointment</button>
+        <button type="button" id="cancel-modal-confirm" class="btn cancel-modal__confirm-btn">Yes, cancel</button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- Recent History -->
   <section class="recent-history">

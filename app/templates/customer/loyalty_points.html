@@ -1,0 +1,1521 @@
+{% extends "customer_base.html" %}
+
+{% block title %}Loyalty Points | Daha Care{% endblock %}
+
+{% block nav_dashboard %}{% endblock %}
+{% block nav_bookings %}{% endblock %}
+{% block nav_book_appointment %}{% endblock %}
+{% block nav_history %}{% endblock %}
+{% block nav_setting %}{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   LOYALTY PAGE — scoped styles (no conflict with customer_base)
+   ============================================================ */
+
+/* ---------- Layout ---------- */
+.lp-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.lp-header {
+    margin-bottom: 36px;
+}
+
+.lp-label {
+    display: inline-block;
+    background: #fdebf2;
+    color: #d64682;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.lp-header h1 {
+    margin: 12px 0 6px;
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #23161c;
+    line-height: 1.1;
+}
+
+.lp-header p {
+    margin: 0;
+    color: #73636a;
+    font-size: 1.05rem;
+}
+
+/* ---------- Bento grid ---------- */
+.lp-bento {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 22px;
+    align-items: stretch;
+}
+
+/* ---------- Balance card ---------- */
+.balance-card {
+    background: #ffffff;
+    border-radius: 26px;
+    padding: 32px;
+    box-shadow: 0 10px 28px rgba(35,22,28,0.07);
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Tier borders */
+.balance-card.tier-silver {
+    border: 2.5px solid transparent;
+    background-image: linear-gradient(#ffffff, #ffffff),
+        linear-gradient(120deg, #e0e0e0, #f5f5f5, #bdbdbd, #e8e8e8, #bdbdbd);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    box-shadow: 0 10px 28px rgba(189,189,189,0.18);
+}
+
+.balance-card.tier-gold {
+    border: 2.5px solid transparent;
+    background-image: linear-gradient(#ffffff, #ffffff),
+        linear-gradient(120deg, #ffd700, #fff8dc, #daa520, #ffe066, #daa520);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    box-shadow: 0 10px 28px rgba(218,165,32,0.22);
+}
+
+.balance-card.tier-diamond {
+    border: 2.5px solid transparent;
+    background-image: linear-gradient(#ffffff, #ffffff),
+        linear-gradient(120deg, #b9f2ff, #e6e6fa, #8a2be2, #c084fc, #b9f2ff);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    box-shadow: 0 10px 28px rgba(138,43,226,0.15);
+}
+
+/* Decorative blobs */
+.balance-card::before,
+.balance-card::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+.balance-card::before {
+    width: 280px;
+    height: 280px;
+    background: rgba(214, 70, 130, 0.05);
+    right: -80px;
+    top: -80px;
+    filter: blur(40px);
+}
+.balance-card::after {
+    width: 200px;
+    height: 200px;
+    background: rgba(214, 70, 130, 0.04);
+    left: -60px;
+    bottom: -60px;
+    filter: blur(40px);
+}
+
+.balance-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+}
+
+.balance-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #73636a;
+    margin-bottom: 6px;
+}
+
+.balance-amount {
+    font-size: 4.5rem;
+    font-weight: 800;
+    color: #d64682;
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+.balance-amount span {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    opacity: 0.55;
+    margin-left: 4px;
+}
+
+.balance-icon {
+    background: rgba(214, 70, 130, 0.06);
+    border: 1px solid rgba(214, 70, 130, 0.12);
+    border-radius: 18px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+/* Progress section */
+.balance-progress {
+    position: relative;
+    z-index: 1;
+}
+
+.progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.tier-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #534048;
+}
+
+.tier-badge.badge-silver { color: #888; }
+.tier-badge.badge-gold   { color: #b8860b; }
+.tier-badge.badge-diamond{ color: #7c3aed; }
+
+.progress-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #d64682;
+}
+
+.progress-track {
+    width: 100%;
+    height: 10px;
+    background: #f1eeee;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #f3387a, #d64682);
+    transition: width 0.6s ease;
+}
+
+.progress-fill.fill-gold {
+    background: linear-gradient(90deg, #ffd700, #daa520);
+}
+
+.progress-fill.fill-diamond {
+    background: linear-gradient(90deg, #a78bfa, #7c3aed);
+}
+
+.progress-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+}
+
+.next-reward-text {
+    font-size: 0.82rem;
+    color: #73636a;
+}
+
+.view-benefits-link {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #d64682;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* ---------- Mission Carousel ---------- */
+.mission-card {
+    border-radius: 26px;
+    box-shadow: 0 10px 28px rgba(35,22,28,0.07);
+    min-height: 300px;
+    position: relative;
+    overflow: hidden;
+}
+
+.mission-card-label {
+    position: absolute;
+    top: 18px;
+    left: 22px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.85;
+}
+
+.carousel-viewport {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.carousel-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-slide {
+    flex: 0 0 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px 28px;
+    box-sizing: border-box;
+}
+
+.mission-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.mission-name {
+    margin: 0 0 6px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.mission-pts {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 18px;
+}
+
+.carousel-slide a {
+    margin-top: auto;
+    margin-bottom: 28px;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.carousel-slide:hover a {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mission-btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.mission-btn:hover {
+    background: rgba(255, 255, 255, 0.38);
+    transform: translateY(-1px);
+}
+
+.mission-btn:active {
+    transform: scale(0.97);
+}
+
+/* arrow buttons */
+.mission-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.18s, opacity 0.2s;
+    opacity: 0;
+    padding: 0;
+}
+.mission-card:hover .mission-arrow { opacity: 1; }
+.mission-arrow:hover { background: rgba(255, 255, 255, 0.28); }
+.mission-arrow.prev { left: 12px; }
+.mission-arrow.next { right: 12px; }
+
+/* dots */
+.carousel-dots {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 7px;
+    z-index: 10;
+}
+
+.carousel-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.25s, width 0.25s;
+}
+
+.carousel-dot.active {
+    background: #fff;
+    width: 18px;
+    border-radius: 3px;
+}
+
+/* ---------- Available Rewards ---------- */
+.lp-section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.lp-section-header h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #23161c;
+    white-space: nowrap;
+}
+
+.lp-section-divider {
+    flex: 1;
+    height: 1px;
+    background: #ece3e7;
+}
+
+.lp-section-header a {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #d64682;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.rewards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.reward-card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0 8px 22px rgba(35,22,28,0.06);
+    transition: transform 0.3s ease;
+}
+
+.reward-card:hover {
+    transform: translateY(-6px);
+}
+
+.reward-card.locked {
+    opacity: 0.7;
+    background: rgba(255,255,255,0.6);
+}
+
+.reward-card:hover.locked {
+    transform: none;
+}
+
+.reward-img-wrap {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 4/3;
+    margin-bottom: 18px;
+}
+
+.reward-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    display: block;
+}
+
+.reward-card:not(.locked):hover .reward-img-wrap img {
+    transform: scale(1.08);
+}
+
+.reward-card.locked .reward-img-wrap img {
+    filter: grayscale(1);
+}
+
+.reward-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #d64682;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.reward-lock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(35,22,28,0.38);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.reward-card h4 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #23161c;
+}
+
+.reward-card p {
+    margin: 0 0 16px;
+    font-size: 0.82rem;
+    color: #73636a;
+}
+
+.reward-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #f1eeee;
+    padding-top: 14px;
+}
+
+.reward-pts {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #d64682;
+}
+
+.reward-pts.locked {
+    color: #73636a;
+}
+
+.redeem-btn {
+    border: none;
+    background: #fdebf2;
+    color: #d64682;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.redeem-btn:hover {
+    background: #d64682;
+    color: #fff;
+}
+
+.locked-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #73636a;
+}
+
+.reward-badge-stock {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #f59e0b;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.reward-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.reward-meta-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 999px;
+}
+
+.reward-meta-tag.tag-stock    { background: #fef3c7; color: #92400e; }
+.reward-meta-tag.tag-cooldown { background: #e0f2fe; color: #0369a1; }
+.reward-meta-tag.tag-limit    { background: #f0fdf4; color: #166534; }
+.reward-meta-tag.tag-locked   { background: #fef2f2; color: #991b1b; }
+
+/* ---------- Points History / My Vouchers Tabs ---------- */
+.history-card {
+    background: #ffffff;
+    border-radius: 26px;
+    padding: 32px;
+    box-shadow: 0 10px 28px rgba(35,22,28,0.07);
+    margin-top: 22px;
+}
+
+/* Tab nav */
+.tab-nav {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 28px;
+    border-bottom: 1.5px solid #f1eeee;
+    padding-bottom: 0;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #73636a;
+    padding: 10px 18px;
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -1.5px;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.tab-btn:hover { color: #d64682; }
+.tab-btn.active {
+    color: #d64682;
+    border-bottom-color: #d64682;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---------- Voucher cards ---------- */
+.voucher-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.voucher-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px;
+    border-radius: 18px;
+    background: #faf7f8;
+    border: 1px solid #f1eeee;
+    transition: border-color 0.2s;
+}
+
+.voucher-item:hover { border-color: rgba(214,70,130,0.2); }
+.voucher-item.used    { opacity: 0.55; }
+.voucher-item.expired { opacity: 0.45; }
+
+.voucher-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.voucher-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: #fdebf2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.voucher-item.used .voucher-icon,
+.voucher-item.expired .voucher-icon { background: #f1eeee; }
+
+.voucher-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #23161c;
+    margin: 0 0 3px;
+}
+
+.voucher-date {
+    font-size: 0.78rem;
+    color: #73636a;
+    margin: 0;
+}
+
+.voucher-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.voucher-code {
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #d64682;
+    background: #fdebf2;
+    border: 1px dashed rgba(214,70,130,0.4);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-family: monospace;
+}
+
+.voucher-status-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 999px;
+}
+
+.voucher-status-badge.active  { background: #dff3e7; color: #228b5d; }
+.voucher-status-badge.used    { background: #f1eeee; color: #73636a; }
+.voucher-status-badge.expired { background: #f1eeee; color: #73636a; }
+
+/* clickable cursor on voucher items */
+.voucher-item { cursor: pointer; }
+
+/* ---------- Voucher Detail Modal ---------- */
+.vd-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(35,22,28,0.45);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+    align-items: center;
+    justify-content: center;
+}
+
+.vd-overlay.open { display: flex; }
+
+.vd-modal {
+    background: #fff;
+    border-radius: 26px;
+    padding: 36px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 24px 60px rgba(35,22,28,0.18);
+    position: relative;
+    animation: vdSlideUp 0.25s ease;
+}
+
+@keyframes vdSlideUp {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.vd-close {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    background: #f1eeee;
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #73636a;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.vd-close:hover { background: #fdebf2; color: #d64682; }
+
+.vd-icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: #fdebf2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 16px;
+}
+
+.vd-icon-wrap.used,
+.vd-icon-wrap.expired { background: #f1eeee; }
+
+.vd-name {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #23161c;
+    margin: 0 0 4px;
+}
+
+.vd-desc {
+    font-size: 0.88rem;
+    color: #73636a;
+    margin: 0 0 24px;
+    line-height: 1.6;
+}
+
+.vd-divider {
+    height: 1px;
+    background: #f1eeee;
+    margin: 20px 0;
+}
+
+.vd-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.vd-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.88rem;
+}
+
+.vd-row-label {
+    color: #73636a;
+    font-weight: 600;
+}
+
+.vd-row-value {
+    font-weight: 700;
+    color: #23161c;
+}
+
+.vd-row-value.pink  { color: #d64682; }
+.vd-row-value.green { color: #228b5d; }
+.vd-row-value.muted { color: #73636a; }
+
+/* Code box */
+.vd-code-block {
+    background: #faf7f8;
+    border: 1.5px dashed rgba(214,70,130,0.35);
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.vd-code-block.inactive {
+    border-color: #ece3e7;
+    background: #f8f6f6;
+}
+
+.vd-code-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #73636a;
+    margin-bottom: 6px;
+}
+
+.vd-code-value {
+    font-family: monospace;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #d64682;
+}
+
+.vd-code-block.inactive .vd-code-value { color: #b09aa4; }
+
+.vd-copy-btn {
+    background: #fdebf2;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #d64682;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.vd-copy-btn:hover { background: #d64682; color: #fff; }
+.vd-copy-btn.copied { background: #dff3e7; color: #228b5d; }
+
+.vd-code-block.inactive .vd-copy-btn { display: none; }
+
+.vd-note {
+    margin-top: 16px;
+    font-size: 0.78rem;
+    color: #b09aa4;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.voucher-empty {
+    text-align: center;
+    padding: 3rem 0;
+    color: #73636a;
+    font-size: 0.9rem;
+}
+
+.voucher-empty span {
+    display: block;
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    opacity: 0.4;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+    border-bottom: 1px solid #f1eeee;
+    gap: 16px;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.history-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.history-icon.earn {
+    background: #dff3e7;
+}
+
+.history-icon.redeem {
+    background: #fdebf2;
+}
+
+.history-desc {
+    font-weight: 700;
+    color: #23161c;
+    margin: 0 0 3px;
+    font-size: 0.9rem;
+}
+
+.history-date {
+    font-size: 0.78rem;
+    color: #73636a;
+    margin: 0;
+}
+
+.history-right {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.history-pts {
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 0 0 3px;
+}
+
+.history-pts.earn  { color: #228b5d; }
+.history-pts.redeem { color: #d64682; }
+
+.history-ref {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #73636a;
+    margin: 0;
+}
+
+.load-more-btn {
+    display: block;
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px;
+    background: transparent;
+    border: 1px solid #ece3e7;
+    border-radius: 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #73636a;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.load-more-btn:hover {
+    background: #faf7f8;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .lp-bento {
+        grid-template-columns: 1fr;
+    }
+
+    .rewards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .lp-header h1 {
+        font-size: 2rem;
+    }
+
+    .rewards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .balance-amount {
+        font-size: 3.2rem;
+    }
+}
+</style>
+{% endblock %}
+
+
+{% block customer_content %}
+<div class="lp-wrapper">
+
+    <!-- ===== Header ===== -->
+    <div class="lp-header">
+        <span class="lp-label">Rewards Club</span>
+        <h1>Loyalty Points</h1>
+        <p>Your journey to effortless beauty, rewarded.</p>
+    </div>
+
+    <!-- ===== Top Bento: Balance + Mission ===== -->
+    <div class="lp-bento">
+
+        <!-- Balance Card -->
+        <!--
+            tier_class: "tier-silver" | "tier-gold" | "tier-diamond"
+            badge_class: "badge-silver" | "badge-gold" | "badge-diamond"
+            fill_class:  "" (default pink) | "fill-gold" | "fill-diamond"
+            Example context vars from Flask route:
+                balance = 1250
+                tier_name = "Silver"
+                tier_class = "tier-silver"
+                next_reward_name = "Free Gel Manicure"
+                next_reward_pts = 2500
+                progress_pct = 50   (int 0–100)
+        -->
+        <div class="balance-card {{ tier_class | default('tier-silver') }}">
+            <div class="balance-top">
+                <div>
+                    <p class="balance-label">Current Balance</p>
+                    <p class="balance-amount">
+                        {{ balance | default(1250) | int | format_number }}<span>pts</span>
+                    </p>
+                </div>
+                <div class="balance-icon">⭐</div>
+            </div>
+
+            <div class="balance-progress">
+                <div class="progress-meta">
+                    <span class="tier-badge {{ badge_class | default('badge-silver') }}">
+                        {{ tier_name | default('Silver') }} Tier
+                    </span>
+                    <span class="progress-label">
+                        {{ (next_reward_pts | default(2500)) - (balance | default(1250)) }} pts to unlock {{ next_reward_name | default('Free Gel Manicure') }}
+                    </span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill {{ fill_class | default('') }}"
+                         style="width: {{ progress_pct | default(50) }}%"></div>
+                </div>
+                <div class="progress-footer">
+                    <span class="next-reward-text">
+                        Next reward: {{ next_reward_name | default('Free Gel Manicure') }} &bull; {{ next_reward_pts | default(2500) }} pts
+                    </span>
+                    <a class="view-benefits-link" href="{{ url_for('main.tier_benefits') }}">View Tier Benefits</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mission Carousel Card -->
+        <div class="mission-card"
+             id="missionCarousel"
+             onmouseenter="pauseCarousel()"
+             onmouseleave="resumeCarousel()">
+
+            <div class="carousel-viewport">
+                <div class="carousel-track" id="carouselTrack">
+
+                    {% set missions = [
+                        {'icon': '⭐', 'name': 'Write a Review',             'pts': '+50 pts',  'cta': 'Start',  'url': url_for('main.customer_history'),
+                         'img': 'images/customer/Loyalty Points/leave_review.png',
+                         'bg': 'linear-gradient(135deg, #fef3c7 0%, #fde68a 55%, #f59e0b 100%)'},
+                        {'icon': '👥', 'name': 'Refer a Friend',              'pts': '+200 pts', 'cta': 'Start',  'url': url_for('main.refer_a_friend'),
+                         'img': 'images/customer/Loyalty Points/invite_friends.png',
+                         'bg': 'linear-gradient(135deg, #ede9fe 0%, #c4b5fd 55%, #8b5cf6 100%)'},
+                        {'icon': '📅', 'name': 'Book Your First Appointment', 'pts': '+100 pts', 'cta': 'Claim',  'url': url_for('main.customer_booking'),
+                         'img': 'images/customer/Loyalty Points/first_visit.png',
+                         'bg': 'linear-gradient(135deg, #d1fae5 0%, #6ee7b7 55%, #059669 100%)'},
+
+                    ] %}
+
+                    {% for m in missions %}
+                    <div class="carousel-slide"
+                         style="{% if m.img is defined and m.img %}background: url('{{ url_for('static', filename=m.img) }}') center / cover no-repeat;{% else %}background: {{ m.bg }};{% endif %}">
+                        {% if not (m.img is defined and m.img) %}
+                        <span class="mission-icon">{{ m.icon }}</span>
+                        <p class="mission-name">{{ m.name }}</p>
+                        <p class="mission-pts">{{ m.pts }}</p>
+                        {% endif %}
+                        {% if m.name == 'Book Your First Appointment' and first_booking_claimed %}
+                        <button class="mission-btn" style="background:rgba(34,197,94,0.25); border:1.5px solid rgba(34,197,94,0.5); color:#dcfce7; cursor:default; letter-spacing:0.05em;" disabled>✓ Claimed</button>
+                        {% elif m.name == 'Write a Review' and not pending_review %}
+                        <button class="mission-btn" style="background:rgba(34,197,94,0.25); border:1.5px solid rgba(34,197,94,0.5); color:#dcfce7; cursor:default; letter-spacing:0.05em;" disabled>✓ All Reviewed</button>
+                        {% else %}
+                        <a href="{{ m.url }}">
+                            <button class="mission-btn">{{ m.cta }}</button>
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                </div>
+                <div class="mission-card-label">Earn Points <span>✦</span></div>
+                <button class="mission-arrow prev" id="missionPrev" aria-label="Previous">&#8592;</button>
+                <button class="mission-arrow next" id="missionNext" aria-label="Next">&#8594;</button>
+
+                <div class="carousel-dots" id="carouselDots">
+                    {% for m in missions %}
+                    <button class="carousel-dot {% if loop.first %}active{% endif %}"
+                            onclick="goToSlide({{ loop.index0 }})"></button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end .lp-bento -->
+
+    <!-- ===== Available Rewards ===== -->
+    <div style="margin-top: 40px;">
+        <div class="lp-section-header">
+            <h2>Available Vouchers</h2>
+            <div class="lp-section-divider"></div>
+            <a href="{{ url_for('main.all_rewards') }}">See All</a>
+        </div>
+
+        <div class="rewards-grid">
+            {% for reward in rewards | default([
+                {'name': 'Free Hand Massage',   'desc': 'A 15-minute tension relief session.', 'pts': 500,  'locked': false, 'img': '', 'available': true},
+                {'name': 'Premium Cuticle Oil', 'desc': 'Take home our signature scent.',       'pts': 750,  'locked': false, 'img': '', 'available': true},
+                {'name': 'Free Gel Manicure',   'desc': 'Our signature full service.',           'pts': 2500, 'locked': true,  'img': '', 'available': false}
+            ]) %}
+            <div class="reward-card {% if reward.locked %}locked{% endif %}">
+                <div class="reward-img-wrap">
+                    {% if reward.img %}
+                    <img src="{{ reward.img }}" alt="{{ reward.name }}">
+                    {% else %}
+                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#fdebf2,#f8f4f6);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">
+                        {% if reward.lock_reason == 'points' %}🔒
+                        {% elif reward.lock_reason == 'stock' %}🚫
+                        {% elif reward.lock_reason == 'limit' %}✅
+                        {% elif reward.lock_reason == 'cooldown' %}⏳
+                        {% else %}💅{% endif %}
+                    </div>
+                    {% endif %}
+                    {% if reward.lock_reason == 'points' %}
+                        <div class="reward-lock-overlay">🔒</div>
+                    {% elif reward.lock_reason == 'stock' %}
+                        <div class="reward-lock-overlay">🚫</div>
+                    {% elif reward.lock_reason == 'cooldown' %}
+                        <div class="reward-lock-overlay">⏳</div>
+                    {% elif reward.lock_reason == 'limit' %}
+                        <div class="reward-lock-overlay">✅</div>
+                    {% elif reward.available %}
+                        <span class="reward-badge">Available</span>
+                        {% if reward.stock_left is not none and reward.stock_left <= 5 %}
+                        <span class="reward-badge-stock">{{ reward.stock_left }} left</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <h4>{{ reward.name }}</h4>
+                <p>{{ reward.desc }}</p>
+                <div class="reward-meta">
+                    {% if reward.redeems_left is not none and reward.redeems_left > 0 %}
+                    <span class="reward-meta-tag tag-limit">{{ reward.redeems_left }} redeem{{ 's' if reward.redeems_left != 1 }} left</span>
+                    {% endif %}
+                    {% if reward.stock_left is not none %}
+                    <span class="reward-meta-tag tag-stock">{{ reward.stock_left }} in stock</span>
+                    {% endif %}
+                </div>
+                <div class="reward-footer">
+                    <span class="reward-pts {% if reward.locked %}locked{% endif %}">
+                        {{ reward.pts | int }} pts
+                    </span>
+                    {% if reward.lock_reason == 'points' %}
+                        <span class="locked-label">Not enough pts</span>
+                    {% elif reward.lock_reason == 'stock' %}
+                        <span class="locked-label" style="color:#dc2626;">Out of stock</span>
+                    {% elif reward.lock_reason == 'limit' %}
+                        <span class="locked-label" style="color:#16a34a;">Limit reached</span>
+                    {% elif reward.lock_reason == 'cooldown' %}
+                        <div>
+                            <span class="locked-label" style="color:#16a34a;">Limit reached</span>
+                            <span style="display:block;font-size:0.65rem;color:#73636a;margin-top:2px;">renew in {{ reward.cooldown_remaining }} day{{ 's' if reward.cooldown_remaining != 1 }}</span>
+                        </div>
+                    {% else %}
+                        <button type="button" class="redeem-btn"
+                                onclick="openRedeemModal({{ reward.id }}, '{{ reward.name | e }}', {{ reward.pts | int }}, {{ balance | default(0) | int }}, '')">
+                            Redeem
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== Points History / My Vouchers ===== -->
+    <div class="history-card">
+
+        <!-- Tab nav -->
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('history', this)">Points History</button>
+            <button class="tab-btn" onclick="switchTab('vouchers', this)">My Vouchers</button>
+        </div>
+
+        <!-- Tab: Points History -->
+        <div class="tab-panel active" id="tab-history">
+            <div class="history-list">
+                {% for item in history | default([
+                    {'desc': 'Gel Manicure Service',           'date': 'Completed on Oct 12, 2023',   'pts': '+50 pts',   'type': 'earn',   'ref': 'Transaction #8842'},
+                    {'desc': 'Reward: Paraffin Wax Treatment', 'date': 'Redeemed on Sep 28, 2023',    'pts': '-300 pts',  'type': 'redeem', 'ref': 'Redemption'},
+                    {'desc': 'Classic Pedicure + Nail Art',    'date': 'Completed on Sep 15, 2023',   'pts': '+85 pts',   'type': 'earn',   'ref': 'Transaction #7921'}
+                ]) %}
+                <div class="history-item">
+                    <div class="history-left">
+                        <div class="history-icon {{ item.type }}">
+                            {% if item.type == 'earn' %}➕{% else %}🎁{% endif %}
+                        </div>
+                        <div>
+                            <p class="history-desc">{{ item.desc }}</p>
+                            <p class="history-date">{{ item.date }}</p>
+                        </div>
+                    </div>
+                    <div class="history-right">
+                        <p class="history-pts {{ item.type }}">{{ item.pts }}</p>
+                        <p class="history-ref">{{ item.ref }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="load-more-btn">Load More History</button>
+        </div>
+
+        <!-- Tab: My Vouchers -->
+        <div class="tab-panel" id="tab-vouchers">
+            {% if vouchers %}
+            <div class="voucher-list">
+                {% for v in vouchers %}
+                <div class="voucher-item {{ v.status }}"
+                     onclick="openVoucherDetail(this)"
+                     data-name="{{ v.name }}"
+                     data-icon="{{ v.icon }}"
+                     data-desc="{{ v.desc | default('') }}"
+                     data-code="{{ v.code }}"
+                     data-status="{{ v.status }}"
+                     data-pts="{{ v.pts | default(0) }}"
+                     data-redeemed="{{ v.redeemed_at | default(v.date) }}"
+                     data-expires="{{ v.expires_at | default('—') }}">
+                    <div class="voucher-left">
+                        <div class="voucher-icon">{{ v.icon }}</div>
+                        <div>
+                            <p class="voucher-name">{{ v.name }}</p>
+                            <p class="voucher-date">{{ v.date }}</p>
+                        </div>
+                    </div>
+                    <div class="voucher-right">
+                        <span class="voucher-status-badge {{ v.status }}">
+                            {% if v.status == 'active' %}Active
+                            {% elif v.status == 'used' %}Used
+                            {% else %}Expired{% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="voucher-empty">
+                <span>🎁</span>
+                You haven't redeemed any rewards yet.<br>
+                Start earning points to unlock vouchers!
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div><!-- end .lp-wrapper -->
+
+{% include 'customer/redeem_confirm_modal.html' %}
+
+<!-- ===== Voucher Detail Modal ===== -->
+<div class="vd-overlay" id="voucherModal" onclick="closeIfOverlay(event)">
+    <div class="vd-modal">
+        <button class="vd-close" onclick="closeVoucherDetail()">✕</button>
+        <div class="vd-icon-wrap" id="vd-icon-wrap">💅</div>
+        <h3 class="vd-name" id="vd-name"></h3>
+        <p class="vd-desc" id="vd-desc"></p>
+        <div class="vd-rows">
+            <div class="vd-row"><span class="vd-row-label">Status</span><span class="vd-row-value" id="vd-status"></span></div>
+            <div class="vd-row"><span class="vd-row-label">Points spent</span><span class="vd-row-value pink" id="vd-pts"></span></div>
+            <div class="vd-row"><span class="vd-row-label">Redeemed on</span><span class="vd-row-value" id="vd-redeemed"></span></div>
+            <div class="vd-row"><span class="vd-row-label">Expires</span><span class="vd-row-value" id="vd-expires"></span></div>
+        </div>
+        <div class="vd-divider"></div>
+        <div class="vd-code-block" id="vd-code-block">
+            <div><p class="vd-code-label">Voucher Code</p><p class="vd-code-value" id="vd-code-value"></p></div>
+            <button class="vd-copy-btn" id="vd-copy-btn" onclick="copyCode()">Copy</button>
+        </div>
+        <p class="vd-note" id="vd-note"></p>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+// Tab switching — Points History / My Vouchers
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+}
+
+// Voucher Detail Modal
+function openVoucherDetail(el) {
+    const d = el.dataset;
+    const status = d.status;
+
+    document.getElementById('vd-icon-wrap').className = 'vd-icon-wrap ' + status;
+    document.getElementById('vd-icon-wrap').textContent = d.icon;
+    document.getElementById('vd-name').textContent = d.name;
+    document.getElementById('vd-desc').textContent = d.desc || 'Show this code to our staff when you visit.';
+
+    // Status label
+    const statusMap = { active: '✦ Active', used: 'Used', expired: 'Expired' };
+    const statusColor = { active: 'green', used: 'muted', expired: 'muted' };
+    const statusEl = document.getElementById('vd-status');
+    statusEl.textContent = statusMap[status] || status;
+    statusEl.className = 'vd-row-value ' + (statusColor[status] || '');
+
+    document.getElementById('vd-pts').textContent = d.pts ? '−' + d.pts + ' pts' : '—';
+    document.getElementById('vd-redeemed').textContent = d.redeemed || '—';
+    document.getElementById('vd-expires').textContent = d.expires || '—';
+    document.getElementById('vd-code-value').textContent = d.code;
+
+    // Code block — active vs inactive
+    const codeBlock = document.getElementById('vd-code-block');
+    codeBlock.className = 'vd-code-block' + (status !== 'active' ? ' inactive' : '');
+
+    // Note text
+    const noteEl = document.getElementById('vd-note');
+    if (status === 'active') {
+        noteEl.textContent = 'Show this code to our staff at your next visit to redeem.';
+    } else if (status === 'used') {
+        noteEl.textContent = 'This voucher has already been used.';
+    } else {
+        noteEl.textContent = 'This voucher has expired and is no longer valid.';
+    }
+
+    // Reset copy btn
+    const copyBtn = document.getElementById('vd-copy-btn');
+    copyBtn.textContent = 'Copy';
+    copyBtn.className = 'vd-copy-btn';
+
+    document.getElementById('voucherModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeVoucherDetail() {
+    document.getElementById('voucherModal').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function closeIfOverlay(e) {
+    if (e.target === document.getElementById('voucherModal')) closeVoucherDetail();
+}
+
+function copyCode() {
+    const code = document.getElementById('vd-code-value').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('vd-copy-btn');
+        btn.textContent = '✓ Copied';
+        btn.classList.add('copied');
+        setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+        }, 2000);
+    });
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeVoucherDetail();
+});
+</script>
+<script>
+(function () {
+    const SLIDES_COUNT = {{ missions | default([1,2,3]) | length }};
+    let current = 0;
+    let timer = null;
+
+    function goTo(idx) {
+        current = (idx + SLIDES_COUNT) % SLIDES_COUNT;
+        document.getElementById('carouselTrack').style.transform =
+            `translateX(-${current * 100}%)`;
+        updateDots();
+    }
+
+    function updateDots() {
+        const dots = document.querySelectorAll('#carouselDots .carousel-dot');
+        dots.forEach((d, i) => {
+            d.classList.toggle('active', i === current);
+        });
+    }
+
+    function next() { goTo(current + 1); }
+
+    function startCarousel() {
+        timer = setInterval(next, 3000);
+    }
+
+    function pauseCarousel() { clearInterval(timer); }
+
+    function resumeCarousel() { startCarousel(); }
+
+    /* expose to inline handlers */
+    window.goToSlide      = goTo;
+    window.pauseCarousel  = pauseCarousel;
+    window.resumeCarousel = resumeCarousel;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        updateDots();
+        startCarousel();
+        document.getElementById('missionPrev').addEventListener('click', () => { goTo(current - 1); });
+        document.getElementById('missionNext').addEventListener('click', () => { goTo(current + 1); });
+    });
+})();
+
+(function () {
+    const BATCH = 5;
+    let shown = BATCH;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const items = document.querySelectorAll('.history-item');
+        const btn   = document.querySelector('.load-more-btn');
+
+        if (items.length <= BATCH) {
+            if (btn) btn.style.display = 'none';
+            return;
+        }
+
+        items.forEach(function (item, i) {
+            if (i >= BATCH) item.style.display = 'none';
+        });
+
+        btn.addEventListener('click', function () {
+            const next = shown + BATCH;
+            items.forEach(function (item, i) {
+                if (i >= shown && i < next) item.style.display = '';
+            });
+            shown = next;
+            if (shown >= items.length) btn.style.display = 'none';
+        });
+    });
+})();
+</script>
+{% endblock %}

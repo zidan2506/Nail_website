@@ -9,7 +9,8 @@
 {% endblock %}
 
 {% block customer_content %}
-<!-- 
+<div class="booking-wrapper">
+<!--
 BACKEND NOTE:
 Form này submit booking cuối cùng.
 Đổi route create_booking theo route thật của m.
@@ -18,7 +19,7 @@ Ví dụ:
 def booking():
     ...
 -->
-<form 
+<form
     method="POST"
     action="{{ url_for('main.create_customer_booking') }}"
 >
@@ -29,17 +30,6 @@ def booking():
 
         <!-- ================= LEFT CONTENT ================= -->
         <main class="booking-main">
-
-            <!-- Breadcrumb -->
-            <div class="booking-breadcrumb">
-                <span class="active">Service</span>
-                <span>›</span>
-                <span>Staff</span>
-                <span>›</span>
-                <span>Time</span>
-                <span>›</span>
-                <span>Review</span>
-            </div>
 
             <!-- Header row -->
             <div class="step-header">
@@ -73,14 +63,15 @@ def booking():
                 >
                     {% for service in services_by_category[category['slug']] %}
                         <label class="service-option">
-                            <input 
-                                type="radio" 
-                                name="service_id" 
+                            <input
+                                type="radio"
+                                name="service_id"
                                 value="{{ service['id'] }}"
                                 class="option-input service-radio"
                                 data-name="{{ service['name'] }}"
                                 data-duration="{{ service['duration_minutes'] }}"
                                 data-price="{{ service['price'] }}"
+                                data-points="{{ service['points'] }}"
                                 required
                             >
 
@@ -304,7 +295,7 @@ def booking():
                 <div class="benefit-icon">🏷️</div>
                 <div>
                     <h3>Member Benefit</h3>
-                    <p>You'll gain 45 loyalty points with this booking.</p>
+                    <p>You'll gain <span id="benefit-points">—</span> loyalty points with this booking.</p>
                 </div>
             </div>
 
@@ -312,12 +303,14 @@ def booking():
 
     </div>
 </form>
+</div>{# end booking-wrapper #}
 
 <script>
     const CALENDAR_CONFIG = {
         today: "{{ today.isoformat() }}",
         maxDate: "{{ max_date.isoformat() }}",
-        availableSlotUrl: "{{ url_for('main.check_available_slot')}}"
+        availableSlotUrl: "{{ url_for('main.check_available_slot')}}",
+        pointsMultiplier: {{ multiplier }}
     }
 </script>
 <script src="{{ url_for('static', filename='js/customer/customer_booking.js') }}"></script>

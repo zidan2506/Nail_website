@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 PAYMENT_METHOD_LABELS = {
     'visa': 'Visa',
@@ -100,6 +100,35 @@ def payment_icon(value):
     return PAYMENT_METHOD_ICONS.get(value, '💳')
     
 
+def format_number(value):
+    """1250 → '1,250'"""
+    try:
+        return f"{int(value):,}"
+    except (ValueError, TypeError):
+        return value
+
+
+def time_ago(value):
+    if not value:
+        return ''
+    if isinstance(value, str):
+        try:
+            value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            return value
+    delta = datetime.now() - value
+    days = delta.days
+    if days < 1:
+        return 'today'
+    if days < 30:
+        return f'{days} day{"s" if days != 1 else ""} ago'
+    months = days // 30
+    if months < 12:
+        return f'{months} month{"s" if months != 1 else ""} ago'
+    years = days // 365
+    return f'{years} year{"s" if years != 1 else ""} ago'
+
+
 def register_filters(app):
     """Đăng ký tất cả filters với Flask app"""
     app.template_filter('format_date')(format_date)
@@ -108,5 +137,5 @@ def register_filters(app):
     app.template_filter('short_name')(short_name)
     app.template_filter('payment_icon')(payment_icon)
     app.template_filter('payment_label')(payment_label)
-
-    
+    app.template_filter('format_number')(format_number)
+    app.template_filter('time_ago')(time_ago)

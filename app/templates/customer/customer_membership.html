@@ -1,0 +1,376 @@
+{% extends "customer_base.html" %}
+
+{% block title %}Membership Plans – Daha Care{% endblock %}
+
+{% block nav_membership %}active{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+  .mp-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* PAGE HEADER */
+  .mp-page-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #d64682;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+
+  .mp-page-h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #24161c;
+    line-height: 1.1;
+    margin: 0 0 14px;
+  }
+
+  .mp-page-sub {
+    font-size: 1.05rem;
+    color: #73636a;
+    line-height: 1.6;
+    margin: 0 0 3rem;
+    max-width: 480px;
+  }
+
+  /* GRID */
+  .mp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: end;
+    padding-bottom: 2rem;
+  }
+
+  /* CARD BASE */
+  .mp-card {
+    border-radius: 26px;
+    padding: 1.75rem 1.5rem;
+    border: 1.5px solid transparent;
+    display: flex;
+    flex-direction: column;
+    min-height: 560px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+  }
+
+  /* SILVER */
+  .mp-card-silver {
+    background: #f8f7f8;
+    border: 1.5px solid #e8e2e6;
+  }
+
+  /* GOLD */
+  .mp-card-gold {
+    background: #fdf8f0;
+    border: 2px solid #e8820c;
+    box-shadow: 0 0 0 4px rgba(232,130,12,0.20), 0 0 18px 6px rgba(232,130,12,0.18), 0 0 36px 10px rgba(220,60,20,0.10);
+    transform: translateY(-10px);
+    min-height: 600px;
+    z-index: 2;
+  }
+
+  /* DIAMOND */
+  .mp-card-diamond {
+    background: #f5f0fa;
+    border: 1.5px solid #ddd0ed;
+  }
+
+  /* CURRENT PLAN — applies to whichever tier is active */
+  .mp-card.current-plan {
+    border: 2px solid #d64682 !important;
+    box-shadow: 0 0 0 5px rgba(214,70,130,0.15), 0 0 20px 4px rgba(214,70,130,0.10) !important;
+  }
+
+  .mp-card:hover:not(.mp-card-gold) {
+    transform: translateY(-4px);
+  }
+
+  .mp-card-gold:hover {
+    transform: translateY(-14px);
+  }
+
+  /* BADGE ROW */
+  .mp-badge-row {
+    min-height: 28px;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+  }
+
+  .mp-badge-current {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(214,70,130,0.10);
+    color: #d64682;
+    border: 1px solid rgba(214,70,130,0.30);
+  }
+
+  .mp-badge-popular {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(135deg, #e8820c, #d64682);
+  }
+
+  /* TIER NAME */
+  .mp-tier {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1;
+    margin: 0 0 4px;
+  }
+
+  .mp-tier-silver  { color: #4a3840; }
+  .mp-tier-gold    { color: #7a5520; }
+  .mp-tier-diamond { color: #5b2d8e; }
+
+  .mp-price-hint {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: #b09aa4;
+    margin: 0 0 10px;
+  }
+
+  .mp-tagline {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #24161c;
+    margin: 0 0 1.5rem;
+  }
+
+  /* BUTTONS */
+  .mp-btn {
+    display: block;
+    width: 100%;
+    padding: 13px 0;
+    border-radius: 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    transition: opacity 0.2s, background 0.2s, transform 0.1s;
+  }
+
+  .mp-btn:active { transform: scale(0.98); }
+
+  .mp-btn-current {
+    background: rgba(214,70,130,0.10);
+    color: #d64682;
+    border: 1.5px solid rgba(214,70,130,0.30);
+    cursor: default;
+  }
+
+  .mp-btn-gold {
+    background: #c49a3c;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(196,154,60,0.30);
+  }
+  .mp-btn-gold:hover { opacity: 0.88; }
+
+  .mp-btn-diamond {
+    background: #5b2d8e;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(91,45,142,0.25);
+  }
+  .mp-btn-diamond:hover { opacity: 0.88; }
+
+  /* DIVIDER */
+  .mp-divider {
+    height: 0.5px;
+    margin-bottom: 1.25rem;
+  }
+  .mp-divider-silver  { background: #e8e2e6; }
+  .mp-divider-gold    { background: #eddfc8; }
+  .mp-divider-diamond { background: #ddd0ed; }
+
+  /* FEATURES */
+  .mp-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+  }
+
+  .mp-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #55434a;
+    line-height: 1.45;
+  }
+
+  .mp-features .material-symbols-outlined {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .mp-feat-highlight-gold    { font-weight: 700; color: #c49a3c; }
+  .mp-feat-highlight-diamond { font-weight: 700; color: #9b6fd4; }
+
+  .mp-check-silver  { color: #9e8a96; }
+  .mp-check-gold    { color: #c49a3c; }
+  .mp-check-diamond { color: #9b6fd4; }
+
+  /* FOOTER DECORATION */
+  .mp-footer-deco {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+    opacity: 0.35;
+  }
+
+  .mp-footer-deco .material-symbols-outlined {
+    font-size: 2.5rem;
+    color: #d64682;
+  }
+
+  @media (max-width: 1100px) {
+    .mp-grid { grid-template-columns: 1fr; }
+    .mp-card-gold { transform: none; }
+    .mp-card-gold:hover { transform: translateY(-4px); }
+    .mp-page-h1 { font-size: 2.2rem; }
+  }
+</style>
+{% endblock %}
+
+{% block customer_content %}
+<div class="mp-wrapper">
+
+  <span class="mp-page-label">Membership</span>
+  <h1 class="mp-page-h1">Choose your plan</h1>
+  <p class="mp-page-sub">Unlock exclusive perks, rewards, and priority care tailored to your loyalty.</p>
+
+  <div class="mp-grid">
+
+    <!-- SILVER -->
+    <div class="mp-card mp-card-silver {% if current_plan == "silver" %}current-plan{% endif %}">
+      <div class="mp-badge-row">
+        {% if current_plan == 'silver' %}
+        <span class="mp-badge-current">Your current plan</span>
+        {% endif %}
+      </div>
+      <h2 class="mp-tier mp-tier-silver">Silver</h2>
+      <p class="mp-price-hint">Entry level</p>
+      <p class="mp-tagline">Start your loyalty journey</p>
+      {% if current_plan == 'silver' %}
+      <button class="mp-btn mp-btn-current" disabled>Current plan</button>
+      {% if expires_at %}<p class="mp-price-hint" style="margin-top:-1rem;">Renews {{ expires_at }}</p>{% endif %}
+      {% else %}
+      <form method="POST" action="{{ url_for('main.upgrade_plan') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="tier_name" value="Silver">
+        <button type="submit" class="mp-btn" style="background:transparent; border:1.5px solid rgba(74,56,64,0.35); color:#4a3840;" onmouseover="this.style.background='#4a3840';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='#4a3840';">Upgrade to Silver</button>
+      </form>
+      {% endif %}
+      <div class="mp-divider mp-divider-silver"></div>
+      <ul class="mp-features">
+        <li><span style="color:#9e8a96; flex-shrink:0; margin-top:2px;">✦</span>Earn base loyalty points on every visit</li>
+        <li><span style="color:#9e8a96; flex-shrink:0; margin-top:2px;">✦</span>Birthday bonus points</li>
+        <li><span style="color:#9e8a96; flex-shrink:0; margin-top:2px;">✦</span>Access to member-only promotions</li>
+        <li><span style="color:#9e8a96; flex-shrink:0; margin-top:2px;">✦</span>Monthly reward voucher</li>
+        <li><span style="color:#9e8a96; flex-shrink:0; margin-top:2px;">✦</span>Priority booking (standard)</li>
+      </ul>
+    </div>
+
+    <!-- GOLD -->
+    <div class="mp-card mp-card-gold {% if current_plan == "gold" %}current-plan{% endif %}">
+      <div class="mp-badge-row">
+        {% if current_plan == 'gold' %}
+          <span class="mp-badge-current">Your current plan</span>
+          <span class="mp-badge-popular" style="margin-left: auto;">Popular</span>
+        {% else %}
+          <span class="mp-badge-popular">Popular</span>
+        {% endif %}
+      </div>
+      <h2 class="mp-tier mp-tier-gold">Gold</h2>
+      <p class="mp-price-hint">Most chosen</p>
+      <p class="mp-tagline">For our dedicated guests</p>
+      {% if current_plan == 'gold' %}
+      <button class="mp-btn mp-btn-current" disabled>Current plan</button>
+      {% if expires_at %}<p class="mp-price-hint" style="margin-top:-1rem;">Renews {{ expires_at }}</p>{% endif %}
+      {% else %}
+      <form method="POST" action="{{ url_for('main.upgrade_plan') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="tier_name" value="Gold">
+        <button type="submit" class="mp-btn mp-btn-gold">Upgrade to Gold</button>
+      </form>
+      {% endif %}
+      <div class="mp-divider mp-divider-gold"></div>
+      <ul class="mp-features">
+        <li><span style="color:#c49a3c; flex-shrink:0; margin-top:2px;">✦</span><span class="mp-feat-highlight-gold">Everything in Silver</span></li>
+        <li><span style="color:#c49a3c; flex-shrink:0; margin-top:2px;">✦</span>1.5× point multiplier on all services</li>
+        <li><span style="color:#c49a3c; flex-shrink:0; margin-top:2px;">✦</span>Early access to new services & seasonal offers</li>
+        <li><span style="color:#c49a3c; flex-shrink:0; margin-top:2px;">✦</span>Complimentary nail care kit (quarterly)</li>
+        <li><span style="color:#c49a3c; flex-shrink:0; margin-top:2px;">✦</span>Dedicated booking slot on weekends</li>
+      </ul>
+    </div>
+
+    <!-- DIAMOND -->
+    <div class="mp-card mp-card-diamond {% if current_plan == "diamond" %}current-plan{% endif %}">
+      <div class="mp-badge-row">
+        {% if current_plan == 'diamond' %}
+        <span class="mp-badge-current">Your current plan</span>
+        {% endif %}
+      </div>
+      <h2 class="mp-tier mp-tier-diamond">Diamond</h2>
+      <p class="mp-price-hint">Ultimate luxury</p>
+      <p class="mp-tagline">For our most valued guests</p>
+      {% if current_plan == 'diamond' %}
+      <button class="mp-btn mp-btn-current" disabled>Current plan</button>
+      {% if expires_at %}<p class="mp-price-hint" style="margin-top:-1rem;">Renews {{ expires_at }}</p>{% endif %}
+      {% else %}
+      <form method="POST" action="{{ url_for('main.upgrade_plan') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="tier_name" value="Diamond">
+        <button type="submit" class="mp-btn mp-btn-diamond">Upgrade to Diamond</button>
+      </form>
+      {% endif %}
+      <div class="mp-divider mp-divider-diamond"></div>
+      <ul class="mp-features">
+        <li><span style="color:#9b6fd4; flex-shrink:0; margin-top:2px;">✦</span><span class="mp-feat-highlight-diamond">Everything in Gold</span></li>
+        <li><span style="color:#9b6fd4; flex-shrink:0; margin-top:2px;">✦</span>2× point multiplier on all services</li>
+        <li><span style="color:#9b6fd4; flex-shrink:0; margin-top:2px;">✦</span>Free add-on service every visit</li>
+        <li><span style="color:#9b6fd4; flex-shrink:0; margin-top:2px;">✦</span>Personal nail stylist assignment</li>
+        <li><span style="color:#9b6fd4; flex-shrink:0; margin-top:2px;">✦</span>VIP lounge access & complimentary drinks</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="mp-footer-deco">
+    <span class="material-symbols-outlined">spa</span>
+  </div>
+
+</div>
+{% endblock %}

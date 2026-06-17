@@ -1,4 +1,6 @@
 import sqlite3
+import secrets
+import string
 from pathlib import Path
 from werkzeug.security import generate_password_hash
 
@@ -95,7 +97,7 @@ def update_status(id, status):
     conn.execute(
         """
     UPDATE bookings
-    SET 
+    SET
         status = ?
     WHERE id = ?
 """, (status, id)
@@ -103,6 +105,15 @@ def update_status(id, status):
     conn.commit()
     conn.close()
     return print(f"Updating status: {status} success!")
+
+def cancel_booking_with_reason(booking_id, reason):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE bookings SET status = 'cancelled', cancellation_reason = ? WHERE id = ?",
+        (reason or None, booking_id)
+    )
+    conn.commit()
+    conn.close()
 
 def verify_customer(customer_id):
     conn = get_connection()
@@ -342,6 +353,7 @@ def get_customer_bookings(customer_id):
         s.duration_minutes AS service_duration,
         s.price AS service_price,
         s.description AS service_description,
+        s.image AS service_image,
 
         st.full_name AS staff_name,
         st.email AS staff_email,
@@ -510,7 +522,170 @@ def get_customer_invoices(customer_id):
     #convert sang dict cho dễ xử lý 
     return [dict(row) for row in rows]
 
+def has_pending_review(customer_id):
+    conn = get_connection()
+    row = conn.execute("""
+        SELECT COUNT(*) FROM bookings
+        WHERE customer_id = ? AND status = 'completed'
+        AND id NOT IN (SELECT booking_id FROM reviews)
+    """, (customer_id,)).fetchone()
+    conn.close()
+    return row[0] > 0
+
+def has_source_award(customer_id, source):
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT 1 FROM loyalty_points_log WHERE customer_id = ? AND source = ?",
+        (customer_id, source)
+    ).fetchone()
+    conn.close()
+    return row is not None
+
+def get_tier_by_name(name):
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT * FROM membership_tiers WHERE name = ? AND is_active = 1",
+        (name,)
+    ).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def upgrade_membership(customer_id, tier_id, duration_days):
+    from datetime import datetime, timedelta
+    conn = get_connection()
+    try:
+        now = datetime.now()
+        started_at = now.strftime("%Y-%m-%d %H:%M:%S")
+        expires_at = (now + timedelta(days=duration_days)).strftime("%Y-%m-%d %H:%M:%S")
+        existing = conn.execute(
+            "SELECT id FROM customer_memberships WHERE customer_id = ?",
+            (customer_id,)
+        ).fetchone()
+        if existing:
+            conn.execute(
+                "UPDATE customer_memberships SET tier_id = ?, started_at = ?, expires_at = ?, is_active = 1 WHERE customer_id = ?",
+                (tier_id, started_at, expires_at, customer_id)
+            )
+        else:
+            conn.execute(
+                "INSERT INTO customer_memberships (customer_id, tier_id, started_at, expires_at, is_active) VALUES (?, ?, ?, ?, 1)",
+                (customer_id, tier_id, started_at, expires_at)
+            )
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
 # Thêm vào app/database/db.py
+
+def get_customer_active_tier(customer_id):
+    conn = get_connection()
+    row = conn.execute("""
+        SELECT mt.name, mt.point_multiplier, cm.expires_at
+        FROM customer_memberships cm
+        JOIN membership_tiers mt ON cm.tier_id = mt.id
+        WHERE cm.customer_id = ?
+          AND cm.is_active = 1
+          AND cm.expires_at > datetime('now')
+        ORDER BY mt.point_multiplier DESC
+        LIMIT 1
+    """, (customer_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def get_loyalty_balance(customer_id):
+    conn = get_connection()
+    balance = conn.execute(
+        "SELECT COALESCE(SUM(points), 0) FROM loyalty_points_log WHERE customer_id = ?",
+        (customer_id,)
+    ).fetchone()[0]
+    conn.close()
+    return int(balance)
+
+
+def get_active_rewards():
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT * FROM rewards WHERE is_active = 1 ORDER BY cost ASC"
+    ).fetchall()
+    conn.close()
+    return rows
+
+def get_customer_vouchers(customer_id):
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT rr.id, rr.voucher_code, rr.points_spent, rr.redeemed_at,
+               r.name, r.description
+        FROM reward_redemptions rr
+        JOIN rewards r ON rr.reward_id = r.id
+        WHERE rr.customer_id = ?
+        ORDER BY rr.redeemed_at DESC
+    """, (customer_id,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def get_customer_reward_status(customer_id, reward_id):
+    conn = get_connection()
+    row = conn.execute("""
+        SELECT COUNT(*) as redeem_count, MAX(redeemed_at) as last_redeemed_at
+        FROM reward_redemptions
+        WHERE customer_id = ? AND reward_id = ?
+    """, (customer_id, reward_id)).fetchone()
+    conn.close()
+    return dict(row) if row else {"redeem_count": 0, "last_redeemed_at": None}
+
+def _generate_voucher_code():
+    alphabet = string.ascii_uppercase + string.digits
+    while True:
+        code = "DAHA-" + "".join(secrets.choice(alphabet) for _ in range(4)) + "-" + "".join(secrets.choice(alphabet) for _ in range(4))
+        conn = get_connection()
+        exists = conn.execute("SELECT 1 FROM reward_redemptions WHERE voucher_code = ?", (code,)).fetchone()
+        conn.close()
+        if not exists:
+            return code
+
+def redeem_reward(customer_id, reward_id, cost, reward_name=""):
+    voucher_code = _generate_voucher_code()
+    conn = get_connection()
+    try:
+        conn.execute(
+            "INSERT INTO reward_redemptions (customer_id, reward_id, points_spent, voucher_code) VALUES (?, ?, ?, ?)",
+            (customer_id, reward_id, cost, voucher_code)
+        )
+        conn.execute(
+            "UPDATE rewards SET stock = stock - 1 WHERE id = ? AND stock IS NOT NULL",
+            (reward_id,)
+        )
+        conn.execute(
+            "INSERT INTO loyalty_points_log (customer_id, points, source, reference_id, note) VALUES (?, ?, ?, ?, ?)",
+            (customer_id, -cost, "reward_redemption", reward_id, f"Redeemed: {reward_name}" if reward_name else "Reward redemption")
+        )
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def get_loyalty_history(customer_id, limit=20):
+    conn = get_connection()
+    rows = conn.execute(
+        """
+        SELECT points, note, created_at, source
+        FROM loyalty_points_log
+        WHERE customer_id = ?
+        ORDER BY created_at DESC
+        LIMIT ?
+        """,
+        (customer_id, limit)
+    ).fetchall()
+    conn.close()
+    return rows
+
 
 def get_invoice_detail_by_id(invoice_id):
     """Lấy full invoice detail bằng cách join invoices -> bookings -> customers, staff, services"""
@@ -551,3 +726,27 @@ def get_invoice_detail_by_id(invoice_id):
     """, (invoice_id,)).fetchone()
 
     return dict(row) if row else None
+
+
+def update_customer_profile(customer_id, full_name, email, phone, date_of_birth):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE customers SET full_name=?, email=?, phone=?, date_of_birth=?, updated_at=CURRENT_TIMESTAMP WHERE id=?",
+        (full_name, email, phone, date_of_birth, customer_id)
+    )
+    conn.commit()
+    conn.close()
+
+
+def update_user_email(user_id, email):
+    conn = get_connection()
+    conn.execute("UPDATE users SET email=? WHERE id=?", (email, user_id))
+    conn.commit()
+    conn.close()
+
+
+def update_user_password(user_id, password_hash):
+    conn = get_connection()
+    conn.execute("UPDATE users SET password_hash=? WHERE id=?", (password_hash, user_id))
+    conn.commit()
+    conn.close()

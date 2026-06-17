@@ -92,13 +92,17 @@ services.forEach(label => {
         const serviceName = radio.dataset.name;
         const serviceDuration = radio.dataset.duration;
         const servicePrice = parseFloat(radio.dataset.price);
+        const servicePoints = parseInt(radio.dataset.points || 0);
 
-        console.log(`Service selected: ${serviceName} - ${serviceDuration} - ${servicePrice}`);    
-        
         //Update summary
         sumServiceName.textContent = serviceName;
         sumServiceDuration.textContent = `${serviceDuration} minutes`;
         sumServicePrice.textContent = `$${servicePrice.toFixed(2)}`;
+
+        //Update benefit points
+        const earnedPoints = Math.floor(servicePoints * CALENDAR_CONFIG.pointsMultiplier);
+        const benefitEl = document.getElementById("benefit-points");
+        if (benefitEl) benefitEl.textContent = earnedPoints;
 
         //CAl VAT (25.5%) and total
         const vat = servicePrice* 0.255;

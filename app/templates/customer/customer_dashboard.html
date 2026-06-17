@@ -1,85 +1,648 @@
 {% extends "customer_base.html" %}
-
-{% block title %}Customer Dashboard{% endblock %}
-
+{% block title %}Dashboard | Daha Care{% endblock %}
 {% block nav_dashboard %}active{% endblock %}
 
+{% block extra_css %}
+<style>
+/* ── DASHBOARD PAGE ─────────────────────────────────── */
+.db-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #d64682;
+    margin: 0 0 10px;
+}
+
+.db-heading {
+    margin: 0;
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #23161c;
+}
+
+.db-subtitle {
+    margin: 10px 0 0;
+    color: #7a6970;
+    font-size: 1rem;
+}
+
+.db-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 28px;
+}
+
+
+/* ── CAROUSEL ───────────────────────────────────────── */
+.carousel-section {
+    position: relative;
+    border-radius: 26px;
+    overflow: hidden;
+    height: 320px;
+    margin-bottom: 28px;
+    background: #2b0f1c;
+    box-shadow: 0 16px 40px rgba(35,22,28,0.18);
+}
+
+.carousel-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-slide {
+    flex: 0 0 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 52px;
+}
+
+.slide-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.35;
+    transition: transform 0.8s ease;
+}
+.carousel-section:hover .slide-bg { transform: scale(1.04); }
+
+.slide-1-bg { background: linear-gradient(135deg, #3d0f22 0%, #7a1a3e 50%, #d64682 100%); }
+.slide-2-bg { background: linear-gradient(135deg, #1a2a3d 0%, #1a4a6e 50%, #2d7abd 100%); }
+.slide-3-bg { background: linear-gradient(135deg, #1a3d2a 0%, #1e6e40 50%, #2dbd72 100%); }
+
+.slide-content {
+    position: relative;
+    z-index: 2;
+    max-width: 580px;
+}
+
+.slide-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(214,70,130,0.25);
+    border: 1px solid rgba(214,70,130,0.4);
+    color: #f4a8c8;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.slide-title {
+    margin: 0 0 12px;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+}
+
+.slide-desc {
+    margin: 0 0 22px;
+    color: rgba(255,255,255,0.72);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.slide-cta {
+    display: inline-block;
+    padding: 12px 26px;
+    border-radius: 12px;
+    background: #fff;
+    color: #23161c;
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.18s, color 0.18s;
+    border: none;
+    cursor: pointer;
+}
+.slide-cta:hover { background: #d64682; color: #fff; }
+
+/* arrow buttons */
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.18s, opacity 0.2s;
+    opacity: 0;
+}
+.carousel-section:hover .carousel-arrow { opacity: 1; }
+.carousel-arrow:hover { background: rgba(255,255,255,0.25); }
+.carousel-arrow.prev { left: 16px; }
+.carousel-arrow.next { right: 16px; }
+
+/* dots */
+.carousel-dots {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.dot.active {
+    background: #fff;
+    transform: scale(1.25);
+}
+
+/* ── ROW 2 GRID ─────────────────────────────────────── */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ── UPCOMING CARD ──────────────────────────────────── */
+.upcoming-card {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 280px;
+    padding: 34px 36px;
+    border-radius: 26px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #fff3f7 0%, #fdeef4 100%);
+    box-shadow: 0 10px 30px rgba(34,21,27,0.06);
+}
+
+.upcoming-card__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 560px;
+}
+
+.upcoming-section-label {
+    margin: 0 0 18px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: #f43f84;
+}
+
+.upcoming-card__title {
+    margin: 0 0 12px;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    color: #23141a;
+}
+
+.upcoming-card__meta {
+    margin: 0;
+    font-size: 1.18rem;
+    line-height: 1.5;
+    color: #5f4e55;
+}
+
+.upcoming-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 26px;
+}
+
+.upcoming-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    align-self: center;
+}
+
+.upcoming-card__img {
+    width: 240px;
+    height: 240px;
+    border-radius: 20px;
+    object-fit: cover;
+    box-shadow: 0 8px 24px rgba(35,22,28,0.12);
+    transition: transform 0.4s ease;
+}
+.upcoming-card:hover .upcoming-card__img { transform: rotate(2deg) scale(1.03); }
+
+.upcoming-card__img-placeholder {
+    width: 240px;
+    height: 240px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #fdebf2 0%, #f4c2d8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    box-shadow: 0 8px 24px rgba(214,70,130,0.10);
+}
+
+/* Button system */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 22px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease,
+                border-color 0.2s ease, transform 0.15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+
+.btn-primary {
+    background: #f43f84;
+    color: #ffffff;
+    box-shadow: 0 10px 22px rgba(244,63,132,0.22);
+}
+.btn-primary:hover { background: #e63176; color: #ffffff; }
+
+.btn-secondary {
+    background: #ffffff;
+    color: #f43f84;
+    border-color: #efe6ea;
+}
+.btn-secondary:hover { background: #fff8fb; }
+
+/* Status badges */
+.appointment-status-badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    min-height: 28px;
+    padding: 0 14px;
+    margin-bottom: 14px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+.appointment-status-badge--confirmed { background: #dff5e8; color: #2d8a57; }
+.appointment-status-badge--pending   { background: #f7e5a7; color: #7a5200; }
+.appointment-status-badge--cancelled { background: #f5d6db; color: #8b3a4a; }
+
+/* ── LOYALTY CARD ───────────────────────────────────── */
+.loyalty-card {
+    background: linear-gradient(160deg, #2b0f1c 0%, #3d1828 60%, #4e1f34 100%);
+    border-radius: 26px;
+    padding: 28px 28px 24px;
+    box-shadow: 0 16px 40px rgba(43,15,28,0.3);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* decorative blur circle */
+.loyalty-card::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 130px;
+    height: 130px;
+    background: rgba(214,70,130,0.15);
+    border-radius: 50%;
+    filter: blur(30px);
+    pointer-events: none;
+}
+
+.loyalty-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.loyalty-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #d64682;
+}
+
+.loyalty-icon {
+    font-size: 1.1rem;
+    color: #d64682;
+}
+
+.loyalty-points-num {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.loyalty-tagline {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 28px;
+    line-height: 1.5;
+}
+
+.loyalty-progress-section {
+    margin-bottom: 20px;
+}
+
+.progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.progress-reward-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.progress-pct {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #d64682;
+}
+
+.progress-bar-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #d64682, #f4a8c8);
+    border-radius: 999px;
+    box-shadow: 0 0 12px rgba(214,70,130,0.5);
+    transition: width 0.6s ease;
+}
+
+.progress-hint {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.35);
+}
+
+.loyalty-view-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.18s;
+    margin-top: auto;
+    box-sizing: border-box;
+}
+.loyalty-view-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .db-heading { font-size: 2rem; }
+}
+
+@media (max-width: 860px) {
+    .carousel-section { height: 260px; }
+    .slide-title { font-size: 1.8rem; }
+    .db-header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+}
+
+.db-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.book-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 22px;
+    border-radius: 14px;
+    background: #f43f84;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 0.18s;
+}
+.book-btn:hover { background: #e63176; color: #fff; }
+</style>
+{% endblock %}
+
 {% block customer_content %}
-<header class="dashboard-header">
-    <p class="dashboard-label">PERSONAL DASHBOARD</p>
-
-    <!-- sau nay xu ly lay bien customer_name gan vao day -->
-    <h1>Welcome back, {{ customer.full_name}}</h1>
-
-    <p class="dashboard-subtitle">
-        Manage your appointment and book your next visit!
-    </p>
-</header>
-
-<section class="dashboard-grid">
-
-    <!-- upcoming appointment -->
-    <div class="card upcoming-card">
-        <span class="status-badge">Confirmed Appointment</span>
-
-        <h2>Basic nail care and polish</h2>
-
-        <div class="appointment-info">
-            <p><strong>Date:</strong> Tuesday, Oct 24</p>
-            <p><strong>Time:</strong> 2:30 PM</p>
-            <p><strong>Stylist:</strong> Alice Ha</p>
-        </div>
+<div class="db-wrapper">
+<!-- Header -->
+<div class="db-header-row">
+    <div>
+        <p class="db-label">Customer Dashboard</p>
+        <h1 class="db-heading">Good morning, {{ current_user.name }}!</h1>
+        <p class="db-subtitle">Ready for your next glow up?</p>
     </div>
+    <a href="{{ url_for('main.customer_booking') }}" class="book-btn">Book Appointment</a>
+</div>
 
-    <!-- Quick action card -->
-    <div class="card action-card">
-        <h2>Ready for your next glow up?</h2>
-        <p>
-            Book your next visit now and enjoy a smooth booking experience.
-        </p>
-        <a href="{{ url_for('main.customer_booking')}}" class="primary-btn">Book your next treatment</a>
-    </div>
+<!-- Carousel: Offers & Deals -->
+<section class="carousel-section">
+    <div class="carousel-track" id="carouselTrack">
 
-    <!-- recent activity -->
-    <div class="card recent-card">
-        <div class="card-top">
-            <h2>Recent activity</h2>
-            <a href="{{ url_for('main.my_bookings')}}">View all</a>
-        </div>
-
-        <div class="recent-booking-list">
-            <div class="recent-booking-item">
-                <div>
-                    <h3>Service 1</h3>
-                    <p>Date - Artist</p>
-                </div>
-                <span>Price</span>
-            </div>
-
-            <div class="recent-booking-item">
-                <div>
-                    <h3>Service 2</h3>
-                    <p>Date - Artist</p>
-                </div>
-                <span>Price</span>
-            </div>
-
-            <div class="recent-booking-item">
-                <div>
-                    <h3>Service 3</h3>
-                    <p>Date - Artist</p>
-                </div>
-                <span>Price</span>
+        {% for reward in carousel_rewards %}
+        <div class="carousel-slide">
+            <div class="slide-bg{% if not reward.get('banner_image') %} slide-{{ (loop.index0 % 3) + 1 }}-bg{% endif %}"
+                 {% if reward.get('banner_image') %}
+                 style="background-image: url('{{ url_for('static', filename='images/carousel/' + reward.get('banner_image')) }}'); background-size: cover; background-position: center;"
+                 {% endif %}
+            ></div>
+            <div class="slide-content">
+                <div class="slide-badge">✦ Loyalty Reward</div>
+                <h2 class="slide-title">{{ reward.name }}</h2>
+                <p class="slide-desc">{{ reward.description }}</p>
+                <a href="{{ url_for('main.customer_loyalty_points') }}" class="slide-cta">Redeem for {{ reward.cost }} pts</a>
             </div>
         </div>
+        {% endfor %}
+
     </div>
 
-    <!-- Profile summary -->
-    <div class="card profile-card">
-        <h2>My profile</h2>
-        <p><strong>Full name:</strong> Mon</p>
-        <p><strong>Email:</strong> mon@customer.com</p>
-        <p><strong>Phone:</strong> +358 40 123 4567</p>
+    <!-- Arrows -->
+    <button class="carousel-arrow prev" id="prevBtn">&#8592;</button>
+    <button class="carousel-arrow next" id="nextBtn">&#8594;</button>
+
+    <!-- Dots -->
+    <div class="carousel-dots" id="carouselDots">
+        {% for reward in carousel_rewards %}
+        <div class="dot{% if loop.first %} active{% endif %}" data-index="{{ loop.index0 }}"></div>
+        {% endfor %}
     </div>
 </section>
+
+<!-- Row 2: Upcoming + Loyalty -->
+<div class="dashboard-grid">
+
+    <!-- Upcoming Appointment -->
+    <div class="upcoming-card">
+        {% if upcoming_booking %}
+            <div class="upcoming-card__content">
+                <p class="upcoming-section-label">Upcoming Appointment</p>
+                <div class="appointment-status-badge appointment-status-badge--{{ upcoming_booking.status }}">
+                    {{ upcoming_booking.status }}
+                </div>
+                <h2 class="upcoming-card__title">{{ upcoming_booking.service_name }}</h2>
+                <p class="upcoming-card__meta">
+                    {{ upcoming_booking.date }} • {{ upcoming_booking.time }} with {{ upcoming_booking.staff_name }}.
+                </p>
+                <div class="upcoming-card__actions">
+                    <a href="{{ upcoming_booking.calendar_url }}" class="btn btn-primary" target="{{ upcoming_booking.url_target }}">Add to Calendar</a>
+                    <a href="{{ url_for('main.view_booking_details', booking_id=upcoming_booking.id) }}" class="btn btn-secondary">View Details</a>
+                </div>
+            </div>
+            <div class="upcoming-card__icon">
+                {% if upcoming_booking.service_img %}
+                <img class="upcoming-card__img" src="{{ upcoming_booking.service_img }}" alt="{{ upcoming_booking.service_name }}">
+                {% else %}
+                <div class="upcoming-card__img-placeholder">💅</div>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="upcoming-card__content">
+                <p class="upcoming-section-label">Upcoming Appointment</p>
+                <h2 class="upcoming-card__title">No upcoming visits scheduled</h2>
+                <p class="upcoming-card__meta">Ready for a new look? Book your next treatment today.</p>
+                <div class="upcoming-card__actions">
+                    <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">Book new appointment</a>
+                </div>
+            </div>
+            <div class="upcoming-card__icon">
+                <div class="upcoming-card__img-placeholder">📅</div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Loyalty Points -->
+    <div class="loyalty-card">
+        <div class="loyalty-header">
+            <span class="loyalty-title">Loyalty Points</span>
+            <span class="loyalty-icon">✦</span>
+        </div>
+
+        <div class="loyalty-points-num">{{ loyalty_points or 0 }}</div>
+        <p class="loyalty-tagline">Keep blooming —<br>your next treat is almost here!</p>
+
+        {% if next_reward %}
+        <div class="loyalty-progress-section">
+            <div class="progress-meta">
+                <span class="progress-reward-name">{{ next_reward.name }}</span>
+                <span class="progress-pct">{{ progress_pct }}% Complete</span>
+            </div>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" style="width: {{ progress_pct }}%"></div>
+            </div>
+            <p class="progress-hint">{{ points_needed }} points to {{ next_reward.name }}</p>
+        </div>
+        {% else %}
+        <div class="loyalty-progress-section">
+            <p style="color:rgba(255,255,255,0.45);font-size:0.85rem;">You've unlocked all rewards! 🎉</p>
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('main.customer_loyalty_points') }}" class="loyalty-view-btn">View All Rewards</a>
+    </div>
+
+</div>
+</div>{# end db-wrapper #}
+{% endblock %}
+
+{% block script %}
+<script>
+(function () {
+    const track = document.getElementById('carouselTrack');
+    const dots = document.querySelectorAll('.dot');
+    const totalSlides = dots.length;
+    let current = 0;
+    let autoTimer;
+
+    function goTo(index) {
+        current = (index + totalSlides) % totalSlides;
+        track.style.transform = `translateX(-${current * 100}%)`;
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    }
+
+    function startAuto() {
+        autoTimer = setInterval(() => goTo(current + 1), 4500);
+    }
+
+    function resetAuto() {
+        clearInterval(autoTimer);
+        startAuto();
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', () => { goTo(current + 1); resetAuto(); });
+    document.getElementById('prevBtn').addEventListener('click', () => { goTo(current - 1); resetAuto(); });
+    dots.forEach(d => d.addEventListener('click', () => { goTo(+d.dataset.index); resetAuto(); }));
+
+    // swipe support
+    let startX = 0;
+    track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+    track.addEventListener('touchend', e => {
+        const diff = startX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) { goTo(diff > 0 ? current + 1 : current - 1); resetAuto(); }
+    });
+
+    startAuto();
+})();
+</script>
 {% endblock %}

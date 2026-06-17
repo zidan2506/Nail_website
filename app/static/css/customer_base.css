@@ -1,3 +1,17 @@
+/* =================================================================
+   customer_base.css
+   
+   CẤU TRÚC FILE:
+   - Phần 1: CSS GỐC — giữ nguyên 100%, không chỉnh sửa gì
+   - Phần 2: CSS MỚI — append thêm để update sidebar UI
+             (nav icons, Book Now btn, Logout btn, sidebar layout)
+================================================================= */
+
+
+/* ================================================================
+   PHẦN 1: CSS GỐC (KHÔNG THAY ĐỔI)
+================================================================ */
+
 .customer-dashboard {
     display: grid;
     grid-template-columns: 260px 1fr;
@@ -33,10 +47,13 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
+    flex: 1; /* NEW: đẩy .sidebar-bottom xuống đáy */
 }
 
 .nav-item {
-    display: block;
+    display: flex;               /* NEW: flex để icon + label căn hàng */
+    align-items: center;         /* NEW */
+    gap: 12px;                   /* NEW: khoảng cách icon và label */
     padding: 14px 16px;
     border-radius: 14px;
     text-decoration: none;
@@ -256,6 +273,7 @@
         font-size: 2.2rem;
     }
 }
+
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
@@ -265,6 +283,7 @@ body {
 .action-card h2 {
     font-weight: 700;
 }
+
 /* =========================
    FLASH MESSAGE
    ========================= */
@@ -416,6 +435,7 @@ body {
         font-size: 14px;
     }
 }
+
 .brand-link {
     display: block;
     text-decoration: none;
@@ -424,4 +444,101 @@ body {
 
 .sidebar-brand {
     margin-bottom: 32px;
+}
+
+
+/* ================================================================
+   PHẦN 2: CSS MỚI — SIDEBAR UI UPDATE
+   Chỉ thêm, không override class cũ nào
+================================================================ */
+
+/* Nav icon SVG — hiển thị icon trái nav label */
+.nav-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    opacity: 0.45;
+    transition: opacity 0.2s ease;
+}
+
+.nav-item:hover .nav-icon,
+.nav-item.active .nav-icon {
+    opacity: 1;
+}
+
+/* Ẩn nav item "Book appointment" khỏi sidebar
+   Block Jinja2 nav_book_appointment vẫn tồn tại trong HTML
+   để không crash template con, nhưng link không hiển thị */
+.nav-item-hidden {
+    display: none !important;
+}
+
+/* Bottom section — Book Now + Logout, pinned to bottom của sidebar */
+.sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #f0e8ec;
+    margin-top: 16px;
+}
+
+/* Book Now — filled pink CTA button */
+.sidebar-book-btn {
+    display: block;
+    width: 100%;
+    padding: 15px 0;
+    background: #ef3976;
+    color: #ffffff;
+    text-align: center;
+    text-decoration: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(239, 57, 118, 0.28);
+    transition: opacity 0.18s ease, transform 0.1s ease;
+    box-sizing: border-box;
+}
+
+.sidebar-book-btn:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
+.sidebar-book-btn:active {
+    transform: translateY(0);
+}
+
+/* Logout button — override .nav-item để có outline style
+   Giữ class .nav-item và .nav-button trên element để backward compat
+   .sidebar-logout-btn override visual thành outline style */
+.sidebar-logout-btn {
+    width: 100%;
+    text-align: center;
+    background: transparent;
+    border: 1px solid rgba(35, 22, 28, 0.12);
+    color: rgba(83, 64, 72, 0.7);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    justify-content: center;
+}
+
+.sidebar-logout-btn:hover {
+    background: #fdf0f4;
+    color: #d64682;
+    border-color: rgba(214, 70, 130, 0.25);
+}
+
+/* nav-button: giữ nguyên class cũ cho logout form button */
+.nav-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: inherit;
+    width: 100%;
+    text-align: left;
 }
