@@ -108,11 +108,6 @@ def customer_dashboard():
         carousel_rewards=carousel_rewards,
     )
 
-@main.route("/customer/my-profile")
-@customer_login_required
-def my_profile():
-    return render_template("customer_profile.html")
-
 @main.route("/customer/booking")
 @customer_login_required
 def customer_booking():
