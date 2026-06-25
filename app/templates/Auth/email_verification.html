@@ -1,0 +1,229 @@
+{% extends "auth_base.html" %}
+
+{% block title %}Verify your email | DahaCare{% endblock %}
+
+{% block auth_panel_text %}
+<h1 class="auth-panel__title">Almost there.</h1>
+<p class="auth-panel__subtitle">Just one more step to secure your account and unlock your personalized beauty journey.</p>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/Auth/email_verification.css') }}">
+{% endblock %}
+
+{% block auth_content %}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   EMAIL VERIFICATION — dùng chung cho nhiều flow (register, booking, và sau
+   này password_change / email_change), KHỚP với backend thật trong routes.py:
+
+   - GET /verify-email và GET /email-verification đều render template này,
+     không nhận query param "purpose" — context lấy hoàn toàn từ
+     session["verify_context"] = { type, email, verification_id, ... }
+     (type hiện có: "register", "booking" — password_change/email_change đã
+     tạo verification ở route riêng nhưng nhánh xử lý trong POST /verify-email
+     chưa thấy trong routes.py hiện tại, có thể Claude Code đang làm dở)
+
+   - POST /verify-email nhận JSON {"verification_code": "..."}, KHÔNG phải
+     form submit thường — bắt buộc dùng fetch() ở JS bên dưới. Response JSON
+     luôn có "success" (bool), "message" (string), và "redirect_url" (string,
+     có khi có khi không tùy nhánh) — JS tự xử lý redirect bằng
+     window.location.href = data.redirect_url khi success.
+
+   - POST /resend-verification-code cũng JSON response, cooldown 60s
+     server-side. Nếu bấm quá sớm, trả HTTP 429 kèm
+     {"message": "Please wait {N} seconds..."} — JS regex-parse số giây còn
+     lại từ message này. ĐỀ XUẤT cho Claude Code: backend nên trả thêm field
+     "remaining_sec" dạng số riêng để client không phải parse câu tiếng Anh.
+
+   - Email hiển thị (đã mask 1 phần, vd "m***@gmail.com"): lấy từ
+     context["email"] truyền xuống view function. HIỆN TẠI 2 route GET
+     (email_verification và verify_email GET) đều chỉ làm
+     render_template("email_verification.html") KHÔNG truyền email — Claude
+     Code cần bổ sung:
+         verify_context = session.get("verify_context", {})
+         raw_email = verify_context.get("email", "")
+         masked_email = mask_email(raw_email)  # viết helper riêng, vd
+                                                  # "m***@gmail.com" từ
+                                                  # "mon@gmail.com"
+         return render_template("email_verification.html", email=masked_email)
+     Bản dưới đây dùng {{ email }} với giả định context này sẽ được bổ sung.
+     Mask email ngay tại Python (không mask bằng JS) để tránh việc email đầy
+     đủ vẫn nằm trong HTML source — mask phía server là đúng nguyên tắc.
+═══════════════════════════════════════════════════════════════════════════ #}
+
+<div class="ev-icon-wrap">
+    <span class="material-symbols-outlined ev-icon">mail</span>
+</div>
+
+<div class="auth-heading">
+    <h2 class="auth-heading__title">Verify your email</h2>
+    <p class="auth-heading__subtitle">
+        We sent a 6-digit code to<br>
+        <strong class="ev-email">{{ email }}</strong>
+    </p>
+</div>
+
+{# Lỗi sai mã hiển thị ngay trên form, KHÔNG dùng flash() — vì verify chạy
+   qua fetch() không reload trang, flash message sẽ không hiện cho tới lần
+   reload tiếp theo. Dùng 1 div ẩn/hiện bằng JS. #}
+<div class="ev-error" id="ev-error" hidden></div>
+
+<form class="ev-form" id="ev-form" novalidate>
+
+    <div class="ev-otp-row" id="otp-container">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" data-otp-index="0" aria-label="Digit 1">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="1" aria-label="Digit 2">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="2" aria-label="Digit 3">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="3" aria-label="Digit 4">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="4" aria-label="Digit 5">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="5" aria-label="Digit 6">
+    </div>
+
+    <div class="ev-resend-row">
+        <span class="ev-resend-text">
+            Didn't get the code? <button type="button" class="ev-resend-link" id="ev-resend-btn">Resend code</button>
+        </span>
+    </div>
+
+    <button class="auth-submit-btn" type="submit" id="ev-submit-btn">
+        Verify email
+        <span class="material-symbols-outlined">arrow_forward</span>
+    </button>
+
+</form>
+
+<script>
+(function () {
+    const otpBoxes   = document.querySelectorAll('.ev-otp-box');
+    const form       = document.getElementById('ev-form');
+    const submitBtn  = document.getElementById('ev-submit-btn');
+    const errorBox   = document.getElementById('ev-error');
+    const resendBtn  = document.getElementById('ev-resend-btn');
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
+
+    const VERIFY_URL = "{{ url_for('main.verify_email') }}";
+    const RESEND_URL = "{{ url_for('main.redo_verification') }}";
+
+    /* ── OTP auto-advance giữa 6 ô + highlight ô đang focus ─────────────── */
+    function clearActiveStyles() {
+        otpBoxes.forEach(b => b.classList.remove('ev-otp-box--active'));
+    }
+
+    otpBoxes.forEach((box, index) => {
+        box.addEventListener('input', () => {
+            box.value = box.value.replace(/[^0-9]/g, '');
+            if (box.value && index < otpBoxes.length - 1) {
+                otpBoxes[index + 1].focus();
+            }
+        });
+
+        box.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !box.value && index > 0) {
+                otpBoxes[index - 1].focus();
+            }
+        });
+
+        box.addEventListener('focus', () => {
+            clearActiveStyles();
+            box.classList.add('ev-otp-box--active');
+        });
+
+        /* Paste cả 6 số 1 lúc (vd copy từ email) — tự điền vào đúng từng ô */
+        box.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+            if (!pasted) return;
+            pasted.split('').slice(0, otpBoxes.length).forEach((digit, i) => {
+                if (otpBoxes[i]) otpBoxes[i].value = digit;
+            });
+            const nextEmpty = Array.from(otpBoxes).find(b => !b.value);
+            (nextEmpty || otpBoxes[otpBoxes.length - 1]).focus();
+        });
+    });
+
+    /* Ô đầu tiên auto-focus khi load trang (giữ behavior "autofocus" của
+       bản Stitch gốc, vốn đặt trên ô thứ 3 chỉ vì demo có sẵn giá trị) */
+    otpBoxes[0].focus();
+
+    function getOtpValue() {
+        return Array.from(otpBoxes).map(b => b.value).join('');
+    }
+
+    function showError(message) {
+        errorBox.textContent = message;
+        errorBox.hidden = false;
+    }
+
+    function clearError() {
+        errorBox.hidden = true;
+        errorBox.textContent = '';
+    }
+
+    /* ── Submit verify code — POST JSON, đọc redirect_url từ response ──── */
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearError();
+
+        const code = getOtpValue();
+        if (code.length !== 6) {
+            showError('Please enter all 6 digits.');
+            return;
+        }
+
+        submitBtn.disabled = true;
+
+        try {
+            const res = await fetch(VERIFY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN },
+                body: JSON.stringify({ verification_code: code }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = data.redirect_url || "{{ url_for('main.home') }}";
+            } else {
+                showError(data.message || 'Invalid verification code.');
+                otpBoxes.forEach(b => b.value = '');
+                otpBoxes[0].focus();
+                if (data.redirect_url) {
+                    /* Một số nhánh lỗi (vd session expired) backend vẫn trả
+                       redirect_url kèm success:false — vẫn nên điều hướng
+                       sau khi người dùng đọc được message, không redirect
+                       ngay lập tức để tránh mất thông báo lỗi. */
+                    setTimeout(() => { window.location.href = data.redirect_url; }, 2000);
+                }
+            }
+        } catch (err) {
+            showError('Something went wrong. Please try again.');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+
+    /* ── Resend code ─────────────────────────────────────────────────────── */
+    resendBtn.addEventListener('click', async () => {
+        clearError();
+        resendBtn.disabled = true;
+
+        try {
+            const res = await fetch(RESEND_URL, { method: 'POST', headers: { 'X-CSRFToken': CSRF_TOKEN } });
+            const data = await res.json();
+
+            if (data.success) {
+                resendBtn.textContent = 'Code sent!';
+                setTimeout(() => { resendBtn.textContent = 'Resend code'; }, 3000);
+            } else {
+                showError(data.message || 'Could not resend code. Please try again.');
+            }
+        } catch (err) {
+            showError('Something went wrong. Please try again.');
+        } finally {
+            resendBtn.disabled = false;
+        }
+    });
+})();
+</script>
+
+{% endblock %}

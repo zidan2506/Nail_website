@@ -1,28 +1,107 @@
-{% extends "base.html" %}
+{% extends "auth_base.html" %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Sign up | DahaCare{% endblock %}
 
-{% block content %}
-<h1>Create Customer Account</h1>
+{% block auth_panel_text %}
+{# Override text bên panel ảnh trái — đổi tagline phù hợp ngữ cảnh đăng ký
+   thay vì dùng chung y nguyên text của Login, nhưng vẫn cùng 1 tấm ảnh #}
+<h1 class="auth-panel__title">Join the atélier.</h1>
+<p class="auth-panel__subtitle">Create an account to book faster and track every visit.</p>
+{% endblock %}
 
-<form class="booking-form" method="POST" action="{{ url_for('main.register') }}" >
+{% block auth_content %}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   REGISTER FORM
+   - LƯU Ý: trang này được suy luận đồng bộ từ login.html (chưa có bản Stitch
+     thật) — giữ đúng structure/spacing/component style của Login để đảm bảo
+     đồng bộ thị giác. Nếu sau này m generate bản Stitch thật cho Register,
+     gửi lại để convert chính xác, file này chỉ là bản tạm dùng được ngay.
+   - Flask route: main.register
+   - DB INTEGRATION (cho Claude Code):
+       1. Validate: name không rỗng, email đúng format VÀ chưa tồn tại trong
+          bảng `customers` (check trùng trước khi insert), password đạt tối
+          thiểu 8 ký tự (đã ghi rõ trong hint text dưới field password)
+       2. Hash password trước khi lưu (werkzeug.security.generate_password_hash
+          hoặc lib đã dùng sẵn trong project) — KHÔNG BAO GIỜ lưu plaintext
+       3. Email trùng: flash("This email is already registered.", "error"),
+          redirect lại GET main.register, giữ lại giá trị name/email đã nhập
+          (không bắt người dùng gõ lại từ đầu — truyền qua context hoặc
+          flash kèm form data tùy convention project)
+       4. Đăng ký thành công: tạo customer mới trong DB, set session
+          (auto-login luôn sau khi đăng ký, đúng UX phổ biến), redirect
+          main.customer_dashboard. Cân nhắc thêm flash("Welcome to
+          DahaCare!", "success")
+   - Google/Facebook signup: hiện tại CHỈ LÀ UI, href="#" — backend OAuth
+     wire sau, giống Login
+═══════════════════════════════════════════════════════════════════════════ #}
+
+<div class="auth-heading">
+    <h2 class="auth-heading__title">Create your account</h2>
+    <p class="auth-heading__subtitle">Book faster and track your visits.</p>
+</div>
+
+<!-- Social Signups — UI placeholder, backend OAuth wire sau -->
+<div class="auth-social-row">
+    <a href="#" class="auth-social-btn">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+        Google
+    </a>
+    <a href="#" class="auth-social-btn">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+        Facebook
+    </a>
+</div>
+
+<div class="auth-divider"><span>or</span></div>
+
+<form class="auth-form" method="POST" action="{{ url_for('main.register') }}">
+
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    
-    <label for="full_name">Full name</label>
-    <input type="text" id="full_name" name="full_name">
 
-    <label for="phone">Phone number</label>
-    <input type="text" id="phone" name="phone">
+    <div>
+        <label class="auth-field__label" for="name">Full Name</label>
+        <div class="auth-field__input-wrap">
+            <span class="material-symbols-outlined auth-field__icon">person</span>
+            <input class="auth-field__input"
+                   id="full_name" name="full_name" type="text"
+                   placeholder="Jane Doe" required>
+        </div>
+    </div>
 
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email">
+    <div>
+        <label class="auth-field__label" for="email">Email Address</label>
+        <div class="auth-field__input-wrap">
+            <span class="material-symbols-outlined auth-field__icon">mail</span>
+            <input class="auth-field__input"
+                   id="email" name="email" type="email"
+                   placeholder="you@example.com" required>
+        </div>
+    </div>
 
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password">
+    <div>
+        <label class="auth-field__label" for="password">Password</label>
+        <div class="auth-field__input-wrap">
+            <span class="material-symbols-outlined auth-field__icon">lock</span>
+            <input class="auth-field__input auth-field__input--with-toggle"
+                   id="password" name="password" type="password"
+                   placeholder="••••••••" required minlength="8">
+            <button class="auth-toggle-pw" type="button" data-target="password" aria-label="Toggle password visibility">
+                <span class="material-symbols-outlined">visibility</span>
+            </button>
+        </div>
+        <p class="auth-field__hint">At least 8 characters</p>
+    </div>
 
-    <button id="registerBtn" type="submit" class="btn">Register</button>
-    
-    <p id="message" class="message"></p>
+    <button class="auth-submit-btn" type="submit">
+        Create account
+        <span class="material-symbols-outlined">arrow_forward</span>
+    </button>
+
 </form>
-<!-- <script src="{{ url_for('static', filename='js/register.js') }}"></script> -->
+
+<div class="auth-switch">
+    <p>Already have an account? <a href="{{ url_for('main.login') }}">Log in</a></p>
+</div>
+
 {% endblock %}

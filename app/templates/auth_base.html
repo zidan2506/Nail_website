@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DahaCare{% endblock %}</title>
+
+    <!-- Plus Jakarta Sans — đồng bộ với base.html chính -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Material Symbols — dùng cho icon mail/lock/visibility/arrow_forward -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public/auth.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="auth-body">
+
+    {# ═══════════════════════════════════════════════════════════════════════
+       AUTH LAYOUT — KHÔNG dùng base.html chính
+       - Không có navbar/footer (theo quyết định: layout tối giản riêng)
+       - Layout cố định: split-screen trên desktop (ảnh trái / form phải),
+         ảnh ẩn hoàn toàn trên mobile, form full width
+       - Mọi page con (login.html, register.html, forgot_password.html) chỉ
+         cần override {% block auth_panel %} — phần ảnh bên trái giữ nguyên
+         dùng chung, không lặp lại code ảnh ở mỗi page
+    ═══════════════════════════════════════════════════════════════════════ #}
+
+    <div class="auth-layout">
+
+        <!-- Left: Atmospheric image panel — dùng chung cho cả 3 trang -->
+        <div class="auth-panel">
+            <div class="auth-panel__img"
+                 style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAWI8tQ3Izn4oFHKUP_TE4nV3P736w_FrhrWNjdfVXIYm-sBQL4RYLxMjiAw_4Lif5DxqWHmP0T4giuLwkYrD3rWSCA81APwCaI8HcyQXbvmo3Mft0nnJbqvJ_93v85B1-8DOtGpL7R3aQpXLswryPNJYjEWwHIutGUyWmnud_cCb2n2zV-0UoAMVVkqnnlMnKlN49K4MHp2xrmpP6ylAVFt_QqyS6CTu0Z3Uv7H1GPTAaUDh4dOoX4R6A8zrNjNZqaRtq5HnBENQuY')">
+            </div>
+            <div class="auth-panel__overlay"></div>
+            <div class="auth-panel__text">
+                {% block auth_panel_text %}
+                <h1 class="auth-panel__title">Where precision meets care.</h1>
+                <p class="auth-panel__subtitle">Experience the pinnacle of luxury nail and beauty treatments.</p>
+                {% endblock %}
+            </div>
+        </div>
+
+        <!-- Right: Form content — mỗi page override block này -->
+        <div class="auth-form-wrap">
+            <div class="auth-form-card">
+
+                <!-- Logo — dùng chung, link về trang chủ -->
+                <div class="auth-logo">
+                    <a href="{{ url_for('main.home') }}" class="auth-logo__link">
+                        Daha<span class="auth-logo__accent">Care</span>
+                    </a>
+                </div>
+
+                {# Flash messages — dùng chung pattern với base.html chính #}
+                <div class="flash-wrapper">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="flash-{{ category }} auto-dismiss-flash">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+
+                {% block auth_content %}{% endblock %}
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+    /* Auto-dismiss flash messages — copy nguyên logic từ base.html chính */
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".auto-dismiss-flash").forEach((flash) => {
+            setTimeout(() => {
+                flash.classList.add("flash-hide");
+                flash.addEventListener("animationend", () => flash.remove(), { once: true });
+            }, 3000);
+        });
+    });
+
+    /* Password visibility toggle — dùng chung cho mọi input password trên
+       các trang auth (login/register). Mỗi input password cần đi kèm 1 button
+       có class .auth-toggle-pw và attribute data-target trỏ tới id của input. */
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".auth-toggle-pw").forEach((btn) => {
+            btn.addEventListener("click", function () {
+                const targetId = btn.dataset.target;
+                const input = document.getElementById(targetId);
+                if (!input) return;
+                const icon = btn.querySelector(".material-symbols-outlined");
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon.textContent = "visibility_off";
+                } else {
+                    input.type = "password";
+                    icon.textContent = "visibility";
+                }
+            });
+        });
+    });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

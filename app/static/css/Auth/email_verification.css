@@ -1,0 +1,146 @@
+/* =============================================================================
+   EMAIL_VERIFICATION.CSS — DahaCare Email Verification Page
+   Dùng riêng cho templates/email_verification.html
+   Phần layout chung (heading, submit-btn, switch...) đã có trong auth.css —
+   file này chỉ chứa các thành phần ĐẶC THÙ của trang verify (icon, email
+   mask, OTP boxes, resend row, error box, back link) không dùng lại ở
+   Login/Register/Forgot Password.
+   ============================================================================= */
+
+
+/* ─── ICON TRÊN HEADING ───────────────────────────────────────────────────────*/
+.ev-icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--color-surface-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 32px;
+    box-shadow: inset 0 1px 2px rgba(138, 112, 119, 0.1);
+}
+
+.ev-icon {
+    color: var(--color-primary);
+    font-size: 28px;
+    font-variation-settings: 'FILL' 1;
+}
+
+
+/* ─── EMAIL MASK TRONG SUBTITLE ───────────────────────────────────────────────*/
+.ev-email {
+    color: var(--color-deep-plum);
+    font-weight: 600;
+}
+
+
+/* ─── ERROR BOX ───────────────────────────────────────────────────────────────
+   Hiện/ẩn bằng JS (attribute [hidden]), KHÔNG dùng flash() vì verify chạy
+   qua fetch() không reload trang.
+   ─────────────────────────────────────────────────────────────────────────── */
+.ev-error {
+    width: 100%;
+    background: #fdecec;
+    border: 1px solid #f5c2c2;
+    color: #b3261e;
+    font-size: 14px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+
+/* ─── FORM WRAPPER ────────────────────────────────────────────────────────────
+   Stitch gốc không bọc form trong auth-form-card padding riêng — toàn bộ nội
+   dung center theo .auth-form-card đã có sẵn trong auth_base.html. Form ở
+   đây chỉ cần full-width, không cần thêm wrapper card riêng.
+   ─────────────────────────────────────────────────────────────────────────── */
+.ev-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+
+/* ─── OTP 6-BOX ROW ───────────────────────────────────────────────────────────*/
+.ev-otp-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+.ev-otp-box {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 1;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    font-family: var(--font-base);
+    color: var(--color-text-primary);
+    background: transparent;
+    border: 1px solid rgba(138, 112, 119, 0.5);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ev-otp-box:focus,
+.ev-otp-box--active {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+
+/* ─── RESEND ROW ──────────────────────────────────────────────────────────────*/
+.ev-resend-row {
+    width: 100%;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.ev-resend-text {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ev-resend-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-base);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+}
+
+.ev-resend-link:hover {
+    color: var(--color-primary-hover);
+}
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────────────────────*/
+@media (max-width: 420px) {
+    .ev-otp-row {
+        gap: 6px;
+    }
+
+    .ev-otp-box {
+        width: 44px;
+        height: 48px;
+        font-size: 18px;
+    }
+}
