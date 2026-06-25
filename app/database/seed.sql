@@ -13,11 +13,11 @@ VALUES
 -- Gel Manicure     → 80 pts
 -- Spa Pedicure     → 120 pts
 -- ============================================
-INSERT INTO services (category_id, name, description, duration_minutes, price, points, image)
+INSERT INTO services (category_id, name, description, duration_minutes, price, points, image, badge, icon)
 VALUES
-(1, 'Classic Manicure', 'Basic nail care and polish',      45, 25, 50, 'Classic Manicure.png'),
-(1, 'Gel Manicure',     'Long-lasting gel polish',         60, 35, 80, 'Classic Manicure.png'),
-(2, 'Spa Pedicure',     'Relaxing foot care treatment',    75, 45, 120, 'Classic Manicure.png');
+(1, 'Classic Manicure', 'Basic nail care and polish',   45, 25,  50, 'Classic Manicure.png', NULL,      'spa'),
+(1, 'Gel Manicure',     'Long-lasting gel polish',      60, 35,  80, 'Classic Manicure.png', 'Popular', 'auto_awesome'),
+(2, 'Spa Pedicure',     'Relaxing foot care treatment', 75, 45, 120, 'Classic Manicure.png', NULL,      'spa');
 
 -- ============================================
 -- USERS
@@ -32,11 +32,11 @@ VALUES
 -- ============================================
 -- STAFF
 -- ============================================
-INSERT INTO staff (full_name, email, phone, hourly_rate, commission_rate, user_id)
+INSERT INTO staff (full_name, email, phone, hourly_rate, commission_rate, role, photo, user_id)
 VALUES
-('Anna Nguyen', 'anna@example.com', '0401234567', 18,  10,  NULL),
-('Linh Tran',   'linh@example.com', '0402345678', 19,  12,  NULL),
-('Mon',         'mon@staff.com',    '0399222999', 999, 999, 2);
+('Anna Nguyen', 'anna@example.com', '0401234567', 18,  10,  'Senior Technician',      'https://lh3.googleusercontent.com/aida-public/AB6AXuC_aUwdcEjZaXxhz9CKBX_Akg0aZKCkOIqBYabE-RmqLJgvE53yNsextuAXNWEIdkwzVR9g-X-56Yc1iAONr8oWR92LPY6EcE9EFNcUs8S3-Ba4umXv_35t9rldlcsB911C8CcDfBFqNkiz6bxqonqaAf3GMasT7hxxmQeqjUpW87lI7KhC4Qm3zqA8uYNBNC9q1LvbtwVez1pwcXLWTk-_6awd2M1MLX_dcD9BLKsIBO99IdLwC4IkCXhJt6s0W5iidVxfsRgnRlDa', NULL),
+('Linh Tran',   'linh@example.com', '0402345678', 19,  12,  'Nail Art Specialist',    'https://lh3.googleusercontent.com/aida-public/AB6AXuA6kDWLDB5ofX-pgm-4hToDyFGEz7PYg30SPjO5dlAZlISo1Jt4wXRbo_mUF7Giumm9Dc_Q_3IQ0y76FS23Fj_TrjrddUpKfsZZG78YEkzu7u4pzuGWqvcTyQMseBp6FpgjWgNzRiYMZZJ_N1xX5mBuNR1fTZI5iV2p9PU30YZdGhPeZ9KRfFYjWTHv6NwTa37d2aqwZLsxQdEvWmgtLquJK97klBkKdY9hKJswVS8MIMRIE35NGVaHB6z8rCXppGsCA9605nFt_Hmr', NULL),
+('Mon',         'mon@staff.com',    '0399222999', 999, 999, 'Founder & Lead Artist', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCLw5WTYptIBZdjI5TCk8iwKUBvmaDy6rQmqxHl4K9fqijP8-nkzmlZCbpIF8MwTPse9wWLu6aMVc4Zg6FvlSUyt0gtkDwqptdYoHzlq6h7TSB1HX-rfFI_8yVkzu09Y1CfS9czTFQlcB7zj9ja4CeIlzdCN4gy88HuNbokPnojWu48_kM7OVG9J52dJ0hDcPQ32ibxGFFFkIei8kM2tYDv-IIsFwAFYlAcWqbXeR5raq2JmTmNCKpUocLx8TXPq931ZM_3Tu0CnYtQ', 2);
 
 -- ============================================
 -- CUSTOMERS (có thêm date_of_birth)
@@ -268,3 +268,18 @@ VALUES
 INSERT INTO reward_redemptions (customer_id, reward_id, points_spent, voucher_code, is_used, redeemed_at)
 VALUES
 (1, 3, 600, 'DAHA-K7MN-2QXP', 0, '2026-04-01 12:00:00');
+
+-- ============================================
+-- GALLERY IMAGES
+-- ============================================
+INSERT INTO gallery_images (image_url, alt_text, sort_order)
+VALUES
+('https://lh3.googleusercontent.com/aida/AP1WRLsl-oCjb8RhXAeIEuB_eNHK2tFeQvd3wmgVOQpY88UPDJ37BFw-U3t-mLkh0Z6HgtiFqLplPaZL5YZP6gW0ABINPIeNUwBPyIEPzsdxG2gyd6EeYOpRa-EJa-NVjOHk4bySuqwuvFahqWVjOFQzF6ViuS4LSvleJGW8_bQESJ2hgMhW5ZYEyeg0nzEmSYC2uUQqYeu-z6CeQt7-NLWM5nKxvhYK9oF4HZpII1db0XmelxVmjNgi0vOAAzo', 'Close-up of polished gel manicure', 1),
+('https://lh3.googleusercontent.com/aida/AP1WRLsNy0yLgd0coTdlPmjRkPHASeHleXdtaC2yTbdKqkilh96b47yjFXCqpFaovNiMkSZdhGuTYBAhSEM0jAuDSdLfNl5xcjDQ2IIgOIdOibCoUkv3Y8iPfJv5yEI02YDEUaT4Q3I1DDW7z--shWyt9ywUzsyFlfAmLqrdqWHMat7yluvED17sDc7BG_dTSUSrweZbYsLUFu-87RLMb74FKNPx726wS5jOq7k-Ur8VP_0oqlSenwpShBEC7LOH', 'Nail art studio session', 2),
+('https://lh3.googleusercontent.com/aida/AP1WRLv8V_3DNk87h2pPBhNPKrg95sbPxyEAec70Je_D8nmPrO_Ld8mMgG4wFYK_USNMwbJuR_98yv3PHsYaJy49pxFZ8qzadr0rNCC1z-cY62PB30XKapHUdVCyju6oIJCq69j9v5KijLythFgb-mm29Uqs58_Un3J7ckI0L2MIkDWyaO961bvLW6POGFk0zh0yXQeGGys6qDbZDeo8Aj1ELAbg-XpKmP1jPQ7uPw91sYXIezIuaZAYk4rvz10', 'Macro shot of nail design detail', 3),
+('https://lh3.googleusercontent.com/aida/AP1WRLsASQhDr3ZdZOalE4xeRT2BoAWEb8Bf0g1o2GX2v71FHpZI9XbxduTfw338P0tWuSirVqzWHTkd3NLLy0aJgOg7HAnRLVT1e9de92IHeoWmw7b-iej2tGlGrd306WQkUhq-jWffD4-lqG6JppMusfs_xoCYII1ngF8oOfcuPIIMKPaLUV-tp5wliQpT3m-jdXgODZgg507ZoM_w_eV1N1cAbowwPC-tKA425iqI-X6gvRHc8UoiXtzY2MSn', 'Salon interior detail shot', 4),
+('https://lh3.googleusercontent.com/aida-public/AB6AXuC2c4ySum3S7Y99dttSJGXpx9PXsq7zEeBi-6yKJIjY2axoj0IX_CFFeD4E7CRmllmBDpSPYDnRQCW4EAsNiadiNp4iDNUJoZclmTdQWJVq1EspTFt-8Eo9oM_TuYHvMLfgAD0l1Qt2Pg2xpLTodak5J1sLNyr73eB3QgRHMjbE5O0BWXA3A9Y1joVtugkxiyC-tZSDjJpKUYD5Js6QKKMjkntd_85r-fZI-ytufLX06f5yOiNMc7Sn5sNlCFENXmv4a3xp4TTnxsuC', 'Almond-shaped nails with gold foil accents on blossom-pink silk', 5),
+('https://lh3.googleusercontent.com/aida-public/AB6AXuA1_1ah9v8CXFtO9Gb2poXx5FSa4BywICbfdjZDi8MPn-YJhQhjWJ88sIyTDDma4WsdUPQt0wFoxOBRAp8FZkTz73C-KeZzPeQBhSKXdoQb5twG8BzkrtMVVYWfAW4ewll-CT-UQA7UUwOuqvq2D0-5AncUvi4yWNd50DudpdQx8vUJNQluYsDdij36hTs4pAs5Ygl9jazicjXQu2CDngpK2xFXKdPg99_ChQxd05IaWcgVqbueM4hfJrpSad3zmwu1HgsmeVZBXdc3', '3D sculpted rose nail art on deep plum base', 6),
+('https://lh3.googleusercontent.com/aida-public/AB6AXuAgvQd7mN2M_f3eVNCTbmWWI_MR6_edcNzEFDNtp_h0o-KU68pF8fwHDPuEmaGb9qBREYuQdVpG-W81Loqcy043OzEYnvpRcL1kBsb1mlfR3NDV_JoNIBXL4WY2MsrOk5WV0vpnJeWNsKXzajcRQlscKSDx7ttiI9LW36AX2UQCMXwGKFFEWsaJ5Xc93XfzJBcH_NagAXOLOFUarQ07bvS1HITke-3avbm_ygh9GV8madO660hXkKZDa-1Ssymi1hKqxwLAGVdM_-Fp', 'Modern French tip manicure with blush pink base', 7),
+('https://lh3.googleusercontent.com/aida-public/AB6AXuB3MaFKpVRnfTPWQuHJmvlwbtFXlCT0CETgsM9KTjw6imV7ggoqSxX6BR5VFlJrFXluOjAeKjVTJY24mHwX1MfhnE5IKFCj1OpsdbYrA2I9X1kJilUF-mtIuIHPzOKNF815sm86GMJcZ9Vi6QeyQEXU-KmDbwGxkfvjf3LvkQYoQH6HXcRqzAqAnDk6bCp-sh0Z5cQi3toMx_6VlcpAUGDh5yHc3vw1gOFxRZuq4lsqRYQlrarGgAcg9svtl-jOfR7Qgf3Yj7VvmTIW', 'Minimalist sheer nude manicure with single crystal accent', 8),
+('https://lh3.googleusercontent.com/aida-public/AB6AXuDttvQceukXIqghQTa9U5wE6lAZ7lEa1DGZm_yJfB4zgxBsDnFA_y_7ppZAxetMpLS_PuFWW16qDRognQCjfR4tcG0G2fCK3Y1Ja0PjARHdh7gBH8PZEREJo_UyWG8R2DxlgrunnsE1O7BdDxEgbNBBTINUQPjfjN1Mr9Mu4zrAi92jKs3UgYdlxXDv6fDDEobNO2u7zb8npnPb11203oeFtCyj1SBu6dm7pgx-lgZwPAV28LG0-JKXqZAwARL7m2YN1oN40KY8sXhM', 'Glossy deep burgundy nails with cherry blossom branch', 9);

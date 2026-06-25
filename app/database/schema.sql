@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS service_categories;
 DROP TABLE IF EXISTS staff;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS email_verifications;
+DROP TABLE IF EXISTS gallery_images;
 
 CREATE TABLE service_categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,6 +36,8 @@ CREATE TABLE services (
     points INTEGER NOT NULL DEFAULT 0,
     is_active INTEGER NOT NULL DEFAULT 1,
     image TEXT DEFAULT NULL,
+    badge TEXT DEFAULT NULL,
+    icon TEXT NOT NULL DEFAULT 'spa',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
@@ -58,6 +61,8 @@ CREATE TABLE staff (
     phone TEXT NOT NULL,
     hourly_rate REAL DEFAULT 0,
     commission_rate REAL DEFAULT 0,
+    role TEXT DEFAULT NULL,
+    photo TEXT DEFAULT NULL,
     is_active INTEGER NOT NULL DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -213,6 +218,14 @@ CREATE TABLE loyalty_config (
     value TEXT NOT NULL,
     description TEXT,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE gallery_images (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    image_url TEXT NOT NULL,
+    alt_text TEXT,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Indexes

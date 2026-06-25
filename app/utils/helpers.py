@@ -113,6 +113,12 @@ def build_services_by_category(categories, services):
         services_by_category[service['category_slug']].append(service)
     return services_by_category
 
+def mask_email(email):
+    if not email or '@' not in email:
+        return email
+    local, domain = email.split('@', 1)
+    return f"{local[0]}***@{domain}"
+
 def build_gg_map_url(address):
     params = {
         "api": "1",

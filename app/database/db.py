@@ -24,6 +24,14 @@ def get_all_staff():
     conn.close()
     return staff
 
+def get_active_staff():
+    conn = get_connection()
+    staff = conn.execute(
+        "SELECT * FROM staff WHERE is_active = 1 ORDER BY id ASC"
+    ).fetchall()
+    conn.close()
+    return staff
+
 def get_service_by_id(service_id):
     conn = get_connection()
     service = conn.execute("SELECT * FROM services WHERE id = ?", (service_id,)).fetchone()
@@ -433,6 +441,14 @@ def get_active_services_with_category():
     conn.close()
     return services
 
+def get_gallery_images():
+    conn = get_connection()
+    images = conn.execute(
+        "SELECT * FROM gallery_images ORDER BY sort_order ASC, id ASC"
+    ).fetchall()
+    conn.close()
+    return images
+
 def get_available_staff_for_slot(booking_date, start_time, end_time):
     conn = get_connection()
     rows = conn.execute(
@@ -446,7 +462,7 @@ def get_available_staff_for_slot(booking_date, start_time, end_time):
                 AND b.booking_date = ?
                 AND b.start_time < ?
                 AND b.end_time > ?
-                AND b.status IN ('pending', 'confirmed', 'unverified')
+                AND b.status IN ('pending', 'confirmed')
           )
         """,
         (booking_date, end_time, start_time)
