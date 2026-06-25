@@ -1,374 +1,620 @@
 {% extends "base.html" %}
 
-{% block title %}Book appointment{% endblock %}
+{% block title %}Book an Appointment | DahaCare{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/customer/customer_booking.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public/public_booking.css') }}">
 {% endblock %}
 
 {% block content %}
-<!-- 
-BACKEND NOTE:
-Form này submit booking cuối cùng.
-Đổi route create_booking theo route thật của m.
-Ví dụ:
-@booking_bp.route("/booking", methods=["GET", "POST"])
-def booking():
-    ...
--->
-<form 
-    method="POST"
-    action="{{ url_for('main.create_booking') }}"
->
-    <!-- Nếu m dùng Flask-WTF / CSRFProtect thì giữ dòng này -->
+
+{# PUBLIC BOOKING — GUEST FLOW
+   5 steps: Service → Stylist → Date & Time → Info → Checkout
+   JS wizard: 1 file, ẩn/hiện step bằng class .bk-step--active
+   DB context cần: categories, services_by_category, staffs, today, max_date #}
+
+<div class="bk-wrap">
+
+  <div class="bk-indicator-bar">
+    <div class="bk-indicator">
+      <div class="bk-progress-track">
+        <div class="bk-progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="bk-step-dot-wrap" data-step="1">
+        <div class="bk-step-dot bk-step-dot--active" id="step-circle-1">1</div>
+        <span class="bk-step-label bk-step-label--active">Service</span>
+      </div>
+      <div class="bk-step-dot-wrap" data-step="2">
+        <div class="bk-step-dot" id="step-circle-2">2</div>
+        <span class="bk-step-label">Stylist</span>
+      </div>
+      <div class="bk-step-dot-wrap" data-step="3">
+        <div class="bk-step-dot" id="step-circle-3">3</div>
+        <span class="bk-step-label">Date</span>
+      </div>
+      <div class="bk-step-dot-wrap" data-step="4">
+        <div class="bk-step-dot" id="step-circle-4">4</div>
+        <span class="bk-step-label">Info</span>
+      </div>
+      <div class="bk-step-dot-wrap" data-step="5">
+        <div class="bk-step-dot" id="step-circle-5">5</div>
+        <span class="bk-step-label">Checkout</span>
+      </div>
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('main.create_booking') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="booking_date" id="hidden-booking-date">
+    <input type="hidden" name="start_time" id="hidden-start-time">
 
-    <div class="booking-layout">
+    <div class="bk-content">
 
-        <!-- ================= LEFT CONTENT ================= -->
-        <main class="booking-main">
+      {# ── STEP 1: SERVICE ─────────────────────────────────────────────────────
+         DB: loop categories cho chips, loop services_by_category cho cards
+         Chip active toggle bằng JS class bk-chip--active
+         Card selected: JS toggle class bk-svc-card--selected trên .bk-svc-card
+         data-name, data-duration, data-price → JS update summary ở step 5 #}
+      <section class="bk-step bk-step--active" id="step-1">
+        <div class="bk-step-head">
+          <h1 class="bk-step-title">Select a Service</h1>
+          <p class="bk-step-sub">Choose from our curated selection of luxury treatments.</p>
+        </div>
 
-            <!-- Header row -->
-            <div class="step-header">
-                <h1>1. Select Service</h1>
+        <div class="bk-chips">
+          <button type="button" class="bk-chip bk-chip--active" data-category="all">All Services</button>
+          {% for category in categories %}
+          <button type="button" class="bk-chip" data-category="{{ category['slug'] }}">{{ category['name'] }}</button>
+          {% endfor %}
+        </div>
+
+        <div class="bk-svc-list">
+          {% set ns = namespace(first_service=true) %}
+          {% for category in categories %}
+            {% for service in services_by_category[category['slug']] %}
+          <label class="bk-svc-label service-item" data-category="{{ category['slug'] }}">
+            <input class="bk-sr-only service-radio" type="radio" name="service_id"
+                   value="{{ service['id'] }}"
+                   data-name="{{ service['name'] }}"
+                   data-duration="{{ service['duration_minutes'] }}"
+                   data-price="{{ service['price'] }}"
+                   {% if ns.first_service %}checked{% endif %} required>
+            {% set ns.first_service = false %}
+            <div class="bk-svc-card">
+              <div class="bk-svc-thumb">
+                {% if service['image'] %}
+                <img src="{{ url_for('static', filename='uploads/services/' + service['image']) }}" alt="{{ service['name'] }}">
+                {% else %}
+                <div class="bk-svc-thumb bk-svc-thumb--bg" style="background:var(--surface-2)"></div>
+                {% endif %}
+              </div>
+              <div class="bk-svc-body">
+                <div class="bk-svc-row">
+                  <h3 class="bk-svc-name">{{ service['name'] }}</h3>
+                  <span class="bk-svc-price">€{{ service['price'] }}</span>
+                </div>
+                <p class="bk-svc-desc">{{ service['description'] }}</p>
+                <div class="bk-svc-meta">
+                  <span class="material-symbols-outlined bk-svc-meta-icon">schedule</span>
+                  {{ service['duration_minutes'] }} min
+                </div>
+              </div>
+              <div class="bk-radio-check">
+                <span class="material-symbols-outlined bk-radio-check-icon">check</span>
+              </div>
             </div>
-
-            <!-- Service tabs -->
-            <!-- 
-            BACKEND NOTE:
-            Cách đơn giản: tab là link GET filter category.
-            /booking?category=manicure
-            class của các tab = tab active và không active
-            -->
-            <div class="service-tabs">
-                {% for category in categories %}
-                    <button
-                        type="button"
-                        class="service-tab {% if loop.first %}service-tab--active{% endif %}"
-                        data-service-tab-target="{{ category['slug'] }}"
-                    >
-                        {{ category['name'] }}
-                    </button>
-                {% endfor %}
-            </div>
-
-            <!-- Service panel -->
-            {% for category in categories %}
-                <section
-                    id="{{ category['slug'] }}"
-                    class="service-list service-tab-panel {% if loop.first %}service-tab-panel--active{% endif %}"
-                >
-                    {% for service in services_by_category[category['slug']] %}
-                        <label class="service-option">
-                            <input 
-                                type="radio" 
-                                name="service_id" 
-                                value="{{ service['id'] }}"
-                                class="option-input service-radio"
-                                data-name="{{ service['name'] }}"
-                                data-duration="{{ service['duration_minutes'] }}"
-                                data-price="{{ service['price'] }}"
-                                required
-                            >
-
-                            <div class="service-card">
-                                <div>
-                                    <h3>{{ service['name'] }}</h3>
-                                    <p>
-                                        Price: ${{ service['price'] }}
-                                    </p>
-                                    
-                                    <p>
-                                        Durations: {{ service['duration_minutes'] }} mins
-                                    </p>
-                                </div>
-
-                                <div class="radio-check">✓</div>
-                            </div>
-                        </label>
-                    {% endfor %}
-                </section>
+          </label>
             {% endfor %}
-            <!-- Staff section -->
-            <section class="booking-section">
-                <h2>2. Select Professional</h2>
+          {% endfor %}
+        </div>
 
-                <div class="staff-grid">
+        <div class="bk-nav bk-nav--end">
+          <button type="button" class="bk-btn-next">
+            Continue <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+      </section>
 
-                    <!-- 
-                    BACKEND NOTE:
-                    value="" nghĩa là no preference.
-                    Backend nhận staff_id = 0 thì tự assign staff available.
-                    -->
-                    <label class="staff-option">
-                        <input 
-                            type="radio" 
-                            name="staff_id" 
-                            value="0" 
-                            checked
-                            class="option-input"
-                            data-name="No Preference"
-                        >
-                        <div class="staff-card">
-                            <div class="staff-avatar no-preference">
-                                👥
-                            </div>
-                            <strong>No Preference</strong>
-                        </div>
-                    </label>
+      {# ── STEP 2: STYLIST ─────────────────────────────────────────────────────
+         value="0" = No Preference → backend auto-assign
+         DB: loop staffs cho các card còn lại
+         Selected: JS toggle bk-staff-card--selected #}
+      <section class="bk-step" id="step-2">
+        <div class="bk-step-head">
+          <h2 class="bk-step-title">Choose a Professional</h2>
+          <p class="bk-step-sub">Select your preferred stylist or let us match you.</p>
+        </div>
 
-                    <!-- 
-                    BACKEND NOTE:
-                    Sau này loop staff:
-                    {% for staff in staff_members %}
-                        value="{{ staff.id }}"
-                        {{ staff.name }}
-                    {% endfor %}
-                    -->
-                    {% for staff in staffs%}
-                    <label class="staff-option">
-                        <input 
-                            type="radio" 
-                            name="staff_id" 
-                            value="{{ staff['id'] }}"
-                            class="option-input"
-                            data-name="{{ staff['full_name'] }}"
-                        >
-                        <div class="staff-card">
-                            <div class="staff-avatar">
-                                <img src="#" alt="{{ staff['full_name'] }}">
-                            </div>
-                            <strong>{{ staff['full_name'] }}</strong>
-                        </div>
-                    </label>
-                    {% endfor %}
+        <div class="bk-staff-grid">
+
+          <label class="bk-staff-label">
+            <input checked class="bk-sr-only" type="radio" name="staff_id" value="0" data-name="No Preference">
+            <div class="bk-staff-card">
+              <div class="bk-staff-avatar bk-staff-avatar--empty">
+                <span class="material-symbols-outlined">group</span>
+              </div>
+              <h3 class="bk-staff-name">No Preference</h3>
+              <p class="bk-staff-role">Any available specialist</p>
+            </div>
+          </label>
+
+          {% for staff in staffs %}
+          <label class="bk-staff-label">
+            <input class="bk-sr-only" type="radio" name="staff_id"
+                   value="{{ staff['id'] }}" data-name="{{ staff['full_name'] }}">
+            <div class="bk-staff-card">
+              {% if staff['photo'] %}
+              <div class="bk-staff-avatar"
+                   style="background-image:url('{{ url_for('static', filename='uploads/staff/' + staff['photo']) }}')"></div>
+              {% else %}
+              <div class="bk-staff-avatar bk-staff-avatar--empty">
+                <span class="material-symbols-outlined">person</span>
+              </div>
+              {% endif %}
+              <h3 class="bk-staff-name">{{ staff['full_name'] }}</h3>
+              <p class="bk-staff-role">{{ staff['role'] or 'Nail Technician' }}</p>
+            </div>
+          </label>
+          {% endfor %}
+
+        </div>
+
+        <div class="bk-nav">
+          <button type="button" class="bk-btn-back">
+            <span class="material-symbols-outlined">arrow_back</span> Back
+          </button>
+          <button type="button" class="bk-btn-next">
+            Continue <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+      </section>
+
+      {# ── STEP 3: DATE & TIME ─────────────────────────────────────────────────
+         2 cột 1:1: calendar trái / time slots phải
+         Calendar nav: ‹ [Month Year căn giữa] ›
+         Time slots: phẳng 1 hàng wrap, slot đầy = strikethrough + disabled
+         JS gọi CALENDAR_CONFIG.availableSlotUrl khi chọn ngày
+         Chọn xong → cập nhật hidden-booking-date và hidden-start-time #}
+      <section class="bk-step" id="step-3">
+        <div class="bk-step-head">
+          <h2 class="bk-step-title">Select Date &amp; Time</h2>
+          <p class="bk-step-sub">Pick a date, then choose an available slot.</p>
+        </div>
+
+        <div class="bk-dt-grid">
+
+          <div class="bk-cal-panel">
+            <div class="bk-cal-nav">
+              <button type="button" id="prevMonth" class="bk-cal-nav-btn" aria-label="Previous month">
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+              <h3 class="bk-cal-month" id="calendarMonthLabel"></h3>
+              <button type="button" id="nextMonth" class="bk-cal-nav-btn" aria-label="Next month">
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+            <div class="bk-cal-weekdays">
+              <span>MO</span><span>TU</span><span>WE</span>
+              <span>TH</span><span>FR</span><span>SA</span><span>SU</span>
+            </div>
+            <div id="calendar" class="bk-cal-grid"></div>
+          </div>
+
+          <div class="bk-time-panel">
+            <h3 class="bk-time-heading" id="timeslot-heading">Available Times</h3>
+            <p class="bk-time-sub" id="timeslot-sub">Select a date to see available times</p>
+            <div class="bk-time-grid" id="timeSlotGrid">
+              <p class="bk-time-placeholder" id="timeslot-placeholder">Please select a date first</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="bk-nav">
+          <button type="button" class="bk-btn-back">
+            <span class="material-symbols-outlined">arrow_back</span> Back
+          </button>
+          <button type="button" class="bk-btn-next">
+            Continue <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+      </section>
+
+
+
+      {# ── STEP 4: YOUR INFO (guest only) ──────────────────────────────────────
+         Customer đã login không thấy step này — xem customer_booking.html
+         "Log in" link → main.login #}
+      <section class="bk-step" id="step-4">
+        <div class="bk-step-head">
+          <h2 class="bk-step-title">Your Details</h2>
+          <p class="bk-step-sub">Please provide your contact information to secure the booking.</p>
+        </div>
+
+        <div class="bk-info-card">
+          <div class="bk-info-glow"></div>
+          <div class="bk-info-login-row">
+            <span class="bk-info-login-text">Already have an account?</span>
+            <a class="bk-info-login-link" href="{{ url_for('main.login') }}">Log in</a>
+          </div>
+          <div class="bk-info-form">
+            <div class="bk-form-row">
+              <div class="bk-form-group">
+                <label class="bk-label" for="full_name">Full Name</label>
+                <input class="bk-input" id="full_name" name="full_name" type="text" placeholder="Jane Doe">
+              </div>
+              <div class="bk-form-group">
+                <label class="bk-label" for="phone">Phone Number</label>
+                <input class="bk-input" id="phone" name="phone" type="tel" placeholder="+358 40 000 0000">
+              </div>
+            </div>
+            <div class="bk-form-group">
+              <label class="bk-label" for="email">Email Address</label>
+              <input class="bk-input" id="email" name="email" type="email" placeholder="jane@example.com">
+            </div>
+            <div class="bk-form-group">
+              <label class="bk-label" for="note">Booking Notes <span class="bk-label-optional">(Optional)</span></label>
+              <textarea class="bk-input bk-textarea" id="note" name="note" rows="3"
+                        placeholder="Any special requests or allergies..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="bk-nav">
+          <button type="button" class="bk-btn-back">
+            <span class="material-symbols-outlined">arrow_back</span> Back
+          </button>
+          <button type="button" class="bk-btn-next">
+            Continue to Checkout <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+      </section>
+
+      {# ── STEP 5: CHECKOUT ────────────────────────────────────────────────────
+         2 cột: left payment / right summary
+         Summary fields update bằng JS khi chuyển đến step này
+         VAT 25.5% tính trong JS
+         Confirm → form submit → main.create_booking → /verify-email #}
+      <section class="bk-step" id="step-5">
+        <div class="bk-step-head">
+          <h2 class="bk-step-title">Confirm &amp; Pay</h2>
+        </div>
+
+        <div class="bk-checkout-grid">
+
+          <div class="bk-payment-col">
+            <h3 class="bk-payment-heading">Payment Method</h3>
+
+            <label class="bk-payment-label">
+              <input checked class="bk-sr-only" type="radio" name="payment_method" value="pay_at_salon">
+              <div class="bk-payment-card">
+                <span class="material-symbols-outlined bk-payment-icon">storefront</span>
+                <div class="bk-payment-body">
+                  <h4 class="bk-payment-title">Pay at Salon</h4>
+                  <p class="bk-payment-desc">Pay after your service is completed</p>
                 </div>
-            </section>
-
-            <!-- Date & Time section -->
-            <section class="booking-section">
-                <h2>3. Choose Date & Time</h2>
-
-                <div class="calendar-card">
-
-                    <div class="calendar-header">
-                        <h3>October 2023</h3>
-
-                        <div class="calendar-actions">
-                            <!-- 
-                            BACKEND NOTE:
-                            Nếu chưa làm JS calendar thì để button disabled hoặc link GET.
-                            Sau này có thể đổi thành:
-                            /booking?week=previous
-                            /booking?week=next
-                            -->
-                            <button type="button" id="prevMonth" aria-label="Previous month">‹</button>
-                            <p id="calendarMonthLabel"></p>
-                            <button type="button" id="nextMonth" aria-label="Next month">›</button>
-                        </div>
-                    </div>
-
-                <div class="calendar-days">
-                    
-                    <div class="weekday-grid">
-                        <span>Mo</span>
-                        <span>Tu</span>
-                        <span>We</span>
-                        <span>Th</span>
-                        <span>Fr</span>
-                        <span>Sa</span>
-                        <span>Su</span>
-                    </div>
-                    
-                    
-                    <div id="calendar" class="date-grid">
-
-                        <!-- 
-                        BACKEND NOTE:
-                        name="booking_date" là ngày backend nhận.
-                        value nên dùng format YYYY-MM-DD.
-                        -->
-                        <label class="date-option">
-                            <input 
-                                type="radio" 
-                                name="booking_date" 
-                                value="2023-10-12"
-                                class="option-input"
-                            >
-                            <div class="date-pill">
-                                <strong>12</strong>
-                            </div>
-                        </label>
-
-                    </div>
-
+                <div class="bk-payment-radio">
+                  <span class="material-symbols-outlined bk-payment-radio-check">check</span>
                 </div>
-                    
+              </div>
+            </label>
 
-                    <div class="available-times">
-                        <h4>Available Times</h4>
-
-                        <div id="timeSlotGrid" class="time-grid">
-
-                            <!-- 
-                            BACKEND NOTE:
-                            name="start_time" là giờ backend nhận.
-                            value nên dùng format HH:MM.
-                            Backend sẽ combine:
-                            booking_date + start_time
-                            -->
-                            <!-- <label class="time-option">
-                                <input 
-                                    type="radio" 
-                                    name="start_time" 
-                                    value="09:00"
-                                    class="option-input"
-                                >
-                                <span>09:0 AM</span>
-                            </label> -->
-                            
-
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-            <!-- Customer information section -->
-            <section class="booking-section">
-                <h2>4. Your Information</h2>
-
-                <div class="customer-card">
-
-                    <div class="guest-info" id="guest_info">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="full_name">Full Name</label>
-                                <input 
-                                    id="full_name"
-                                    type="text" 
-                                    name="full_name" 
-                                    placeholder=""
-                                >
-                            </div>
-
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input 
-                                    id="phone"
-                                    type="tel" 
-                                    name="phone" 
-                                    placeholder=""
-                                >
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input 
-                                id="email"
-                                type="email" 
-                                name="email" 
-                                placeholder=""
-                            >
-                        </div>
-
-                        <div class="form-group">
-                            <label for="note">Leave your note (OPTIONAL)</label>
-                            <input 
-                                id="note"
-                                type="text" 
-                                name="note" 
-                                placeholder=""
-                            >
-                        </div>
-                </div>
-
-                    <!-- <label class="checkbox-row">
-                        <input 
-                            type="checkbox" 
-                            name="is_guest_booking" 
-                            value="1"
-                            id="is_guest_booking"
-                        >
-                        <span>I'm booking for a guest</span>
-                    </label> -->
-
-                </div>
-            </section>
-
-        </main>
-
-        <!-- ================= RIGHT SUMMARY ================= -->
-        <aside class="booking-sidebar">
-
-            <div class="summary-card">
-
-                <div class="summary-title">
-                    <span class="summary-icon">🛍️</span>
-                    <h2>Booking Summary</h2>
-                </div>
-
-                <!-- 
-                BACKEND NOTE:
-                Phần này trước mắt có thể render theo default selected service.
-                Sau này nếu muốn update live khi user chọn service/staff/time thì thêm JS.
-                -->
-                <div class="summary-service">
-                    <div>
-                        <h3 id="summary-service-name">-</h3>
-                        <p id="summary-service-duration">- minutes</p>
-                    </div>
-                    <strong id="summary-service-price">$0.00</strong>
-                </div>
-
-                <div class="summary-meta">
-                    <p id="summary-staff">👤 No Preference</p>
-                    <p id="summary-date">📅 -</p>
-                    <p id="summary-time">🕐 -</p>
-                </div>
-
-                <hr>
-
-                <div class="summary-line">
-                    <span>VAT - 25.5%</span>
-                    <span id="summary-vat">$0.00</span>
-                </div>
-
-                <div class="summary-total">
-                    <span>Total</span>
-                    <strong id="summary-total">$0.00</strong>
-                </div>
-
-                <button type="submit" class="confirm-btn">
-                    Confirm Booking
-                </button>
-
-                <p class="policy-note">
-                    By clicking "Confirm Booking" you agree to our 24h cancellation policy.
-                </p>
-
+            <div class="bk-payment-card bk-payment-card--disabled">
+              <span class="material-symbols-outlined bk-payment-icon">credit_card</span>
+              <div class="bk-payment-body">
+                <h4 class="bk-payment-title">Online Payment</h4>
+                <p class="bk-payment-desc">Coming soon</p>
+              </div>
             </div>
 
-            <div class="benefit-card">
-                <div class="benefit-icon">🏷️</div>
-                <div>
-                    <h3>Member Benefit</h3>
-                    <p>Sign in to earn 45 loyalty points with this booking.</p>
-                </div>
+            <div class="bk-info-note">
+              <span class="material-symbols-outlined bk-info-note-icon">info</span>
+              <span>You'll receive a verification email after confirming. Your booking will be
+                <strong>pending</strong> until the salon confirms your appointment.</span>
             </div>
+          </div>
 
-        </aside>
+          <div class="bk-summary-col">
+            <div class="bk-summary-card">
+              <h3 class="bk-summary-heading">Booking Summary</h3>
+              <div class="bk-summary-rows">
+                <div class="bk-summary-row">
+                  <span class="bk-summary-key">Service</span>
+                  <span class="bk-summary-val" id="summary-service-name">—</span>
+                </div>
+                <div class="bk-summary-row">
+                  <span class="bk-summary-key">Duration</span>
+                  <span class="bk-summary-val" id="summary-duration">—</span>
+                </div>
+                <div class="bk-summary-row">
+                  <span class="bk-summary-key">Stylist</span>
+                  <span class="bk-summary-val" id="summary-staff">No Preference</span>
+                </div>
+                <div class="bk-summary-row">
+                  <span class="bk-summary-key">Date &amp; Time</span>
+                  <span class="bk-summary-val" id="summary-datetime">—</span>
+                </div>
+              </div>
+              <div class="bk-summary-price-rows">
+                <div class="bk-summary-price-row">
+                  <span>Subtotal</span><span id="summary-subtotal">€0.00</span>
+                </div>
+                <div class="bk-summary-price-row">
+                  <span>VAT (25.5%)</span><span id="summary-vat">€0.00</span>
+                </div>
+                <div class="bk-summary-total">
+                  <span>Total</span>
+                  <span id="summary-total">€0.00</span>
+                </div>
+              </div>
+              <div class="bk-summary-points-nudge">
+                <span class="material-symbols-outlined">stars</span>
+                <span>Sign in to earn loyalty points with this booking.</span>
+              </div>
+              <p class="bk-summary-policy">By confirming, you agree to our 24h cancellation policy.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="bk-nav">
+          <button type="button" class="bk-btn-back">
+            <span class="material-symbols-outlined">arrow_back</span> Back
+          </button>
+          <button type="submit" class="bk-btn-confirm" id="confirm-btn">
+            Confirm &amp; verify email <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+      </section>
 
     </div>
-</form>
+  </form>
+</div>
 
 <script>
-    const CALENDAR_CONFIG = {
-        today: "{{ today.isoformat() }}",
-        maxDate: "{{ max_date.isoformat() }}",
-        availableSlotUrl: "{{ url_for('main.check_available_slot')}}"
+
+document.addEventListener('DOMContentLoaded', () => {
+    const steps      = document.querySelectorAll('.bk-step');
+    const dotWraps   = document.querySelectorAll('.bk-step-dot-wrap');
+    const fill       = document.getElementById('progress-fill');
+    const nextBtns   = document.querySelectorAll('.bk-btn-next');
+    const prevBtns   = document.querySelectorAll('.bk-btn-back');
+    let cur          = 1;
+    const total      = steps.length;
+
+    function updateWizard() {
+        steps.forEach((s, i) => s.classList.toggle('bk-step--active', i + 1 === cur));
+        dotWraps.forEach(w => {
+            const n  = parseInt(w.dataset.step);
+            const d  = document.getElementById(`step-circle-${n}`);
+            const lb = w.querySelector('.bk-step-label');
+            d.className = 'bk-step-dot';
+            lb.className = 'bk-step-label';
+            if (n < cur) {
+                d.classList.add('bk-step-dot--done');
+                d.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">check</span>';
+                lb.classList.add('bk-step-label--done');
+            } else if (n === cur) {
+                d.classList.add('bk-step-dot--active');
+                d.textContent = n;
+                lb.classList.add('bk-step-label--active');
+            } else {
+                d.textContent = n;
+            }
+        });
+        fill.style.width = `${((cur - 1) / (total - 1)) * 100}%`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    nextBtns.forEach(b => b.addEventListener('click', () => { if (cur < total) { cur++; updateWizard(); } }));
+    prevBtns.forEach(b => b.addEventListener('click', () => { if (cur > 1) { cur--; updateWizard(); } }));
+
+    const chips = document.querySelectorAll('.bk-chip');
+    chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            chips.forEach(c => c.classList.remove('bk-chip--active'));
+            chip.classList.add('bk-chip--active');
+            const filter = chip.dataset.category;
+            document.querySelectorAll('.service-item').forEach(item => {
+                item.style.display = (filter === 'all' || item.dataset.category === filter) ? '' : 'none';
+            });
+        });
+    });
+
+    document.querySelectorAll('.bk-svc-label').forEach(label => {
+        label.addEventListener('click', () => {
+            document.querySelectorAll('.bk-svc-card').forEach(c => c.classList.remove('bk-svc-card--selected'));
+            label.querySelector('.bk-svc-card').classList.add('bk-svc-card--selected');
+        });
+    });
+
+    document.querySelectorAll('.bk-staff-label').forEach(label => {
+        label.addEventListener('click', () => {
+            document.querySelectorAll('.bk-staff-card').forEach(c => c.classList.remove('bk-staff-card--selected'));
+            label.querySelector('.bk-staff-card').classList.add('bk-staff-card--selected');
+        });
+    });
+
+    document.querySelectorAll('.bk-payment-label').forEach(label => {
+        label.addEventListener('click', () => {
+            document.querySelectorAll('.bk-payment-card:not(.bk-payment-card--disabled)').forEach(c => c.classList.remove('bk-payment-card--selected'));
+            label.querySelector('.bk-payment-card').classList.add('bk-payment-card--selected');
+        });
+    });
+
+    const VAT = 0.255;
+    function updateSummary() {
+        const svc  = document.querySelector('.service-radio:checked');
+        const stf  = document.querySelector('input[name="staff_id"]:checked');
+        if (svc) {
+            const p   = parseFloat(svc.dataset.price) || 0;
+            const vat = p * VAT;
+            document.getElementById('summary-service-name').textContent = svc.dataset.name || '—';
+            document.getElementById('summary-duration').textContent     = svc.dataset.duration ? `${svc.dataset.duration} min` : '—';
+            document.getElementById('summary-subtotal').textContent     = `€${p.toFixed(2)}`;
+            document.getElementById('summary-vat').textContent          = `€${vat.toFixed(2)}`;
+            document.getElementById('summary-total').textContent        = `€${(p + vat).toFixed(2)}`;
+        }
+        if (stf) document.getElementById('summary-staff').textContent = stf.dataset.name || 'No Preference';
+    }
+    document.querySelectorAll('.service-radio, input[name="staff_id"]').forEach(r => r.addEventListener('change', updateSummary));
+    updateSummary();
+
+    document.getElementById('confirm-btn')?.closest('form').addEventListener('submit', () => {
+        const btn = document.getElementById('confirm-btn');
+        btn.disabled = true;
+        btn.textContent = 'Processing…';
+    });
+
+    document.querySelectorAll('.bk-staff-label input:checked').forEach(r => {
+        r.closest('.bk-staff-label')?.querySelector('.bk-staff-card')?.classList.add('bk-staff-card--selected');
+    });
+    document.querySelectorAll('.service-radio:checked').forEach(r => {
+        r.closest('.bk-svc-label')?.querySelector('.bk-svc-card')?.classList.add('bk-svc-card--selected');
+    });
+    document.querySelectorAll('input[name="payment_method"]:checked').forEach(r => {
+        r.closest('.bk-payment-label')?.querySelector('.bk-payment-card')?.classList.add('bk-payment-card--selected');
+    });
+
+    // --Calendar & Time Slot
+    const calendarEl   = document.getElementById('calendar');
+    const timeGridEl   = document.getElementById('timeSlotGrid');
+    const monthLabelEl = document.getElementById('calendarMonthLabel');
+    const hiddenDate   = document.getElementById('hidden-booking-date');
+    const hiddenTime   = document.getElementById('hidden-start-time');
+
+    function parseLocalDate(s) {
+        const [y, m, d] = s.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    }
+    function fmtDate(d) {
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function calGridDates(monthDate) {
+        const y = monthDate.getFullYear(), m = monthDate.getMonth();
+        const offset = (new Date(y, m, 1).getDay() + 6) % 7;
+        return Array.from({ length: 35 }, (_, i) => new Date(y, m, 1 - offset + i));
+    }
+
+    function renderCalendar() {
+        monthLabelEl.textContent = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        calendarEl.innerHTML = '';
+        calGridDates(currentMonth).forEach(dateObj => {
+            const isOther  = dateObj.getMonth() !== currentMonth.getMonth();
+            const isPast   = dateObj < todayDate;
+            const isFuture = dateObj > maxDate;
+            const isToday  = fmtDate(dateObj) === CALENDAR_CONFIG.today;
+            const disabled = isOther || isPast || isFuture;
+
+            const cell = document.createElement('div');
+            cell.className = 'bk-cal-day';
+            if (disabled) cell.classList.add('bk-cal-day--past');
+            if (isToday)  cell.classList.add('bk-cal-day--today');
+            if (selectedDate && fmtDate(dateObj) === fmtDate(selectedDate)) cell.classList.add('bk-cal-day--selected');
+            cell.textContent = dateObj.getDate();
+
+            if (!disabled) {
+                cell.addEventListener('click', () => {
+                    selectedDate     = dateObj;
+                    hiddenDate.value = fmtDate(dateObj);
+                    hiddenTime.value = '';
+                    renderCalendar();
+                    updateDatetimeSummary();
+                    tryLoadSlots();
+                });
+            }
+            calendarEl.appendChild(cell);
+        });
+    }
+
+    function updateDatetimeSummary() {
+        const el = document.getElementById('summary-datetime');
+        if (!el) return;
+        const datePart = selectedDate
+            ? selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : '—';
+        el.textContent = hiddenTime.value ? `${datePart} · ${hiddenTime.value}` : datePart;
+    }
+
+    function tryLoadSlots() {
+        const svcEl = document.querySelector('.service-radio:checked');
+        if (!svcEl) {
+            timeGridEl.innerHTML = '<p class="bk-time-placeholder">Please select a service first.</p>';
+            return;
+        }
+        if (!selectedDate) {
+            timeGridEl.innerHTML = '<p class="bk-time-placeholder">Please select a date first.</p>';
+            return;
+        }
+        loadSlots(fmtDate(selectedDate), svcEl.value, document.querySelector('input[name="staff_id"]:checked')?.value || 0);
+    }
+
+    async function loadSlots(dateStr, svcId, stfId) {
+        timeGridEl.innerHTML = '<p class="bk-time-placeholder">Loading...</p>';
+        try {
+            const res  = await fetch(`${CALENDAR_CONFIG.availableSlotUrl}?booking_date=${dateStr}&staff_id=${stfId}&service_id=${svcId}`);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Failed');
+            renderSlots(data.available_slots || []);
+        } catch {
+            timeGridEl.innerHTML = '<p class="bk-time-placeholder">Could not load available times.</p>';
+        }
+    }
+
+    function renderSlots(slots) {
+        timeGridEl.innerHTML = '';
+        if (!slots.length) {
+            timeGridEl.innerHTML = '<p class="bk-time-placeholder">No available slots for this date.</p>';
+            return;
+        }
+        slots.forEach(slot => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'slot-pill';
+            btn.textContent = slot.label;
+            btn.addEventListener('click', () => {
+                timeGridEl.querySelectorAll('.slot-pill').forEach(p => p.classList.remove('selected'));
+                btn.classList.add('selected');
+                hiddenTime.value = slot.value;
+                updateDatetimeSummary();
+            });
+            timeGridEl.appendChild(btn);
+        });
+    }
+
+    const todayDate  = parseLocalDate(CALENDAR_CONFIG.today);
+    const maxDate    = parseLocalDate(CALENDAR_CONFIG.maxDate);
+    let selectedDate = null;
+    let currentMonth = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
+
+    document.getElementById('prevMonth').addEventListener('click', () => {
+        currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+        renderCalendar();
+    });
+    document.getElementById('nextMonth').addEventListener('click', () => {
+        currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+        renderCalendar();
+    }); 
+
+    renderCalendar();
+    document.querySelectorAll('.service-radio, input[name="staff_id"]').forEach(r =>
+        r.addEventListener('change', tryLoadSlots)
+    );
+
+});
+
+const CALENDAR_CONFIG = {
+    today:               "{{ today.isoformat() }}",
+    maxDate:             "{{ max_date.isoformat() }}",
+    availableSlotUrl:    "{{ url_for('main.check_available_slot') }}",
+    hiddenDateId:        "hidden-booking-date",
+    hiddenTimeId:        "hidden-start-time",
+    timeslotGridId:      "timeSlotGrid",
+    timeslotHeadingId:   "timeslot-heading",
+    timeslotSubId:       "timeslot-sub",
+    timeslotPlaceholderId: "timeslot-placeholder"
+};
 </script>
-<script src="{{ url_for('static', filename='js/customer/customer_booking.js') }}"></script>
+
 {% endblock %}
