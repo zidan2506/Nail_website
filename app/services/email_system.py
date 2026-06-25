@@ -59,6 +59,16 @@ Please enter this code to confirm your email address change request.
 
 If you did not request this, please ignore this email and your email address will remain unchanged.
 """
+    elif verification_type == "forgot_password":
+        subject = "Reset Your Password – Daha Care"
+        body = f"""Hello,
+
+Your password reset code is: {verification_code}
+
+Please enter this code to reset your password. This code expires in 10 minutes.
+
+If you did not request a password reset, please ignore this email.
+"""
     else:
         subject = "Your Booking Verification Code – Daha Care"
         body = f"""Hello,

@@ -435,6 +435,7 @@ def customer_reschedule(booking_id):
         booking_date=booking_date,
         booking_time=booking_time,
         cp_booking_date=cp_booking_date,
+        duration=service['duration_minutes']
 
     )
 
@@ -1571,7 +1572,7 @@ def success():
 @guest_only
 def register():
     if request.method == "GET":
-        return render_template("public/customer_register.html")
+        return render_template("Auth/customer_register.html")
 
     full_name = request.form.get("full_name", "").strip()
     email = request.form.get("email", "").strip().lower()
@@ -1621,7 +1622,7 @@ def register():
 @guest_only
 def login():
     if request.method == "GET":
-        return render_template("/public/customer_login.html")
+        return render_template("/Auth/customer_login.html")
 
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
@@ -1659,7 +1660,55 @@ def login():
 @main.route('/login/forgot-password', methods=['GET', 'POST'])
 @guest_only
 def forgot_password():
-    return render_template('/public/customer_forgot_password.html')
+    if request.method == "GET":
+        return render_template('/Auth/customer_forgot_password.html')
+
+    email = request.form.get("email", "").strip().lower()
+    if not email:
+        flash("Please enter your email address.", "error")
+        return redirect(url_for("main.forgot_password"))
+
+    user = get_user_by_email(email)
+    if user and user["role"] == "customer":
+        expires_at = (datetime.now(UTC) + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+        code = generate_verification_code()
+        verification_id = create_verification(code, "forgot_password", expires_at)
+        send_verification_email(email, code, "forgot_password")
+        session["verify_context"] = {
+            "type": "forgot_password",
+            "email": email,
+            "verification_id": verification_id,
+            "user_id": user["id"]
+        }
+
+    return redirect(url_for("main.email_verification"))
+
+@main.route("/set-new-password", methods=["GET", "POST"])
+@guest_only
+def set_new_password():
+    user_id = session.get("reset_user_id")
+    if not user_id:
+        flash("Session expired. Please try again.", "error")
+        return redirect(url_for("main.forgot_password"))
+
+    if request.method == "GET":
+        return render_template("/Auth/set_new_password.html")
+
+    new_password = request.form.get("new_password", "")
+    confirm_password = request.form.get("confirm_password", "")
+
+    if new_password != confirm_password:
+        flash("Passwords do not match.", "error")
+        return redirect(url_for("main.set_new_password"))
+
+    if len(new_password) < 6:
+        flash("Password must be at least 6 characters.", "error")
+        return redirect(url_for("main.set_new_password"))
+
+    update_user_password(user_id, generate_password_hash(new_password))
+    session.pop("reset_user_id", None)
+    flash("Password reset successfully. Please log in.", "success")
+    return redirect(url_for("main.login"))
 
 @main.route('/logout', methods=['POST'])
 def logout():
@@ -1997,10 +2046,30 @@ def verify_email():
                     "success": False,
                     "message": "Invalid verification code. Please resend and try again!"
                 })
-            
 
-    
-        
+        if verify_type == "forgot_password":
+            user_id = verify_context.get("user_id")
+            if not user_id:
+                return jsonify({
+                    "success": False,
+                    "message": "Session expired. Please try again.",
+                    "redirect_url": url_for("main.forgot_password")
+                }), 400
+
+            if user_code == verification_code:
+                update_verification(verification_id, user_id, 1)
+                session["reset_user_id"] = user_id
+                session.pop("verify_context", None)
+                return jsonify({
+                    "success": True,
+                    "message": "Code verified.",
+                    "redirect_url": url_for("main.set_new_password")
+                }), 200
+            else:
+                return jsonify({
+                    "success": False,
+                    "message": "Invalid verification code. Please try again."
+                }), 400
 
     #Clean up expired verifications
 
