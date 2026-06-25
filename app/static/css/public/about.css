@@ -1,0 +1,415 @@
+/* =============================================================================
+   ABOUT.CSS — DahaCare About Page Styles
+   Dùng riêng cho templates/about.html
+   Kế thừa design tokens từ base.css (không redefine :root)
+   ============================================================================= */
+
+
+/* ─── HERO ────────────────────────────────────────────────────────────────────*/
+.abt-hero {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 80px 80px 64px;
+    text-align: center;
+    background: linear-gradient(to bottom, var(--color-surface-low), var(--color-bg));
+}
+
+.abt-hero__eyebrow {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-primary);
+    margin-bottom: 16px;
+}
+
+.abt-hero__title {
+    font-family: var(--font-base);
+    font-style: italic;
+    font-size: 44px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+}
+
+.abt-hero__subtitle {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+
+/* ─── OUR STORY ───────────────────────────────────────────────────────────────*/
+.abt-story {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 80px;
+    margin-bottom: 120px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: center;
+}
+
+.abt-story__img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.abt-story__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.abt-story__text {
+    padding: 0 24px;
+}
+
+.abt-story__heading {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 16px;
+}
+
+.abt-story__divider {
+    width: 48px;
+    height: 4px;
+    background: var(--color-primary);
+    border-radius: var(--radius-full);
+    margin-bottom: 24px;
+}
+
+.abt-story__lead {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0 0 16px;
+}
+
+.abt-story__body {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    opacity: 0.85;
+    margin: 0;
+}
+
+
+/* ─── STATS BAR ───────────────────────────────────────────────────────────────*/
+.abt-stats {
+    background: var(--color-deep-plum);
+    color: var(--color-stone-white);
+    padding: 64px 0;
+    margin-bottom: 120px;
+}
+
+.abt-stats__grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 80px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    text-align: center;
+}
+
+.abt-stats__item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.abt-stats__number {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-primary-light);
+}
+
+.abt-stats__label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(248, 249, 250, 0.6);
+}
+
+
+/* ─── TEAM SECTION ────────────────────────────────────────────────────────────*/
+.abt-team {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 80px;
+    margin-bottom: 120px;
+    background: var(--color-surface-low);
+    border-radius: var(--radius-xl);
+    padding-top: 64px;
+    padding-bottom: 64px;
+}
+
+.abt-team__header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.abt-team__title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 16px;
+}
+
+.abt-team__title-rule {
+    width: 64px;
+    height: 2px;
+    background: var(--color-border-subtle);
+    margin: 0 auto;
+}
+
+/* Grid tự scale: KHÔNG hardcode số cột cố định. minmax(180px, 1fr) tự quyết
+   bao nhiêu thẻ vừa 1 hàng tùy độ rộng màn hình, justify-content: center giúp
+   hàng cuối lẻ (vd 5 người -> hàng 2 còn 2 thẻ) tự căn giữa thay vì dạt trái. */
+.abt-team__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+    gap: 20px;
+    justify-content: center;
+}
+
+.abt-team__card {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-surface-mid);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.abt-team__card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.abt-team__avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-surface-mid);
+}
+
+.abt-team__name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 4px;
+}
+
+.abt-team__role {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-primary);
+    margin: 0;
+}
+
+
+/* ─── VALUES SECTION ──────────────────────────────────────────────────────────*/
+.abt-values {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 80px;
+    margin-bottom: 120px;
+}
+
+.abt-values__header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.abt-values__title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 16px;
+}
+
+.abt-values__title-rule {
+    width: 64px;
+    height: 2px;
+    background: var(--color-primary);
+    margin: 0 auto;
+}
+
+.abt-values__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.abt-value {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.abt-value__icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.abt-value__icon {
+    color: var(--color-primary);
+    font-size: 24px;
+    font-variation-settings: 'FILL' 1;
+}
+
+.abt-value__title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 8px;
+}
+
+.abt-value__desc {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+
+/* ─── BOTTOM CTA ──────────────────────────────────────────────────────────────*/
+.abt-cta {
+    background: var(--color-surface-mid);
+    padding: 96px 24px;
+    text-align: center;
+}
+
+.abt-cta__title {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 16px;
+}
+
+.abt-cta__subtitle {
+    font-size: 17px;
+    color: var(--color-text-secondary);
+    margin: 0 0 32px;
+}
+
+.abt-cta__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 40px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-family: var(--font-base);
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.2s ease;
+}
+
+.abt-cta__btn:hover {
+    background: var(--color-primary-hover);
+}
+
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────────────────────*/
+@media (max-width: 1024px) {
+    .abt-story {
+        grid-template-columns: 1fr;
+    }
+
+    .abt-story__text {
+        padding: 0;
+    }
+
+    .abt-values__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .abt-hero {
+        padding: 48px 24px 40px;
+    }
+
+    .abt-hero__title {
+        font-size: 32px;
+    }
+
+    .abt-story {
+        padding: 0 24px;
+        margin-bottom: 64px;
+    }
+
+    .abt-stats {
+        padding: 40px 0;
+        margin-bottom: 64px;
+    }
+
+    .abt-stats__grid {
+        padding: 0 24px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+    }
+
+    .abt-team {
+        padding: 40px 24px;
+        margin-bottom: 64px;
+    }
+
+    .abt-team__grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .abt-values {
+        padding: 0 24px;
+        margin-bottom: 64px;
+    }
+
+    .abt-value {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+
+    .abt-cta {
+        padding: 64px 24px;
+    }
+
+    .abt-cta__title {
+        font-size: 26px;
+    }
+}

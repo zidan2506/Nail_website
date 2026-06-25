@@ -1,0 +1,356 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Services | DahaCare Atélier</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Manrope:ital,wght@0,400;0,600;1,400;1,600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100..900&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#3e001e",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#76527e",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#dae2fd",
+                        "stone-white": "#F8F9FA",
+                        "atélier-navy": "#0F172A",
+                        "primary-container": "#cc3e7a",
+                        "secondary-fixed-dim": "#e3b8ea",
+                        "on-background": "#22191d",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#372e32",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#ae2563",
+                        "secondary-fixed": "#fbd7ff",
+                        "surface-variant": "#efdee4",
+                        "surface-container-low": "#fff0f5",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#fdecf2",
+                        "surface-container-highest": "#efdee4",
+                        "deep-plum": "#3E1F47",
+                        "primary-fixed-dim": "#ffb0c9",
+                        "inverse-primary": "#ffb0c9",
+                        "background": "#fff8f8",
+                        "blossom-surface": "#FBEAF0",
+                        "tertiary-container": "#6c748b",
+                        "on-surface": "#22191d",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#f8cbff",
+                        "secondary": "#75527d",
+                        "surface": "#fff8f8",
+                        "primary": "#ab2261",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#545c72",
+                        "on-tertiary-container": "#fefcff",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#ddbfc6",
+                        "on-secondary-fixed-variant": "#5c3a64",
+                        "forest-shimmer": "#1A2F23",
+                        "on-tertiary-fixed": "#131b2e",
+                        "on-primary-fixed-variant": "#8e004b",
+                        "surface-container": "#fbeaf0",
+                        "surface-container-high": "#f5e4ea",
+                        "on-surface-variant": "#574147",
+                        "surface-bright": "#fff8f8",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-primary-container": "#fffbff",
+                        "primary-fixed": "#ffd9e2",
+                        "outline": "#8a7077",
+                        "surface-dim": "#e6d6dc",
+                        "on-secondary-fixed": "#2c0e36"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "service-card": "26px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "section-gap": "120px",
+                        "element-gap": "16px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "margin-desktop": "80px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "serif-accent": ["Manrope"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-overlay {
+            backdrop-filter: blur(16px);
+            background: rgba(248, 249, 250, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .service-card-shadow {
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .service-card-shadow:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -20px rgba(171, 34, 97, 0.15);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-pill {
+            background-color: #ab2261; /* Using primary pink */
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-stone-white/60 backdrop-blur-md border-b border-outline/10 px-margin-desktop py-4">
+<div class="max-w-container-max mx-auto flex justify-between items-center">
+<div class="font-display-lg text-[28px] font-bold text-primary tracking-tight">DahaCare</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-medium" href="#">Services</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-medium" href="#">Gallery</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-medium" href="#">Membership</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-medium" href="#">About</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-medium" href="#">Contact</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-primary font-semibold px-6 py-2.5 rounded-full hover:bg-primary/5 transition-all">Register</button>
+<button class="bg-primary text-on-primary font-semibold px-8 py-2.5 rounded-[14px] hover:shadow-lg hover:shadow-primary/20 active:scale-95 transition-all">Book Now</button>
+</div>
+</div>
+</nav>
+<main class="pt-32">
+<!-- Hero Section -->
+<section class="max-w-container-max mx-auto px-margin-desktop text-center mb-16">
+<h1 class="font-serif-accent italic text-display-lg text-atélier-navy mb-4">Our Services</h1>
+<p class="text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                Discover a curated collection of premium nail care and aesthetic treatments designed for the modern individual. Precision meets tranquility in every session.
+            </p>
+</section>
+<!-- Sticky Filter Tabs -->
+<div class="sticky top-[80px] z-40 bg-background/80 backdrop-blur-sm border-y border-outline/5 py-6 mb-16">
+<div class="max-w-container-max mx-auto px-margin-desktop flex items-center justify-center gap-3 overflow-x-auto no-scrollbar flex-wrap"><button class="px-6 py-2 rounded-full border border-primary bg-primary text-white font-semibold text-sm flex items-center gap-2 transition-all duration-200">
+    All <span class="bg-white/20 px-2 py-0.5 rounded-full text-xs">12</span>
+</button>
+<button class="px-6 py-2 rounded-full border border-outline/10 bg-surface-container-low/50 text-on-surface-variant font-semibold text-sm flex items-center gap-2 hover:border-primary/40 transition-all duration-200">
+    Manicure <span class="bg-on-surface-variant/10 px-2 py-0.5 rounded-full text-xs">4</span>
+</button>
+<button class="px-6 py-2 rounded-full border border-outline/10 bg-surface-container-low/50 text-on-surface-variant font-semibold text-sm flex items-center gap-2 hover:border-primary/40 transition-all duration-200">
+    Pedicure <span class="bg-on-surface-variant/10 px-2 py-0.5 rounded-full text-xs">3</span>
+</button>
+<button class="px-6 py-2 rounded-full border border-outline/10 bg-surface-container-low/50 text-on-surface-variant font-semibold text-sm flex items-center gap-2 hover:border-primary/40 transition-all duration-200">
+    Nail Art <span class="bg-on-surface-variant/10 px-2 py-0.5 rounded-full text-xs">2</span>
+</button>
+<button class="px-6 py-2 rounded-full border border-outline/10 bg-surface-container-low/50 text-on-surface-variant font-semibold text-sm flex items-center gap-2 hover:border-primary/40 transition-all duration-200">
+    Extensions <span class="bg-on-surface-variant/10 px-2 py-0.5 rounded-full text-xs">3</span>
+</button></div>
+</div>
+<!-- Service Grid -->
+<section class="max-w-container-max mx-auto px-margin-desktop mb-section-gap">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<div class="bg-white border border-outline/10 rounded-service-card p-5 service-card-shadow flex flex-col h-full transition-all duration-700 opacity-100 translate-y-0">
+<div class="relative w-full aspect-[4/3] rounded-[20px] overflow-hidden mb-6">
+<img class="w-full h-full object-cover" data-alt="Close up of a professional minimalist manicure session with soft moody lighting and deep plum accents. The technician is applying a high-gloss finish to a client's hands against a clean, stone-white background. The mood is luxurious and serene, emphasizing precision and soft textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBYRHOvC7fJIhVt2hz4JXUYtj3gUh2oc49oi2JzhgXKXrduV6WoXlBEkphLPH84-5oQY1yWmoBB6Mjo3PBLT1I1nYBFwYYEhrJIPIZHjEL23r6pi-owftbbWnjM7G8ABkEcATWnaYCVtghCyiMmqSlmYKl2QQgCZV3to8iyPtD51jwoNjsA1bBw_xA1GL3Ho3nLHnrI1CwhMgjGh4TxjZM7xxDNkk6zM8bN-ZZQUnNcmHG0Y4ncfrHOggcA1MDycshGF5PNeHtZbxd">
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-primary">Manicure</span>
+<span class="bg-primary/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white">Popular</span>
+</div>
+</div>
+<div class="px-2 flex-grow">
+<h3 class="font-headline-sm text-atélier-navy mb-2">Signature Gel Overlay</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-4 leading-relaxed">
+                            A strengthening gel treatment that provides a durable, high-shine finish while protecting your natural nails.
+                        </p>
+<div class="border-t border-outline/5 pt-4 mb-6 flex justify-between items-end">
+<div>
+<span class="text-primary font-bold text-xl">$65</span>
+<span class="text-on-surface-variant/60 text-xs ml-1">/ 75 mins</span>
+</div>
+<span class="material-symbols-outlined text-outline/40">auto_awesome</span>
+</div>
+</div>
+<button class="w-full bg-stone-white text-atélier-navy font-bold py-4 rounded-[14px] border border-outline/10 hover:bg-primary hover:text-white hover:border-primary transition-all">Book now</button>
+</div>
+<!-- Card 2 -->
+<div class="bg-white border border-outline/10 rounded-service-card p-5 service-card-shadow flex flex-col h-full transition-all duration-700 opacity-100 translate-y-0">
+<div class="relative w-full aspect-[4/3] rounded-[20px] overflow-hidden mb-6">
+<img class="w-full h-full object-cover" data-alt="Elegant pedicure setup in a luxury spa environment. Soft focus on a ceramic foot bath filled with blossom pink petals. The lighting is warm and moody, with textures of stone-white marble and deep navy towels in the periphery. High-end, editorial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzqhE9hQvg_Cn8x-KsuZnBgSblpgkgRvt2ns5JvuQ09QwsV_aJdbw9SZ3jl4juswuGDTensbM7hdjXBLMw6PRcPxwICequ-PJfuHvn0Unvs1tRb-b3UkE71Ash3UBczzz75UtyJBIe6ZfhMZrk7ciKKDWXB2cX29iqJVHBlzB-MYYlp7LieGDR9j0w5hey5ZXqHjWiTltXJm7H6pIsbpDBU4LGbxtR6mZxzp5nNymT7FOYviEhfsOpnzGjUpzZiaM6wWnRelFo7GEj">
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-primary">Pedicure</span>
+</div>
+</div>
+<div class="px-2 flex-grow">
+<h3 class="font-headline-sm text-atélier-navy mb-2">Apurwa Zen Pedicure</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-4 leading-relaxed">
+                            Complete restorative ritual featuring an organic salt soak, gentle exfoliation, and a deep hydration mask.
+                        </p>
+<div class="border-t border-outline/5 pt-4 mb-6 flex justify-between items-end">
+<div>
+<span class="text-primary font-bold text-xl">$85</span>
+<span class="text-on-surface-variant/60 text-xs ml-1">/ 90 mins</span>
+</div>
+<span class="material-symbols-outlined text-outline/40">spa</span>
+</div>
+</div>
+<button class="w-full bg-stone-white text-atélier-navy font-bold py-4 rounded-[14px] border border-outline/10 hover:bg-primary hover:text-white hover:border-primary transition-all">Book now</button>
+</div>
+<!-- Card 3 -->
+<div class="bg-white border border-outline/10 rounded-service-card p-5 service-card-shadow flex flex-col h-full transition-all duration-700 opacity-100 translate-y-0">
+<div class="relative w-full aspect-[4/3] rounded-[20px] overflow-hidden mb-6">
+<img class="w-full h-full object-cover" data-alt="Macro photography of avant-garde nail art featuring delicate gold leaf and deep emerald gradients. The style is modern corporate luxury, with sharp focus and professional studio lighting that highlights the intricate details of the nail extensions." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVKthC2_PwswJ92Zjk4NaswgZ2BwiELlO7eogqKpKf-Y9OzyMNADrk4EA4GtLpD5Z6qnT_G12nzse5B6Vl-dugkT9MIN807QDH-nzebVZ_AOCO3Si8RucoBwYI5HWpwc-hzgQbqytWSzhxVekjmcELEHSh8AqzGk7Jjmaylm93ssmHwNMkhe7Nlz3spacSalzhM5Qbn_ZhTKTUTbU3W06zDMO-t5sZ-KRCNOUO56dJ5tO91YIIT0b5DBODgjgVnZw369EPX05dx78M">
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-primary">Nail Art</span>
+<span class="bg-secondary/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-white">New</span>
+</div>
+</div>
+<div class="px-2 flex-grow">
+<h3 class="font-headline-sm text-atélier-navy mb-2">Atélier Sculpt Extensions</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-4 leading-relaxed">
+                            Hand-sculpted extensions tailored to your hand shape, offering unparalleled strength and a natural aesthetic.
+                        </p>
+<div class="border-t border-outline/5 pt-4 mb-6 flex justify-between items-end">
+<div>
+<span class="text-primary font-bold text-xl">$120</span>
+<span class="text-on-surface-variant/60 text-xs ml-1">/ 120 mins</span>
+</div>
+<span class="material-symbols-outlined text-outline/40">brush</span>
+</div>
+</div>
+<button class="w-full bg-stone-white text-atélier-navy font-bold py-4 rounded-[14px] border border-outline/10 hover:bg-primary hover:text-white hover:border-primary transition-all">Book now</button>
+</div>
+</div>
+</section>
+<!-- Trust Bar -->
+<section class="border-y border-outline/10 bg-white">
+<div class="max-w-container-max mx-auto px-margin-desktop py-12">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-0">
+<div class="flex-1 text-center md:border-r border-outline/10 last:border-0">
+<div class="text-display-lg-mobile md:text-[36px] font-bold text-atélier-navy mb-1">4.9/5</div>
+<div class="text-xs font-bold uppercase tracking-widest text-primary">Average Rating</div>
+</div>
+<div class="flex-1 text-center md:border-r border-outline/10 last:border-0">
+<div class="text-display-lg-mobile md:text-[36px] font-bold text-atélier-navy mb-1">12k+</div>
+<div class="text-xs font-bold uppercase tracking-widest text-primary">Satisfied Clients</div>
+</div>
+<div class="flex-1 text-center last:border-0">
+<div class="text-display-lg-mobile md:text-[36px] font-bold text-atélier-navy mb-1">100%</div>
+<div class="text-xs font-bold uppercase tracking-widest text-primary">Quality Assurance</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom CTA -->
+<section class="py-section-gap bg-background overflow-hidden relative">
+<div class="absolute inset-0 opacity-5 pointer-events-none">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary rounded-full blur-[120px]"></div>
+</div>
+<div class="max-w-container-max mx-auto px-margin-desktop text-center relative z-10">
+<h2 class="font-headline-md text-atélier-navy mb-8">Ready to define your signature look?</h2>
+<button class="inline-flex items-center gap-3 bg-primary text-white font-bold px-12 py-5 rounded-[14px] hover:shadow-2xl hover:shadow-primary/30 transition-all hover:-translate-y-1 active:scale-95 group">
+                    Book a consultation
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-atélier-navy text-stone-white py-section-gap">
+<div class="max-w-container-max mx-auto px-margin-desktop">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-20">
+<div class="col-span-1 md:col-span-1">
+<div class="font-display-lg text-stone-white mb-6">DahaCare</div>
+<p class="text-stone-white/60 text-sm leading-relaxed max-w-xs">
+                        The definitive atélier for premium aesthetic care, redefining the relationship between service and soul.
+                    </p>
+</div>
+<div>
+<h5 class="font-bold text-sm uppercase tracking-widest mb-6">Explore</h5>
+<ul class="space-y-4 text-stone-white/80 text-sm">
+<li class=""><a class="hover:text-primary transition-colors" href="#">Services</a></li>
+<li class=""><a class="hover:text-primary transition-colors" href="#">Membership</a></li>
+<li class=""><a class="hover:text-primary transition-colors" href="#">Gallery</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-sm uppercase tracking-widest mb-6">Support</h5>
+<ul class="space-y-4 text-stone-white/80 text-sm">
+<li class=""><a class="hover:text-primary transition-colors" href="#">About Us</a></li>
+<li class=""><a class="hover:text-primary transition-colors" href="#">Contact</a></li>
+<li class=""><a class="hover:text-primary transition-colors" href="#">FAQs</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold text-sm uppercase tracking-widest mb-6">Newsletter</h5>
+<p class="text-stone-white/60 text-xs mb-4">Join our list for exclusive seasonal offerings.</p>
+<div class="flex gap-2">
+<input class="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm w-full focus:outline-none focus:border-primary/50" placeholder="Email address" type="email">
+<button class="bg-primary px-4 py-2 rounded-lg text-white font-bold hover:bg-primary/90 transition-all">Join</button>
+</div>
+</div>
+</div>
+<div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="text-stone-white/40 text-[12px] uppercase tracking-widest">© 2024 DahaCare Atélier. All rights reserved.</p>
+<div class="flex gap-8 text-[12px] uppercase tracking-widest text-stone-white/40">
+<a class="hover:text-stone-white transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-stone-white transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions for tabs
+        const filterTabs = document.querySelectorAll('button[class*="whitespace-nowrap"]');
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                filterTabs.forEach(t => {
+                    t.classList.remove('active-pill');
+                    t.classList.add('bg-white');
+                });
+                tab.classList.add('active-pill');
+                tab.classList.remove('bg-white');
+            });
+        });
+
+        // Add a smooth scroll observer for reveal animations
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.service-card-shadow').forEach(card => {
+            card.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700');
+            observer.observe(card);
+        });
+    </script>
+
+
+</body></html>

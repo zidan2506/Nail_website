@@ -1,0 +1,300 @@
+/* =============================================================================
+   GALLERY.CSS — DahaCare Gallery Page Styles
+   Dùng riêng cho templates/gallery.html
+   Kế thừa design tokens từ base.css (không redefine :root)
+   ============================================================================= */
+
+
+/* ─── HERO ────────────────────────────────────────────────────────────────────
+   Đồng bộ với .svc-hero bên services.css
+   ─────────────────────────────────────────────────────────────────────────── */
+.gal-hero {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 64px 80px 0;
+    text-align: center;
+    margin-bottom: 64px;
+}
+
+.gal-hero__title {
+    font-family: var(--font-base);
+    font-style: italic;
+    font-size: 44px;
+    font-weight: 600;
+    color: var(--color-deep-plum);
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+}
+
+.gal-hero__subtitle {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+
+/* ─── GALLERY GRID ────────────────────────────────────────────────────────────*/
+.gal-grid-section {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 80px;
+    margin-bottom: 120px;
+}
+
+.gal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.gal-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--color-surface-variant);
+    border: 0.5px solid var(--color-border-subtle);
+}
+
+.gal-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(62, 31, 71, 0.4), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.gal-item:hover::after {
+    opacity: 1;
+}
+
+.gal-item__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.gal-item:hover .gal-item__img {
+    transform: scale(1.05);
+}
+
+.gal-item__hover-icon {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(248, 249, 250, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: all 0.25s ease;
+    z-index: 2;
+}
+
+.gal-item:hover .gal-item__hover-icon {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* ─── BOTTOM CTA ──────────────────────────────────────────────────────────────*/
+.gal-cta {
+    text-align: center;
+    margin-bottom: 120px;
+}
+
+.gal-cta__title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-deep-plum);
+    margin: 0 0 24px;
+}
+
+.gal-cta__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 32px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-family: var(--font-base);
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.gal-cta__btn:hover {
+    opacity: 0.9;
+    box-shadow: var(--shadow-md);
+}
+
+
+/* ─── LIGHTBOX OVERLAY ────────────────────────────────────────────────────────
+   Fixed fullscreen, ẩn mặc định, toggle bằng class .gal-lightbox--open (JS)
+   ─────────────────────────────────────────────────────────────────────────── */
+body.gal-lightbox-active {
+    overflow: hidden;
+}
+
+.gal-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.gal-lightbox--open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.gal-lightbox__close-wrap {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 210;
+}
+
+.gal-lightbox__counter-wrap {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 210;
+    background: rgba(62, 31, 71, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 6px 18px;
+    border-radius: var(--radius-full);
+}
+
+.gal-lightbox__counter {
+    color: var(--color-stone-white);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.gal-lightbox__icon-btn {
+    color: var(--color-stone-white);
+    background: rgba(62, 31, 71, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.gal-lightbox__icon-btn:hover {
+    color: var(--color-primary-light);
+}
+
+.gal-lightbox__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 210;
+}
+
+.gal-lightbox__nav--prev {
+    left: 16px;
+}
+
+.gal-lightbox__nav--next {
+    right: 16px;
+}
+
+.gal-lightbox__img-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    max-height: 80vh;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gal-lightbox__img {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────────────────────*/
+@media (max-width: 1024px) {
+    .gal-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .gal-hero {
+        padding: 40px 24px 0;
+        margin-bottom: 40px;
+    }
+
+    .gal-hero__title {
+        font-size: 32px;
+    }
+
+    .gal-grid-section {
+        padding: 0 24px;
+        margin-bottom: 64px;
+    }
+
+    .gal-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gal-cta {
+        margin-bottom: 64px;
+    }
+
+    .gal-lightbox__nav {
+        width: 40px;
+        height: 40px;
+    }
+
+    .gal-lightbox__nav--prev {
+        left: 8px;
+    }
+
+    .gal-lightbox__nav--next {
+        right: 8px;
+    }
+}

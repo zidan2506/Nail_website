@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Confirmed | DahaCare{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public/success.css') }}">
+{% endblock %}
+
+{% block content %}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   BOOKING CONFIRMATION PAGE
+   - extends base.html (navbar + footer dùng chung, không tự viết riêng)
+   - LƯU Ý QUAN TRỌNG: trạng thái booking thực tế lúc này là "pending" trong
+     DB (chưa được salon xác nhận), nhưng theo quyết định của Mon, nội dung
+     trang VẪN giữ nguyên wording "Booking Confirmed!" như bản Stitch gốc —
+     không đổi thành "pending"/"received" dù trạng thái kỹ thuật khác. Đây là
+     lựa chọn UX có chủ đích (ưu tiên cảm giác an tâm cho khách hơn là phản
+     ánh chính xác trạng thái backend), Claude Code không cần "sửa lại cho
+     đúng" — giữ nguyên text như trong file này.
+   - DB INTEGRATION (cho Claude Code):
+       1. Route nhận booking_id (qua URL param hoặc session sau khi tạo
+          booking xong), query bảng `bookings` JOIN `services` JOIN `staff`
+          để lấy đủ thông tin hiển thị
+       2. Context cần truyền xuống template:
+            booking_id        -> hiển thị mã booking (hiện CHƯA có trong UI
+                                  Stitch gốc — xem phần Header Section, Stitch
+                                  không có chỗ hiển thị booking ID. Cân nhắc
+                                  thêm 1 dòng nhỏ dưới heading kiểu
+                                  "Booking #{{ booking_id }}" nếu Mon muốn
+                                  hiện mã này — hiện đang để placeholder
+                                  comment, CHƯA chèn vào UI vì Stitch không
+                                  thiết kế chỗ cho nó)
+            service_name       -> "Deluxe Manicure & Gel Polish"
+            appointment_date   -> format "Friday, October 25, 2024"
+            appointment_time   -> format "2:00 PM (approx. 60 mins)"
+            staff_name          -> "Sarah M.", staff_title (vd "Senior Stylist")
+            service_image_url   -> ảnh bên phải card summary
+            salon_address       -> "123 Beauty Lane, Glow City"
+            salon_map_image_url -> ảnh minh họa bản đồ (Stitch dùng ảnh tĩnh,
+                                    không phải embed Google Maps thật — nếu
+                                    muốn map tương tác thật, cần thay bằng
+                                    Google Maps Embed API sau)
+       3. "Create Account" button trong Account CTA section: chỉ hiện section
+          này NẾU khách đang booking là GUEST (session không có customer_id).
+          Nếu là customer đã đăng nhập, nên ẩn cả section này (không cần mời
+          tạo tài khoản khi đã có tài khoản) — dùng
+          {% if not session.get("customer_id") %} bọc quanh Account CTA.
+       4. "Book Another Service" button -> link tới main.public_booking
+          "Back to Home" button -> link tới main.home
+   - Ảnh hiện tại trỏ link tạm Google (lh3.googleusercontent.com) — cần thay
+     ảnh thật trước khi deploy production
+═══════════════════════════════════════════════════════════════════════════ #}
+
+<main class="bkc-main">
+
+    <!-- Subtle background gradients -->
+    <div class="bkc-bg-decor">
+        <div class="bkc-bg-blob bkc-bg-blob--1"></div>
+        <div class="bkc-bg-blob bkc-bg-blob--2"></div>
+    </div>
+
+    <div class="bkc-container">
+
+        <!-- Header Section -->
+        <div class="bkc-header">
+            <div class="bkc-header__icon-wrap">
+                <div class="bkc-header__icon-ping"></div>
+                <span class="material-symbols-outlined bkc-header__icon">check_circle</span>
+            </div>
+            <h1 class="bkc-header__title">Booking Confirmed!</h1>
+            <p class="bkc-header__subtitle">We've reserved your spot. Get ready for some well-deserved pampering.</p>
+        </div>
+
+        <!-- Confirmation Card -->
+        <div class="bkc-card">
+            <div class="bkc-card__row">
+                <div class="bkc-card__details">
+
+                    <div class="bkc-card__summary-head">
+                        <span class="bkc-card__eyebrow">Appointment Summary</span>
+                        <h3 class="bkc-card__service-name">{{ service_name }}</h3>
+                    </div>
+
+                    <div class="bkc-card__meta-list">
+                        <div class="bkc-card__meta-row">
+                            <span class="material-symbols-outlined bkc-card__meta-icon">calendar_today</span>
+                            <span class="bkc-card__meta-text">{{ appointment_date }}</span>
+                        </div>
+                        <div class="bkc-card__meta-row">
+                            <span class="material-symbols-outlined bkc-card__meta-icon">schedule</span>
+                            <span class="bkc-card__meta-text">{{ appointment_time }}</span>
+                        </div>
+                        <div class="bkc-card__meta-row">
+                            <span class="material-symbols-outlined bkc-card__meta-icon">person</span>
+                            <span class="bkc-card__meta-text">{{ staff_display }}</span>
+                        </div>
+                    </div>
+
+                    <div class="bkc-card__calendar-btn-wrap">
+                        <a class="bkc-card__calendar-btn" href="{{ calendar_url }}" target="_blank">
+                            <span class="material-symbols-outlined">event</span>
+                            Add to Calendar
+                        </a>
+                    </div>
+
+                </div>
+
+                <div class="bkc-card__img-wrap">
+                    {% if service_image %}
+                    <img class="bkc-card__img" src="{{ service_image }}" alt="{{ service_name }}">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- What's Next -->
+        <section class="bkc-next">
+            <h3 class="bkc-next__title">What's Next?</h3>
+            <div class="bkc-next__grid">
+                <div class="bkc-next__card">
+                    <span class="material-symbols-outlined bkc-next__icon">mail</span>
+                    <div>
+                        <p class="bkc-next__card-title">Check your inbox</p>
+                        <p class="bkc-next__card-text">We sent a detailed confirmation email with our location and contact info.</p>
+                    </div>
+                </div>
+                <div class="bkc-next__card">
+                    <span class="material-symbols-outlined bkc-next__icon">alarm</span>
+                    <div>
+                        <p class="bkc-next__card-title">Arrive on time</p>
+                        <p class="bkc-next__card-text">Please arrive 5-10 minutes early to choose your perfect shade and settle in.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# Account CTA — chỉ hiện cho guest booking (chưa có tài khoản), ẩn
+           với customer đã đăng nhập. Xem comment DB INTEGRATION #3 phía trên. #}
+        {% if not session.get("customer_id") %}
+        <div class="bkc-account-cta">
+            <div class="bkc-account-cta__bg-img"></div>
+            <div class="bkc-account-cta__content">
+                <h3 class="bkc-account-cta__title">Manage bookings easily</h3>
+                <p class="bkc-account-cta__text">Create an account to track your loyalty points, reschedule appointments, and save your favorite colors.</p>
+                <a href="{{ url_for('main.register') }}" class="bkc-account-cta__btn">Create Account</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="bkc-actions">
+            <a href="{{ url_for('main.public_booking') }}" class="bkc-actions__btn bkc-actions__btn--primary">Book Another Service</a>
+            <a href="{{ url_for('main.home') }}" class="bkc-actions__btn bkc-actions__btn--secondary">Back to Home</a>
+        </div>
+
+        <!-- Location Mini Map -->
+        <div class="bkc-location">
+            <div class="bkc-location__label">
+                <span class="material-symbols-outlined">location_on</span>
+                <span>Find us at: {{ salon_address }}</span>
+            </div>
+            <a class="bkc-location__map-wrap" href="{{ gg_map_url }}" target="_blank">
+                <div class="bkc-location__map-overlay"></div>
+                <img class="bkc-location__map-img"
+                     src="/static/images/public/nail_studio.jpg"
+                     alt="Map location">
+            </a>
+        </div>
+
+    </div>
+
+</main>
+
+{% endblock %}

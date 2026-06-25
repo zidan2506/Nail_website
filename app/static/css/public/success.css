@@ -1,0 +1,471 @@
+/* =============================================================================
+   BOOKING_PENDING.CSS — DahaCare Booking Confirmation Page
+   Dùng riêng cho templates/booking_pending.html
+   Kế thừa design tokens từ base.css (không redefine :root)
+   ============================================================================= */
+
+
+/* ─── MAIN WRAPPER + BACKGROUND DECOR ─────────────────────────────────────────*/
+.bkc-main {
+    position: relative;
+    overflow: hidden;
+    padding: 120px 80px 120px;
+    display: flex;
+    justify-content: center;
+}
+
+.bkc-bg-decor {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.bkc-bg-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+}
+
+.bkc-bg-blob--1 {
+    top: -20%;
+    right: -10%;
+    width: 60%;
+    height: 60%;
+    background: var(--color-surface-mid);
+    opacity: 0.7;
+}
+
+.bkc-bg-blob--2 {
+    bottom: -20%;
+    left: -10%;
+    width: 50%;
+    height: 50%;
+    background: var(--color-surface-low);
+    opacity: 0.5;
+    filter: blur(100px);
+}
+
+.bkc-container {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/* ─── HEADER SECTION ──────────────────────────────────────────────────────────*/
+.bkc-header {
+    text-align: center;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bkc-header__icon-wrap {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    background: var(--color-surface-low);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.bkc-header__icon-ping {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(214, 70, 130, 0.1);
+    animation: bkc-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes bkc-ping {
+    75%, 100% {
+        transform: scale(1.4);
+        opacity: 0;
+    }
+}
+
+.bkc-header__icon {
+    position: relative;
+    color: var(--color-primary);
+    font-size: 40px;
+    font-variation-settings: 'FILL' 1;
+}
+
+.bkc-header__title {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 16px;
+}
+
+.bkc-header__subtitle {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+
+/* ─── CONFIRMATION CARD ───────────────────────────────────────────────────────*/
+.bkc-card {
+    width: 100%;
+    background: rgba(248, 249, 250, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    margin-bottom: 48px;
+}
+
+.bkc-card__row {
+    display: flex;
+    gap: 32px;
+}
+
+.bkc-card__details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.bkc-card__summary-head {
+    border-bottom: 1px solid var(--color-border-subtle);
+    padding-bottom: 16px;
+}
+
+.bkc-card__eyebrow {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-primary);
+    margin-bottom: 4px;
+}
+
+.bkc-card__service-name {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.bkc-card__meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.bkc-card__meta-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--color-text-secondary);
+}
+
+.bkc-card__meta-icon {
+    color: var(--color-primary);
+}
+
+.bkc-card__meta-text {
+    font-size: 16px;
+}
+
+.bkc-card__calendar-btn-wrap {
+    padding-top: 8px;
+}
+
+.bkc-card__calendar-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: rgba(214, 70, 130, 0.1);
+    color: var(--color-primary);
+    font-family: var(--font-base);
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.bkc-card__calendar-btn:hover {
+    background: rgba(214, 70, 130, 0.2);
+}
+
+.bkc-card__img-wrap {
+    width: 256px;
+    height: 256px;
+    flex-shrink: 0;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background: var(--color-surface-low);
+}
+
+.bkc-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* ─── WHAT'S NEXT ──────────────────────────────────────────────────────────────*/
+.bkc-next {
+    width: 100%;
+    margin-bottom: 48px;
+}
+
+.bkc-next__title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 24px;
+}
+
+.bkc-next__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.bkc-next__card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface-low);
+}
+
+.bkc-next__icon {
+    color: var(--color-primary);
+}
+
+.bkc-next__card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.bkc-next__card-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 8px 0 0;
+}
+
+
+/* ─── ACCOUNT CTA ──────────────────────────────────────────────────────────────*/
+.bkc-account-cta {
+    position: relative;
+    width: 100%;
+    background: var(--color-deep-plum);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    text-align: center;
+    overflow: hidden;
+    margin-bottom: 48px;
+}
+
+.bkc-account-cta__bg-img {
+    position: absolute;
+    inset: 0;
+    background-image: url('https://lh3.googleusercontent.com/aida/AP1WRLvnLzHt23015Dh5aSONPZTUYChiANz4_0SqSjWLgwka0k9IqF8nxeWAIT1DYmK3KOgYl5UAQuShgWNDrhi0bgCq_8sYhY7H6p5vqOhLCM9x_A4GOoYtvATnTiFIgC0LajlHsRm3vkT8u94ll4R_U0twpy6xCiFzur-9TaBwB3BHon7cNc5OzlqME_YOxH9B5TVpUWPRq39uPWmnUMw2hf1w11tY9Jpxq25cK5d_laKF5zer62pUKA67S9oG');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.2;
+    mix-blend-mode: overlay;
+}
+
+.bkc-account-cta__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bkc-account-cta__title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--color-stone-white);
+    margin: 0;
+}
+
+.bkc-account-cta__text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(248, 249, 250, 0.9);
+    max-width: 420px;
+    margin: 8px 0 0;
+}
+
+.bkc-account-cta__btn {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 16px 32px;
+    background: var(--color-primary);
+    color: #ffffff;
+    font-family: var(--font-base);
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.bkc-account-cta__btn:hover {
+    opacity: 0.9;
+}
+
+.bkc-account-cta__btn:active {
+    transform: scale(0.98);
+}
+
+
+/* ─── ACTIONS ──────────────────────────────────────────────────────────────────*/
+.bkc-actions {
+    width: 100%;
+    display: flex;
+    gap: 24px;
+    margin-bottom: 48px;
+}
+
+.bkc-actions__btn {
+    flex: 1;
+    text-align: center;
+    padding: 16px 24px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-base);
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.bkc-actions__btn--primary {
+    background: var(--color-primary);
+    color: #ffffff;
+}
+
+.bkc-actions__btn--primary:hover {
+    opacity: 0.9;
+}
+
+.bkc-actions__btn--secondary {
+    background: transparent;
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-text-primary);
+}
+
+.bkc-actions__btn--secondary:hover {
+    background: var(--color-surface-low);
+}
+
+
+/* ─── LOCATION MINI MAP ────────────────────────────────────────────────────────*/
+.bkc-location {
+    width: 100%;
+    padding: 32px 0;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.bkc-location__label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.bkc-location__label .material-symbols-outlined {
+    color: var(--color-primary);
+}
+
+.bkc-location__map-wrap {
+    display: block;
+    position: relative;
+    height: 256px;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background: var(--color-surface-low);
+    transition: transform 0.35s ease;
+    text-decoration: none;
+}
+
+.bkc-location__map-wrap:hover {
+    transform: scale(1.015);
+}
+
+.bkc-location__map-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(to bottom, transparent 50%, rgba(74, 30, 50, 0.25));
+    pointer-events: none;
+}
+
+.bkc-location__map-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(25%) saturate(0.85) brightness(0.95);
+    transition: filter 0.35s ease, transform 0.35s ease;
+}
+
+.bkc-location__map-wrap:hover .bkc-location__map-img {
+    filter: grayscale(0%) saturate(1.05) brightness(1);
+    transform: scale(1.04);
+}
+
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────────────────────*/
+@media (max-width: 768px) {
+    .bkc-main {
+        padding: 100px 20px 64px;
+    }
+
+    .bkc-header__title {
+        font-size: 30px;
+    }
+
+    .bkc-card {
+        padding: 24px;
+    }
+
+    .bkc-card__row {
+        flex-direction: column;
+    }
+
+    .bkc-card__img-wrap {
+        width: 100%;
+        height: 200px;
+    }
+
+    .bkc-next__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bkc-actions {
+        flex-direction: column;
+    }
+}

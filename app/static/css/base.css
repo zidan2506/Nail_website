@@ -261,18 +261,21 @@ header.nav-open .nav-mobile-menu {
 }
 
 
-/* ─── CONTAINERS ─────────────────────────────────────────────────────────────
-   .extra-container: fullbleed, no max-width — dùng cho hero, hero carousel
-   .container:       max-width 1280px centered — dùng cho main page content
+/* ─── CONTAINER UTILITY ──────────────────────────────────────────────────────
+   Base không tự wrap content trong bất kỳ container nào.
+   Mỗi page tự quyết layout của mình.
+   .page-container: utility class — page nào muốn centered max-width thì tự dùng
    ─────────────────────────────────────────────────────────────────────────── */
-.extra-container {
-    width: 100%;
-}
-
-.container {
+.page-container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 40px;
+}
+
+@media (max-width: 768px) {
+    .page-container {
+        padding: 0 20px;
+    }
 }
 
 
@@ -633,6 +636,142 @@ header.nav-open .nav-mobile-menu {
 }
 
 
+/* ─── FOOTER ──────────────────────────────────────────────────────────────────
+   Dùng chung cho mọi public page kế thừa base.html
+   3 cột: Brand (logo + branch loop + business id) / Explore / Support
+   Bottom row: copyright + legal links
+   ─────────────────────────────────────────────────────────────────────────── */
+.site-footer {
+    background: var(--color-deep-plum);
+    color: var(--color-stone-white);
+    padding: 64px 0 24px;
+}
+
+.footer-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 80px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 40px;
+}
+
+.footer-logo {
+    margin-bottom: 16px;
+}
+
+.footer-logo .logo-text {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--color-stone-white);
+}
+
+.footer-logo .logo-accent {
+    color: var(--color-primary-vivid);
+}
+
+.footer-branches {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.footer-branch {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.footer-branch-icon {
+    font-size: 16px;
+    color: var(--color-primary-vivid);
+    margin-top: 1px;
+}
+
+.footer-branch-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(248, 249, 250, 0.6);
+}
+
+.footer-branch-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(248, 249, 250, 0.85);
+    margin-bottom: 2px;
+}
+
+.footer-bizid {
+    font-size: 11px;
+    color: rgba(248, 249, 250, 0.4);
+}
+
+.footer-heading {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(248, 249, 250, 0.9);
+    margin-bottom: 16px;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-links a {
+    font-size: 14px;
+    color: rgba(248, 249, 250, 0.65);
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: var(--color-stone-white);
+}
+
+.footer-bottom {
+    border-top: 0.5px solid rgba(248, 249, 250, 0.1);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.footer-copy {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(248, 249, 250, 0.35);
+}
+
+.footer-legal {
+    display: flex;
+    gap: 24px;
+}
+
+.footer-legal a {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(248, 249, 250, 0.35);
+    transition: color 0.2s ease;
+}
+
+.footer-legal a:hover {
+    color: var(--color-stone-white);
+}
+
+
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────────────*/
 @media (max-width: 768px) {
     .navbar {
@@ -673,6 +812,20 @@ header.nav-open .nav-mobile-menu {
     .option-btn {
         width: 100%;
         text-align: center;
+    }
+
+    .footer-container {
+        padding: 0 24px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 

@@ -1,18 +1,187 @@
 {% extends "base.html" %}
 
-{% block title %}Services - Nail Salon{% endblock %}
+{% block title %}Services | DahaCare Atélier{% endblock %}
+
+{# Load services-page-specific CSS — base.css đã được load sẵn trong base.html #}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public/services.css') }}">
+{% endblock %}
+
 
 {% block content %}
-<h1>Our Services</h1>
 
-<div class="card-grid">
-    {% for service in services %}
-    <div class="card">
-        <h2>{{ service.name }}</h2>
-        <p>{{ service.description }}</p>
-        <p><strong>Duration:</strong> {{ service.duration_minutes }} minutes</p>
-        <p><strong>Price:</strong> €{{ service.price }}</p>
+{# ═══════════════════════════════════════════════════════════════════════════
+   HERO SECTION
+   - Centered title (italic serif accent) + subtitle
+   - Tĩnh, không cần data động
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="svc-hero">
+    <h1 class="svc-hero__title">Our Services</h1>
+    <p class="svc-hero__subtitle">
+        Discover a curated collection of premium nail care and aesthetic treatments
+        designed for the modern individual. Precision meets tranquility in every session.
+    </p>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   STICKY FILTER TABS
+   - Sticky dưới navbar (top offset = --nav-height từ base.css)
+   - HIỆN TẠI: hardcode 5 category mẫu (All / Nail / Hair salon / Massage / Spa & body)
+   - DB INTEGRATION (cho Claude Code):
+       1. Cần bảng `service_categories` (id, name, slug) — slug dùng làm data-filter value
+       2. View function `main.services` query:
+            categories = ServiceCategory.query.all()
+          rồi loop:
+            {% for category in categories %}
+                <button class="svc-tab" data-filter="{{ category.slug }}">{{ category.name }}</button>
+            {% endfor %}
+          Tab "All" luôn render tĩnh đầu tiên (data-filter="all"), không nằm trong DB.
+       3. Mỗi service card bên dưới cần thêm attribute data-category="{{ service.category.slug }}"
+          để JS filter dựa vào đó (so khớp với data-filter của tab đang active).
+       4. Logic JS filter: khi click 1 tab, so data-filter của tab với data-category của
+          từng .svc-card — match thì show, không match thì ẩn (hoặc dùng query string
+          ?category=slug và filter server-side nếu muốn SEO-friendly hơn).
+   - Bản dưới đây là PLACEHOLDER tĩnh, giữ đúng cấu trúc để Claude Code thay thế
+     bằng vòng lặp Jinja khi đã có bảng service_categories.
+═══════════════════════════════════════════════════════════════════════════ #}
+<div class="svc-filter-wrap">
+    <div class="svc-filter">
+        <button class="svc-tab svc-tab--active" data-filter="all">All</button>
+        {% for category in categories %}
+        <button class="svc-tab" data-filter="{{ category.slug }}">{{ category.name }}</button>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   SERVICE GRID
+   - 3 cột desktop / 2 cột tablet / 1 cột mobile (xem services.css)
+   - HIỆN TẠI: hardcode 3 card mẫu (đúng data từ bản Stitch gốc)
+   - DB INTEGRATION (cho Claude Code):
+       1. Cần bảng `services` (id, name, description, price, duration_minutes,
+          image_url, category_id FK -> service_categories, badge [nullable,
+          vd: "Popular"/"New"], icon [material symbol name, vd: "auto_awesome"])
+       2. View function query:
+            services = Service.query.all()
+          rồi loop:
+            {% for service in services %}
+                <div class="svc-card" data-category="{{ service.category.slug }}">
+                    ...
+                </div>
+            {% endfor %}
+       3. Giá hiện format "$65" — nếu DB lưu số (Decimal/Float) thì format trong
+          template bằng {{ "%.0f"|format(service.price) }} hoặc xử lý ở Python
+          tùy convention hiện có của project (m đang dùng VAT 25.5% ở chỗ khác
+          nên có thể đã có helper format giá sẵn — ưu tiên dùng lại helper đó).
+       4. Nút "Book now" nên link sang booking flow kèm pre-selected service:
+            href="{{ url_for('main.public_booking', service_id=service.id) }}"
+          (điều chỉnh tên route/param theo booking flow thực tế của project).
+   - Bản dưới đây là PLACEHOLDER tĩnh 3 card, giữ đúng cấu trúc để Claude Code
+     thay thế bằng vòng lặp Jinja khi đã có bảng services.
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="svc-grid-section">
+    <div class="svc-grid">
+        {% for service in services %}
+        <div class="svc-card" data-category="{{ service.category_slug }}">
+            <div class="svc-card__img-wrap">
+                {% if service.image %}
+                <img class="svc-card__img"
+                     src="{{ url_for('static', filename='uploads/services/' + service.image) }}"
+                     alt="{{ service.name }}">
+                {% endif %}
+                <div class="svc-card__badges">
+                    <span class="svc-badge svc-badge--category">{{ service.category_name }}</span>
+                    {% if service.badge == 'Popular' %}
+                    <span class="svc-badge svc-badge--status">Popular</span>
+                    {% elif service.badge == 'New' %}
+                    <span class="svc-badge svc-badge--new">New</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="svc-card__body">
+                <h3 class="svc-card__name">{{ service.name }}</h3>
+                <p class="svc-card__desc">{{ service.description }}</p>
+                <div class="svc-card__meta">
+                    <div>
+                        <span class="svc-card__price">${{ service.price | int }}</span>
+                        <span class="svc-card__duration">/ {{ service.duration_minutes }} mins</span>
+                    </div>
+                    <span class="material-symbols-outlined svc-card__icon">{{ service.icon }}</span>
+                </div>
+            </div>
+            <a href="{{ url_for('main.public_booking') }}" class="svc-card__btn">Book now</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   TRUST BAR
+   - 3 số liệu ngang, separator dọc mảnh
+   - Tĩnh — nếu sau này muốn dynamic (vd rating thật từ review system) thì
+     truyền qua context: avg_rating, client_count
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="svc-trust">
+    <div class="svc-trust__inner">
+        <div class="svc-trust__item">
+            <div class="svc-trust__number">4.9/5</div>
+            <div class="svc-trust__label">Average Rating</div>
+        </div>
+        <div class="svc-trust__item">
+            <div class="svc-trust__number">12k+</div>
+            <div class="svc-trust__label">Satisfied Clients</div>
+        </div>
+        <div class="svc-trust__item">
+            <div class="svc-trust__number">100%</div>
+            <div class="svc-trust__label">Quality Assurance</div>
+        </div>
+    </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   BOTTOM CTA
+   - Heading + 1 nút "Book a consultation" dẫn sang public_booking
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="svc-cta">
+    <div class="svc-cta__glow"></div>
+    <div class="svc-cta__inner">
+        <h2 class="svc-cta__title">Ready to define your signature look?</h2>
+        <a href="{{ url_for('main.public_booking') }}" class="svc-cta__btn">
+            Book a consultation
+            <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+    </div>
+</section>
+
+{# Footer không khai báo ở đây — đã chuyển sang base.html {% block footer %},
+   dùng chung cho mọi public page. Xem base.html. #}
+
+<script>
+(function () {
+    /* Filter tabs — client-side toggle hiện tại.
+       Khi đã có DB (xem comment phần STICKY FILTER TABS phía trên), logic so khớp
+       data-filter (tab) với data-category (card) vẫn dùng được nguyên, chỉ cần
+       Jinja loop sinh ra đúng các attribute này từ DB là JS chạy không cần sửa. */
+    const tabs  = document.querySelectorAll('.svc-tab');
+    const cards = document.querySelectorAll('.svc-card');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('svc-tab--active'));
+            tab.classList.add('svc-tab--active');
+
+            const filter = tab.dataset.filter;
+            cards.forEach(card => {
+                const match = filter === 'all' || card.dataset.category === filter;
+                card.style.display = match ? '' : 'none';
+            });
+        });
+    });
+})();
+</script>
+
 {% endblock %}

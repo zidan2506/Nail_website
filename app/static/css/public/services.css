@@ -1,0 +1,408 @@
+/* =============================================================================
+   SERVICES.CSS — DahaCare Services Page Styles
+   Dùng riêng cho templates/services.html
+   Kế thừa design tokens từ base.css (không redefine :root)
+   ============================================================================= */
+
+
+/* ─── HERO ────────────────────────────────────────────────────────────────────*/
+.svc-hero {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 64px 80px 0;
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.svc-hero__title {
+    font-family: var(--font-base);
+    font-style: italic;
+    font-size: 44px;
+    font-weight: 600;
+    color: var(--color-deep-plum);
+    margin: 0 0 16px;
+    letter-spacing: -0.01em;
+}
+
+.svc-hero__subtitle {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+
+/* ─── STICKY FILTER TABS ─────────────────────────────────────────────────────*/
+.svc-filter-wrap {
+    position: sticky;
+    top: var(--nav-height);
+    z-index: 40;
+    background: rgba(255, 248, 248, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 0.5px solid var(--color-border-subtle);
+    border-bottom: 0.5px solid var(--color-border-subtle);
+    padding: 20px 0;
+    margin-bottom: 48px;
+}
+
+.svc-filter {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.svc-tab {
+    padding: 8px 22px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    font-family: var(--font-base);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.svc-tab:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.svc-tab--active,
+.svc-tab--active:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #ffffff;
+}
+
+
+/* ─── SERVICE GRID ────────────────────────────────────────────────────────────*/
+.svc-grid-section {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 80px;
+    margin-bottom: 120px;
+}
+
+.svc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.svc-card {
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.svc-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -20px rgba(171, 34, 97, 0.15);
+}
+
+.svc-card__img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.svc-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.svc-card__badges {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    display: flex;
+    gap: 8px;
+}
+
+.svc-badge {
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.svc-badge--category {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--color-primary);
+}
+
+.svc-badge--status {
+    background: rgba(171, 34, 97, 0.92);
+    color: #ffffff;
+}
+
+.svc-badge--new {
+    background: rgba(117, 82, 125, 0.92);
+    color: #ffffff;
+}
+
+.svc-card__body {
+    flex-grow: 1;
+    padding: 0 4px;
+}
+
+.svc-card__name {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-deep-plum);
+    margin: 0 0 8px;
+}
+
+.svc-card__desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0 0 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.svc-card__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 0.5px solid var(--color-border-subtle);
+    padding-top: 16px;
+    margin-bottom: 20px;
+}
+
+.svc-card__price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.svc-card__duration {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-left: 4px;
+}
+
+.svc-card__icon {
+    color: var(--color-text-tertiary);
+    opacity: 0.5;
+}
+
+.svc-card__btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-subtle);
+    background: var(--color-stone-white);
+    color: var(--color-deep-plum);
+    font-family: var(--font-base);
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.svc-card__btn:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #ffffff;
+}
+
+
+/* ─── TRUST BAR ───────────────────────────────────────────────────────────────*/
+.svc-trust {
+    border-top: 0.5px solid var(--color-border-subtle);
+    border-bottom: 0.5px solid var(--color-border-subtle);
+    background: var(--color-surface);
+}
+
+.svc-trust__inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.svc-trust__item {
+    flex: 1;
+    text-align: center;
+    border-right: 0.5px solid var(--color-border-subtle);
+}
+
+.svc-trust__item:last-child {
+    border-right: none;
+}
+
+.svc-trust__number {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-deep-plum);
+    margin-bottom: 4px;
+}
+
+.svc-trust__label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-primary);
+}
+
+
+/* ─── BOTTOM CTA ──────────────────────────────────────────────────────────────*/
+.svc-cta {
+    position: relative;
+    padding: 120px 0;
+    background: var(--color-bg);
+    overflow: hidden;
+}
+
+.svc-cta__glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 800px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.05;
+    pointer-events: none;
+}
+
+.svc-cta__inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 80px;
+    text-align: center;
+}
+
+.svc-cta__title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--color-deep-plum);
+    margin: 0 0 32px;
+}
+
+.svc-cta__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 48px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-family: var(--font-base);
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+    box-shadow: var(--shadow-md);
+    transition: all 0.25s ease;
+}
+
+.svc-cta__btn:hover {
+    box-shadow: 0 20px 40px -10px rgba(171, 34, 97, 0.3);
+    transform: translateY(-4px);
+}
+
+.svc-cta__btn .material-symbols-outlined {
+    transition: transform 0.2s ease;
+}
+
+.svc-cta__btn:hover .material-symbols-outlined {
+    transform: translateX(4px);
+}
+
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────────────────────*/
+@media (max-width: 1024px) {
+    .svc-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .svc-hero {
+        padding: 40px 24px 0;
+    }
+
+    .svc-hero__title {
+        font-size: 32px;
+    }
+
+    .svc-filter {
+        padding: 0 24px;
+        justify-content: flex-start;
+        overflow-x: auto;
+    }
+
+    .svc-grid-section {
+        padding: 0 24px;
+    }
+
+    .svc-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .svc-trust__inner {
+        flex-direction: column;
+        gap: 24px;
+        padding: 32px 24px;
+    }
+
+    .svc-trust__item {
+        border-right: none;
+        border-bottom: 0.5px solid var(--color-border-subtle);
+        padding-bottom: 24px;
+        width: 100%;
+    }
+
+    .svc-trust__item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .svc-cta {
+        padding: 64px 0;
+    }
+
+    .svc-cta__inner {
+        padding: 0 24px;
+    }
+
+    .svc-cta__title {
+        font-size: 24px;
+    }
+}

@@ -40,10 +40,9 @@
             <!-- Desktop nav links -->
             <ul class="nav-links">
                 <li><a href="{{ url_for('main.services') }}">Services</a></li>
-                <li><a href="#">Gallery</a></li>
-                <li><a href="#">Membership</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="{{ url_for('main.gallery') }}">Gallery</a></li>
+                <li><a href="{{ url_for('main.about') }}">About</a></li>
+                <li><a href="{{ url_for('main.home') }}#contact">Contact</a></li>
             </ul>
 
             <!-- Right action buttons — conditional on login state -->
@@ -79,7 +78,7 @@
                 <li><a href="#">Gallery</a></li>
                 <li><a href="#">Membership</a></li>
                 <li><a href="#">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="{{ url_for('main.home') }}#contact">Contact</a></li>
             </ul>
             <div class="nav-mobile-actions">
                 {% if not session.get("user_id") %}
@@ -138,15 +137,82 @@
     });
     </script>
 
-    <!-- extra_content: dùng cho các page cần inject content ngoài .container (ví dụ: hero fullbleed) -->
-    <main class="extra-container">
-        {% block extra_content %}{% endblock %}
-    </main>
+    {# Page tự quyết hoàn toàn layout — base không áp padding hay max-width nào #}
+    {% block content %}{% endblock %}
 
-    <!-- content: main page content trong max-width container -->
-    <main class="container">
-        {% block content %}{% endblock %}
-    </main>
+    <!-- ═══════════════════════════════════════════════════════════════
+         FOOTER
+         - Dùng chung cho mọi public page, tránh mỗi page tự bịa footer riêng
+         - Cột 1: Logo + branch block (loop qua branches) + Business ID
+         - Cột 2: Explore links
+         - Cột 3: Support links
+         - Bottom row: copyright (year động qua Jinja) + legal links
+         - Flask: truyền biến `branches` (list of dict: name, address) từ view function
+           Hiện chỉ có 1 chi nhánh nên branches = [{ "name": "...", "address": "..." }]
+           Khi mở thêm chi nhánh, chỉ cần thêm phần tử vào list — Jinja tự loop, không sửa HTML
+         - Flask: truyền `business_id` (string) và `current_year` (int, vd: datetime.now().year)
+           Khuyến nghị: dùng context_processor để inject 2 biến này global, khỏi phải
+           pass riêng ở từng route render base.html
+    ════════════════════════════════════════════════════════════════════ -->
+    {% block footer %}
+    <footer class="site-footer">
+        <div class="footer-container">
+
+            <div class="footer-grid">
+
+                <!-- Cột 1: Logo + branch + business id -->
+                <div class="footer-col footer-col--brand">
+                    <div class="footer-logo">
+                        <span class="logo-text">Daha<span class="logo-accent">Care</span></span>
+                    </div>
+
+                    <div class="footer-branches">
+                        {% for branch in branches %}
+                        <div class="footer-branch">
+                            <span class="material-symbols-outlined footer-branch-icon">location_on</span>
+                            <div class="footer-branch-text">
+                                <div class="footer-branch-name">{{ branch.name }}</div>
+                                <div class="footer-branch-address">{{ branch.address }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="footer-bizid">Business ID: {{ business_id }}</div>
+                </div>
+
+                <!-- Cột 2: Explore -->
+                <div class="footer-col">
+                    <div class="footer-heading">Explore</div>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('main.services') }}">Services</a></li>
+                        <li><a href="#">Gallery</a></li>
+                    </ul>
+                </div>
+
+                <!-- Cột 3: Support -->
+                <div class="footer-col">
+                    <div class="footer-heading">Support</div>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('main.about')}}">About Us</a></li>
+                        <li><a href="{{ url_for('main.home') }}#contact">Contact</a></li>
+                        <li><a href="#">FAQs</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <span class="footer-copy">&copy; {{ current_year }} DahaCare Atélier. All rights reserved.</span>
+                <div class="footer-legal">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+    {% endblock %}
 
 </body>
 </html>

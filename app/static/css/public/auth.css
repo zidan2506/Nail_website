@@ -1,0 +1,409 @@
+/* =============================================================================
+   AUTH.CSS — DahaCare Auth Pages (Login / Register / Forgot Password)
+   Dùng riêng cho templates/auth_base.html và các page con
+   Kế thừa design tokens từ base.css (không redefine :root)
+   ============================================================================= */
+
+.auth-body {
+    margin: 0;
+    background: var(--color-bg);
+    font-family: var(--font-base);
+}
+
+
+/* ─── LAYOUT: SPLIT-SCREEN ────────────────────────────────────────────────────*/
+.auth-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ── Left panel: atmospheric image, ẩn hoàn toàn trên mobile ── */
+.auth-panel {
+    display: none;
+    position: relative;
+    flex: 1;
+    min-height: 100vh;
+}
+
+.auth-panel__img {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+}
+
+.auth-panel__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.8), transparent 60%);
+}
+
+.auth-panel__text {
+    position: absolute;
+    bottom: 48px;
+    left: 48px;
+    right: 48px;
+    max-width: 480px;
+    z-index: 2;
+}
+
+.auth-panel__title {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--color-stone-white);
+    margin: 0 0 16px;
+}
+
+.auth-panel__subtitle {
+    font-size: 17px;
+    line-height: 1.6;
+    color: rgba(248, 249, 250, 0.8);
+    margin: 0;
+}
+
+/* ── Right panel: form ── */
+.auth-form-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.auth-form-card {
+    width: 100%;
+    max-width: 420px;
+}
+
+
+/* ─── LOGO ────────────────────────────────────────────────────────────────────*/
+.auth-logo {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.auth-logo__link {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--color-deep-plum);
+    text-decoration: none;
+}
+
+.auth-logo__accent {
+    color: var(--color-primary);
+}
+
+
+/* ─── HEADING ─────────────────────────────────────────────────────────────────*/
+.auth-heading {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.auth-heading__title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 8px;
+}
+
+.auth-heading__subtitle {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+
+/* ─── SOCIAL LOGIN BUTTONS ────────────────────────────────────────────────────*/
+.auth-social-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.auth-social-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    font-family: var(--font-base);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    text-decoration: none;
+}
+
+.auth-social-btn:hover {
+    background: var(--color-surface-variant);
+}
+
+.auth-social-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+
+/* ─── DIVIDER ─────────────────────────────────────────────────────────────────*/
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex-grow: 1;
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+.auth-divider span {
+    flex-shrink: 0;
+    margin: 0 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-tertiary);
+}
+
+
+/* ─── FORM ────────────────────────────────────────────────────────────────────*/
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.auth-field__label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+}
+
+.auth-field__input-wrap {
+    position: relative;
+}
+
+.auth-field__icon {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    color: var(--color-text-tertiary);
+    font-size: 20px;
+    pointer-events: none;
+}
+
+.auth-field__input {
+    display: block;
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    border: 1px solid rgba(62, 31, 71, 0.2);
+    border-radius: var(--radius-xl);
+    background: var(--color-stone-white);
+    color: var(--color-text-primary);
+    font-family: var(--font-base);
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.auth-field__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.auth-field__input::placeholder {
+    color: var(--color-text-tertiary);
+}
+
+/* Input có nút toggle password ở bên phải cần padding-right rộng hơn */
+.auth-field__input--with-toggle {
+    padding-right: 48px;
+}
+
+.auth-toggle-pw {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+.auth-toggle-pw:hover {
+    color: var(--color-primary);
+}
+
+.auth-field__hint {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-top: 6px;
+}
+
+.auth-forgot-row {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.auth-forgot-link {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.auth-forgot-link:hover {
+    color: var(--color-primary-hover);
+}
+
+.auth-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.auth-back-link:hover {
+    color: var(--color-primary-hover);
+}
+
+.auth-back-link .material-symbols-outlined {
+    font-size: 18px;
+}
+
+
+/* ─── SUBMIT BUTTON ───────────────────────────────────────────────────────────*/
+.auth-submit-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 32px;
+    border: none;
+    border-radius: var(--radius-xl);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-family: var(--font-base);
+    font-weight: 600;
+    font-size: 17px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.25s ease, transform 0.15s ease;
+}
+
+.auth-submit-btn:hover {
+    background: var(--color-primary-hover);
+}
+
+.auth-submit-btn:active {
+    transform: scale(0.98);
+}
+
+
+/* ─── SWITCH LINK (bottom of form) ────────────────────────────────────────────*/
+.auth-switch {
+    text-align: center;
+    margin-top: 32px;
+}
+
+.auth-switch p {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.auth-switch a {
+    color: var(--color-primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.auth-switch a:hover {
+    color: var(--color-primary-hover);
+}
+
+
+/* ─── CONFIRMATION STATE (Forgot Password — sau khi submit) ──────────────────*/
+.auth-confirm {
+    text-align: center;
+}
+
+.auth-confirm__icon-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--color-primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+}
+
+.auth-confirm__icon {
+    color: var(--color-primary);
+    font-size: 32px;
+    font-variation-settings: 'FILL' 1;
+}
+
+.auth-confirm__title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 12px;
+}
+
+.auth-confirm__text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0 0 32px;
+}
+
+.auth-confirm__text strong {
+    color: var(--color-text-primary);
+}
+
+
+/* ─── RESPONSIVE ──────────────────────────────────────────────────────────────*/
+@media (min-width: 768px) {
+    .auth-panel {
+        display: block;
+    }
+}
+
+@media (max-width: 767px) {
+    .auth-form-wrap {
+        padding: 32px 20px;
+    }
+
+    .auth-panel__title {
+        font-size: 32px;
+    }
+}

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Gallery | DahaCare Atélier{% endblock %}
+
+{# Load gallery-page-specific CSS — base.css đã được load sẵn trong base.html #}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public/gallery.css') }}">
+{% endblock %}
+
+
+{% block content %}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   HERO SECTION
+   - Centered title (italic serif accent) + subtitle — đồng bộ style với svc-hero
+     bên services.html
+   - Tĩnh, không cần data động
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="gal-hero">
+    <h1 class="gal-hero__title">Our Work</h1>
+    <p class="gal-hero__subtitle">A glimpse into the artistry and precision behind every visit.</p>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   GALLERY GRID
+   - 3 cột desktop / 2 cột tablet / 1 cột mobile, tất cả ô vuông (aspect-ratio 1:1)
+   - Không filter category (đã chốt: chỉ 1 grid chung)
+   - data-index dùng để map ảnh trong lightbox JS phía dưới — PHẢI tăng dần
+     liên tục từ 0, không có khoảng trống, vì JS dùng index này để build mảng
+     `images` và tính prev/next theo modulo
+   - HIỆN TẠI: hardcode 9 ảnh mẫu (đúng asset từ bản Stitch gốc)
+   - DB INTEGRATION (cho Claude Code):
+       1. Cần bảng `gallery_images` (id, image_url, alt_text, sort_order [nullable,
+          dùng để control thứ tự hiển thị nếu cần], uploaded_at)
+       2. View function `main.gallery` query:
+            images = GalleryImage.query.order_by(GalleryImage.sort_order).all()
+          rồi loop:
+            {% for image in images %}
+                <div class="gal-item" data-index="{{ loop.index0 }}">
+                    <div class="gal-item__hover-icon">
+                        <span class="material-symbols-outlined">zoom_in</span>
+                    </div>
+                    <img class="gal-item__img" src="{{ image.image_url }}" alt="{{ image.alt_text }}">
+                </div>
+            {% endfor %}
+          Lưu ý: dùng {{ loop.index0 }} (bắt đầu từ 0) cho data-index, không phải
+          {{ loop.index }} (bắt đầu từ 1) — khớp với cách JS lightbox đang đếm.
+       3. Ảnh hiện tại trỏ tới link tạm của Google (lh3.googleusercontent.com) —
+          cần thay bằng ảnh thật upload lên static/ hoặc cloud storage trước khi
+          deploy production.
+   - Bản dưới đây là PLACEHOLDER tĩnh 9 ảnh, giữ đúng cấu trúc để Claude Code
+     thay thế bằng vòng lặp Jinja khi đã có bảng gallery_images.
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="gal-grid-section">
+    <div class="gal-grid" id="gallery-container">
+        {% for image in images %}
+        <div class="gal-item" data-index="{{ loop.index0 }}">
+            <div class="gal-item__hover-icon">
+                <span class="material-symbols-outlined">zoom_in</span>
+            </div>
+            <img class="gal-item__img" src="{{ image.image_url }}" alt="{{ image.alt_text }}">
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   BOTTOM CTA
+   - Heading + 1 nút "Book your session" dẫn sang public_booking
+   - Đồng bộ style với svc-cta bên services.html
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="gal-cta">
+    <p class="gal-cta__title">Like what you see?</p>
+    <a href="{{ url_for('main.public_booking') }}" class="gal-cta__btn">
+        Book your session
+        <span class="material-symbols-outlined">arrow_forward</span>
+    </a>
+</section>
+
+{# Footer không khai báo ở đây — đã chuyển sang base.html {% block footer %},
+   dùng chung cho mọi public page. Xem base.html. #}
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   LIGHTBOX OVERLAY
+   - Nằm ngoài <main> trong code Stitch gốc, nhưng trong Jinja content block
+     này nó vẫn render đúng vị trí cuối trang trước footer — vì footer giờ
+     nằm trong base.html (sau {% block content %}), thứ tự DOM không đổi:
+     lightbox vẫn xuất hiện trước footer trong HTML, không ảnh hưởng vì nó
+     là fixed/overlay, không phụ thuộc vị trí trong luồng layout.
+   - 1 lightbox dùng chung cho toàn bộ ảnh trong .gal-grid, không cần loop
+═══════════════════════════════════════════════════════════════════════════ #}
+<div class="gal-lightbox" id="lightbox">
+    <div class="gal-lightbox__close-wrap">
+        <button class="gal-lightbox__icon-btn" id="lightbox-close" aria-label="Close">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="gal-lightbox__counter-wrap">
+        <span class="gal-lightbox__counter" id="lightbox-counter">1 / 9</span>
+    </div>
+    <button class="gal-lightbox__icon-btn gal-lightbox__nav gal-lightbox__nav--prev" id="lightbox-prev" aria-label="Previous image">
+        <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+    <div class="gal-lightbox__img-wrap">
+        <img class="gal-lightbox__img" id="lightbox-img" src="" alt="Enlarged gallery image">
+    </div>
+    <button class="gal-lightbox__icon-btn gal-lightbox__nav gal-lightbox__nav--next" id="lightbox-next" aria-label="Next image">
+        <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+</div>
+
+<script>
+(function () {
+    /* Lightbox — đọc data-index từ mỗi .gal-item để biết thứ tự ảnh.
+       Khi chuyển sang DB-driven (xem comment GALLERY GRID phía trên), JS này
+       KHÔNG cần sửa gì — chỉ cần Jinja loop sinh đúng data-index liên tục
+       từ 0 (dùng  loop.index0 ) là lightbox tự hoạt động đúng. */
+    const galleryItems = document.querySelectorAll('.gal-item');
+    const lightbox      = document.getElementById('lightbox');
+    const lightboxImg   = document.getElementById('lightbox-img');
+    const closeBtn       = document.getElementById('lightbox-close');
+    const prevBtn        = document.getElementById('lightbox-prev');
+    const nextBtn        = document.getElementById('lightbox-next');
+    const counter         = document.getElementById('lightbox-counter');
+
+    let currentIndex = 0;
+    const totalImages = galleryItems.length;
+    const images = Array.from(galleryItems).map(item => item.querySelector('img').src);
+
+    function openLightbox(index) {
+        currentIndex = index;
+        updateLightbox();
+        lightbox.classList.add('gal-lightbox--open');
+        document.body.classList.add('gal-lightbox-active');
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('gal-lightbox--open');
+        document.body.classList.remove('gal-lightbox-active');
+    }
+
+    function updateLightbox() {
+        lightboxImg.src = images[currentIndex];
+        counter.textContent = `${currentIndex + 1} / ${totalImages}`;
+    }
+
+    function nextImage() {
+        currentIndex = (currentIndex + 1) % totalImages;
+        updateLightbox();
+    }
+
+    function prevImage() {
+        currentIndex = (currentIndex - 1 + totalImages) % totalImages;
+        updateLightbox();
+    }
+
+    galleryItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const index = parseInt(item.dataset.index, 10);
+            openLightbox(index);
+        });
+    });
+
+    closeBtn.addEventListener('click', closeLightbox);
+    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
+    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('gal-lightbox--open')) return;
+        if (e.key === 'Escape')    closeLightbox();
+        if (e.key === 'ArrowRight') nextImage();
+        if (e.key === 'ArrowLeft')  prevImage();
+    });
+})();
+</script>
+
+{% endblock %}

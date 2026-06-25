@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}About Us | DahaCare{% endblock %}
+
+{# Load about-page-specific CSS — base.css đã được load sẵn trong base.html #}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public/about.css') }}">
+{% endblock %}
+
+
+{% block content %}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   HERO SECTION
+   - Eyebrow label "The Retreat" + italic title "Our Story" + subtitle
+   - Tĩnh, không cần data động
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="abt-hero">
+    <span class="abt-hero__eyebrow">The Retreat</span>
+    <h1 class="abt-hero__title">Our Story</h1>
+    <p class="abt-hero__subtitle">
+        Redefining luxury wellness with precise, artisanal care in a sanctuary
+        of soft mood and quiet elegance.
+    </p>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   OUR STORY SECTION
+   - 2 cột: ảnh (4:5 ratio) + text (heading, divider, 2 đoạn văn)
+   - Tĩnh — nếu sau này muốn dynamic, đưa story_title/story_paragraphs qua context
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="abt-story">
+    <div class="abt-story__img-wrap">
+        <img class="abt-story__img"
+             src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnwk9UOFw8n6A-fLdKtQNg3OMDm5KrpL_d_-WOAXNr-EsLitzawPfKPRrZvTBvrlKnQ-leHfE9EL7qUvniRIZzE3tSCXlqvIOSPrKxBSqSLDSIj-xS-uHvY-To50dCDzw4GNU_gSI6hXzgf0rWdP5Bm29U6rEe2JwWO6R9nPP3erZzxRyTVlAMxPMQ9EGir5YOXv5uFcFMMy6TL_QdDk1peN-TW_7sH3h9CDS0yPL2V0VO3f27_JjYFLZu9pFwgpMM3Il_Xi9Sc-TC"
+             alt="DahaCare salon interior — soft blossom-pink and stone-white tones">
+    </div>
+    <div class="abt-story__text">
+        <h2 class="abt-story__heading">Crafted with intention</h2>
+        <div class="abt-story__divider"></div>
+        <p class="abt-story__lead">
+            At DahaCare, we believe that true luxury lies in the details. Founded
+            on the principle of bringing atelier-level precision to daily
+            wellness, our space was designed as a retreat from the noise of
+            the city.
+        </p>
+        <p class="abt-story__body">
+            Every treatment is a careful composition of quality products,
+            rigorous hygiene standards, and the trained hands of our artists.
+            We don't just provide a service; we curate an experience that
+            honors your time and elevates your personal care ritual.
+        </p>
+    </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   STATS BAR
+   - 4 số liệu ngang, nền tối (deep-plum) tương phản với phần còn lại
+   - HIỆN TẠI: hardcode 4 số liệu thật theo yêu cầu (5+ years / 12k+ clients /
+     5 master artists / 4.9 rating)
+   - DB INTEGRATION (cho Claude Code):
+       Nếu muốn cập nhật số liệu mà không sửa code, truyền qua context của
+       view function main.about:
+            stats = {
+                "years": "5+",
+                "clients": "12k+",
+                "artists": Staff.query.count(),   # hoặc hardcode nếu chưa có bảng staff
+                "rating": "4.9",
+            }
+       rồi thay giá trị tĩnh bên dưới bằng {{ stats.years }}, {{ stats.clients }}, ...
+       Số "artists" nên đồng bộ với số lượng thật trong TEAM SECTION bên dưới —
+       tốt nhất là tính bằng len(team_members) thay vì hardcode riêng, tránh
+       lệch số khi thêm/bớt nhân viên.
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="abt-stats">
+    <div class="abt-stats__grid">
+        <div class="abt-stats__item">
+            <span class="abt-stats__number">5+</span>
+            <span class="abt-stats__label">Years of Excellence</span>
+        </div>
+        <div class="abt-stats__item">
+            <span class="abt-stats__number">12k+</span>
+            <span class="abt-stats__label">Clients Served</span>
+        </div>
+        <div class="abt-stats__item">
+            <span class="abt-stats__number">{{ staff_members | length }}</span>
+            <span class="abt-stats__label">Master Artists</span>
+        </div>
+        <div class="abt-stats__item">
+            <span class="abt-stats__number">4.9</span>
+            <span class="abt-stats__label">Average Rating</span>
+        </div>
+    </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   TEAM SECTION
+   - Grid responsive: 2 cột mobile / 3 cột desktop
+   - QUAN TRỌNG: bản gốc từ Stitch dùng "md:grid-cols-5" (5 cột cứng) — đã đổi
+     thành "repeat(auto-fit, minmax(180px, 1fr))" để tự scale khi thêm thành
+     viên mới (yêu cầu của Mon: team hiện có 5 người nhưng sẽ tăng dần).
+     Với 5 người ở viewport rộng, layout sẽ tự xếp 3 cột (dòng 2 còn 2 thẻ
+     tự căn giữa nhờ "justify-content: center" trên container), không cần
+     biết trước số lượng để hardcode số cột.
+   - HIỆN TẠI: hardcode 5 thành viên mẫu (đúng data từ bản Stitch gốc)
+   - DB INTEGRATION (cho Claude Code):
+       1. Cần bảng `staff_members` (id, name, role, photo_url, sort_order
+          [nullable, control thứ tự hiển thị], is_active [bool, để ẩn người
+          đã nghỉ mà không xóa data])
+       2. View function `main.about` query:
+            team_members = StaffMember.query.filter_by(is_active=True) \
+                                              .order_by(StaffMember.sort_order).all()
+          rồi loop:
+            {% for member in team_members %}
+                <div class="abt-team__card">
+                    <img class="abt-team__avatar" src="{{ member.photo_url }}" alt="{{ member.name }}">
+                    <div>
+                        <h3 class="abt-team__name">{{ member.name }}</h3>
+                        <p class="abt-team__role">{{ member.role }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+   - Bản dưới đây là PLACEHOLDER tĩnh 5 card, giữ đúng cấu trúc để Claude Code
+     thay thế bằng vòng lặp Jinja khi đã có bảng staff_members.
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="abt-team">
+    <div class="abt-team__header">
+        <h2 class="abt-team__title">Meet the team</h2>
+        <div class="abt-team__title-rule"></div>
+    </div>
+
+    <div class="abt-team__grid">
+        {% for member in staff_members %}
+        <div class="abt-team__card">
+            {% if member.photo %}
+            <img class="abt-team__avatar" src="{{ member.photo }}" alt="{{ member.full_name }}">
+            {% endif %}
+            <div>
+                <h3 class="abt-team__name">{{ member.full_name }}</h3>
+                {% if member.role %}
+                <p class="abt-team__role">{{ member.role }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   VALUES SECTION
+   - 2x2 grid, mỗi card: icon tròn + tiêu đề + mô tả
+   - Tĩnh — nội dung này là tuyên ngôn thương hiệu, không cần DB
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="abt-values">
+    <div class="abt-values__header">
+        <h2 class="abt-values__title">What we stand for</h2>
+        <div class="abt-values__title-rule"></div>
+    </div>
+
+    <div class="abt-values__grid">
+
+        <div class="abt-value">
+            <div class="abt-value__icon-wrap">
+                <span class="material-symbols-outlined abt-value__icon">sanitizer</span>
+            </div>
+            <div>
+                <h3 class="abt-value__title">Hygiene first</h3>
+                <p class="abt-value__desc">
+                    Medical-grade sterilization processes for every tool,
+                    ensuring your safety is never compromised.
+                </p>
+            </div>
+        </div>
+
+        <div class="abt-value">
+            <div class="abt-value__icon-wrap">
+                <span class="material-symbols-outlined abt-value__icon">workspace_premium</span>
+            </div>
+            <div>
+                <h3 class="abt-value__title">Trained artists</h3>
+                <p class="abt-value__desc">
+                    Continuous education and mastery of techniques mean you
+                    receive the pinnacle of modern care.
+                </p>
+            </div>
+        </div>
+
+        <div class="abt-value">
+            <div class="abt-value__icon-wrap">
+                <span class="material-symbols-outlined abt-value__icon">diamond</span>
+            </div>
+            <div>
+                <h3 class="abt-value__title">Quality products</h3>
+                <p class="abt-value__desc">
+                    We source only premium, non-toxic, and sustainable
+                    materials for long-lasting, brilliant results.
+                </p>
+            </div>
+        </div>
+
+        <div class="abt-value">
+            <div class="abt-value__icon-wrap">
+                <span class="material-symbols-outlined abt-value__icon">favorite</span>
+            </div>
+            <div>
+                <h3 class="abt-value__title">Client-first care</h3>
+                <p class="abt-value__desc">
+                    Your comfort is our priority. Enjoy a serene environment
+                    designed entirely around your relaxation.
+                </p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   BOTTOM CTA
+   - Heading + subtitle + nút "Book your visit" dẫn sang public_booking
+   - Đồng bộ style với svc-cta / gal-cta
+═══════════════════════════════════════════════════════════════════════════ #}
+<section class="abt-cta">
+    <h2 class="abt-cta__title">Come meet the team</h2>
+    <p class="abt-cta__subtitle">Experience the DahaCare difference in person.</p>
+    <a href="{{ url_for('main.public_booking') }}" class="abt-cta__btn">
+        Book your visit
+        <span class="material-symbols-outlined">arrow_forward</span>
+    </a>
+</section>
+
+{# Footer không khai báo ở đây — đã chuyển sang base.html {% block footer %},
+   dùng chung cho mọi public page. Xem base.html. #}
+
+{% endblock %}
