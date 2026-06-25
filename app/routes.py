@@ -1,6 +1,6 @@
 import os
 from flask import Blueprint, flash,render_template, request, jsonify, redirect, url_for, session
-from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_active_tier, get_tier_by_name, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_user_email, update_user_password, cancel_booking_with_reason
+from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_active_tier, get_tier_by_name, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_user_email, update_user_password, cancel_booking_with_reason, get_gallery_images, get_active_staff
 from datetime import datetime, timedelta, UTC, date
 from app.services.email_system import send_verification_email, send_thank_you_email, generate_verification_code
 from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days
@@ -8,7 +8,7 @@ from app.services.loyalty import get_active_multiplier, get_config_value, alread
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
-from app.utils.helpers import split_customer_bookings, format_booking_date, format_booking_time, build_calendar_url, build_gg_map_url, build_services_by_category
+from app.utils.helpers import split_customer_bookings, format_booking_date, format_booking_time, build_calendar_url, build_gg_map_url, build_services_by_category, mask_email
 from collections import Counter
 main = Blueprint("main",__name__)
 
@@ -26,10 +26,23 @@ def customer_login_required(view_func):
         return view_func(*args, **kwargs)
     return wrapped_view
 
-#Server routes
-@main.route("/")
-def home():
-    return render_template("/public/home.html")
+def guest_only(view_func):
+    @wraps(view_func)
+    def wrapped_view(*args, **kwargs):
+        if session.get("user_id"):
+            role = session.get("role")
+            if role == "staff":
+                return redirect(url_for("main.staff_dashboard"))
+            if role == "admin":
+                return redirect(url_for("main.admin_dashboard"))
+            return redirect(url_for("main.customer_dashboard"))
+        return view_func(*args, **kwargs)
+    return wrapped_view
+
+#====================================
+#               Public
+#====================================
+
 
 #====================================
 #               customer
@@ -1022,6 +1035,7 @@ def redeem_reward_route():
     flash(f"Successfully redeemed: {reward['name']}!", "success")
     if is_json:
         return jsonify({"success": True})
+    return redirect(url_for("main.customer_loyalty_points"))
 
 @main.route("/customer/refer-a-friend")
 @customer_login_required
@@ -1219,6 +1233,57 @@ def redeem_terms():
 #====================================
 #               Staff
 #====================================
+
+@main.route('/staff/login', methods=['POST', 'GET'])
+def staff_login():
+    if request.method == "GET":
+        return render_template("/staff/staff_login.html")
+    
+    email = request.form.get("email", "").strip().lower()
+    password = request.form.get("password","")
+
+    if not email or not password:
+        flash("Please enter email or password!", "error")
+        return redirect(url_for("main.staff_login"))
+    
+    user = get_user_by_email(email)
+
+    if not user:
+        flash("Invalid email or password!", "error")
+        return redirect(url_for("main.staff_login"))
+    
+    user_id = user['id']
+
+    if not check_password_hash(user["password_hash"], password):
+        flash("Invalid email or password!", "error")
+        return redirect(url_for("main.staff_login"))
+
+    if user["role"] not in ("staff", "admin"):
+        flash("Please use the customer login portal", "error")
+        return redirect(url_for("main.login"))
+
+    session.clear()
+    session["user_id"] = user_id
+    session["role"] = user["role"]
+    session["user_email"] = user["email"]
+
+    if user["role"] == "staff":
+        staff = get_staff_by_user_id(user_id)
+        if not staff:
+            flash("Staff profile not found!", "error")
+            return redirect(url_for("main.staff_login"))
+        
+        session["staff_id"] = staff['id']
+        flash(f"Login successfully. Welcome {staff['full_name']}!", "success")
+        return redirect(url_for("main.staff_dashboard"))
+    
+    if user["role"] == "admin":
+        flash(f"Login successfully. Welcome master!", "success")
+        return redirect(url_for("main.admin_dashboard"))
+    
+    flash("something went wrong :(", "error")
+    return redirect(url_for("main.staff_login"))
+
 @main.route("/staff")
 def staff_dashboard():
     return render_template("/staff/staff_dashboard.html")
@@ -1308,8 +1373,54 @@ def admin_dashboard():
 #====================================
 #               Public
 #====================================
+
+_CAROUSEL_SLIDES = [
+    {
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBdLs7y_erczKwTFAkkULT1a042tLNhFZGl9Ah7tK1zkNUMr0o9u-X8GVtruUJ8m-Kajy88JyX1pSLbZlovykcDs0Rxw67LR_aip4hxOtv-IGtso02wXGW7UX54KpBWBoe2H-wZStp_ArLDpO8BzT-8iTORkuh4yO39_AKE-kN4J9NFmdwpo1vkJiAbAJb_5wQy0bJv5B_gUha00oYboCESO-c5MCJ0gc7fZnXL1YkzurU2-V5iWdq_K_X3i_nrZXwOKzVhewpDx6Ti",
+        "badge": "New season collection",
+        "title": "Your nails, perfectly cared.",
+        "subtitle": "Premium nail care & art services crafted just for you. Experience the intersection of precision and relaxation.",
+        "cta": [
+            {"label": "Book Now",         "route": "main.public_booking", "style": "primary"},
+            {"label": "Explore Services", "route": "main.services",       "style": "outline"},
+        ],
+    },
+    {
+        "image": "/static/images/Homepage_Carousel_Slides/slide_2.jpg",
+        "badge": "New season collection",
+        "title": "Your nails, perfectly cared.",
+        "subtitle": "Premium nail care & art services crafted just for you. Experience the intersection of precision and relaxation.",
+        "cta": [
+            {"label": "Book Now",         "route": "main.public_booking", "style": "primary"},
+            {"label": "Explore Services", "route": "main.services",       "style": "outline"},
+        ],
+    },
+    {
+        "image": "/static/images/Homepage_Carousel_Slides/slide_3.jpg",
+        "badge": "New season collection",
+        "title": "Your nails, perfectly cared.",
+        "subtitle": "Premium nail care & art services crafted just for you. Experience the intersection of precision and relaxation.",
+        "cta": [
+            {"label": "Book Now",         "route": "main.public_booking", "style": "primary"},
+            {"label": "Explore Services", "route": "main.services",       "style": "outline"},
+        ],
+    },
+]
+
+@main.route("/")
+def home():
+    return render_template("/public/index.html", slides=_CAROUSEL_SLIDES)
+
 @main.route("/public/booking")
 def public_booking():
+    if session.get("user_id"):
+        role = session.get("role")
+        if role == "staff":
+            return redirect(url_for("main.staff_dashboard"))
+        if role == "admin":
+            return redirect(url_for("main.admin_dashboard"))
+        return redirect(url_for("main.customer_booking"))
+
     today = date.today()
     max_date = today + timedelta(days=60)
 
@@ -1319,6 +1430,7 @@ def public_booking():
 
     services_by_category = build_services_by_category(categories, services)
 
+
     return render_template(
         "/public/public_booking.html",
         categories=categories,
@@ -1327,6 +1439,7 @@ def public_booking():
         today=today,
         max_date=max_date,
     )
+
 @main.route("/public/create-booking", methods=['POST'])
 def create_booking():
     #Data from booking form.
@@ -1401,21 +1514,69 @@ def create_booking():
 
     return redirect(url_for('main.email_verification'))
 
-
 @main.route("/services")
 def services():
-    services_list = get_all_services()
-    return render_template("/public/services.html", services=services_list)
+    categories = get_active_service_categories()
+    services_list = get_active_services_with_category()
+    return render_template("/public/services.html", categories=categories, services=services_list)
+
+@main.route("/gallery")
+def gallery():
+    images = get_gallery_images()
+    return render_template("/public/gallery.html", images=images)
+
+@main.route("/about")
+def about():
+    staff_members = get_active_staff()
+    return render_template("/public/about.html", staff_members=staff_members)
 
 @main.route("/success")
 def success():
-    return render_template("success.html")
+    booking_id = session.get("booking_id")
+    if not booking_id:
+        return redirect(url_for("main.home"))
+
+    booking = get_booking_by_id(booking_id)
+    if not booking:
+        return redirect(url_for("main.home"))
+
+    service = get_service_by_id(booking["service_id"])
+    staff   = get_staff_by_id(booking["staff_id"])
+    if not service or not staff:
+        return redirect(url_for("main.home"))
+
+    booking_date_obj = datetime.strptime(booking["booking_date"], "%Y-%m-%d")
+    appointment_date = booking_date_obj.strftime("%A, %B %d, %Y")
+    appointment_time = f"{format_booking_time(booking['start_time'])} (approx. {service['duration_minutes']} mins)"
+
+    role_prefix   = f"{staff['role']}: " if staff["role"] else ""
+    staff_display = f"With {role_prefix}{staff['full_name']}"
+
+    service_image = (
+        url_for("static", filename=f"uploads/services/{service['image']}")
+        if service["image"] else None
+    )
+
+    cal           = build_calendar_url(service["name"], staff["full_name"], booking["booking_date"], booking["start_time"], booking["end_time"])
+    salon_address = "Kyyhkysmäki 9, 02650 Espoo"
+
+    return render_template(
+        "/public/success.html",
+        service_name=service["name"],
+        appointment_date=appointment_date,
+        appointment_time=appointment_time,
+        staff_display=staff_display,
+        service_image=service_image,
+        calendar_url=cal["url"],
+        salon_address=salon_address,
+        gg_map_url=build_gg_map_url(salon_address),
+    )
 
 @main.route("/register", methods=["GET", "POST"])
+@guest_only
 def register():
     if request.method == "GET":
         return render_template("public/customer_register.html")
-
 
     full_name = request.form.get("full_name", "").strip()
     email = request.form.get("email", "").strip().lower()
@@ -1461,8 +1622,8 @@ def register():
     flash("A verification code has been sent to your email.", "success")
     return redirect(url_for('main.email_verification'))
 
-
 @main.route("/login", methods=["GET", "POST"])
+@guest_only
 def login():
     if request.method == "GET":
         return render_template("/public/customer_login.html")
@@ -1500,56 +1661,10 @@ def login():
         flash(f"Login successfully, welcome back {customer['full_name']}", "success")
         return redirect(url_for('main.customer_dashboard'))
 
-
-@main.route('/staff/login', methods=['POST', 'GET'])
-def staff_login():
-    if request.method == "GET":
-        return render_template("/staff/staff_login.html")
-    
-    email = request.form.get("email", "").strip().lower()
-    password = request.form.get("password","")
-
-    if not email or not password:
-        flash("Please enter email or password!", "error")
-        return redirect(url_for("main.staff_login"))
-    
-    user = get_user_by_email(email)
-
-    if not user:
-        flash("Invalid email or password!", "error")
-        return redirect(url_for("main.staff_login"))
-    
-    user_id = user['id']
-
-    if not check_password_hash(user["password_hash"], password):
-        flash("Invalid email or password!", "error")
-        return redirect(url_for("main.staff_login"))
-
-    if user["role"] not in ("staff", "admin"):
-        flash("Please use the customer login portal", "error")
-        return redirect(url_for("main.login"))
-
-    session.clear()
-    session["user_id"] = user_id
-    session["role"] = user["role"]
-    session["user_email"] = user["email"]
-
-    if user["role"] == "staff":
-        staff = get_staff_by_user_id(user_id)
-        if not staff:
-            flash("Staff profile not found!", "error")
-            return redirect(url_for("main.staff_login"))
-        
-        session["staff_id"] = staff['id']
-        flash(f"Login successfully. Welcome {staff['full_name']}!", "success")
-        return redirect(url_for("main.staff_dashboard"))
-    
-    if user["role"] == "admin":
-        flash(f"Login successfully. Welcome master!", "success")
-        return redirect(url_for("main.admin_dashboard"))
-    
-    flash("something went wrong :(", "error")
-    return redirect(url_for("main.staff_login"))
+@main.route('/login/forgot-password', methods=['GET', 'POST'])
+@guest_only
+def forgot_password():
+    return render_template('/public/customer_forgot_password.html')
 
 @main.route('/logout', methods=['POST'])
 def logout():
@@ -1722,7 +1837,9 @@ def check_available_slot():
 
 @main.route("/email-verification")
 def email_verification():
-    return render_template("email_verification.html")
+    verify_context = session.get("verify_context", {})
+    masked_email = mask_email(verify_context.get("email", ""))
+    return render_template("/Auth/email_verification.html", email=masked_email)
 
 @main.route("/verify-email", methods=["POST", "GET"])
 def verify_email():
@@ -1730,7 +1847,9 @@ def verify_email():
 
     #Browser send request "GET" to server (Request server to render template)
     if request.method == "GET":
-        return render_template("email_verification.html")
+        verify_context = session.get("verify_context", {})
+        masked_email = mask_email(verify_context.get("email", ""))
+        return render_template("/Auth/email_verification.html", email=masked_email)
     
     #Browser send request "POST" to server (Broswer send verification code to server for verifying then respone it back)
     if request.method == "POST":
@@ -1848,7 +1967,7 @@ def verify_email():
                     return jsonify({
                         "success": False,
                         "message": "This slot has been booked by other customer! Please try again.",
-                        "redirect_url": url_for('main.book')
+                        "redirect_url": url_for('main.public_booking')
                     }), 400
 
                 #Booking successfully solve
