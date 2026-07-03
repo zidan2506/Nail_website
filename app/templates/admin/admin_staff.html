@@ -1,0 +1,1443 @@
+{% extends "admin/admin_base.html" %}
+
+{#
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  ADMIN STAFF MANAGEMENT PAGE — admin_staff.html                     ║
+  ║  Extends: admin/admin_base.html                                     ║
+  ║  Blocks used: title, extra_css, page_title, content, extra_js       ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ⚠ CONFLICTS WITH ORIGINAL BRIEF (flagged, not silently overwritten)║
+  ║                                                                     ║
+  ║  1. Blueprint name: brief assumed endpoints named "admin.*".        ║
+  ║     Codebase's actual blueprint is "main" (main = Blueprint("main", ║
+  ║     __name__)). All routes below use "main.*", matching the         ║
+  ║     existing convention (main.admin_bookings, main.admin_dashboard).║
+  ║                                                                     ║
+  ║  2. CSS variables: brief specified var(--surface-2), var(--border), ║
+  ║     var(--text-secondary), var(--border-strong). These do NOT exist ║
+  ║     in admin_base.html (only in public/customer templates). This    ║
+  ║     page instead uses the hardcoded hex palette already established║
+  ║     by admin_bookings.html / admin_base.html for visual consistency ║
+  ║     across the admin panel (white cards, 0.5px #e4e6ea borders,     ║
+  ║     #6b7280 secondary text, #4a90d9 accent).                        ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  CONTEXT VARIABLES EXPECTED:                                        ║
+  ║    staff_list: list of dicts — id, full_name, email, phone, role,   ║
+  ║      hourly_rate, commission_rate, is_active, user_id,              ║
+  ║      bookings_this_month, done_today, total_today                  ║
+  ║    stats: dict — total_staff, active_staff, bookings_this_month,    ║
+  ║      avg_hourly_rate                                                ║
+  ║    role_list: list of distinct role strings from staff table        ║
+  ║                                                                     ║
+  ║    Add-staff flow auto-creates a linked user account (role=staff,   ║
+  ║    username=email, random password). Credentials are passed once   ║
+  ║    via flash(category="staff_credentials") and shown in a modal.    ║
+  ║                                                                     ║
+  ║    DB tables involved:                                              ║
+  ║      staff JOIN users (optional, for linked account)                ║
+  ║      bookings WHERE booking_date = today (done_today / total_today) ║
+  ║      bookings WHERE booking_date >= first of month                  ║
+  ║        (bookings_this_month)                                        ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ROUTES (implemented in routes.py):                                 ║
+  ║    main.admin_staffs              GET  /admin/staffs                ║
+  ║      params: q, role, active                                        ║
+  ║    main.admin_create_staff        POST /admin/staff/create          ║
+  ║    main.admin_update_staff        POST /admin/staff/<id>/update     ║
+  ║    main.admin_delete_staff        POST /admin/staff/<id>/delete     ║
+  ║    main.admin_toggle_staff_active POST /admin/staff/<id>/toggle-active
+  ╚══════════════════════════════════════════════════════════════════════╝
+#}
+
+{% block title %}Quản lý nhân viên - DahaCare Admin{% endblock %}
+{% block page_title %}Quản lý nhân viên{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   st- BEM prefix — Staff Management Page
+   ═══════════════════════════════════════════ */
+
+/* ── Page header ── */
+.st-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.st-page-header__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #191c1e;
+    letter-spacing: -0.3px;
+}
+
+.st-page-header__subtitle {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.st-btn-create {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #4a90d9;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.st-btn-create:hover { background: #3a7bc8; }
+.st-btn-create:active { transform: scale(0.98); }
+
+.st-btn-create .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Stat strip ── */
+.st-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.st-stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+}
+
+.st-stat-card__value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #191c1e;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.st-stat-card__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+/* ── Toolbar ── */
+.st-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.st-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 20px;
+    padding: 4px;
+}
+
+.st-tab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+}
+
+.st-tab:hover { color: #191c1e; }
+
+.st-tab--active {
+    background: #4a90d9;
+    color: #ffffff;
+}
+
+.st-tab--active:hover { color: #ffffff; }
+
+.st-toolbar-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.st-filter-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    min-width: 200px;
+}
+
+.st-filter-search .material-symbols-outlined {
+    font-size: 16px;
+    color: #9ca3af;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    flex-shrink: 0;
+}
+
+.st-filter-search input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    outline: none;
+    width: 100%;
+}
+
+.st-filter-search input::placeholder { color: #9ca3af; }
+
+.st-filter-select {
+    padding: 7px 10px;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    min-width: 160px;
+    transition: border-color 0.15s;
+}
+
+.st-filter-select:focus { border-color: #4a90d9; }
+
+/* ── Staff card grid ── */
+.st-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.st-card {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.st-card:hover {
+    border-color: #4a90d9;
+    box-shadow: 0 2px 8px rgba(74,144,217,0.12);
+    transform: translateY(-1px);
+}
+
+.st-card--inactive { opacity: 0.6; }
+
+.st-card__top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.st-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.st-avatar--0 { background: #e0e7ff; color: #3730a3; }
+.st-avatar--1 { background: #fce7f3; color: #9d174d; }
+.st-avatar--2 { background: #fef3c7; color: #92400e; }
+.st-avatar--3 { background: #dcfce7; color: #166534; }
+.st-avatar--4 { background: #f3e8ff; color: #6b21a8; }
+
+.st-card__info { flex: 1; min-width: 0; }
+
+.st-card__name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #191c1e;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.st-card__role {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 1px;
+}
+
+.st-edit-btn {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 8px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.st-edit-btn:hover { background: #e5e7eb; color: #374151; }
+
+.st-edit-btn .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Mini stats row ── */
+.st-mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.st-mini-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px;
+    background: #f7f9fb;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.st-mini-stat__value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #191c1e;
+    font-variant-numeric: tabular-nums;
+}
+
+.st-mini-stat__label {
+    font-size: 10px;
+    font-weight: 500;
+    color: #9ca3af;
+}
+
+/* ── Progress bar ── */
+.st-progress { margin-top: 12px; }
+
+.st-progress__label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.st-progress__track {
+    height: 6px;
+    background: #eef0f2;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.st-progress__fill {
+    height: 100%;
+    background: #4a90d9;
+    border-radius: 20px;
+}
+
+/* ── Card footer ── */
+.st-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.st-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.st-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.st-badge--active { background: #E1F5EE; color: #085041; }
+.st-badge--active::before { background: #1D9E75; }
+
+.st-badge--inactive { background: #f1f3f5; color: #6b7280; }
+.st-badge--inactive::before { background: #c5c6cc; }
+
+.st-card__phone { font-size: 12px; color: #6b7280; }
+
+/* ── Empty state ── */
+.st-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    gap: 10px;
+    text-align: center;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+}
+
+.st-empty .material-symbols-outlined {
+    font-size: 40px;
+    color: #d1d5db;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
+}
+
+.st-empty__title { font-size: 15px; font-weight: 600; color: #6b7280; }
+.st-empty__subtitle { font-size: 13px; color: #9ca3af; }
+
+/* ── Modals ── */
+.st-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(25, 28, 30, 0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.st-modal-overlay--open { display: flex; }
+
+.st-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+}
+
+.st-modal--wide { max-width: 600px; }
+.st-modal--narrow { max-width: 400px; }
+
+.st-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+    flex-shrink: 0;
+}
+
+.st-modal__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #191c1e;
+}
+
+.st-modal__close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.st-modal__close:hover { background: #f3f4f6; color: #374151; }
+
+.st-modal__close .material-symbols-outlined {
+    font-size: 20px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.st-modal__body { padding: 20px 24px; flex: 1; overflow-y: auto; }
+
+.st-modal__footer {
+    padding: 0 24px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.st-modal__footer--split { justify-content: space-between; }
+
+/* ── Detail modal header ── */
+.st-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.st-detail-header .st-avatar { width: 52px; height: 52px; font-size: 17px; }
+
+.st-detail-header__name { font-size: 16px; font-weight: 700; color: #191c1e; }
+.st-detail-header__role { font-size: 13px; color: #6b7280; margin-top: 2px; }
+
+.st-section-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #191c1e;
+    margin-bottom: 8px;
+}
+
+.st-form-divider { height: 1px; background: #f3f4f6; margin: 16px 0; }
+
+/* ── Form elements ── */
+.st-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.st-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+}
+
+.st-form-group:last-child { margin-bottom: 0; }
+
+.st-form-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.st-form-input,
+.st-form-select {
+    padding: 8px 12px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    background: #f7f9fb;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.st-form-input:focus,
+.st-form-select:focus { border-color: #4a90d9; background: #ffffff; }
+
+.st-detail-field {
+    padding: 9px 12px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: #374151;
+}
+
+.st-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    color: #374151;
+}
+
+.st-rating-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #9ca3af;
+    font-size: 12.5px;
+}
+
+.st-rating-placeholder .material-symbols-outlined {
+    font-size: 16px;
+    color: #d1d5db;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Toggle switch ── */
+.st-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+}
+
+.st-toggle-label { font-size: 13px; font-weight: 600; color: #374151; }
+
+.st-switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.st-switch input { opacity: 0; width: 0; height: 0; }
+
+.st-switch__slider {
+    position: absolute;
+    inset: 0;
+    background: #c5c6cc;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.st-switch__slider::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 3px;
+    top: 3px;
+    background: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.15s;
+}
+
+.st-switch input:checked + .st-switch__slider { background: #4a90d9; }
+.st-switch input:checked + .st-switch__slider::before { transform: translateX(16px); }
+
+/* ── Buttons ── */
+.st-btn-secondary {
+    padding: 8px 18px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #374151;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.st-btn-secondary:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+.st-btn-primary {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #4a90d9;
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.st-btn-primary:hover { background: #3a7bc8; }
+.st-btn-primary:active { transform: scale(0.98); }
+
+.st-btn-danger {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.st-btn-danger:hover { background: #fee2e2; }
+
+/* ── Credentials modal ── */
+.st-cred-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #E1F5EE;
+    color: #1D9E75;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 4px auto 14px;
+}
+
+.st-cred-icon .material-symbols-outlined {
+    font-size: 26px;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.st-cred-lead {
+    text-align: center;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.st-cred-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px 9px 12px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: #191c1e;
+}
+
+.st-cred-field span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.st-cred-copy {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 6px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.st-cred-copy:hover { background: #f3f4f6; color: #374151; }
+.st-cred-copy--done { color: #1D9E75; border-color: #bfe8d9; }
+
+.st-cred-copy .material-symbols-outlined {
+    font-size: 15px;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.st-cred-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 10px 12px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #92400e;
+    line-height: 1.5;
+}
+
+.st-cred-warning .material-symbols-outlined {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{# ── Currently active filter values ── #}
+{% set q_val = request.args.get('q', '') %}
+{% set role_val = request.args.get('role', '') %}
+{% set active_val = request.args.get('active', '') %}
+
+{# ── Avatar color palette — cycles through 5 via loop.index0 % 5 ── #}
+{% set AVATAR_PALETTE = ['st-avatar--0', 'st-avatar--1', 'st-avatar--2', 'st-avatar--3', 'st-avatar--4'] %}
+
+
+{# ══════════════════════════════════════════
+   1. PAGE HEADER
+   ══════════════════════════════════════════ #}
+<div class="st-page-header">
+    <div>
+        <div class="st-page-header__title">Quản lý nhân viên</div>
+        <div class="st-page-header__subtitle">Tổng cộng {{ stats.total_staff }} nhân viên</div>
+    </div>
+    <button class="st-btn-create" onclick="openModal('stAddModal')">
+        <span class="material-symbols-outlined">add</span>
+        Thêm nhân viên
+    </button>
+</div>
+
+
+{# ══════════════════════════════════════════
+   2. STAT STRIP
+   Context: stats.total_staff, .active_staff, .bookings_this_month, .avg_hourly_rate
+   ══════════════════════════════════════════ #}
+<div class="st-stats">
+    <div class="st-stat-card">
+        <span class="st-stat-card__value">{{ stats.total_staff }}</span>
+        <span class="st-stat-card__label">Tổng nhân viên</span>
+    </div>
+    <div class="st-stat-card">
+        <span class="st-stat-card__value">{{ stats.active_staff }}</span>
+        <span class="st-stat-card__label">Đang hoạt động</span>
+    </div>
+    <div class="st-stat-card">
+        <span class="st-stat-card__value">{{ stats.bookings_this_month }}</span>
+        <span class="st-stat-card__label">Bookings tháng này</span>
+    </div>
+    <div class="st-stat-card">
+        <span class="st-stat-card__value">{{ stats.avg_hourly_rate | round(2) }} €</span>
+        <span class="st-stat-card__label">Lương giờ trung bình</span>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   3. TOOLBAR — tabs (active filter) + search/role form
+   ══════════════════════════════════════════ #}
+<div class="st-toolbar">
+
+    <div class="st-tabs">
+        <a href="{{ url_for('main.admin_staffs', q=q_val or None, role=role_val or None) }}"
+           class="st-tab {% if active_val == '' %}st-tab--active{% endif %}">Tất cả</a>
+        <a href="{{ url_for('main.admin_staffs', q=q_val or None, role=role_val or None, active='1') }}"
+           class="st-tab {% if active_val == '1' %}st-tab--active{% endif %}">Đang làm</a>
+        <a href="{{ url_for('main.admin_staffs', q=q_val or None, role=role_val or None, active='0') }}"
+           class="st-tab {% if active_val == '0' %}st-tab--active{% endif %}">Nghỉ việc</a>
+    </div>
+
+    <form method="get" action="{{ url_for('main.admin_staffs') }}" class="st-toolbar-form">
+        <input type="hidden" name="active" value="{{ active_val }}">
+
+        <div class="st-filter-search">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" name="q" placeholder="Tìm nhân viên..." value="{{ q_val }}" autocomplete="off">
+        </div>
+
+        <select name="role" class="st-filter-select" onchange="this.form.submit()">
+            <option value="">Tất cả vai trò</option>
+            {% for r in role_list %}
+            <option value="{{ r }}" {% if role_val == r %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+</div>
+
+
+{# ══════════════════════════════════════════
+   4. STAFF CARD GRID
+   Data attributes on each card feed the Detail / Edit / Delete modals via JS.
+   ══════════════════════════════════════════ #}
+<div class="st-grid">
+
+    {% if staff_list %}
+        {% for s in staff_list %}
+        {# Initials: last 2 words of full_name #}
+        {% set name_parts = s.full_name.split() %}
+        {% set last_two = name_parts[-2:] if name_parts | length > 1 else name_parts %}
+        {% set initials = last_two[0][0] | upper %}
+        {% if last_two | length > 1 %}{% set initials = initials + (last_two[1][0] | upper) %}{% endif %}
+
+        {% set avatar_class = AVATAR_PALETTE[loop.index0 % 5] %}
+        {% set total_today = s.total_today or 0 %}
+        {% set done_today = s.done_today or 0 %}
+        {% set progress_pct = ((done_today / total_today) * 100) | round(0, 'floor') if total_today > 0 else 0 %}
+
+        <div class="st-card {% if s.is_active == 0 %}st-card--inactive{% endif %}"
+             data-idx="{{ loop.index0 % 5 }}"
+             data-id="{{ s.id }}"
+             data-name="{{ s.full_name }}"
+             data-role="{{ s.role or '' }}"
+             data-email="{{ s.email }}"
+             data-phone="{{ s.phone or '' }}"
+             data-rate="{{ s.hourly_rate }}"
+             data-commission="{{ s.commission_rate }}"
+             data-active="{{ s.is_active }}"
+             data-bookings="{{ s.bookings_this_month }}"
+             data-done-today="{{ done_today }}"
+             data-total-today="{{ total_today }}"
+             onclick="openDetail(this)">
+
+            <div class="st-card__top">
+                <div class="st-avatar {{ avatar_class }}">{{ initials }}</div>
+                <div class="st-card__info">
+                    <div class="st-card__name">{{ s.full_name }}</div>
+                    <div class="st-card__role">{{ s.role or 'Chưa phân loại' }}</div>
+                </div>
+                <button type="button" class="st-edit-btn" title="Chỉnh sửa"
+                        onclick="event.stopPropagation(); openEdit(this.closest('.st-card'))">
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+            </div>
+
+            <div class="st-mini-stats">
+                <div class="st-mini-stat">
+                    <span class="st-mini-stat__value">{{ s.bookings_this_month }}</span>
+                    <span class="st-mini-stat__label">Bookings</span>
+                </div>
+                <div class="st-mini-stat">
+                    <span class="st-mini-stat__value">{{ s.hourly_rate }} €</span>
+                    <span class="st-mini-stat__label">Giờ công</span>
+                </div>
+                <div class="st-mini-stat">
+                    <span class="st-mini-stat__value">{{ s.commission_rate }}%</span>
+                    <span class="st-mini-stat__label">Hoa hồng</span>
+                </div>
+            </div>
+
+            <div class="st-progress">
+                <div class="st-progress__label">
+                    <span>Tiến độ hôm nay</span>
+                    <span>{{ done_today }}/{{ total_today }} done</span>
+                </div>
+                <div class="st-progress__track">
+                    <div class="st-progress__fill" style="width: {{ progress_pct }}%;"></div>
+                </div>
+            </div>
+
+            <div class="st-card__footer">
+                {% if s.is_active == 1 %}
+                <span class="st-badge st-badge--active">Đang làm việc</span>
+                {% else %}
+                <span class="st-badge st-badge--inactive">Nghỉ việc</span>
+                {% endif %}
+                <span class="st-card__phone">{{ s.phone or '—' }}</span>
+            </div>
+
+        </div>
+        {% endfor %}
+
+    {% else %}
+        <div class="st-empty">
+            <span class="material-symbols-outlined">group</span>
+            <div class="st-empty__title">Không tìm thấy nhân viên nào</div>
+            <div class="st-empty__subtitle">
+                {% if q_val or role_val or active_val %}
+                    Không có nhân viên phù hợp với bộ lọc hiện tại.
+                {% else %}
+                    Chưa có nhân viên nào được thêm.
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+
+
+{# ══════════════════════════════════════════
+   5a. DETAIL MODAL — populated via JS from data-* on clicked card
+   ══════════════════════════════════════════ #}
+<div id="stDetailModal" class="st-modal-overlay" onclick="closeModalOnBackdrop(event, 'stDetailModal')">
+    <div class="st-modal" onclick="event.stopPropagation()">
+
+        <div class="st-modal__header">
+            <span class="st-modal__title">Chi tiết nhân viên</span>
+            <button type="button" class="st-modal__close" onclick="closeModal('stDetailModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="st-modal__body">
+
+            <div class="st-detail-header">
+                <div class="st-avatar" id="st_detail_avatar"></div>
+                <div>
+                    <div class="st-detail-header__name" id="st_detail_name"></div>
+                    <div class="st-detail-header__role" id="st_detail_role"></div>
+                </div>
+            </div>
+
+            <div class="st-section-title">Thông tin liên hệ</div>
+            <div class="st-form-row">
+                <div class="st-form-group">
+                    <label class="st-form-label">Email</label>
+                    <div class="st-detail-field" id="st_detail_email"></div>
+                </div>
+                <div class="st-form-group">
+                    <label class="st-form-label">Số điện thoại</label>
+                    <div class="st-detail-field" id="st_detail_phone"></div>
+                </div>
+            </div>
+
+            <div class="st-form-divider"></div>
+
+            <div class="st-section-title">Lương &amp; Hoa hồng</div>
+            <div class="st-form-row">
+                <div class="st-form-group">
+                    <label class="st-form-label">Lương giờ</label>
+                    <div class="st-detail-field" id="st_detail_rate"></div>
+                </div>
+                <div class="st-form-group">
+                    <label class="st-form-label">Hoa hồng</label>
+                    <div class="st-detail-field" id="st_detail_commission"></div>
+                </div>
+            </div>
+
+            <div class="st-form-divider"></div>
+
+            <div class="st-section-title">Hiệu suất hôm nay</div>
+            <div class="st-form-group">
+                <label class="st-form-label">Bookings tháng này</label>
+                <div class="st-detail-field" id="st_detail_bookings"></div>
+            </div>
+            <div class="st-progress" style="margin-top: 0;">
+                <div class="st-progress__label">
+                    <span>Tiến độ hôm nay</span>
+                    <span id="st_detail_progress_label"></span>
+                </div>
+                <div class="st-progress__track">
+                    <div class="st-progress__fill" id="st_detail_progress_fill" style="width: 0%;"></div>
+                </div>
+            </div>
+            <div class="st-rating-placeholder" style="margin-top: 10px;">
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span>
+                <span>Chưa có dữ liệu đánh giá</span>
+            </div>
+
+            <div class="st-form-divider"></div>
+
+            <div class="st-section-title">Trạng thái làm việc</div>
+            <form method="post" id="st_toggle_form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="st-toggle-row">
+                    <span class="st-toggle-label" id="st_toggle_status_label"></span>
+                    <label class="st-switch">
+                        <input type="checkbox" id="st_toggle_checkbox" onchange="this.form.submit()">
+                        <span class="st-switch__slider"></span>
+                    </label>
+                </div>
+            </form>
+
+        </div>
+
+        <div class="st-modal__footer st-modal__footer--split">
+            <button type="button" class="st-btn-danger" onclick="openDeleteFromDetail()">Xóa nhân viên</button>
+            <div style="display:flex; gap:8px;">
+                <button type="button" class="st-btn-secondary" onclick="closeModal('stDetailModal')">Đóng</button>
+                <button type="button" class="st-btn-primary" onclick="closeModal('stDetailModal'); openEdit(currentStaffCard);">Chỉnh sửa</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5b. EDIT MODAL — shared by card edit icon & Detail modal's "Chỉnh sửa" button
+   Backend: POST /admin/staff/<id>/update → main.admin_update_staff
+   ══════════════════════════════════════════ #}
+<div id="stEditModal" class="st-modal-overlay" onclick="closeModalOnBackdrop(event, 'stEditModal')">
+    <div class="st-modal" onclick="event.stopPropagation()">
+
+        <div class="st-modal__header">
+            <span class="st-modal__title">Chỉnh sửa nhân viên</span>
+            <button type="button" class="st-modal__close" onclick="closeModal('stEditModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" id="st_edit_form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="st-modal__body">
+
+                <div class="st-form-group">
+                    <label class="st-form-label" for="st_edit_full_name">Họ và tên *</label>
+                    <input type="text" name="full_name" id="st_edit_full_name" class="st-form-input" required>
+                </div>
+
+                <div class="st-form-group">
+                    <label class="st-form-label" for="st_edit_role">Vai trò</label>
+                    <select name="role" id="st_edit_role" class="st-form-select">
+                        <option value="">Chưa phân loại</option>
+                        {% for r in role_list %}
+                        <option value="{{ r }}">{{ r }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="st-form-group">
+                    <label class="st-form-label" for="st_edit_email">Email *</label>
+                    <input type="email" name="email" id="st_edit_email" class="st-form-input" required>
+                </div>
+
+                <div class="st-form-group">
+                    <label class="st-form-label" for="st_edit_phone">Số điện thoại</label>
+                    <input type="text" name="phone" id="st_edit_phone" class="st-form-input">
+                </div>
+
+                <div class="st-form-row">
+                    <div class="st-form-group">
+                        <label class="st-form-label" for="st_edit_rate">Lương giờ €</label>
+                        <input type="number" step="0.01" min="0" name="hourly_rate" id="st_edit_rate" class="st-form-input">
+                    </div>
+                    <div class="st-form-group">
+                        <label class="st-form-label" for="st_edit_commission">Hoa hồng %</label>
+                        <input type="number" step="0.01" min="0" name="commission_rate" id="st_edit_commission" class="st-form-input">
+                    </div>
+                </div>
+
+                <div class="st-form-divider"></div>
+
+                <div class="st-checkbox-row">
+                    <input type="checkbox" name="is_active" id="st_edit_active" value="1">
+                    <label for="st_edit_active">Đang hoạt động (bỏ chọn để vô hiệu hoá nhân viên này)</label>
+                </div>
+
+            </div>
+
+            <div class="st-modal__footer">
+                <button type="button" class="st-btn-secondary" onclick="closeModal('stEditModal')">Hủy bỏ</button>
+                <button type="submit" class="st-btn-primary">Lưu thay đổi</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5c. ADD STAFF MODAL
+   Backend: POST /admin/staff/create → main.admin_create_staff
+   Context needed: role_list
+   Auto-creates a linked user account; credentials shown via 5e.
+   ══════════════════════════════════════════ #}
+<div id="stAddModal" class="st-modal-overlay" onclick="closeModalOnBackdrop(event, 'stAddModal')">
+    <div class="st-modal" onclick="event.stopPropagation()">
+
+        <div class="st-modal__header">
+            <span class="st-modal__title">Thêm nhân viên mới</span>
+            <button type="button" class="st-modal__close" onclick="closeModal('stAddModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" action="{{ url_for('main.admin_create_staff') }}" id="st_add_form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="st-modal__body">
+
+                <div class="st-form-group">
+                    <label class="st-form-label" for="st_add_full_name">Họ và tên *</label>
+                    <input type="text" name="full_name" id="st_add_full_name" class="st-form-input" required>
+                </div>
+
+                <div class="st-form-group">
+                    <label class="st-form-label" for="st_add_role">Vai trò</label>
+                    <select name="role" id="st_add_role" class="st-form-select">
+                        <option value="">Chưa phân loại</option>
+                        {% for r in role_list %}
+                        <option value="{{ r }}">{{ r }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="st-form-group">
+                    <label class="st-form-label" for="st_add_email">Email *</label>
+                    <input type="email" name="email" id="st_add_email" class="st-form-input" required>
+                </div>
+
+                <div class="st-form-group">
+                    <label class="st-form-label" for="st_add_phone">Số điện thoại</label>
+                    <input type="text" name="phone" id="st_add_phone" class="st-form-input">
+                </div>
+
+                <div class="st-form-row">
+                    <div class="st-form-group">
+                        <label class="st-form-label" for="st_add_rate">Lương giờ €</label>
+                        <input type="number" step="0.01" min="0" name="hourly_rate" id="st_add_rate" class="st-form-input">
+                    </div>
+                    <div class="st-form-group">
+                        <label class="st-form-label" for="st_add_commission">Hoa hồng %</label>
+                        <input type="number" step="0.01" min="0" name="commission_rate" id="st_add_commission" class="st-form-input">
+                    </div>
+                </div>
+
+                <div class="st-form-divider"></div>
+
+                <div class="st-checkbox-row">
+                    <input type="checkbox" name="is_active" id="st_add_active" value="1" checked>
+                    <label for="st_add_active">Kích hoạt ngay</label>
+                </div>
+
+                <p style="font-size: 12px; color: #6b7280; margin-top: 10px; line-height: 1.5;">
+                    Một tài khoản đăng nhập (vai trò nhân viên) sẽ được tạo tự động với email này và mật khẩu ngẫu nhiên.
+                </p>
+
+            </div>
+
+            <div class="st-modal__footer">
+                <button type="button" class="st-btn-secondary" onclick="closeModal('stAddModal')">Hủy bỏ</button>
+                <button type="submit" class="st-btn-primary">Thêm nhân viên</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5d. DELETE CONFIRM MODAL
+   Backend: POST /admin/staff/<id>/delete → main.admin_delete_staff
+   ══════════════════════════════════════════ #}
+<div id="stDeleteModal" class="st-modal-overlay" onclick="closeModalOnBackdrop(event, 'stDeleteModal')">
+    <div class="st-modal st-modal--narrow" onclick="event.stopPropagation()">
+
+        <div class="st-modal__header">
+            <span class="st-modal__title">Xác nhận xóa nhân viên</span>
+            <button type="button" class="st-modal__close" onclick="closeModal('stDeleteModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="st-modal__body">
+            <p style="font-size: 13.5px; color: #374151; line-height: 1.5;">
+                Bạn có chắc chắn muốn xóa nhân viên <strong id="st_delete_name"></strong>?
+                Hành động này không thể hoàn tác.
+            </p>
+        </div>
+
+        <div class="st-modal__footer">
+            <button type="button" class="st-btn-secondary" onclick="closeModal('stDeleteModal'); openModal('stDetailModal');">Hủy</button>
+            <form method="post" id="st_delete_form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="st-btn-danger">Xác nhận xóa</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5e. CREDENTIALS MODAL — shown once right after "Add staff" auto-creates a login account
+   Data source: flash(category="staff_credentials"), format "email|password"
+   ══════════════════════════════════════════ #}
+<div id="stCredModal" class="st-modal-overlay" onclick="closeModalOnBackdrop(event, 'stCredModal')">
+    <div class="st-modal st-modal--narrow" onclick="event.stopPropagation()">
+
+        <div class="st-modal__header">
+            <span class="st-modal__title">Đã tạo tài khoản nhân viên</span>
+            <button type="button" class="st-modal__close" onclick="closeModal('stCredModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="st-modal__body">
+            <div class="st-cred-icon">
+                <span class="material-symbols-outlined">check_circle</span>
+            </div>
+            <p class="st-cred-lead">Nhân viên có thể dùng thông tin này để đăng nhập tại trang đăng nhập nhân viên.</p>
+
+            <div class="st-form-group">
+                <label class="st-form-label">Tài khoản (email)</label>
+                <div class="st-cred-field">
+                    <span id="st_cred_email"></span>
+                    <button type="button" class="st-cred-copy" onclick="copyCredential('st_cred_email', this)" title="Sao chép">
+                        <span class="material-symbols-outlined">content_copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="st-form-group">
+                <label class="st-form-label">Mật khẩu tạm thời</label>
+                <div class="st-cred-field">
+                    <span id="st_cred_password"></span>
+                    <button type="button" class="st-cred-copy" onclick="copyCredential('st_cred_password', this)" title="Sao chép">
+                        <span class="material-symbols-outlined">content_copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="st-cred-warning">
+                <span class="material-symbols-outlined">warning</span>
+                <span>Mật khẩu chỉ hiển thị một lần. Hãy sao chép và gửi cho nhân viên ngay bây giờ.</span>
+            </div>
+        </div>
+
+        <div class="st-modal__footer">
+            <button type="button" class="st-btn-primary" onclick="closeModal('stCredModal')">Đã lưu, đóng</button>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+const ST_AVATAR_PALETTE = ['st-avatar--0', 'st-avatar--1', 'st-avatar--2', 'st-avatar--3', 'st-avatar--4'];
+
+const ST_ROUTES = {
+    update: "{{ url_for('main.admin_update_staff', staff_id=0) }}",
+    delete: "{{ url_for('main.admin_delete_staff', staff_id=0) }}",
+    toggle: "{{ url_for('main.admin_toggle_staff_active', staff_id=0) }}"
+};
+
+let currentStaffCard = null;
+
+/* ── Modal management ── */
+function openModal(id) {
+    document.getElementById(id).classList.add('st-modal-overlay--open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('st-modal-overlay--open');
+    document.body.style.overflow = '';
+}
+
+function closeModalOnBackdrop(event, id) {
+    if (event.target === event.currentTarget) closeModal(id);
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal('stDetailModal');
+        closeModal('stEditModal');
+        closeModal('stAddModal');
+        closeModal('stDeleteModal');
+    }
+});
+
+function buildActionUrl(template, id) {
+    return template.replace('/0/', '/' + id + '/');
+}
+
+/* ── Detail modal ── */
+function openDetail(el) {
+    currentStaffCard = el;
+    const d = el.dataset;
+
+    const avatarEl = document.getElementById('st_detail_avatar');
+    const cardAvatarEl = el.querySelector('.st-avatar');
+    avatarEl.className = 'st-avatar ' + ST_AVATAR_PALETTE[parseInt(d.idx, 10) % 5];
+    avatarEl.textContent = cardAvatarEl ? cardAvatarEl.textContent.trim() : '';
+
+    document.getElementById('st_detail_name').textContent = d.name;
+    document.getElementById('st_detail_role').textContent = d.role || 'Chưa phân loại';
+    document.getElementById('st_detail_email').textContent = d.email;
+    document.getElementById('st_detail_phone').textContent = d.phone || '—';
+    document.getElementById('st_detail_rate').textContent = parseFloat(d.rate || 0).toFixed(2) + ' €';
+    document.getElementById('st_detail_commission').textContent = parseFloat(d.commission || 0) + '%';
+    document.getElementById('st_detail_bookings').textContent = d.bookings;
+
+    const total = parseInt(d.totalToday, 10) || 0;
+    const done = parseInt(d.doneToday, 10) || 0;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    document.getElementById('st_detail_progress_label').textContent = done + '/' + total + ' done';
+    document.getElementById('st_detail_progress_fill').style.width = pct + '%';
+
+    const isActive = d.active === '1';
+    document.getElementById('st_toggle_checkbox').checked = isActive;
+    document.getElementById('st_toggle_status_label').textContent = isActive ? 'Đang làm việc' : 'Nghỉ việc';
+    document.getElementById('st_toggle_form').action = buildActionUrl(ST_ROUTES.toggle, d.id);
+
+    openModal('stDetailModal');
+}
+
+/* ── Edit modal (card edit icon or Detail modal's "Chỉnh sửa") ── */
+function openEdit(el) {
+    currentStaffCard = el;
+    const d = el.dataset;
+
+    document.getElementById('st_edit_form').action = buildActionUrl(ST_ROUTES.update, d.id);
+    document.getElementById('st_edit_full_name').value = d.name;
+    document.getElementById('st_edit_role').value = d.role || '';
+    document.getElementById('st_edit_email').value = d.email;
+    document.getElementById('st_edit_phone').value = d.phone || '';
+    document.getElementById('st_edit_rate').value = d.rate;
+    document.getElementById('st_edit_commission').value = d.commission;
+    document.getElementById('st_edit_active').checked = d.active === '1';
+
+    openModal('stEditModal');
+}
+
+/* ── Delete confirm modal ── */
+function openDelete(name, id) {
+    document.getElementById('st_delete_name').textContent = name;
+    document.getElementById('st_delete_form').action = buildActionUrl(ST_ROUTES.delete, id);
+    openModal('stDeleteModal');
+}
+
+function openDeleteFromDetail() {
+    if (!currentStaffCard) return;
+    closeModal('stDetailModal');
+    openDelete(currentStaffCard.dataset.name, currentStaffCard.dataset.id);
+}
+
+/* ── Credentials modal (shown once after Add staff creates a login account) ── */
+function copyCredential(fieldId, btn) {
+    const text = document.getElementById(fieldId).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        const icon = btn.querySelector('.material-symbols-outlined');
+        icon.textContent = 'check';
+        btn.classList.add('st-cred-copy--done');
+        setTimeout(() => {
+            icon.textContent = 'content_copy';
+            btn.classList.remove('st-cred-copy--done');
+        }, 1200);
+    });
+}
+
+{% set cred_flashes = get_flashed_messages(category_filter=['staff_credentials']) %}
+const ST_NEW_CREDENTIALS = {{ (cred_flashes[0].split('|') | tojson) if cred_flashes else 'null' }};
+if (ST_NEW_CREDENTIALS) {
+    document.getElementById('st_cred_email').textContent = ST_NEW_CREDENTIALS[0];
+    document.getElementById('st_cred_password').textContent = ST_NEW_CREDENTIALS[1];
+    openModal('stCredModal');
+}
+</script>
+{% endblock %}
