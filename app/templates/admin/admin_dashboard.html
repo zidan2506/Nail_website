@@ -1,7 +1,691 @@
-{% extends "base.html" %}
+{% extends "admin/admin_base.html" %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Dashboard · DahaCare Admin{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   db- BEM prefix — Admin Dashboard
+   ═══════════════════════════════════════════ */
+
+:root {
+  --db-surface:  #ffffff;
+  --db-bg:       #f7f9fb;
+  --db-border:   #e8eaed;
+  --db-text:     #191c1e;
+  --db-muted:    #6b7280;
+  --db-accent:   #4a90d9;
+  --db-r-card:   12px;
+  --db-r-inner:  8px;
+  --db-r-pill:   20px;
+}
+
+.db-page { display: flex; flex-direction: column; gap: 24px; }
+
+/* ── Page Header ── */
+.db-header { display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 4px; }
+.db-header__title { font-size: 22px; font-weight: 700; color: var(--db-text); letter-spacing: -0.3px; }
+.db-header__date  { font-size: 13px; color: var(--db-muted); font-weight: 500; }
+
+/* ── Stat Cards ── */
+.db-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.db-stat {
+  background: var(--db-surface);
+  border-radius: var(--db-r-card);
+  border: 0.5px solid var(--db-border);
+  padding: 20px 22px;
+  display: flex; flex-direction: column;
+  transition: box-shadow 0.15s;
+}
+.db-stat:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+.db-stat__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.db-stat__icon {
+  width: 38px; height: 38px; border-radius: var(--db-r-inner);
+  display: flex; align-items: center; justify-content: center;
+}
+.db-stat__icon .material-symbols-outlined { font-size: 20px; }
+.db-stat__icon--blue   { background: #e8f2fb; color: var(--db-accent); }
+.db-stat__icon--green  { background: #e1f5ee; color: #085041; }
+.db-stat__icon--amber  { background: #faeeda; color: #633806; }
+.db-stat__icon--purple { background: #f3e8ff; color: #6b21a8; }
+.db-stat__badge {
+  font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: var(--db-r-pill);
+  background: #f1f5f9; color: #475569;
+}
+.db-stat__value { font-size: 28px; font-weight: 700; color: var(--db-text); letter-spacing: -0.5px; line-height: 1; }
+.db-stat__label { font-size: 12px; color: var(--db-muted); font-weight: 500; margin-top: 5px; }
+
+/* ── Shared Card ── */
+.db-card {
+  background: var(--db-surface);
+  border-radius: var(--db-r-card);
+  border: 0.5px solid var(--db-border);
+}
+.db-card__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--db-border);
+}
+.db-card__title { font-size: 13px; font-weight: 600; color: var(--db-text); }
+.db-card__meta  { font-size: 11px; color: var(--db-muted); background: var(--db-bg); padding: 2px 8px; border-radius: var(--db-r-pill); }
+.db-card__link  { font-size: 12px; font-weight: 600; color: var(--db-accent); text-decoration: none; }
+.db-card__link:hover { text-decoration: underline; }
+.db-card__head-right { display: flex; align-items: center; gap: 10px; }
+
+/* ── Middle Grid ── */
+.db-middle { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: start; }
+.db-right-col { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Appointments Table ── */
+.db-appt-table { width: 100%; border-collapse: collapse; }
+.db-appt-table th {
+  font-size: 11px; font-weight: 600; color: var(--db-muted);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 9px 20px; text-align: left;
+  background: var(--db-bg); border-bottom: 1px solid var(--db-border);
+}
+.db-appt-table td {
+  padding: 11px 20px; border-bottom: 0.5px solid var(--db-border);
+  font-size: 13px; color: var(--db-text); vertical-align: middle;
+}
+.db-appt-table tr:last-child td { border-bottom: none; }
+.db-appt-table tr:hover td { background: #fafbfc; }
+.db-appt__name-wrap { display: flex; align-items: center; gap: 10px; }
+.db-appt__avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; flex-shrink: 0;
+}
+.db-appt__name { font-weight: 600; }
+.db-appt__time { font-weight: 600; }
+.db-appt__dur  { font-size: 11px; color: var(--db-muted); margin-top: 1px; }
+.db-appt-empty {
+  text-align: center; padding: 40px 20px;
+  color: var(--db-muted); font-size: 13px;
+}
+.db-appt-empty .material-symbols-outlined {
+  font-size: 36px; display: block; margin-bottom: 8px;
+  color: #c5c6cc;
+}
+
+/* ── Status Pills ── */
+.db-pill {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: var(--db-r-pill);
+  white-space: nowrap; text-transform: capitalize;
+}
+.db-pill--pending    { background: #FAEEDA; color: #633806; }
+.db-pill--unverified { background: #FAEEDA; color: #633806; }
+.db-pill--confirmed  { background: #E1F5EE; color: #085041; }
+.db-pill--completed  { background: #E6F1FB; color: #0C447C; }
+.db-pill--cancelled  { background: #FCEBEB; color: #791F1F; }
+
+/* ── Status Summary ── */
+.db-status-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding: 14px;
+}
+.db-status-box {
+  padding: 12px 14px; border-radius: var(--db-r-inner);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.db-status-box__count { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.db-status-box__label { font-size: 11px; font-weight: 500; }
+.db-status-box--pending   { background: #fffbf5; }
+.db-status-box--confirmed { background: #f4fdf9; }
+.db-status-box--completed { background: #f3f8fe; }
+.db-status-box--cancelled { background: #fdf5f5; }
+.db-status-box--pending   .db-status-box__count { color: #633806; }
+.db-status-box--confirmed .db-status-box__count { color: #085041; }
+.db-status-box--completed .db-status-box__count { color: #0C447C; }
+.db-status-box--cancelled .db-status-box__count { color: #791F1F; }
+.db-status-box--pending   .db-status-box__label { color: #9a6420; }
+.db-status-box--confirmed .db-status-box__label { color: #1d7555; }
+.db-status-box--completed .db-status-box__label { color: #1e60a0; }
+.db-status-box--cancelled .db-status-box__label { color: #9b2020; }
+
+/* ── Activity Feed ── */
+.db-activity-list { display: flex; flex-direction: column; }
+.db-activity-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 11px 20px; border-bottom: 0.5px solid var(--db-border);
+}
+.db-activity-item:last-child { border-bottom: none; }
+.db-activity__dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.db-activity__body { flex: 1; }
+.db-activity__text { font-size: 12px; color: var(--db-text); line-height: 1.6; }
+.db-activity__time { font-size: 11px; color: var(--db-muted); margin-top: 2px; }
+.db-activity-empty { padding: 24px 20px; text-align: center; color: var(--db-muted); font-size: 12px; }
+
+/* ── Revenue Chart ── */
+.db-chart {
+  background: var(--db-surface);
+  border-radius: var(--db-r-card);
+  border: 0.5px solid var(--db-border);
+}
+.db-chart__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--db-border);
+}
+.db-chart__title { font-size: 13px; font-weight: 600; color: var(--db-text); }
+.db-chart__tabs {
+  display: flex; gap: 3px;
+  background: var(--db-bg); border-radius: var(--db-r-inner); padding: 3px;
+}
+.db-chart__tab {
+  font-size: 12px; font-weight: 600; padding: 4px 14px;
+  border-radius: 6px; border: none; background: none;
+  cursor: pointer; color: var(--db-muted);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: all 0.15s;
+}
+.db-chart__tab--active {
+  background: var(--db-surface); color: var(--db-accent);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.db-chart__body { padding: 20px 20px 10px; }
+#db-revenue-canvas { display: block; width: 100%; height: 220px; }
+
+/* ── Bottom Row ── */
+.db-bottom { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+/* ── Service Table ── */
+.db-svc-table { width: 100%; border-collapse: collapse; }
+.db-svc-table th {
+  font-size: 11px; font-weight: 600; color: var(--db-muted);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 8px 16px; text-align: left;
+  background: var(--db-bg); border-bottom: 1px solid var(--db-border);
+}
+.db-svc-table td {
+  padding: 10px 16px; font-size: 12px; color: var(--db-text);
+  border-bottom: 0.5px solid var(--db-border);
+}
+.db-svc-table tr:last-child td { border-bottom: none; }
+.db-svc-table tr:hover td { background: #fafbfc; }
+.db-svc__name { font-weight: 600; }
+.db-svc__rev  { font-weight: 700; color: var(--db-accent); }
+
+/* ── Loyalty List ── */
+.db-loyalty-list { display: flex; flex-direction: column; }
+.db-loyalty-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-bottom: 0.5px solid var(--db-border);
+}
+.db-loyalty-item:last-child { border-bottom: none; }
+.db-loyalty__avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: #e8f2fb; color: var(--db-accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; flex-shrink: 0;
+}
+.db-loyalty__info { flex: 1; min-width: 0; }
+.db-loyalty__name { font-size: 12px; font-weight: 600; color: var(--db-text); }
+.db-loyalty__tier { font-size: 11px; color: var(--db-muted); }
+.db-loyalty__pts  { font-size: 12px; font-weight: 700; color: var(--db-accent); white-space: nowrap; }
+
+/* ── New Members ── */
+.db-members-list { display: flex; flex-direction: column; }
+.db-member-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-bottom: 0.5px solid var(--db-border);
+}
+.db-member-item:last-child { border-bottom: none; }
+.db-member__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--db-accent); flex-shrink: 0; }
+.db-member__info { flex: 1; min-width: 0; }
+.db-member__name { font-size: 12px; font-weight: 600; color: var(--db-text); }
+.db-member__email {
+  font-size: 11px; color: var(--db-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.db-member__date { font-size: 11px; color: var(--db-muted); white-space: nowrap; }
+
+/* ── Empty state ── */
+.db-empty { padding: 28px 16px; text-align: center; color: var(--db-muted); font-size: 12px; }
+
+/* ── Grid overflow fix: allow items to shrink below content width ── */
+.db-stat, .db-middle > *, .db-bottom > * { min-width: 0; }
+
+/* ── Rounded corner clipping ── */
+.db-card, .db-chart { overflow: hidden; }
+</style>
+{% endblock %}
 
 {% block content %}
-<h1>this is admin dashboard!</h1>
+{# ════════════════════════════════════════════════
+   CONTEXT VARIABLES (from admin_dashboard route)
+   - today_label      : string, e.g. "Monday, Jun 29"
+   - kpi              : dict  — keys: revenue, bookings, new_customers, pending
+   - today_appointments: list — keys: time, duration, initials, avatar_bg, avatar_color, name, service, staff, status
+   - activity_feed    : list — keys: dot_color, text (HTML), time
+   - revenue_chart    : dict — keys: week (list {label,value}), month (list {label,value})
+   ════════════════════════════════════════════════ #}
+
+<div class="db-page">
+
+  {# ── 1. PAGE HEADER ── #}
+  {# Depends on: today_label #}
+  <div class="db-header">
+    <h2 class="db-header__title">Dashboard</h2>
+    <span class="db-header__date">{{ today_label | default('Hôm nay') }}</span>
+  </div>
+
+  {# ── 2. STAT CARDS ── #}
+  {# Depends on: kpi dict from get_admin_kpis(today_str) #}
+  {# Tables: bookings (COUNT), invoices (SUM amount WHERE paid), customers (COUNT by date) #}
+  <div class="db-stats">
+
+    {# Bookings today — kpi.bookings counts status NOT IN ('unverified','cancelled') #}
+    <div class="db-stat">
+      <div class="db-stat__top">
+        <div class="db-stat__icon db-stat__icon--blue">
+          <span class="material-symbols-outlined">calendar_month</span>
+        </div>
+        <span class="db-stat__badge">Hôm nay</span>
+      </div>
+      <div class="db-stat__value">{{ kpi.bookings | default(0) }}</div>
+      <div class="db-stat__label">Lịch hẹn hôm nay</div>
+    </div>
+
+    {# Revenue today — kpi.revenue is pre-formatted as "1,234" (no currency symbol) #}
+    {# Tables: invoices WHERE DATE(issued_at) = today AND status = 'paid' #}
+    <div class="db-stat">
+      <div class="db-stat__top">
+        <div class="db-stat__icon db-stat__icon--green">
+          <span class="material-symbols-outlined">payments</span>
+        </div>
+        <span class="db-stat__badge">Hôm nay</span>
+      </div>
+      <div class="db-stat__value">€{{ kpi.revenue | default('0') }}</div>
+      <div class="db-stat__label">Doanh thu hôm nay</div>
+    </div>
+
+    {# Pending bookings — kpi.pending counts ALL bookings with status='pending' (not date-filtered) #}
+    {# Tables: bookings WHERE status = 'pending' #}
+    <div class="db-stat">
+      <div class="db-stat__top">
+        <div class="db-stat__icon db-stat__icon--amber">
+          <span class="material-symbols-outlined">pending_actions</span>
+        </div>
+        <span class="db-stat__badge">Chờ duyệt</span>
+      </div>
+      <div class="db-stat__value">{{ kpi.pending | default(0) }}</div>
+      <div class="db-stat__label">Cần xử lý</div>
+    </div>
+
+    {# New customers today — kpi.new_customers counts by DATE(created_at) = today #}
+    {# Tables: customers WHERE DATE(created_at) = today #}
+    <div class="db-stat">
+      <div class="db-stat__top">
+        <div class="db-stat__icon db-stat__icon--purple">
+          <span class="material-symbols-outlined">person_add</span>
+        </div>
+        <span class="db-stat__badge">Hôm nay</span>
+      </div>
+      <div class="db-stat__value">{{ kpi.new_customers | default(0) }}</div>
+      <div class="db-stat__label">Khách mới hôm nay</div>
+    </div>
+
+  </div>
+
+  {# ── 3. MIDDLE ROW ── #}
+  <div class="db-middle">
+
+    {# LEFT: Today's Appointments Table #}
+    {# Depends on: today_appointments (list from get_admin_today_appointments) #}
+    {# Tables: bookings JOIN customers JOIN services JOIN staff WHERE booking_date = today #}
+    {# Fields used: a.time, a.duration, a.initials, a.avatar_bg, a.avatar_color, a.name, a.service, a.staff, a.status #}
+    <div class="db-card">
+      <div class="db-card__head">
+        <span class="db-card__title">Lịch hẹn hôm nay</span>
+        <div class="db-card__head-right">
+          {% if today_appointments %}
+            <span class="db-card__meta">{{ today_appointments | length }} lịch</span>
+          {% endif %}
+          <a href="{{ url_for('main.admin_bookings') }}" class="db-card__link">Xem tất cả</a>
+        </div>
+      </div>
+      <div>
+        {% if today_appointments %}
+          <table class="db-appt-table">
+            <thead>
+              <tr>
+                <th>Khách</th>
+                <th>Dịch vụ</th>
+                <th>Thợ</th>
+                <th>Giờ</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in today_appointments %}
+              <tr>
+                <td>
+                  <div class="db-appt__name-wrap">
+                    <div class="db-appt__avatar"
+                         style="background:{{ a.avatar_bg }};color:{{ a.avatar_color }};">
+                      {{ a.initials | default('?') }}
+                    </div>
+                    <span class="db-appt__name">{{ a.name | default('—') }}</span>
+                  </div>
+                </td>
+                <td>{{ a.service | default('—') }}</td>
+                <td>{{ a.staff | default('—') }}</td>
+                <td>
+                  <div class="db-appt__time">{{ a.time | default('—') }}</div>
+                  <div class="db-appt__dur">{{ a.duration | default('') }}</div>
+                </td>
+                <td>
+                  <span class="db-pill db-pill--{{ a.status | default('pending') }}">
+                    {{ a.status | default('pending') }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="db-appt-empty">
+            <span class="material-symbols-outlined">event_available</span>
+            Không có lịch hẹn nào hôm nay
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# RIGHT COLUMN #}
+    <div class="db-right-col">
+
+      {# Status summary — derived from today_appointments via Jinja2 selectattr #}
+      {# No additional DB query needed: computed client-side from available context #}
+      {% set cnt_pending   = today_appointments | selectattr('status', 'equalto', 'pending')   | list | length %}
+      {% set cnt_confirmed = today_appointments | selectattr('status', 'equalto', 'confirmed') | list | length %}
+      {% set cnt_completed = today_appointments | selectattr('status', 'equalto', 'completed') | list | length %}
+      {% set cnt_cancelled = today_appointments | selectattr('status', 'equalto', 'cancelled') | list | length %}
+      <div class="db-card">
+        <div class="db-card__head">
+          <span class="db-card__title">Tình trạng hôm nay</span>
+        </div>
+        <div class="db-status-grid">
+          <div class="db-status-box db-status-box--pending">
+            <span class="db-status-box__count">{{ cnt_pending }}</span>
+            <span class="db-status-box__label">Chờ duyệt</span>
+          </div>
+          <div class="db-status-box db-status-box--confirmed">
+            <span class="db-status-box__count">{{ cnt_confirmed }}</span>
+            <span class="db-status-box__label">Xác nhận</span>
+          </div>
+          <div class="db-status-box db-status-box--completed">
+            <span class="db-status-box__count">{{ cnt_completed }}</span>
+            <span class="db-status-box__label">Hoàn thành</span>
+          </div>
+          <div class="db-status-box db-status-box--cancelled">
+            <span class="db-status-box__count">{{ cnt_cancelled }}</span>
+            <span class="db-status-box__label">Huỷ</span>
+          </div>
+        </div>
+      </div>
+
+      {# Activity Feed #}
+      {# Depends on: activity_feed (list from get_admin_recent_activity(5)) #}
+      {# Tables: bookings JOIN customers JOIN services ORDER BY created_at DESC LIMIT 5 #}
+      {# Fields: item.dot_color (hex string), item.text (HTML with <strong>), item.time (relative string) #}
+      <div class="db-card">
+        <div class="db-card__head">
+          <span class="db-card__title">Hoạt động gần đây</span>
+        </div>
+        <div class="db-activity-list">
+          {% if activity_feed %}
+            {% for item in activity_feed %}
+            <div class="db-activity-item">
+              <div class="db-activity__dot" style="background:{{ item.dot_color }};"></div>
+              <div class="db-activity__body">
+                <div class="db-activity__text">{{ item.text | safe }}</div>
+                <div class="db-activity__time">{{ item.time }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="db-activity-empty">Chưa có hoạt động nào</div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {# ── 4. REVENUE CHART ── #}
+  {# Depends on: revenue_chart dict from get_admin_revenue_chart(today_str) #}
+  {# Tables: invoices WHERE status='paid', grouped by day (week view) or strftime week (month view) #}
+  {# Fields: revenue_chart.week = [{label: "Mon", value: 123}, ...] (7 items) #}
+  {#         revenue_chart.month = [{label: "Week 1", value: 456}, ...] (4 items) #}
+  <div class="db-chart">
+    <div class="db-chart__head">
+      <span class="db-chart__title">Doanh thu</span>
+      <div class="db-chart__tabs">
+        <button class="db-chart__tab db-chart__tab--active" data-range="week">7 ngày</button>
+        <button class="db-chart__tab" data-range="month">4 tuần</button>
+      </div>
+    </div>
+    <div class="db-chart__body">
+      <canvas id="db-revenue-canvas"></canvas>
+    </div>
+  </div>
+
+  {# ── 5. BOTTOM ROW ── #}
+  <div class="db-bottom">
+
+    {# Col 1: Top services this month #}
+    {# TODO: add top_services to admin_dashboard route #}
+    {# Query: SELECT sv.name, COUNT(b.id) AS booking_count, COALESCE(SUM(i.amount),0) AS revenue #}
+    {#        FROM bookings b JOIN services sv ON sv.id=b.service_id #}
+    {#        LEFT JOIN invoices i ON i.booking_id=b.id AND i.status='paid' #}
+    {#        WHERE strftime('%Y-%m', b.booking_date) = strftime('%Y-%m', 'now') #}
+    {#        GROUP BY b.service_id ORDER BY booking_count DESC LIMIT 5 #}
+    <div class="db-card">
+      <div class="db-card__head">
+        <span class="db-card__title">Dịch vụ nổi bật tháng này</span>
+      </div>
+      <div>
+        {% if top_services | default([]) %}
+          <table class="db-svc-table">
+            <thead>
+              <tr>
+                <th>Dich vu</th>
+                <th>Luot</th>
+                <th>Doanh thu</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sv in top_services %}
+              <tr>
+                <td><span class="db-svc__name">{{ sv.name | default('—') }}</span></td>
+                <td>{{ sv.booking_count | default(0) }}</td>
+                <td><span class="db-svc__rev">€{{ sv.revenue | default(0) }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="db-empty">Chưa có dữ liệu</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Col 2: Loyalty top customers #}
+    {# TODO: add top_loyalty to admin_dashboard route #}
+    {# Query: SELECT c.full_name, mt.name AS tier_name, COALESCE(SUM(lpl.points),0) AS total_points #}
+    {#        FROM loyalty_points_log lpl JOIN customers c ON c.id=lpl.customer_id #}
+    {#        LEFT JOIN customer_memberships cm ON cm.customer_id=c.id AND cm.is_active=1 #}
+    {#        LEFT JOIN membership_tiers mt ON mt.id=cm.tier_id #}
+    {#        GROUP BY lpl.customer_id HAVING total_points > 0 ORDER BY total_points DESC LIMIT 5 #}
+    <div class="db-card">
+      <div class="db-card__head">
+        <span class="db-card__title">Khách hàng thân thiết</span>
+      </div>
+      <div class="db-loyalty-list">
+        {% if top_loyalty | default([]) %}
+          {% for c in top_loyalty %}
+          <div class="db-loyalty-item">
+            <div class="db-loyalty__avatar">
+              {{ c.full_name[:2].upper() | default('--') }}
+            </div>
+            <div class="db-loyalty__info">
+              <div class="db-loyalty__name">{{ c.full_name | default('—') }}</div>
+              <div class="db-loyalty__tier">{{ c.tier_name | default('Silver') }}</div>
+            </div>
+            <div class="db-loyalty__pts">{{ c.total_points | default(0) }} pts</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="db-empty">Chưa có dữ liệu</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Col 3: New members this month #}
+    {# TODO: add new_members to admin_dashboard route #}
+    {# Query: SELECT full_name, email, DATE(created_at) AS joined_date FROM customers #}
+    {#        WHERE strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now') #}
+    {#        ORDER BY created_at DESC LIMIT 8 #}
+    <div class="db-card">
+      <div class="db-card__head">
+        <span class="db-card__title">Khách mới tháng này</span>
+        <a href="{{ url_for('main.admin_customers') }}" class="db-card__link">Xem tất cả</a>
+      </div>
+      <div class="db-members-list">
+        {% if new_members | default([]) %}
+          {% for m in new_members %}
+          <div class="db-member-item">
+            <div class="db-member__dot"></div>
+            <div class="db-member__info">
+              <div class="db-member__name">{{ m.full_name | default('—') }}</div>
+              <div class="db-member__email">{{ m.email | default('—') }}</div>
+            </div>
+            <div class="db-member__date">{{ m.joined_date | default('') }}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="db-empty">Chưa có khách mới</div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+{# Revenue chart — Canvas bar chart #}
+{# Depends on: revenue_chart.week (7 items) and revenue_chart.month (4 items) #}
+(function () {
+  var chartData = {{ revenue_chart | tojson }};
+  var canvas = document.getElementById('db-revenue-canvas');
+  if (!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var activeRange = 'week';
+
+  function drawChart(range) {
+    var data = (chartData[range] || []);
+    var dpr = window.devicePixelRatio || 1;
+    var parent = canvas.parentElement;
+    var cssW = parent.clientWidth;
+    var cssH = 220;
+
+    canvas.width  = cssW * dpr;
+    canvas.height = cssH * dpr;
+    canvas.style.width  = cssW + 'px';
+    canvas.style.height = cssH + 'px';
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    if (!data.length) return;
+
+    var maxVal = 0;
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].value > maxVal) maxVal = data[i].value;
+    }
+    if (maxVal === 0) maxVal = 1;
+
+    var padL = 52, padR = 12, padT = 12, padB = 34;
+    var chartW = cssW - padL - padR;
+    var chartH = cssH - padT - padB;
+    var slotW  = chartW / data.length;
+    var barW   = slotW * 0.55;
+
+    {# Grid lines + Y labels #}
+    var steps = 4;
+    ctx.strokeStyle = '#e8eaed';
+    ctx.lineWidth = 0.5;
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '10px Plus Jakarta Sans, sans-serif';
+    ctx.textAlign = 'right';
+    for (var s = 0; s <= steps; s++) {
+      var y = padT + (chartH / steps) * s;
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(cssW - padR, y);
+      ctx.stroke();
+      var val = maxVal - (maxVal / steps) * s;
+      var label = val >= 1000 ? (val / 1000).toFixed(1) + 'k' : Math.round(val).toString();
+      ctx.fillStyle = '#9ca3af';
+      ctx.fillText(label, padL - 5, y + 3.5);
+    }
+
+    {# Bars #}
+    for (var j = 0; j < data.length; j++) {
+      var barH = data[j].value > 0 ? Math.max(3, (data[j].value / maxVal) * chartH) : 0;
+      var x = padL + slotW * j + (slotW - barW) / 2;
+      var y2 = padT + chartH - barH;
+
+      var grad = ctx.createLinearGradient(0, y2, 0, padT + chartH);
+      grad.addColorStop(0, 'rgba(74,144,217,0.88)');
+      grad.addColorStop(1, 'rgba(74,144,217,0.22)');
+      ctx.fillStyle = grad;
+
+      var r = Math.min(4, barH / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y2);
+      ctx.lineTo(x + barW - r, y2);
+      ctx.quadraticCurveTo(x + barW, y2, x + barW, y2 + r);
+      ctx.lineTo(x + barW, padT + chartH);
+      ctx.lineTo(x, padT + chartH);
+      ctx.lineTo(x, y2 + r);
+      ctx.quadraticCurveTo(x, y2, x + r, y2);
+      ctx.closePath();
+      ctx.fill();
+
+      {# X-axis label #}
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '10px Plus Jakarta Sans, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(data[j].label, x + barW / 2, padT + chartH + 17);
+    }
+  }
+
+  {# Tab toggle #}
+  var tabs = document.querySelectorAll('.db-chart__tab');
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabs.forEach(function (b) { b.classList.remove('db-chart__tab--active'); });
+      btn.classList.add('db-chart__tab--active');
+      activeRange = btn.dataset.range;
+      drawChart(activeRange);
+    });
+  });
+
+  drawChart(activeRange);
+
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () { drawChart(activeRange); }, 80);
+  });
+})();
+</script>
 {% endblock %}
