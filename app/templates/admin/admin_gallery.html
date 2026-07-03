@@ -1,0 +1,1400 @@
+{% extends "admin/admin_base.html" %}
+
+{#
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  ADMIN GALLERY MANAGEMENT PAGE — admin_gallery.html                 ║
+  ║  Extends: admin/admin_base.html                                     ║
+  ║  Blocks used: title, extra_css, page_title, content, extra_js       ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ⚠ CONFLICTS WITH ORIGINAL BRIEF (flagged, not silently overwritten)║
+  ║                                                                     ║
+  ║  1. Blueprint name: brief assumed endpoints named "admin.*". The    ║
+  ║     codebase's actual blueprint is "main" — all routes below use    ║
+  ║     "main.admin_gallery*", matching the existing convention         ║
+  ║     (main.admin_services, main.admin_staffs). Same call already     ║
+  ║     made in admin_services.html.                                    ║
+  ║                                                                     ║
+  ║  2. CSS variables: brief specified var(--surface-1). Does not exist ║
+  ║     in admin_base.html (hardcoded hex only, site-wide). Uses the    ║
+  ║     same hardcoded hex palette as admin_services.html instead.      ║
+  ║                                                                     ║
+  ║  3. Icon set: brief specified Tabler classes (ti-eye-off, ti-photo, ║
+  ║     ti-grip-vertical...). Not loaded anywhere in this project.      ║
+  ║     Uses Material Symbols Outlined instead (font already loaded in  ║
+  ║     admin_base.html, used site-wide) — same substitution already    ║
+  ║     made in admin_services.html.                                    ║
+  ║                                                                     ║
+  ║  4. CSRF: every POST form/fetch in this project carries a CSRF      ║
+  ║     token (Flask-WTF CSRFProtect is enabled globally in              ║
+  ║     app/__init__.py). Forms use a hidden csrf_token input; the      ║
+  ║     JSON reorder fetch() sends it via the X-CSRFToken header,       ║
+  ║     matching the pattern in customer_setting.html.                  ║
+  ║                                                                     ║
+  ║  5. Sidebar: admin_base.html was updated to add a "Gallery" nav     ║
+  ║     item (between Services and Customers) — otherwise this page     ║
+  ║     would be unreachable from the admin UI. Confirmed with user.    ║
+  ║                                                                     ║
+  ║  6. Public gallery (main.gallery / get_gallery_images) now filters  ║
+  ║     WHERE is_active = 1 so the "ẩn/hiện" toggle here actually has   ║
+  ║     an effect on the public-facing page. Minimal, necessary         ║
+  ║     consequence of adding the is_active column.                     ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  SCHEMA MIGRATION (already applied to app/database/database.db      ║
+  ║  and app/database/schema.sql):                                      ║
+  ║    ALTER TABLE gallery_images ADD COLUMN is_active INTEGER          ║
+  ║      NOT NULL DEFAULT 1;                                            ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  CONTEXT VARIABLES (provided by main.admin_gallery in routes.py):   ║
+  ║    images : list of dicts — id, image_url, alt_text, sort_order,    ║
+  ║      uploaded_at, is_active — ordered by sort_order ASC. Filtered   ║
+  ║      by q (caption search) / filter=captioned|uncaptioned.          ║
+  ║    stats  : dict — total, active, hidden                            ║
+  ║                                                                     ║
+  ║    Image path convention:                                           ║
+  ║      Stored at: static/uploads/gallery/<uuid>.ext                   ║
+  ║      Served via: url_for('static', filename='uploads/gallery/' +    ║
+  ║        img.image_url)                                               ║
+  ║      Directory is created automatically on first upload             ║
+  ║      (os.makedirs(..., exist_ok=True) in _save_gallery_image()).    ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ROUTES (implemented in routes.py / db.py):                         ║
+  ║    main.admin_gallery              GET  /admin/gallery              ║
+  ║      params: q, filter                                              ║
+  ║    main.admin_gallery_upload       POST /admin/gallery/upload       ║
+  ║      multipart/form-data — files[], alt_text, sort_order_start      ║
+  ║    main.admin_gallery_update       POST                             ║
+  ║      /admin/gallery/<id>/update — multipart/form-data               ║
+  ║      alt_text, sort_order, is_active, optional image replace        ║
+  ║    main.admin_gallery_delete       POST /admin/gallery/<id>/delete  ║
+  ║    main.admin_gallery_reorder      POST /admin/gallery/reorder      ║
+  ║      JSON body: {"order": [{"id": 1, "sort_order": 1}, ...]}        ║
+  ║    main.admin_gallery_bulk_delete  POST                             ║
+  ║      /admin/gallery/bulk-delete — form field: image_ids (CSV)       ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+#}
+
+{% block title %}Quản lý Gallery - DahaCare Admin{% endblock %}
+{% block page_title %}Quản lý Gallery{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   gl- BEM prefix — Gallery Management Page
+   ═══════════════════════════════════════════ */
+
+/* ── Page header ── */
+.gl-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.gl-page-header__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #191c1e;
+    letter-spacing: -0.3px;
+}
+
+.gl-page-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gl-page-header__actions .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.gl-btn-ghost {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.gl-btn-ghost:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+.gl-btn-ghost--active {
+    background: #eef5fc;
+    border-color: #4a90d9;
+    color: #1a5ea8;
+}
+
+.gl-btn-create {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #4a90d9;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.gl-btn-create:hover { background: #3a7bc8; }
+.gl-btn-create:active { transform: scale(0.98); }
+
+/* ── Stat strip ── */
+.gl-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.gl-stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+}
+
+.gl-stat-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.gl-stat-card__value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #191c1e;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.gl-stat-card__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.gl-stat-card__icon {
+    font-size: 20px;
+    color: #ba1a1a;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Toolbar ── */
+.gl-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.gl-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 20px;
+    padding: 4px;
+}
+
+.gl-tab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+}
+
+.gl-tab:hover { color: #191c1e; }
+
+.gl-tab--active {
+    background: #4a90d9;
+    color: #ffffff;
+}
+
+.gl-tab--active:hover { color: #ffffff; }
+
+.gl-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.gl-filter-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    min-width: 220px;
+}
+
+.gl-filter-search .material-symbols-outlined {
+    font-size: 16px;
+    color: #9ca3af;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    flex-shrink: 0;
+}
+
+.gl-filter-search input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    outline: none;
+    width: 100%;
+}
+
+.gl-filter-search input::placeholder { color: #9ca3af; }
+
+.gl-view-toggle {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+}
+
+.gl-view-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.gl-view-btn:hover { background: #f3f4f6; }
+
+.gl-view-btn--active { background: #eef5fc; color: #1a5ea8; }
+
+.gl-view-btn .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Drop zone banner ── */
+.gl-drop-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 12px;
+    background: #f7f9fb;
+    color: #6b7280;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.gl-drop-banner:hover,
+.gl-drop-banner--drag { border-color: #4a90d9; background: #eef5fc; color: #1a5ea8; }
+
+.gl-drop-banner .material-symbols-outlined {
+    font-size: 22px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.gl-drop-banner__text { font-size: 13.5px; font-weight: 600; }
+
+/* ── Bulk action bar ── */
+.gl-bulk-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    background: #eef5fc;
+    border: 1px solid #4a90d9;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1a5ea8;
+}
+
+.gl-bulk-bar--visible { display: flex; }
+
+.gl-bulk-bar__actions { display: flex; align-items: center; gap: 8px; }
+.gl-bulk-bar__actions form { display: inline; }
+
+/* ── Gallery grid ── */
+.gl-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 1280px) {
+    .gl-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.gl-grid--list { grid-template-columns: 1fr; }
+
+.gl-card {
+    position: relative;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+.gl-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+.gl-card--hidden { opacity: 0.5; }
+
+.gl-card--selected { outline: 2px solid #4a90d9; outline-offset: -2px; }
+
+.gl-grid--list .gl-card { display: flex; flex-direction: row; }
+.gl-grid--list .gl-card__thumb { width: 140px; height: 140px; flex-shrink: 0; }
+.gl-grid--list .gl-card__footer { flex: 1; }
+
+.gl-card__drag {
+    position: absolute;
+    top: 8px; left: 8px;
+    z-index: 2;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 6px;
+    color: #6b7280;
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.gl-card:hover .gl-card__drag { opacity: 1; }
+
+.gl-card__drag .material-symbols-outlined { font-size: 16px; }
+
+.gl-card__hidden-badge {
+    position: absolute;
+    top: 8px; left: 8px;
+    z-index: 2;
+    padding: 3px 9px;
+    background: rgba(0,0,0,0.6);
+    color: #ffffff;
+    font-size: 10.5px;
+    font-weight: 700;
+    border-radius: 20px;
+    letter-spacing: 0.2px;
+}
+
+.gl-card:hover .gl-card__hidden-badge { opacity: 0; }
+
+.gl-card__checkbox {
+    position: absolute;
+    top: 8px; right: 8px;
+    z-index: 2;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.9);
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    cursor: pointer;
+}
+
+.gl-card:hover .gl-card__checkbox,
+.gl-grid--select-mode .gl-card__checkbox { opacity: 1; }
+
+.gl-card__checkbox input { width: 16px; height: 16px; cursor: pointer; accent-color: #4a90d9; }
+
+.gl-card__sort-badge {
+    position: absolute;
+    bottom: 8px; left: 8px;
+    z-index: 2;
+    padding: 3px 9px;
+    background: rgba(25,28,30,0.65);
+    color: #ffffff;
+    font-size: 10.5px;
+    font-weight: 700;
+    border-radius: 20px;
+    font-variant-numeric: tabular-nums;
+}
+
+.gl-card__thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #f7f9fb;
+    overflow: hidden;
+}
+
+.gl-card__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.gl-card__thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d1d5db;
+}
+
+.gl-card__thumb-placeholder .material-symbols-outlined {
+    font-size: 32px;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 40;
+}
+
+.gl-card__footer {
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.gl-card__caption {
+    font-size: 12.5px;
+    color: #374151;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.gl-card__caption--empty { font-style: italic; color: #9ca3af; }
+
+.gl-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.gl-card__actions form { display: inline; }
+
+.gl-action-btn {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 6px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.gl-action-btn:hover { background: #e5e7eb; color: #374151; }
+
+.gl-action-btn--danger:hover { background: #fee2e2; color: #991b1b; }
+
+.gl-action-btn .material-symbols-outlined {
+    font-size: 15px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Empty state ── */
+.gl-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.gl-empty .material-symbols-outlined {
+    font-size: 48px;
+    color: #d1d5db;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
+}
+
+.gl-empty__title { font-size: 15px; font-weight: 600; color: #6b7280; }
+.gl-empty__subtitle { font-size: 13px; color: #9ca3af; }
+
+/* ── Modals ── */
+.gl-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(25, 28, 30, 0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.gl-modal-overlay--open { display: flex; }
+
+.gl-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+}
+
+.gl-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+    flex-shrink: 0;
+}
+
+.gl-modal__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #191c1e;
+}
+
+.gl-modal__close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.gl-modal__close:hover { background: #f3f4f6; color: #374151; }
+
+.gl-modal__close .material-symbols-outlined {
+    font-size: 20px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.gl-modal__body { padding: 20px 24px; flex: 1; overflow-y: auto; }
+
+.gl-modal__footer {
+    padding: 0 24px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.gl-modal__footer--split { justify-content: space-between; }
+
+/* ── Form elements ── */
+.gl-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+}
+
+.gl-form-group:last-child { margin-bottom: 0; }
+
+.gl-form-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.gl-form-input {
+    padding: 8px 12px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    background: #f7f9fb;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.gl-form-input:focus { border-color: #4a90d9; background: #ffffff; }
+
+.gl-form-hint {
+    font-size: 11.5px;
+    color: #9ca3af;
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+/* ── Upload dropzone (inside modal) ── */
+.gl-upload-dropzone {
+    position: relative;
+    min-height: 140px;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 12px;
+    background: #f7f9fb;
+    cursor: pointer;
+    padding: 16px;
+    margin-bottom: 16px;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.gl-upload-dropzone:hover,
+.gl-upload-dropzone--drag { border-color: #4a90d9; background: #eef5fc; }
+
+.gl-upload-dropzone__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 108px;
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.gl-upload-dropzone__empty .material-symbols-outlined {
+    font-size: 28px;
+    color: #c5c6cc;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 40;
+}
+
+.gl-dropzone__title { font-size: 13px; font-weight: 600; color: #6b7280; }
+.gl-dropzone__hint { font-size: 11.5px; color: #9ca3af; text-align: center; }
+
+.gl-upload-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 8px;
+}
+
+.gl-upload-preview-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #eceef0;
+}
+
+.gl-upload-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.gl-upload-preview-item__remove {
+    position: absolute;
+    top: 3px; right: 3px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(25,28,30,0.7);
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.gl-upload-preview-item__remove .material-symbols-outlined { font-size: 12px; }
+
+/* ── Edit modal preview ── */
+.gl-edit-preview {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f7f9fb;
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+
+.gl-edit-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.gl-edit-preview__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(25,28,30,0.45);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.gl-edit-preview:hover .gl-edit-preview__overlay { opacity: 1; }
+
+/* ── Toggle row (show/hide) ── */
+.gl-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    transition: background 0.15s;
+}
+
+.gl-toggle-label { font-size: 13px; font-weight: 600; color: #374151; }
+.gl-toggle-sub { font-size: 11.5px; color: #9ca3af; margin-top: 2px; }
+
+.gl-switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.gl-switch input { opacity: 0; width: 0; height: 0; }
+
+.gl-switch__slider {
+    position: absolute;
+    inset: 0;
+    background: #c5c6cc;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.gl-switch__slider::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 3px;
+    top: 3px;
+    background: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.15s;
+}
+
+.gl-switch input:checked + .gl-switch__slider { background: #4a90d9; }
+.gl-switch input:checked + .gl-switch__slider::before { transform: translateX(16px); }
+
+/* ── Buttons ── */
+.gl-btn-secondary {
+    padding: 8px 18px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #374151;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.gl-btn-secondary:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+.gl-btn-primary {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #4a90d9;
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.gl-btn-primary:hover { background: #3a7bc8; }
+.gl-btn-primary:active { transform: scale(0.98); }
+
+.gl-btn-danger {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.gl-btn-danger:hover { background: #fee2e2; }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{% set q_val = request.args.get('q', '') %}
+{% set filter_val = request.args.get('filter', '') %}
+
+{# ══════════════════════════════════════════
+   1. PAGE HEADER
+   ══════════════════════════════════════════ #}
+<div class="gl-page-header">
+    <div class="gl-page-header__title">Quản lý Gallery</div>
+    <div class="gl-page-header__actions">
+        <button type="button" class="gl-btn-ghost" id="glSelectModeBtn" onclick="glToggleSelectMode()">
+            <span class="material-symbols-outlined">checklist</span>
+            Chọn nhiều
+        </button>
+        <button type="button" class="gl-btn-create" onclick="glOpenUploadModal()">
+            <span class="material-symbols-outlined">upload</span>
+            Tải ảnh lên
+        </button>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   2. STAT STRIP — stats.total / .active / .hidden
+   ══════════════════════════════════════════ #}
+<div class="gl-stats">
+    <div class="gl-stat-card">
+        <span class="gl-stat-card__value">{{ stats.total }}</span>
+        <span class="gl-stat-card__label">Tổng ảnh</span>
+    </div>
+    <div class="gl-stat-card">
+        <span class="gl-stat-card__value">{{ stats.active }}</span>
+        <span class="gl-stat-card__label">Đang hiển thị</span>
+    </div>
+    <div class="gl-stat-card">
+        <div class="gl-stat-card__header">
+            <span class="gl-stat-card__value">{{ stats.hidden }}</span>
+            <span class="material-symbols-outlined gl-stat-card__icon">visibility_off</span>
+        </div>
+        <span class="gl-stat-card__label">Đã ẩn</span>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   3. TOOLBAR — tabs (caption filter) + search + view toggle
+   ══════════════════════════════════════════ #}
+<div class="gl-toolbar">
+    <div class="gl-tabs">
+        <a href="{{ url_for('main.admin_gallery', q=q_val or None) }}" class="gl-tab {% if filter_val == '' %}gl-tab--active{% endif %}">Tất cả</a>
+        <a href="{{ url_for('main.admin_gallery', q=q_val or None, filter='captioned') }}" class="gl-tab {% if filter_val == 'captioned' %}gl-tab--active{% endif %}">Có chú thích</a>
+        <a href="{{ url_for('main.admin_gallery', q=q_val or None, filter='uncaptioned') }}" class="gl-tab {% if filter_val == 'uncaptioned' %}gl-tab--active{% endif %}">Chưa có chú thích</a>
+    </div>
+
+    <div class="gl-toolbar-right">
+        <form method="get" action="{{ url_for('main.admin_gallery') }}" class="gl-toolbar-form">
+            <input type="hidden" name="filter" value="{{ filter_val }}">
+            <div class="gl-filter-search">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" name="q" placeholder="Tìm theo chú thích..." value="{{ q_val }}" autocomplete="off">
+            </div>
+        </form>
+
+        <div class="gl-view-toggle">
+            <button type="button" class="gl-view-btn gl-view-btn--active" id="glViewGridBtn" onclick="glSetView('grid')" title="Dạng lưới">
+                <span class="material-symbols-outlined">grid_view</span>
+            </button>
+            <button type="button" class="gl-view-btn" id="glViewListBtn" onclick="glSetView('list')" title="Dạng danh sách">
+                <span class="material-symbols-outlined">view_list</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   4. DROP ZONE BANNER
+   ══════════════════════════════════════════ #}
+<div class="gl-drop-banner" id="glDropBanner"
+     onclick="glOpenUploadModal()"
+     ondragover="glBannerDragOver(event)" ondragleave="glBannerDragLeave(event)" ondrop="glBannerDrop(event)">
+    <span class="material-symbols-outlined">cloud_upload</span>
+    <span class="gl-drop-banner__text">Kéo thả ảnh vào đây để tải lên nhanh</span>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5. BULK ACTION BAR — hidden until a card is selected
+   ══════════════════════════════════════════ #}
+<div class="gl-bulk-bar" id="glBulkBar">
+    <span id="glBulkCount">Đã chọn 0 ảnh</span>
+    <div class="gl-bulk-bar__actions">
+        <button type="button" class="gl-btn-secondary" onclick="glCancelSelect()">Hủy chọn</button>
+        <form method="post" action="{{ url_for('main.admin_gallery_bulk_delete') }}" onsubmit="return confirm('Xóa các ảnh đã chọn?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="image_ids" id="glBulkIds">
+            <button type="submit" class="gl-btn-danger">Xóa đã chọn</button>
+        </form>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   6. GALLERY GRID
+   ══════════════════════════════════════════ #}
+{% if images %}
+<div class="gl-grid" id="glGrid">
+    {% for img in images %}
+    <div class="gl-card {% if not img.is_active %}gl-card--hidden{% endif %}" data-id="{{ img.id }}">
+        <button type="button" class="gl-card__drag" title="Kéo để sắp xếp">
+            <span class="material-symbols-outlined">drag_indicator</span>
+        </button>
+
+        {% if not img.is_active %}
+        <span class="gl-card__hidden-badge">Đã ẩn</span>
+        {% endif %}
+
+        <label class="gl-card__checkbox">
+            <input type="checkbox" onchange="glToggleCard(this)">
+        </label>
+
+        <span class="gl-card__sort-badge">#{{ img.sort_order }}</span>
+
+        <div class="gl-card__thumb">
+            {% if img.image_url %}
+            <img src="{{ url_for('static', filename='uploads/gallery/' + img.image_url) }}" alt="{{ img.alt_text or '' }}">
+            {% else %}
+            <div class="gl-card__thumb-placeholder">
+                <span class="material-symbols-outlined">photo</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="gl-card__footer">
+            <span class="gl-card__caption {% if not img.alt_text %}gl-card__caption--empty{% endif %}">
+                {{ img.alt_text or 'Chưa có chú thích' }}
+            </span>
+            <div class="gl-card__actions">
+                <button type="button" class="gl-action-btn" title="Chỉnh sửa"
+                        onclick="openEditModal({{ img.id }}, '{{ img.image_url }}', '{{ (img.alt_text or '') | e }}', {{ img.sort_order }}, {{ img.is_active }})">
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+                <form method="post" action="{{ url_for('main.admin_gallery_delete', image_id=img.id) }}" onsubmit="return confirm('Xóa ảnh này?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="gl-action-btn gl-action-btn--danger" title="Xóa">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="gl-empty">
+    <span class="material-symbols-outlined">photo_library</span>
+    <div class="gl-empty__title">Chưa có ảnh nào trong gallery</div>
+    <div class="gl-empty__subtitle">Tải ảnh đầu tiên lên nhé!</div>
+</div>
+{% endif %}
+
+
+{# ══════════════════════════════════════════
+   7a. UPLOAD MODAL
+   Backend: POST main.admin_gallery_upload (multipart/form-data)
+   ══════════════════════════════════════════ #}
+<div id="glUploadModal" class="gl-modal-overlay" onclick="closeModalOnBackdrop(event, 'glUploadModal')">
+    <div class="gl-modal" onclick="event.stopPropagation()">
+
+        <div class="gl-modal__header">
+            <span class="gl-modal__title">Tải ảnh lên Gallery</span>
+            <button type="button" class="gl-modal__close" onclick="closeModal('glUploadModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" action="{{ url_for('main.admin_gallery_upload') }}" enctype="multipart/form-data" id="glUploadForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="gl-modal__body">
+
+                <div class="gl-upload-dropzone" id="glUploadDropzone"
+                     onclick="document.getElementById('glUploadInput').click()"
+                     ondragover="glDzDragOver(event)" ondragleave="glDzDragLeave(event)" ondrop="glDzDrop(event)">
+                    <div class="gl-upload-dropzone__empty" id="glUploadEmpty">
+                        <span class="material-symbols-outlined">cloud_upload</span>
+                        <span class="gl-dropzone__title">Kéo thả ảnh vào đây</span>
+                        <span class="gl-dropzone__hint">hoặc click để chọn nhiều ảnh (JPG, PNG, WEBP, tối đa 2MB/ảnh)</span>
+                    </div>
+                    <div class="gl-upload-preview-grid" id="glUploadPreviewGrid"></div>
+                </div>
+                <input type="file" name="files[]" id="glUploadInput" multiple accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="glHandleFiles(this.files)">
+
+                <div class="gl-form-group">
+                    <label class="gl-form-label">Chú thích chung (áp dụng cho tất cả ảnh)</label>
+                    <input type="text" name="alt_text" class="gl-form-input" placeholder="Ví dụ: Mẫu nail mùa hè 2026">
+                </div>
+
+                <div class="gl-form-group">
+                    <label class="gl-form-label">Số thứ tự bắt đầu</label>
+                    <input type="number" name="sort_order_start" id="glSortOrderStart" class="gl-form-input" value="{{ stats.total + 1 }}">
+                    <span class="gl-form-hint">Ảnh tải lên sẽ được đánh số thứ tự tăng dần từ giá trị này.</span>
+                </div>
+
+            </div>
+
+            <div class="gl-modal__footer">
+                <button type="button" class="gl-btn-secondary" onclick="closeModal('glUploadModal')">Hủy</button>
+                <button type="submit" class="gl-btn-primary">Tải lên</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   7b. EDIT MODAL
+   Backend: POST main.admin_gallery_update (multipart/form-data)
+   ══════════════════════════════════════════ #}
+<div id="glEditModal" class="gl-modal-overlay" onclick="closeModalOnBackdrop(event, 'glEditModal')">
+    <div class="gl-modal" onclick="event.stopPropagation()">
+
+        <div class="gl-modal__header">
+            <span class="gl-modal__title">Chỉnh sửa ảnh</span>
+            <button type="button" class="gl-modal__close" onclick="closeModal('glEditModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" id="glEditForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="gl-modal__body">
+
+                <div class="gl-edit-preview" id="glEditPreview" onclick="document.getElementById('glEditImageInput').click()">
+                    <img id="glEditPreviewImg" src="" alt="">
+                    <div class="gl-edit-preview__overlay">Thay ảnh</div>
+                </div>
+                <input type="file" name="image" id="glEditImageInput" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="glPreviewEditImage(this)">
+
+                <div class="gl-form-group">
+                    <label class="gl-form-label">Chú thích</label>
+                    <input type="text" name="alt_text" id="glEditAltText" class="gl-form-input">
+                </div>
+
+                <div class="gl-form-group">
+                    <label class="gl-form-label">Thứ tự hiển thị</label>
+                    <input type="number" name="sort_order" id="glEditSortOrder" class="gl-form-input">
+                    <span class="gl-form-hint">Số nhỏ hơn = hiển thị trước</span>
+                </div>
+
+                <div class="gl-toggle-row" id="glEditToggleRow">
+                    <div>
+                        <div class="gl-toggle-label" id="glEditToggleLabel">Hiển thị ảnh này</div>
+                        <div class="gl-toggle-sub" id="glEditToggleSub">Ảnh đang được hiển thị trong gallery công khai</div>
+                    </div>
+                    <label class="gl-switch">
+                        <input type="checkbox" name="is_active" id="glEditIsActive" value="1" onchange="glOnToggleChange(this)">
+                        <span class="gl-switch__slider"></span>
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="gl-modal__footer gl-modal__footer--split">
+                <button type="button" class="gl-btn-danger" onclick="glDeleteFromEdit()">Xóa ảnh</button>
+                <div style="display:flex; gap:8px;">
+                    <button type="button" class="gl-btn-secondary" onclick="closeModal('glEditModal')">Hủy</button>
+                    <button type="submit" class="gl-btn-primary">Lưu thay đổi</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<form method="post" id="glEditDeleteForm" style="display:none">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+</form>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script>
+
+/* ── Modal management (shared open/close, mirrors admin_services.html) ── */
+function openModal(id) {
+    document.getElementById(id).classList.add('gl-modal-overlay--open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('gl-modal-overlay--open');
+    document.body.style.overflow = '';
+}
+
+function closeModalOnBackdrop(event, id) {
+    if (event.target === event.currentTarget) closeModal(id);
+}
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        closeModal('glUploadModal');
+        closeModal('glEditModal');
+    }
+});
+
+function glBuildUrl(template, id) {
+    return template.replace('/0/', '/' + id + '/');
+}
+
+/* ── Sortable drag-to-reorder ── */
+document.addEventListener('DOMContentLoaded', function () {
+    var grid = document.getElementById('glGrid');
+    if (!grid || typeof Sortable === 'undefined') return;
+
+    Sortable.create(grid, {
+        handle: '.gl-card__drag',
+        animation: 150,
+        onEnd: function () {
+            var cards = grid.querySelectorAll('.gl-card');
+            var order = [];
+            cards.forEach(function (card, index) {
+                var sortOrder = index + 1;
+                order.push({ id: parseInt(card.dataset.id, 10), sort_order: sortOrder });
+                var badge = card.querySelector('.gl-card__sort-badge');
+                if (badge) badge.textContent = '#' + sortOrder;
+            });
+            fetch("{{ url_for('main.admin_gallery_reorder') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ order: order })
+            });
+        }
+    });
+});
+
+/* ── Select mode / bulk delete ── */
+var glSelectedIds = new Set();
+
+function glToggleSelectMode() {
+    var grid = document.getElementById('glGrid');
+    var btn = document.getElementById('glSelectModeBtn');
+    var active = btn.classList.toggle('gl-btn-ghost--active');
+    if (grid) grid.classList.toggle('gl-grid--select-mode', active);
+    if (!active) glCancelSelect();
+}
+
+function glToggleCard(checkbox) {
+    var card = checkbox.closest('.gl-card');
+    var id = card.dataset.id;
+    if (checkbox.checked) {
+        glSelectedIds.add(id);
+        card.classList.add('gl-card--selected');
+    } else {
+        glSelectedIds.delete(id);
+        card.classList.remove('gl-card--selected');
+    }
+    glUpdateBulkBar();
+}
+
+function glUpdateBulkBar() {
+    var count = glSelectedIds.size;
+    document.getElementById('glBulkCount').textContent = 'Đã chọn ' + count + ' ảnh';
+    document.getElementById('glBulkBar').classList.toggle('gl-bulk-bar--visible', count > 0);
+    document.getElementById('glBulkIds').value = Array.from(glSelectedIds).join(',');
+}
+
+function glCancelSelect() {
+    glSelectedIds.clear();
+    document.querySelectorAll('.gl-card__checkbox input').forEach(function (cb) { cb.checked = false; });
+    document.querySelectorAll('.gl-card--selected').forEach(function (c) { c.classList.remove('gl-card--selected'); });
+    glUpdateBulkBar();
+}
+
+/* ── View toggle (grid / list) — client-side only ── */
+function glSetView(view) {
+    var grid = document.getElementById('glGrid');
+    if (grid) grid.classList.toggle('gl-grid--list', view === 'list');
+    document.getElementById('glViewGridBtn').classList.toggle('gl-view-btn--active', view === 'grid');
+    document.getElementById('glViewListBtn').classList.toggle('gl-view-btn--active', view === 'list');
+}
+
+/* ── Drop zone banner (page-level) ── */
+function glBannerDragOver(e) {
+    e.preventDefault();
+    document.getElementById('glDropBanner').classList.add('gl-drop-banner--drag');
+}
+
+function glBannerDragLeave() {
+    document.getElementById('glDropBanner').classList.remove('gl-drop-banner--drag');
+}
+
+function glBannerDrop(e) {
+    e.preventDefault();
+    document.getElementById('glDropBanner').classList.remove('gl-drop-banner--drag');
+    if (e.dataTransfer.files.length) {
+        glOpenUploadModal();
+        glHandleFiles(e.dataTransfer.files);
+    }
+}
+
+/* ── Upload modal: multi-file queue + preview grid ── */
+var glUploadFiles = [];
+
+function glOpenUploadModal() {
+    glUploadFiles = [];
+    glSyncUploadInput();
+    glRenderUploadPreview();
+    document.getElementById('glUploadForm').reset();
+    openModal('glUploadModal');
+}
+
+function glHandleFiles(fileList) {
+    for (var i = 0; i < fileList.length; i++) glUploadFiles.push(fileList[i]);
+    glSyncUploadInput();
+    glRenderUploadPreview();
+}
+
+function glSyncUploadInput() {
+    var dt = new DataTransfer();
+    glUploadFiles.forEach(function (f) { dt.items.add(f); });
+    document.getElementById('glUploadInput').files = dt.files;
+}
+
+function glRenderUploadPreview() {
+    var grid = document.getElementById('glUploadPreviewGrid');
+    grid.innerHTML = '';
+    glUploadFiles.forEach(function (file, index) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var item = document.createElement('div');
+            item.className = 'gl-upload-preview-item';
+            var img = document.createElement('img');
+            img.src = e.target.result;
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'gl-upload-preview-item__remove';
+            removeBtn.innerHTML = '<span class="material-symbols-outlined">close</span>';
+            removeBtn.onclick = function () { glRemoveUploadFile(index); };
+            item.appendChild(img);
+            item.appendChild(removeBtn);
+            grid.appendChild(item);
+        };
+        reader.readAsDataURL(file);
+    });
+    document.getElementById('glUploadEmpty').style.display = glUploadFiles.length ? 'none' : 'flex';
+}
+
+function glRemoveUploadFile(index) {
+    glUploadFiles.splice(index, 1);
+    glSyncUploadInput();
+    glRenderUploadPreview();
+}
+
+function glDzDragOver(e) {
+    e.preventDefault();
+    document.getElementById('glUploadDropzone').classList.add('gl-upload-dropzone--drag');
+}
+
+function glDzDragLeave() {
+    document.getElementById('glUploadDropzone').classList.remove('gl-upload-dropzone--drag');
+}
+
+function glDzDrop(e) {
+    e.preventDefault();
+    document.getElementById('glUploadDropzone').classList.remove('gl-upload-dropzone--drag');
+    if (e.dataTransfer.files.length) glHandleFiles(e.dataTransfer.files);
+}
+
+/* ── Edit modal ── */
+var glCurrentEditId = null;
+var GL_UPDATE_URL_TEMPLATE = "{{ url_for('main.admin_gallery_update', image_id=0) }}";
+var GL_DELETE_URL_TEMPLATE = "{{ url_for('main.admin_gallery_delete', image_id=0) }}";
+var GL_IMG_BASE = "{{ url_for('static', filename='uploads/gallery/') }}";
+
+function openEditModal(id, imageUrl, altText, sortOrder, isActive) {
+    glCurrentEditId = id;
+    document.getElementById('glEditForm').action = glBuildUrl(GL_UPDATE_URL_TEMPLATE, id);
+    document.getElementById('glEditPreviewImg').src = imageUrl ? GL_IMG_BASE + imageUrl : '';
+    document.getElementById('glEditAltText').value = altText;
+    document.getElementById('glEditSortOrder').value = sortOrder;
+    document.getElementById('glEditImageInput').value = '';
+
+    var toggle = document.getElementById('glEditIsActive');
+    toggle.checked = !!isActive;
+    glOnToggleChange(toggle);
+
+    openModal('glEditModal');
+}
+
+function glOnToggleChange(el) {
+    var row = document.getElementById('glEditToggleRow');
+    var label = document.getElementById('glEditToggleLabel');
+    var sub = document.getElementById('glEditToggleSub');
+    if (el.checked) {
+        label.textContent = 'Hiển thị ảnh này';
+        sub.textContent = 'Ảnh đang được hiển thị trong gallery công khai';
+        row.style.background = '#f7f9fb';
+    } else {
+        label.textContent = 'Ẩn ảnh này';
+        sub.textContent = 'Ảnh sẽ không hiển thị trong gallery công khai';
+        row.style.background = '#FCEBEB';
+    }
+}
+
+function glPreviewEditImage(input) {
+    var file = input.files && input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (e) { document.getElementById('glEditPreviewImg').src = e.target.result; };
+    reader.readAsDataURL(file);
+}
+
+function glDeleteFromEdit() {
+    if (!glCurrentEditId) return;
+    if (!confirm('Xóa ảnh này?')) return;
+    var form = document.getElementById('glEditDeleteForm');
+    form.action = glBuildUrl(GL_DELETE_URL_TEMPLATE, glCurrentEditId);
+    form.submit();
+}
+
+</script>
+{% endblock %}
