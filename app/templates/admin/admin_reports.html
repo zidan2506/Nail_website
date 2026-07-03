@@ -1,0 +1,645 @@
+{% extends "admin/admin_base.html" %}
+
+{#
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  ADMIN REPORTS & STATISTICS — admin_reports.html                     ║
+  ║  Extends: admin/admin_base.html                                      ║
+  ║  Blocks used: title, page_title, extra_css, content, extra_js        ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ⚠ ĐÃ CHỈNH SO VỚI BRIEF GỐC (flag, không ghi đè im lặng):          ║
+  ║                                                                      ║
+  ║  1. Endpoint: brief dùng "admin.reports"/"admin.export_report_csv". ║
+  ║     Blueprint thực tế là "main" → dùng main.admin_reports /         ║
+  ║     main.export_report_csv (nav ở base đã trỏ main.admin_reports).  ║
+  ║  2. Icon: base load Material Symbols, KHÔNG phải Tabler → dùng      ║
+  ║     "download", "assessment"... thay cho ti-*.                       ║
+  ║  3. CSS vars var(--surface-2)/var(--border) KHÔNG tồn tại → dùng    ║
+  ║     bảng màu hex đã thiết lập trong admin panel (thẻ trắng, viền    ║
+  ║     #e4e6ea, chữ phụ #6b7280, accent #4a90d9).                       ║
+  ║  4. "| enumerate" KHÔNG phải filter đã đăng ký → dùng loop.index.   ║
+  ║  5. Route/db backend đã được viết kèm (routes.py + db.py).          ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  CONTEXT (route main.admin_reports cung cấp):                       ║
+  ║   kpi: total_revenue, revenue_trend%, total_bookings,               ║
+  ║        bookings_trend%, new_customers, customers_trend(±tuyệt đối),  ║
+  ║        points_issued, points_trend%                                  ║
+  ║   revenue_by_day: [{label, amount, pct}]                            ║
+  ║   booking_status_breakdown: [{status, label, count, pct, color,     ║
+  ║        cumulative_offset}]  · total_bookings_count                   ║
+  ║   top_services: [{name, booking_count, revenue, revenue_pct}]       ║
+  ║   staff_performance: [{full_name, initials, booking_count, revenue, ║
+  ║        revenue_pct}]                                                 ║
+  ║   customer_growth: [{label, month, year, count, pct, is_current,    ║
+  ║        growth_pct}] — luôn 6 tháng gần nhất                          ║
+  ║   loyalty: {total_issued, total_redeemed, net_points,               ║
+  ║        redemption_count, sources:[{source, source_label, points}]}  ║
+  ║   date_from, date_to, active_preset (''=custom)                     ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+#}
+
+{% block title %}Báo cáo & Thống kê - DahaCare Admin{% endblock %}
+{% block page_title %}Báo cáo & Thống kê{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   rp- BEM prefix — Reports & Statistics page
+   ═══════════════════════════════════════════ */
+
+/* ── Page header ── */
+.rp-page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.rp-page-header__title { font-size: 20px; font-weight: 700; color: #191c1e; letter-spacing: -0.3px; }
+.rp-page-header__subtitle { font-size: 13px; color: #6b7280; margin-top: 3px; }
+
+.rp-btn-ghost {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 16px;
+    background: #ffffff; color: #44474c;
+    border: 1px solid #d5d8dd; border-radius: 8px;
+    font-size: 13.5px; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    text-decoration: none; cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+.rp-btn-ghost:hover { background: #f2f4f7; border-color: #c5c6cc; }
+.rp-btn-ghost:active { transform: translateY(1px); }
+.rp-btn-ghost .material-symbols-outlined { font-size: 18px; }
+
+/* ── Filter bar ── */
+.rp-filter {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+    background: #ffffff; border: 1px solid #e4e6ea; border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 20px;
+}
+.rp-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.rp-tab {
+    padding: 7px 14px; border-radius: 8px;
+    border: 1px solid transparent; background: transparent;
+    color: #6b7280; font-size: 13px; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    text-decoration: none; cursor: pointer; transition: all 0.15s ease;
+}
+.rp-tab:hover { background: #f2f4f7; color: #191c1e; }
+.rp-tab--active { background: #eaf3fc; color: #2f6fb0; border-color: #cfe3f7; }
+
+.rp-range { display: flex; align-items: center; gap: 8px; }
+.rp-range__sep { color: #9aa0aa; font-size: 12px; }
+.rp-date {
+    padding: 7px 10px; border: 1px solid #d5d8dd; border-radius: 8px;
+    font-size: 13px; color: #191c1e; font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #ffffff;
+}
+.rp-date:focus { outline: none; border-color: #4a90d9; box-shadow: 0 0 0 3px rgba(74,144,217,0.12); }
+.rp-btn-apply {
+    padding: 8px 14px; background: #4a90d9; color: #ffffff;
+    border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer;
+    transition: background 0.15s ease;
+}
+.rp-btn-apply:hover { background: #3a7bc8; }
+
+/* ── KPI row ── */
+.rp-kpi-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-bottom: 20px;
+}
+.rp-kpi {
+    background: #ffffff; border: 1px solid #e4e6ea; border-radius: 12px;
+    padding: 18px;
+}
+.rp-kpi__head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.rp-kpi__icon {
+    width: 38px; height: 38px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    background: #eaf3fc; color: #2f6fb0; flex-shrink: 0;
+}
+.rp-kpi__icon .material-symbols-outlined { font-size: 20px; }
+.rp-kpi__label { font-size: 12.5px; color: #6b7280; font-weight: 600; }
+.rp-kpi__value { font-size: 24px; font-weight: 700; color: #191c1e; letter-spacing: -0.5px; }
+.rp-kpi__foot { margin-top: 8px; }
+
+.rp-trend { display: inline-flex; align-items: center; gap: 3px; font-size: 12.5px; font-weight: 700; }
+.rp-trend .material-symbols-outlined { font-size: 15px; }
+.rp-trend__note { color: #9aa0aa; font-weight: 500; margin-left: 3px; }
+.rp-trend--up { color: #0F6E56; }
+.rp-trend--down { color: #A32D2D; }
+
+/* ── Generic card ── */
+.rp-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.rp-card {
+    background: #ffffff; border: 1px solid #e4e6ea; border-radius: 12px;
+    padding: 18px; min-width: 0;
+}
+.rp-card__head { margin-bottom: 16px; }
+.rp-card__title { font-size: 15px; font-weight: 700; color: #191c1e; }
+.rp-card__sub { font-size: 12px; color: #9aa0aa; margin-top: 2px; }
+
+/* ── Revenue by day: dynamic period header ── */
+.rp-card__head--rev { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.rp-chart-period { font-size: 12px; font-weight: 600; color: #6b7280; text-align: right; flex-shrink: 0; white-space: nowrap; }
+
+/* ── Revenue by day: dynamic bar chart (grouping varies by preset) ── */
+.rp-chart-wrap { display: flex; align-items: flex-end; gap: 4px; }
+.rp-chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+.rp-chart-bar-val { height: 14px; font-size: 10.5px; font-weight: 700; color: #191c1e; white-space: nowrap; }
+.rp-chart-bar-val--hidden { visibility: hidden; }
+.rp-chart-bar-track { width: 100%; height: 130px; display: flex; align-items: flex-end; justify-content: center; }
+.rp-chart-bar {
+    width: 100%; max-width: 26px; min-height: 3px;
+    background: #4A90D9; border-radius: 4px 4px 0 0;
+    transition: opacity 0.15s ease; cursor: default;
+}
+.rp-chart-bar:hover { opacity: 0.82; }
+.rp-chart-bar--current { background: #1E2A3A; }
+.rp-chart-bar-lbl { font-size: 10.5px; color: #9aa0aa; font-weight: 600; white-space: nowrap; }
+.rp-chart--dense .rp-chart-bar-lbl { font-size: 9px; }
+
+.rp-empty {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; padding: 32px 16px; color: #9aa0aa; text-align: center;
+}
+.rp-empty .material-symbols-outlined { font-size: 30px; opacity: 0.6; }
+.rp-empty span:last-child { font-size: 13px; }
+
+/* ── CSS bar chart ── */
+.rp-bars {
+    display: flex; align-items: flex-end; gap: 4px;
+    height: 150px; padding-top: 8px;
+}
+.rp-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+.rp-bar-track { width: 100%; height: 130px; display: flex; align-items: flex-end; justify-content: center; }
+.rp-bar {
+    width: 100%; max-width: 26px; min-height: 3px;
+    background: #4A90D9; border-radius: 4px 4px 0 0;
+    transition: opacity 0.15s ease; cursor: default;
+    animation: rp-bar-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.rp-bar:hover { opacity: 0.82; }
+.rp-bar--current { background: #1E2A3A; }
+.rp-bar__label { font-size: 10.5px; color: #9aa0aa; font-weight: 600; }
+
+@keyframes rp-bar-rise { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .rp-bar { animation: none; } }
+
+/* ── Donut ── */
+.rp-donut-wrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.rp-donut { position: relative; width: 150px; height: 150px; flex-shrink: 0; }
+.rp-donut svg { width: 100%; height: 100%; }
+.rp-donut__seg { transition: opacity 0.15s ease; }
+.rp-donut__seg:hover { opacity: 0.82; }
+.rp-donut__center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.rp-donut__total { font-size: 26px; font-weight: 700; color: #191c1e; line-height: 1; }
+.rp-donut__caption { font-size: 11px; color: #9aa0aa; margin-top: 3px; }
+
+.rp-legend { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 150px; }
+.rp-legend__row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.rp-legend__dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.rp-legend__label { color: #44474c; font-weight: 600; }
+.rp-legend__meta { margin-left: auto; color: #6b7280; font-weight: 600; font-size: 12.5px; }
+
+/* ── Ranked table (top services) ── */
+.rp-rank-table { width: 100%; border-collapse: collapse; }
+.rp-rank-table th {
+    text-align: left; font-size: 11px; font-weight: 700; color: #9aa0aa;
+    text-transform: uppercase; letter-spacing: 0.4px; padding: 0 8px 10px; border-bottom: 1px solid #eceef0;
+}
+.rp-rank-table th.rp-num, .rp-rank-table td.rp-num { text-align: right; }
+.rp-rank-table td { padding: 12px 8px; font-size: 13.5px; color: #191c1e; border-bottom: 1px solid #f2f4f7; }
+.rp-rank-table tr:last-child td { border-bottom: none; }
+.rp-rank-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 7px;
+    font-size: 12px; font-weight: 700; color: #6b7280; background: #f2f4f7;
+}
+.rp-rank-badge--1 { background: #fdf3d6; color: #96731b; }
+.rp-rank-badge--2 { background: #eef1f4; color: #667080; }
+.rp-rank-badge--3 { background: #f6e6d8; color: #97591f; }
+.rp-rank-pct { color: #6b7280; font-weight: 600; }
+
+/* ── Staff performance ── */
+.rp-staff-list { display: flex; flex-direction: column; gap: 14px; }
+.rp-staff { display: flex; align-items: center; gap: 12px; }
+.rp-staff__avatar {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: #eaf3fc; color: #2f6fb0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+}
+.rp-staff__body { flex: 1; min-width: 0; }
+.rp-staff__top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+.rp-staff__name { font-size: 13.5px; font-weight: 600; color: #191c1e; }
+.rp-staff__value { font-size: 13px; font-weight: 700; color: #191c1e; flex-shrink: 0; }
+.rp-staff__meta { font-size: 11.5px; color: #9aa0aa; }
+.rp-staff__bar { height: 6px; background: #f2f4f7; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+.rp-staff__fill {
+    height: 100%; background: #4A90D9; border-radius: 4px;
+    animation: rp-fill-grow 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes rp-fill-grow { from { transform: scaleX(0); transform-origin: left; } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .rp-staff__fill { animation: none; } }
+
+/* ── Customer growth mini table ── */
+.rp-mini-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+.rp-mini-table th {
+    text-align: left; font-size: 11px; font-weight: 700; color: #9aa0aa;
+    text-transform: uppercase; letter-spacing: 0.4px; padding: 8px; border-bottom: 1px solid #eceef0;
+}
+.rp-mini-table th.rp-num, .rp-mini-table td.rp-num { text-align: right; }
+.rp-mini-table td { padding: 9px 8px; font-size: 13px; color: #191c1e; border-bottom: 1px solid #f2f4f7; }
+.rp-mini-table tr:last-child td { border-bottom: none; }
+
+/* ── Loyalty ── */
+.rp-loy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.rp-loy-box { background: #f8fafc; border: 1px solid #eceef0; border-radius: 10px; padding: 13px; }
+.rp-loy-box__label { font-size: 11.5px; color: #6b7280; font-weight: 600; margin-bottom: 4px; }
+.rp-loy-box__value { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; color: #191c1e; }
+.rp-loy-box__value--pos { color: #0F6E56; }
+.rp-loy-box__value--neg { color: #A32D2D; }
+
+.rp-src-title { font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+.rp-src-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #f2f4f7; font-size: 13.5px; }
+.rp-src-row:last-child { border-bottom: none; }
+.rp-src-row__label { color: #44474c; }
+.rp-src-row__points { color: #0F6E56; font-weight: 700; }
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+    .rp-kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 860px) {
+    .rp-grid-2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+    .rp-kpi-row { grid-template-columns: 1fr; }
+    .rp-filter { flex-direction: column; align-items: stretch; }
+    .rp-range { justify-content: space-between; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+{# ── 1. Page header ── #}
+<div class="rp-page-header">
+    <div>
+        <div class="rp-page-header__title">Báo cáo & Thống kê</div>
+        <div class="rp-page-header__subtitle">Dữ liệu từ {{ date_from }} đến {{ date_to }}</div>
+    </div>
+    {% if active_preset %}
+    <a class="rp-btn-ghost" href="{{ url_for('main.export_report_csv', preset=active_preset) }}">
+        <span class="material-symbols-outlined">download</span> Xuất CSV
+    </a>
+    {% else %}
+    <a class="rp-btn-ghost" href="{{ url_for('main.export_report_csv', date_from=date_from, date_to=date_to) }}">
+        <span class="material-symbols-outlined">download</span> Xuất CSV
+    </a>
+    {% endif %}
+</div>
+
+{# ── 2. Date filter bar (một form GET bao toàn bộ) ── #}
+{# Backend resolve preset → date_from/date_to thực trước khi query; template chỉ truyền params. #}
+<form class="rp-filter" method="get">
+    <div class="rp-tabs">
+        {% set presets = [('today','Hôm nay'), ('7days','7 ngày'), ('month','Tháng này'), ('3months','3 tháng'), ('year','Năm nay')] %}
+        {% for value, text in presets %}
+        <button type="submit" name="preset" value="{{ value }}"
+                class="rp-tab {% if active_preset == value %}rp-tab--active{% endif %}">{{ text }}</button>
+        {% endfor %}
+    </div>
+    <div class="rp-range">
+        <input type="date" name="date_from" class="rp-date" value="{{ request.args.get('date_from', '') }}">
+        <span class="rp-range__sep">→</span>
+        <input type="date" name="date_to" class="rp-date" value="{{ request.args.get('date_to', '') }}">
+        <button type="submit" class="rp-btn-apply">Áp dụng</button>
+    </div>
+</form>
+
+{# ── 3. KPI summary row ── #}
+<div class="rp-kpi-row">
+    {# Tổng doanh thu #}
+    <div class="rp-kpi">
+        <div class="rp-kpi__head">
+            <div class="rp-kpi__icon"><span class="material-symbols-outlined">payments</span></div>
+            <div class="rp-kpi__label">Tổng doanh thu</div>
+        </div>
+        <div class="rp-kpi__value">{{ kpi.total_revenue | format_currency }}</div>
+        <div class="rp-kpi__foot">
+            <span class="rp-trend {{ 'rp-trend--up' if kpi.revenue_trend >= 0 else 'rp-trend--down' }}">
+                <span class="material-symbols-outlined">{{ 'trending_up' if kpi.revenue_trend >= 0 else 'trending_down' }}</span>
+                {{ kpi.revenue_trend }}%<span class="rp-trend__note">so với kỳ trước</span>
+            </span>
+        </div>
+    </div>
+    {# Tổng booking #}
+    <div class="rp-kpi">
+        <div class="rp-kpi__head">
+            <div class="rp-kpi__icon"><span class="material-symbols-outlined">event_available</span></div>
+            <div class="rp-kpi__label">Tổng booking</div>
+        </div>
+        <div class="rp-kpi__value">{{ kpi.total_bookings }}</div>
+        <div class="rp-kpi__foot">
+            <span class="rp-trend {{ 'rp-trend--up' if kpi.bookings_trend >= 0 else 'rp-trend--down' }}">
+                <span class="material-symbols-outlined">{{ 'trending_up' if kpi.bookings_trend >= 0 else 'trending_down' }}</span>
+                {{ kpi.bookings_trend }}%<span class="rp-trend__note">so với kỳ trước</span>
+            </span>
+        </div>
+    </div>
+    {# Khách hàng mới #}
+    <div class="rp-kpi">
+        <div class="rp-kpi__head">
+            <div class="rp-kpi__icon"><span class="material-symbols-outlined">person_add</span></div>
+            <div class="rp-kpi__label">Khách hàng mới</div>
+        </div>
+        <div class="rp-kpi__value">{{ kpi.new_customers }}</div>
+        <div class="rp-kpi__foot">
+            <span class="rp-trend {{ 'rp-trend--up' if kpi.customers_trend >= 0 else 'rp-trend--down' }}">
+                <span class="material-symbols-outlined">{{ 'trending_up' if kpi.customers_trend >= 0 else 'trending_down' }}</span>
+                {{ '+' if kpi.customers_trend >= 0 else '' }}{{ kpi.customers_trend }}<span class="rp-trend__note">so với kỳ trước</span>
+            </span>
+        </div>
+    </div>
+    {# Điểm loyalty đã phát #}
+    <div class="rp-kpi">
+        <div class="rp-kpi__head">
+            <div class="rp-kpi__icon"><span class="material-symbols-outlined">stars</span></div>
+            <div class="rp-kpi__label">Điểm loyalty đã phát</div>
+        </div>
+        <div class="rp-kpi__value">{{ kpi.points_issued }}</div>
+        <div class="rp-kpi__foot">
+            <span class="rp-trend {{ 'rp-trend--up' if kpi.points_trend >= 0 else 'rp-trend--down' }}">
+                <span class="material-symbols-outlined">{{ 'trending_up' if kpi.points_trend >= 0 else 'trending_down' }}</span>
+                {{ kpi.points_trend }}%<span class="rp-trend__note">so với kỳ trước</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+{# ── 4. Revenue chart + Booking status donut ── #}
+<div class="rp-grid-2">
+    {# Doanh thu theo ngày #}
+    {# revenue_chart_data computed in route based on active_preset or custom date range #}
+    {# Deviation from brief: added .rp-chart-bar-track (fixed 130px) around .rp-chart-bar instead of
+       sizing .rp-chart-bar-wrap itself to 130px — a wrap that also holds the value/day labels inside
+       a 130px box overflows once a bar reaches high pct (same bug already hit once on this card). #}
+    <div class="rp-card">
+        <div class="rp-card__head rp-card__head--rev">
+            <div>
+                <div class="rp-card__title">Doanh thu theo ngày</div>
+                <div class="rp-card__sub">Chỉ tính hóa đơn đã thanh toán</div>
+            </div>
+            {% if active_preset == 'today' %}
+                {% set period_label = 'Hôm nay theo giờ' %}
+            {% elif active_preset == '7days' %}
+                {% set period_label = '7 ngày gần nhất' %}
+            {% elif active_preset == 'month' %}
+                {% set period_label = 'Tháng ' ~ (date_to[5:7] | int) ~ '/' ~ date_to[0:4] %}
+            {% elif active_preset == '3months' %}
+                {% set period_label = '3 tháng gần nhất' %}
+            {% elif active_preset == 'year' %}
+                {% set period_label = 'Năm ' ~ date_to[0:4] %}
+            {% else %}
+                {% set period_label = (date_from | format_date) ~ ' – ' ~ (date_to | format_date) %}
+            {% endif %}
+            <div class="rp-chart-period">{{ period_label }}</div>
+        </div>
+        {% set chart_data = revenue_chart_data | default([]) %}
+        {% if chart_data %}
+        <div class="rp-chart-wrap {% if chart_data | length > 12 %}rp-chart--dense{% endif %}">
+            {% for d in chart_data %}
+            <div class="rp-chart-bar-wrap">
+                <div class="rp-chart-bar-val {% if d.pct <= 20 %}rp-chart-bar-val--hidden{% endif %}">{{ d.amount | int }}€</div>
+                <div class="rp-chart-bar-track">
+                    <div class="rp-chart-bar {% if d.is_current %}rp-chart-bar--current{% endif %}"
+                         style="height: {{ d.pct }}%"
+                         title="{{ d.tooltip }}"></div>
+                </div>
+                <div class="rp-chart-bar-lbl">{{ d.label }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="rp-empty">
+            <span class="material-symbols-outlined">bar_chart</span>
+            <span>Không có dữ liệu trong khoảng thời gian này</span>
+        </div>
+        {% endif %}
+    </div>
+
+    {# Thống kê booking (donut) #}
+    <div class="rp-card">
+        <div class="rp-card__head">
+            <div class="rp-card__title">Thống kê booking</div>
+            <div class="rp-card__sub">Phân bố theo trạng thái</div>
+        </div>
+        {% if booking_status_breakdown %}
+        <div class="rp-donut-wrap">
+            <div class="rp-donut">
+                <svg viewBox="0 0 36 36">
+                    {# Vòng nền #}
+                    <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#f2f4f7" stroke-width="3.6"></circle>
+                    {% for s in booking_status_breakdown %}
+                    {# dasharray = pct (100-pct); dashoffset âm = dịch điểm bắt đầu theo chiều kim đồng hồ #}
+                    <circle class="rp-donut__seg" cx="18" cy="18" r="15.9155" fill="none"
+                            stroke="{{ s.color }}" stroke-width="3.6"
+                            stroke-dasharray="{{ s.pct }} {{ 100 - s.pct }}"
+                            stroke-dashoffset="{{ -s.cumulative_offset }}"
+                            transform="rotate(-90 18 18)">
+                        <title>{{ s.label }}: {{ s.count }} ({{ s.pct }}%)</title>
+                    </circle>
+                    {% endfor %}
+                </svg>
+                <div class="rp-donut__center">
+                    <div class="rp-donut__total">{{ total_bookings_count }}</div>
+                    <div class="rp-donut__caption">booking</div>
+                </div>
+            </div>
+            <div class="rp-legend">
+                {% for s in booking_status_breakdown %}
+                <div class="rp-legend__row">
+                    <span class="rp-legend__dot" style="background: {{ s.color }}"></span>
+                    <span class="rp-legend__label">{{ s.label }}</span>
+                    <span class="rp-legend__meta">{{ s.count }} · {{ s.pct }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="rp-empty">
+            <span class="material-symbols-outlined">donut_large</span>
+            <span>Chưa có booking trong khoảng này</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ── 5. Top services + Staff performance ── #}
+<div class="rp-grid-2">
+    {# Top dịch vụ bán chạy #}
+    <div class="rp-card">
+        <div class="rp-card__head">
+            <div class="rp-card__title">Top dịch vụ bán chạy</div>
+            <div class="rp-card__sub">Theo doanh thu</div>
+        </div>
+        {% if top_services %}
+        <table class="rp-rank-table">
+            <thead>
+                <tr>
+                    <th style="width: 34px;">#</th>
+                    <th>Dịch vụ</th>
+                    <th class="rp-num">Lượt</th>
+                    <th class="rp-num">Doanh thu</th>
+                    <th class="rp-num">Tỉ lệ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sv in top_services %}
+                <tr>
+                    <td><span class="rp-rank-badge rp-rank-badge--{{ loop.index }}">{{ loop.index }}</span></td>
+                    <td>{{ sv.name }}</td>
+                    <td class="rp-num">{{ sv.booking_count }}</td>
+                    <td class="rp-num">{{ sv.revenue | format_currency }}</td>
+                    <td class="rp-num rp-rank-pct">{{ sv.revenue_pct }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="rp-empty">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span>Chưa có dữ liệu dịch vụ</span>
+        </div>
+        {% endif %}
+    </div>
+
+    {# Hiệu suất nhân viên #}
+    <div class="rp-card">
+        <div class="rp-card__head">
+            <div class="rp-card__title">Hiệu suất nhân viên</div>
+            <div class="rp-card__sub">Theo doanh thu tạo ra</div>
+        </div>
+        {% if staff_performance %}
+        <div class="rp-staff-list">
+            {% for s in staff_performance %}
+            <div class="rp-staff">
+                <div class="rp-staff__avatar">{{ s.initials }}</div>
+                <div class="rp-staff__body">
+                    <div class="rp-staff__top">
+                        <div>
+                            <div class="rp-staff__name">{{ s.full_name }}</div>
+                            <div class="rp-staff__meta">{{ s.booking_count }} booking · {{ s.revenue | format_currency }}</div>
+                        </div>
+                        <div class="rp-staff__value">{{ s.revenue | format_currency }}</div>
+                    </div>
+                    <div class="rp-staff__bar">
+                        <div class="rp-staff__fill" style="width: {{ s.revenue_pct }}%; animation-delay: {{ loop.index0 * 60 }}ms"></div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="rp-empty">
+            <span class="material-symbols-outlined">groups</span>
+            <span>Chưa có dữ liệu nhân viên</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ── 6. Customer growth + Loyalty points ── #}
+<div class="rp-grid-2">
+    {# Tăng trưởng khách hàng mới #}
+    <div class="rp-card">
+        <div class="rp-card__head">
+            <div class="rp-card__title">Tăng trưởng khách hàng mới</div>
+            <div class="rp-card__sub">6 tháng gần nhất</div>
+        </div>
+        <div class="rp-bars">
+            {% for m in customer_growth %}
+            <div class="rp-bar-col">
+                <div class="rp-bar-track">
+                    <div class="rp-bar {% if m.is_current %}rp-bar--current{% endif %}"
+                         style="height: {{ m.pct if m.pct > 0 else 2 }}%; animation-delay: {{ loop.index0 * 60 }}ms"
+                         title="{{ m.label }}: {{ m.count }} khách mới"></div>
+                </div>
+                <div class="rp-bar__label">{{ m.label }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {# Bảng gọn: 3 tháng gần nhất #}
+        <table class="rp-mini-table">
+            <thead>
+                <tr>
+                    <th>Tháng</th>
+                    <th class="rp-num">Khách mới</th>
+                    <th class="rp-num">Tăng trưởng</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in customer_growth[-3:] %}
+                <tr>
+                    <td>{{ m.label }}/{{ m.year }}</td>
+                    <td class="rp-num">{{ m.count }}</td>
+                    <td class="rp-num">
+                        <span class="rp-trend {{ 'rp-trend--up' if m.growth_pct >= 0 else 'rp-trend--down' }}">
+                            {{ '+' if m.growth_pct >= 0 else '' }}{{ m.growth_pct }}%
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Loyalty points #}
+    <div class="rp-card">
+        <div class="rp-card__head">
+            <div class="rp-card__title">Loyalty points</div>
+            <div class="rp-card__sub">Phát hành & Đổi điểm</div>
+        </div>
+        <div class="rp-loy-grid">
+            <div class="rp-loy-box">
+                <div class="rp-loy-box__label">Điểm đã phát hành</div>
+                <div class="rp-loy-box__value rp-loy-box__value--pos">+{{ loyalty.total_issued }}</div>
+            </div>
+            <div class="rp-loy-box">
+                <div class="rp-loy-box__label">Điểm đã đổi</div>
+                <div class="rp-loy-box__value rp-loy-box__value--neg">-{{ loyalty.total_redeemed }}</div>
+            </div>
+            <div class="rp-loy-box">
+                <div class="rp-loy-box__label">Điểm ròng còn lại</div>
+                <div class="rp-loy-box__value">{{ loyalty.net_points }}</div>
+            </div>
+            <div class="rp-loy-box">
+                <div class="rp-loy-box__label">Lượt đổi quà</div>
+                <div class="rp-loy-box__value">{{ loyalty.redemption_count }}</div>
+            </div>
+        </div>
+        <div class="rp-src-title">Nguồn phát điểm</div>
+        {% if loyalty.sources %}
+        {% for src in loyalty.sources %}
+        <div class="rp-src-row">
+            <span class="rp-src-row__label">{{ src.source_label }}</span>
+            <span class="rp-src-row__points">+{{ src.points }}</span>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="rp-empty">
+            <span class="material-symbols-outlined">redeem</span>
+            <span>Chưa phát điểm trong khoảng này</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
