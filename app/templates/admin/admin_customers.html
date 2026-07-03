@@ -1,0 +1,1611 @@
+{% extends "admin/admin_base.html" %}
+
+{#
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  ADMIN CUSTOMER MANAGEMENT PAGE — admin_customers.html               ║
+  ║  Extends: admin/admin_base.html                                     ║
+  ║  Blocks used: title, extra_css, page_title, content, extra_js       ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ⚠ CONFLICTS WITH ORIGINAL BRIEF (flagged, not silently overwritten)║
+  ║                                                                     ║
+  ║  1. Blueprint name: brief assumed endpoints named "admin.*".        ║
+  ║     Codebase's actual blueprint is "main" (main = Blueprint("main", ║
+  ║     __name__)). All routes below use "main.*", matching             ║
+  ║     admin_bookings.html / admin_staff.html. A stub route            ║
+  ║     main.admin_customers already exists at routes.py:1884 (renders  ║
+  ║     admin_dashboard.html as placeholder) — needs to be rewritten.   ║
+  ║                                                                     ║
+  ║  2. CSS variables: brief specified var(--surface-2), var(--border), ║
+  ║     var(--border-strong). These do NOT exist in admin_base.html.    ║
+  ║     Uses the hardcoded hex palette already established across the   ║
+  ║     admin panel instead (white cards, 0.5px #e4e6ea borders,        ║
+  ║     #6b7280 secondary text, #4a90d9 accent).                        ║
+  ║                                                                     ║
+  ║  3. Pagination dict shape: brief specified current_page/total_pages.║
+  ║     Uses the shape already established by admin_bookings.html       ║
+  ║     instead: start, end, total, page, pages, has_prev, has_next.    ║
+  ║                                                                     ║
+  ║  4. Out of scope note: this page is a data table / admin panel, not ║
+  ║     a marketing page — built against this project's existing admin ║
+  ║     design system (admin_base/admin_bookings/admin_staff), not      ║
+  ║     landing-page taste conventions.                                 ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  CONTEXT VARIABLES EXPECTED:                                        ║
+  ║    customers: list of dicts — id, full_name, email, phone,          ║
+  ║      date_of_birth, notes, user_id, tier_name (silver/gold/diamond),║
+  ║      total_points, total_bookings, total_spend, last_visit,         ║
+  ║      voucher_count, created_at,                                     ║
+  ║      recent_bookings: list of up to 3 {service_name, booking_date,  ║
+  ║      staff_name, status}                                            ║
+  ║    stats: dict — total, has_account, new_this_month, silver_count,  ║
+  ║      gold_count, diamond_count                                      ║
+  ║    pagination: dict — start, end, total, page, pages, has_prev,     ║
+  ║      has_next                                                       ║
+  ║                                                                     ║
+  ║    DB tables involved:                                              ║
+  ║      customers LEFT JOIN users ON customers.user_id = users.id      ║
+  ║      LEFT JOIN customer_memberships (is_active=1)                   ║
+  ║        JOIN membership_tiers                                        ║
+  ║      LEFT JOIN (SUM points GROUP BY customer_id) loyalty_points_log ║
+  ║      LEFT JOIN (COUNT + MAX booking_date GROUP BY customer_id)      ║
+  ║        bookings                                                     ║
+  ║      LEFT JOIN (SUM amount WHERE status='paid' GROUP BY             ║
+  ║        b.customer_id) invoices JOIN bookings                        ║
+  ║      LEFT JOIN (COUNT WHERE is_used=0 GROUP BY customer_id)          ║
+  ║        reward_redemptions                                           ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ROUTES (create in routes.py):                                      ║
+  ║    main.admin_customers        GET  /admin/customers                ║
+  ║      params: q, sort (newest|points|bookings), tier, page           ║
+  ║    main.admin_create_customer  POST /admin/customers/create         ║
+  ║      body: full_name, phone, date_of_birth, notes, email(optional)  ║
+  ║      creates customers row; if email given also creates users row + ║
+  ║      links user_id; auto-creates active Silver customer_memberships ║
+  ║    main.admin_edit_customer    GET/POST /admin/customers/<id>/edit  ║
+  ║    main.admin_adjust_points    POST /admin/customers/<id>/adjust-points
+  ║      body: points (signed int); inserts loyalty_points_log row with ║
+  ║      source='admin_adjustment'                                      ║
+  ║    main.admin_delete_customer  POST /admin/customers/<id>/delete    ║
+  ║      fails with a flashed error if the customer has related rows    ║
+  ║      (bookings/reviews) blocked by FK constraints                   ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+#}
+
+{% block title %}Quản lý khách hàng - DahaCare Admin{% endblock %}
+{% block page_title %}Quản lý khách hàng{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   cu- BEM prefix — Customer Management Page
+   ═══════════════════════════════════════════ */
+
+/* ── Page header ── */
+.cu-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.cu-page-header__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #191c1e;
+    letter-spacing: -0.3px;
+}
+
+.cu-page-header__subtitle {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.cu-btn-create {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #4a90d9;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.cu-btn-create:hover { background: #3a7bc8; }
+.cu-btn-create:active { transform: scale(0.98); }
+
+.cu-btn-create .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Stat strip ── */
+.cu-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.cu-stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+}
+
+.cu-stat-card__value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #191c1e;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.cu-stat-card__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+/* ── Toolbar ── */
+.cu-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.cu-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 20px;
+    padding: 4px;
+}
+
+.cu-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+}
+
+.cu-tab:hover { color: #191c1e; }
+
+.cu-tab--active {
+    background: #4a90d9;
+    color: #ffffff;
+}
+
+.cu-tab--active:hover { color: #ffffff; }
+
+.cu-tab__count {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.06);
+}
+
+.cu-tab--active .cu-tab__count { background: rgba(255,255,255,0.25); }
+
+.cu-toolbar-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cu-filter-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    min-width: 220px;
+}
+
+.cu-filter-search .material-symbols-outlined {
+    font-size: 16px;
+    color: #9ca3af;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    flex-shrink: 0;
+}
+
+.cu-filter-search input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    outline: none;
+    width: 100%;
+}
+
+.cu-filter-search input::placeholder { color: #9ca3af; }
+
+.cu-filter-select {
+    padding: 7px 10px;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    min-width: 170px;
+    transition: border-color 0.15s;
+}
+
+.cu-filter-select:focus { border-color: #4a90d9; }
+
+/* ── Table ── */
+.cu-table-container {
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.cu-table-scroll { overflow-x: auto; }
+
+.cu-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 980px;
+}
+
+.cu-table thead {
+    background: #f7f9fb;
+    border-bottom: 1px solid #e4e6ea;
+}
+
+.cu-table th {
+    padding: 11px 16px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #6b7280;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.cu-table td {
+    padding: 13px 16px;
+    font-size: 13.5px;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.cu-table tbody tr:last-child td { border-bottom: none; }
+
+.cu-table tbody tr { cursor: pointer; }
+.cu-table tbody tr:hover td { background: #fafbfc; }
+
+/* ── Customer cell ── */
+.cu-customer-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cu-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.cu-avatar--0 { background: #e0e7ff; color: #3730a3; }
+.cu-avatar--1 { background: #fce7f3; color: #9d174d; }
+.cu-avatar--2 { background: #fef3c7; color: #92400e; }
+.cu-avatar--3 { background: #dcfce7; color: #166534; }
+.cu-avatar--4 { background: #f3e8ff; color: #6b21a8; }
+
+.cu-customer-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #191c1e;
+    line-height: 1.3;
+}
+
+.cu-customer-email {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* ── Tier pill ── */
+.cu-tier-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cu-tier-pill--silver  { background: #F0F0F0; color: #555555; }
+.cu-tier-pill--gold    { background: #FEF3C7; color: #92400E; }
+.cu-tier-pill--diamond { background: #EDE9FE; color: #4C1D95; }
+
+.cu-points { font-variant-numeric: tabular-nums; font-weight: 600; color: #191c1e; }
+.cu-spend  { font-variant-numeric: tabular-nums; }
+
+/* ── Account column ── */
+.cu-acc {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #374151;
+}
+
+.cu-acc-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cu-acc-dot--verified   { background: #1D9E75; }
+.cu-acc-dot--unverified { background: #c5c6cc; }
+
+/* ── Action button ── */
+.cu-action-btn--eye {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border: none;
+    color: #6b7280;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.cu-action-btn--eye:hover { background: #e5e7eb; color: #374151; }
+
+.cu-action-btn--eye .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Empty state ── */
+.cu-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    gap: 10px;
+    text-align: center;
+}
+
+.cu-empty .material-symbols-outlined {
+    font-size: 40px;
+    color: #d1d5db;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
+}
+
+.cu-empty__title { font-size: 15px; font-weight: 600; color: #6b7280; }
+.cu-empty__subtitle { font-size: 13px; color: #9ca3af; }
+
+/* ── Pagination ── */
+.cu-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+}
+
+.cu-pagination__info { font-size: 13px; color: #6b7280; }
+
+.cu-pagination__pages {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cu-page-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    border: 1px solid #e4e6ea;
+    background: #ffffff;
+    color: #374151;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.cu-page-btn:hover:not(.cu-page-btn--active):not(.cu-page-btn--disabled) {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.cu-page-btn--active {
+    background: #4a90d9;
+    border-color: #4a90d9;
+    color: #ffffff;
+}
+
+.cu-page-btn--disabled {
+    color: #d1d5db;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.cu-page-btn .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Modals ── */
+.cu-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(25, 28, 30, 0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.cu-modal-overlay--open { display: flex; }
+
+.cu-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+}
+
+.cu-modal--narrow { max-width: 460px; }
+
+.cu-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+    flex-shrink: 0;
+}
+
+.cu-modal__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #191c1e;
+}
+
+.cu-modal__close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.cu-modal__close:hover { background: #f3f4f6; color: #374151; }
+
+.cu-modal__close .material-symbols-outlined {
+    font-size: 20px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.cu-modal__body { padding: 20px 24px; flex: 1; overflow-y: auto; }
+
+.cu-modal__footer {
+    padding: 0 24px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.cu-modal__footer--split { justify-content: space-between; }
+
+/* ── Detail modal header ── */
+.cu-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.cu-detail-header .cu-avatar { width: 52px; height: 52px; font-size: 17px; }
+
+.cu-detail-header__name { font-size: 16px; font-weight: 700; color: #191c1e; }
+
+.cu-detail-header__meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: #6b7280;
+    margin-top: 3px;
+}
+
+.cu-section-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #191c1e;
+    margin-bottom: 8px;
+}
+
+.cu-form-divider { height: 1px; background: #f3f4f6; margin: 16px 0; }
+
+/* ── Form elements ── */
+.cu-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.cu-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+}
+
+.cu-form-group:last-child { margin-bottom: 0; }
+
+.cu-form-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.cu-form-input,
+.cu-form-textarea {
+    padding: 8px 12px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    background: #f7f9fb;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.cu-form-textarea { resize: vertical; min-height: 64px; }
+
+.cu-form-input:focus,
+.cu-form-textarea:focus { border-color: #4a90d9; background: #ffffff; }
+
+.cu-form-hint { font-size: 12px; color: #9ca3af; }
+
+.cu-detail-field {
+    padding: 9px 12px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: #374151;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+/* ── Loyalty box ── */
+.cu-loyalty-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 10px;
+}
+
+.cu-loyalty-box__points {
+    font-size: 26px;
+    font-weight: 700;
+    color: #191c1e;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.cu-loyalty-box__label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 3px;
+}
+
+/* ── Points adjustment row ── */
+.cu-adjust-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cu-adjust-row .cu-form-input { flex: 1; }
+
+/* ── Stat boxes ── */
+.cu-stat-box-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.cu-stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 6px;
+    background: #f7f9fb;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.cu-stat-box__value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #191c1e;
+    font-variant-numeric: tabular-nums;
+}
+
+.cu-stat-box__label {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: #9ca3af;
+}
+
+/* ── Recent bookings ── */
+.cu-booking-list { display: flex; flex-direction: column; gap: 8px; }
+
+.cu-booking-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #f7f9fb;
+    border-radius: 8px;
+}
+
+.cu-booking-item__service { font-size: 13px; font-weight: 600; color: #191c1e; }
+.cu-booking-item__meta { font-size: 12px; color: #9ca3af; margin-top: 1px; }
+
+.cu-b-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.cu-b-pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cu-b-pill--pending    { background: #FAEEDA; color: #633806; }
+.cu-b-pill--pending::before { background: #EF9F27; }
+
+.cu-b-pill--confirmed  { background: #E6F1FB; color: #0C447C; }
+.cu-b-pill--confirmed::before { background: #378ADD; }
+
+.cu-b-pill--in-progress { background: #F2EBFB; color: #5C2D91; }
+.cu-b-pill--in-progress::before { background: #9B59D0; }
+
+.cu-b-pill--done       { background: #E1F5EE; color: #085041; }
+.cu-b-pill--done::before { background: #1D9E75; }
+
+.cu-b-pill--cancelled  { background: #FCEBEB; color: #791F1F; }
+.cu-b-pill--cancelled::before { background: #E24B4A; }
+
+.cu-empty-mini {
+    padding: 16px;
+    text-align: center;
+    font-size: 12.5px;
+    color: #9ca3af;
+    background: #f7f9fb;
+    border-radius: 8px;
+}
+
+/* ── Info box (Add modal) ── */
+.cu-info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 4px;
+    padding: 10px 12px;
+    background: #E6F1FB;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #0C447C;
+    line-height: 1.5;
+}
+
+.cu-info-box .material-symbols-outlined {
+    font-size: 16px;
+    color: #4A90D9;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* ── Buttons ── */
+.cu-btn-secondary {
+    padding: 8px 18px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #374151;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.cu-btn-secondary:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+.cu-btn-primary {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #4a90d9;
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.cu-btn-primary:hover { background: #3a7bc8; }
+.cu-btn-primary:active { transform: scale(0.98); }
+
+.cu-btn-danger {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.cu-btn-danger:hover { background: #fee2e2; }
+
+/* ── Credentials modal ── */
+.cu-cred-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #E1F5EE;
+    color: #1D9E75;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 4px auto 14px;
+}
+
+.cu-cred-icon .material-symbols-outlined {
+    font-size: 26px;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.cu-cred-lead {
+    text-align: center;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.cu-cred-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px 9px 12px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: #191c1e;
+}
+
+.cu-cred-field span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cu-cred-copy {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 6px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.cu-cred-copy:hover { background: #f3f4f6; color: #374151; }
+.cu-cred-copy--done { color: #1D9E75; border-color: #bfe8d9; }
+
+.cu-cred-copy .material-symbols-outlined {
+    font-size: 15px;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.cu-cred-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 10px 12px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #92400e;
+    line-height: 1.5;
+}
+
+.cu-cred-warning .material-symbols-outlined {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{# ── Currently active filter values ── #}
+{% set q_val = request.args.get('q', '') %}
+{% set sort_val = request.args.get('sort', 'newest') %}
+{% set tier_val = request.args.get('tier', '') %}
+
+{# ── Avatar color palette — cycles through 5 via loop.index0 % 5 ── #}
+{% set AVATAR_PALETTE = ['cu-avatar--0', 'cu-avatar--1', 'cu-avatar--2', 'cu-avatar--3', 'cu-avatar--4'] %}
+{% set TIER_LABELS = {'silver': '🥈 Silver', 'gold': '⭐ Gold', 'diamond': '💎 Diamond'} %}
+
+
+{# ══════════════════════════════════════════
+   1. PAGE HEADER
+   ══════════════════════════════════════════ #}
+<div class="cu-page-header">
+    <div>
+        <div class="cu-page-header__title">Quản lý khách hàng</div>
+        <div class="cu-page-header__subtitle">Tổng cộng {{ stats.total }} khách hàng</div>
+    </div>
+    <button class="cu-btn-create" onclick="openModal('cuAddModal')">
+        <span class="material-symbols-outlined">add</span>
+        Thêm khách hàng
+    </button>
+</div>
+
+
+{# ══════════════════════════════════════════
+   2. STAT STRIP
+   Context: stats.total, .has_account, .new_this_month, .gold_count, .diamond_count
+   ══════════════════════════════════════════ #}
+<div class="cu-stats">
+    <div class="cu-stat-card">
+        <span class="cu-stat-card__value">{{ stats.total }}</span>
+        <span class="cu-stat-card__label">Tổng khách hàng</span>
+    </div>
+    <div class="cu-stat-card">
+        <span class="cu-stat-card__value">{{ stats.has_account }}</span>
+        <span class="cu-stat-card__label">Đã tạo tài khoản</span>
+    </div>
+    <div class="cu-stat-card">
+        <span class="cu-stat-card__value">{{ stats.new_this_month }}</span>
+        <span class="cu-stat-card__label">Mới trong tháng</span>
+    </div>
+    <div class="cu-stat-card">
+        <span class="cu-stat-card__value">{{ stats.gold_count }}</span>
+        <span class="cu-stat-card__label">Gold Member</span>
+    </div>
+    <div class="cu-stat-card">
+        <span class="cu-stat-card__value">{{ stats.diamond_count }}</span>
+        <span class="cu-stat-card__label">Diamond Member</span>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   3. TOOLBAR — tier tabs + search/sort form
+   ══════════════════════════════════════════ #}
+<div class="cu-toolbar">
+
+    <div class="cu-tabs">
+        <a href="{{ url_for('main.admin_customers', q=q_val or None, sort=sort_val or None) }}"
+           class="cu-tab {% if tier_val == '' %}cu-tab--active{% endif %}">
+            Tất cả <span class="cu-tab__count">{{ stats.total }}</span>
+        </a>
+        <a href="{{ url_for('main.admin_customers', q=q_val or None, sort=sort_val or None, tier='silver') }}"
+           class="cu-tab {% if tier_val == 'silver' %}cu-tab--active{% endif %}">
+            Silver <span class="cu-tab__count">{{ stats.silver_count }}</span>
+        </a>
+        <a href="{{ url_for('main.admin_customers', q=q_val or None, sort=sort_val or None, tier='gold') }}"
+           class="cu-tab {% if tier_val == 'gold' %}cu-tab--active{% endif %}">
+            Gold <span class="cu-tab__count">{{ stats.gold_count }}</span>
+        </a>
+        <a href="{{ url_for('main.admin_customers', q=q_val or None, sort=sort_val or None, tier='diamond') }}"
+           class="cu-tab {% if tier_val == 'diamond' %}cu-tab--active{% endif %}">
+            Diamond <span class="cu-tab__count">{{ stats.diamond_count }}</span>
+        </a>
+    </div>
+
+    <form method="get" action="{{ url_for('main.admin_customers') }}" class="cu-toolbar-form">
+        <input type="hidden" name="tier" value="{{ tier_val }}">
+
+        <div class="cu-filter-search">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" name="q" placeholder="Tìm tên, email, số điện thoại..." value="{{ q_val }}" autocomplete="off">
+        </div>
+
+        <select name="sort" class="cu-filter-select" onchange="this.form.submit()">
+            <option value="newest" {% if sort_val == 'newest' %}selected{% endif %}>Mới nhất</option>
+            <option value="points" {% if sort_val == 'points' %}selected{% endif %}>Điểm cao nhất</option>
+            <option value="bookings" {% if sort_val == 'bookings' %}selected{% endif %}>Nhiều booking nhất</option>
+        </select>
+    </form>
+
+</div>
+
+
+{# ══════════════════════════════════════════
+   4. CUSTOMER TABLE
+   customers JOIN users JOIN customer_memberships JOIN membership_tiers
+   JOIN loyalty_points_log (SUM) JOIN bookings JOIN invoices
+   Data attributes on each row feed the Detail modal via JS.
+   ══════════════════════════════════════════ #}
+<div class="cu-table-container">
+    <div class="cu-table-scroll">
+        <table class="cu-table">
+            <thead>
+                <tr>
+                    <th>Khách hàng</th>
+                    <th>Số điện thoại</th>
+                    <th>Hạng thành viên</th>
+                    <th>Điểm tích lũy</th>
+                    <th>Tổng booking</th>
+                    <th>Tổng chi tiêu</th>
+                    <th>Lần cuối đến</th>
+                    <th>Tài khoản</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+            {% if customers %}
+                {% for c in customers %}
+                {# Initials: last 2 words of full_name #}
+                {% set name_parts = c.full_name.split() %}
+                {% set last_two = name_parts[-2:] if name_parts | length > 1 else name_parts %}
+                {% set initials = last_two[0][0] | upper %}
+                {% if last_two | length > 1 %}{% set initials = initials + (last_two[1][0] | upper) %}{% endif %}
+
+                {% set avatar_class = AVATAR_PALETTE[loop.index0 % 5] %}
+                {% set tier_key = (c.tier_name or 'silver') | lower %}
+
+                <tr class="cu-row"
+                    data-idx="{{ loop.index0 % 5 }}"
+                    data-id="{{ c.id }}"
+                    data-name="{{ c.full_name }}"
+                    data-email="{{ c.email or '' }}"
+                    data-phone="{{ c.phone or '' }}"
+                    data-dob="{{ c.date_of_birth | format_date | default('', true) }}"
+                    data-notes="{{ c.notes or '' }}"
+                    data-user-id="{{ c.user_id or '' }}"
+                    data-tier="{{ tier_key }}"
+                    data-points="{{ c.total_points or 0 }}"
+                    data-bookings="{{ c.total_bookings or 0 }}"
+                    data-spend="{{ c.total_spend or 0 }}"
+                    data-last-visit="{{ c.last_visit | format_date | default('', true) }}"
+                    data-vouchers="{{ c.voucher_count or 0 }}"
+                    data-joined="{{ c.created_at | format_date | default('', true) }}"
+                    data-recent-bookings='{{ (c.recent_bookings or []) | tojson }}'
+                    onclick="openDetail(this)">
+
+                    <td>
+                        <div class="cu-customer-cell">
+                            <div class="cu-avatar {{ avatar_class }}">{{ initials }}</div>
+                            <div>
+                                <div class="cu-customer-name">{{ c.full_name }}</div>
+                                <div class="cu-customer-email">{{ c.email | default('—', true) }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ c.phone or '—' }}</td>
+                    <td><span class="cu-tier-pill cu-tier-pill--{{ tier_key }}">{{ TIER_LABELS.get(tier_key, tier_key) }}</span></td>
+                    <td class="cu-points">{{ c.total_points or 0 }} pts</td>
+                    <td>{{ c.total_bookings or 0 }}</td>
+                    <td class="cu-spend">{{ c.total_spend | format_currency }}</td>
+                    <td>{{ c.last_visit | format_date | default('—', true) }}</td>
+                    <td>
+                        <span class="cu-acc">
+                            <span class="cu-acc-dot {{ 'cu-acc-dot--verified' if c.user_id else 'cu-acc-dot--unverified' }}"></span>
+                            {{ 'Đã tạo' if c.user_id else 'Chưa tạo' }}
+                        </span>
+                    </td>
+                    <td>
+                        <button type="button" class="cu-action-btn--eye" title="Xem chi tiết"
+                                onclick="event.stopPropagation(); openDetail(this.closest('tr'))">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            {% else %}
+                <tr>
+                    <td colspan="9">
+                        <div class="cu-empty">
+                            <span class="material-symbols-outlined">person</span>
+                            <div class="cu-empty__title">Không tìm thấy khách hàng nào</div>
+                            <div class="cu-empty__subtitle">
+                                {% if q_val or tier_val %}
+                                    Không có khách hàng phù hợp với bộ lọc hiện tại.
+                                {% else %}
+                                    Chưa có khách hàng nào được thêm.
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5. PAGINATION
+   Context: pagination.start, .end, .total, .page, .pages, .has_prev, .has_next
+   Preserves all current query params when navigating pages (JS goToPage).
+   ══════════════════════════════════════════ #}
+{% if pagination and pagination.total > 0 %}
+<div class="cu-pagination">
+    <span class="cu-pagination__info">
+        Hiển thị {{ pagination.start }}–{{ pagination.end }} / {{ pagination.total }} khách hàng
+    </span>
+    <div class="cu-pagination__pages">
+
+        {% if pagination.has_prev %}
+        <a href="javascript:void(0)" onclick="goToPage({{ pagination.page - 1 }})" class="cu-page-btn">
+            <span class="material-symbols-outlined">chevron_left</span>
+        </a>
+        {% else %}
+        <span class="cu-page-btn cu-page-btn--disabled">
+            <span class="material-symbols-outlined">chevron_left</span>
+        </span>
+        {% endif %}
+
+        {% for p in range(1, pagination.pages + 1) %}
+            {% if p == pagination.page %}
+            <span class="cu-page-btn cu-page-btn--active">{{ p }}</span>
+            {% elif p <= 2 or p >= pagination.pages - 1 or (p >= pagination.page - 1 and p <= pagination.page + 1) %}
+            <a href="javascript:void(0)" onclick="goToPage({{ p }})" class="cu-page-btn">{{ p }}</a>
+            {% elif p == 3 and pagination.page > 4 %}
+            <span class="cu-page-btn cu-page-btn--disabled">…</span>
+            {% elif p == pagination.pages - 2 and pagination.page < pagination.pages - 3 %}
+            <span class="cu-page-btn cu-page-btn--disabled">…</span>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+        <a href="javascript:void(0)" onclick="goToPage({{ pagination.page + 1 }})" class="cu-page-btn">
+            <span class="material-symbols-outlined">chevron_right</span>
+        </a>
+        {% else %}
+        <span class="cu-page-btn cu-page-btn--disabled">
+            <span class="material-symbols-outlined">chevron_right</span>
+        </span>
+        {% endif %}
+
+    </div>
+</div>
+{% endif %}
+
+
+{# ══════════════════════════════════════════
+   6a. CUSTOMER DETAIL MODAL — populated via JS from data-* on clicked row
+   ══════════════════════════════════════════ #}
+<div id="cuDetailModal" class="cu-modal-overlay" onclick="closeModalOnBackdrop(event, 'cuDetailModal')">
+    <div class="cu-modal" onclick="event.stopPropagation()">
+
+        <div class="cu-modal__header">
+            <span class="cu-modal__title">Chi tiết khách hàng</span>
+            <button type="button" class="cu-modal__close" onclick="closeModal('cuDetailModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="cu-modal__body">
+
+            <div class="cu-detail-header">
+                <div class="cu-avatar" id="cu_detail_avatar"></div>
+                <div>
+                    <div class="cu-detail-header__name" id="cu_detail_name"></div>
+                    <div class="cu-detail-header__meta">
+                        <span class="cu-acc-dot" id="cu_detail_acc_dot"></span>
+                        <span id="cu_detail_acc_label"></span>
+                        <span>·</span>
+                        <span id="cu_detail_id_label"></span>
+                        <span>·</span>
+                        <span class="cu-tier-pill" id="cu_detail_tier_pill"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cu-section-title">Thông tin liên hệ</div>
+            <div class="cu-form-row">
+                <div class="cu-form-group">
+                    <label class="cu-form-label">Email</label>
+                    <div class="cu-detail-field" id="cu_detail_email"></div>
+                </div>
+                <div class="cu-form-group">
+                    <label class="cu-form-label">Số điện thoại</label>
+                    <div class="cu-detail-field" id="cu_detail_phone"></div>
+                </div>
+            </div>
+            <div class="cu-form-row">
+                <div class="cu-form-group">
+                    <label class="cu-form-label">Ngày sinh</label>
+                    <div class="cu-detail-field" id="cu_detail_dob"></div>
+                </div>
+                <div class="cu-form-group">
+                    <label class="cu-form-label">Thành viên từ</label>
+                    <div class="cu-detail-field" id="cu_detail_joined"></div>
+                </div>
+            </div>
+            <div class="cu-form-group">
+                <label class="cu-form-label">Ghi chú nội bộ</label>
+                <div class="cu-detail-field" id="cu_detail_notes"></div>
+            </div>
+
+            <div class="cu-form-divider"></div>
+
+            <div class="cu-section-title">Điểm thưởng</div>
+            <div class="cu-loyalty-box">
+                <div>
+                    <div class="cu-loyalty-box__points" id="cu_detail_points"></div>
+                    <div class="cu-loyalty-box__label">điểm tích lũy</div>
+                </div>
+                <span class="cu-tier-pill" id="cu_detail_loyalty_tier_pill"></span>
+            </div>
+
+            <div class="cu-section-title" style="margin-top: 16px;">Điều chỉnh điểm (admin)</div>
+            <form method="post" id="cu_points_form" class="cu-adjust-row">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="number" name="points" step="1" class="cu-form-input" placeholder="+50 hoặc -20" required>
+                <button type="submit" class="cu-btn-primary">Áp dụng</button>
+            </form>
+
+            <div class="cu-form-divider"></div>
+
+            <div class="cu-section-title">Thống kê</div>
+            <div class="cu-stat-box-row">
+                <div class="cu-stat-box">
+                    <span class="cu-stat-box__value" id="cu_detail_bookings"></span>
+                    <span class="cu-stat-box__label">Tổng booking</span>
+                </div>
+                <div class="cu-stat-box">
+                    <span class="cu-stat-box__value" id="cu_detail_spend"></span>
+                    <span class="cu-stat-box__label">Tổng chi tiêu</span>
+                </div>
+                <div class="cu-stat-box">
+                    <span class="cu-stat-box__value" id="cu_detail_vouchers"></span>
+                    <span class="cu-stat-box__label">Voucher đang có</span>
+                </div>
+            </div>
+
+            <div class="cu-form-divider"></div>
+
+            <div class="cu-section-title">Booking gần đây</div>
+            <div class="cu-booking-list" id="cu_detail_bookings_list"></div>
+
+        </div>
+
+        <div class="cu-modal__footer cu-modal__footer--split">
+            <button type="button" class="cu-btn-danger" onclick="openDeleteFromDetail()">Xóa khách hàng</button>
+            <div style="display:flex; gap:8px;">
+                <button type="button" class="cu-btn-secondary" onclick="closeModal('cuDetailModal')">Đóng</button>
+                <a href="#" id="cu_detail_edit_link" class="cu-btn-primary">Chỉnh sửa</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   6b. ADD CUSTOMER MODAL
+   Backend: POST /admin/customers/create → main.admin_create_customer
+   ══════════════════════════════════════════ #}
+<div id="cuAddModal" class="cu-modal-overlay" onclick="closeModalOnBackdrop(event, 'cuAddModal')">
+    <div class="cu-modal cu-modal--narrow" onclick="event.stopPropagation()">
+
+        <div class="cu-modal__header">
+            <span class="cu-modal__title">Thêm khách hàng mới</span>
+            <button type="button" class="cu-modal__close" onclick="closeModal('cuAddModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" action="{{ url_for('main.admin_create_customer') }}" id="cu_add_form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="cu-modal__body">
+
+                <div class="cu-section-title">Thông tin cơ bản</div>
+
+                <div class="cu-form-group">
+                    <label class="cu-form-label" for="cu_add_full_name">Họ và tên *</label>
+                    <input type="text" name="full_name" id="cu_add_full_name" class="cu-form-input" required>
+                </div>
+
+                <div class="cu-form-group">
+                    <label class="cu-form-label" for="cu_add_phone">Số điện thoại</label>
+                    <input type="text" name="phone" id="cu_add_phone" class="cu-form-input">
+                </div>
+
+                <div class="cu-form-group">
+                    <label class="cu-form-label" for="cu_add_dob">Ngày sinh</label>
+                    <input type="date" name="date_of_birth" id="cu_add_dob" class="cu-form-input">
+                </div>
+
+                <div class="cu-form-group">
+                    <label class="cu-form-label" for="cu_add_notes">Ghi chú nội bộ</label>
+                    <textarea name="notes" id="cu_add_notes" class="cu-form-textarea" rows="3"></textarea>
+                </div>
+
+                <div class="cu-form-divider"></div>
+
+                <div class="cu-section-title">Tài khoản (tùy chọn)</div>
+
+                <div class="cu-form-group">
+                    <label class="cu-form-label" for="cu_add_email">Email</label>
+                    <input type="email" name="email" id="cu_add_email" class="cu-form-input">
+                    <span class="cu-form-hint">Điền email nếu khách muốn tạo tài khoản đăng nhập</span>
+                </div>
+
+                <div class="cu-info-box">
+                    <span class="material-symbols-outlined">info</span>
+                    <span>Khách hàng mới sẽ tự động được xếp vào hạng Silver và nhận 0 điểm tích lũy ban đầu.</span>
+                </div>
+
+            </div>
+
+            <div class="cu-modal__footer">
+                <button type="button" class="cu-btn-secondary" onclick="closeModal('cuAddModal')">Hủy</button>
+                <button type="submit" class="cu-btn-primary">Thêm khách hàng</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   6c. DELETE CONFIRM MODAL
+   Backend: POST /admin/customers/<id>/delete → main.admin_delete_customer
+   ══════════════════════════════════════════ #}
+<div id="cuDeleteModal" class="cu-modal-overlay" onclick="closeModalOnBackdrop(event, 'cuDeleteModal')">
+    <div class="cu-modal cu-modal--narrow" onclick="event.stopPropagation()">
+
+        <div class="cu-modal__header">
+            <span class="cu-modal__title">Xác nhận xóa khách hàng</span>
+            <button type="button" class="cu-modal__close" onclick="closeModal('cuDeleteModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="cu-modal__body">
+            <p style="font-size: 13.5px; color: #374151; line-height: 1.5;">
+                Bạn có chắc chắn muốn xóa khách hàng <strong id="cu_delete_name"></strong>?
+                Hành động này không thể hoàn tác.
+            </p>
+        </div>
+
+        <div class="cu-modal__footer">
+            <button type="button" class="cu-btn-secondary" onclick="closeModal('cuDeleteModal'); openModal('cuDetailModal');">Hủy</button>
+            <form method="post" id="cu_delete_form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="cu-btn-danger">Xác nhận xóa</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   6d. CREDENTIALS MODAL — shown once right after "Add customer" creates a login account
+   Data source: flash(category="customer_credentials"), format "email|password"
+   ══════════════════════════════════════════ #}
+<div id="cuCredModal" class="cu-modal-overlay" onclick="closeModalOnBackdrop(event, 'cuCredModal')">
+    <div class="cu-modal cu-modal--narrow" onclick="event.stopPropagation()">
+
+        <div class="cu-modal__header">
+            <span class="cu-modal__title">Đã tạo khách hàng thành công</span>
+            <button type="button" class="cu-modal__close" onclick="closeModal('cuCredModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="cu-modal__body">
+            <div class="cu-cred-icon">
+                <span class="material-symbols-outlined">check_circle</span>
+            </div>
+            <p class="cu-cred-lead">Khách hàng có thể dùng thông tin này để đăng nhập tại trang đăng nhập.</p>
+
+            <div class="cu-form-group">
+                <label class="cu-form-label">Tài khoản (email)</label>
+                <div class="cu-cred-field">
+                    <span id="cu_cred_email"></span>
+                    <button type="button" class="cu-cred-copy" onclick="copyCredential('cu_cred_email', this)" title="Sao chép">
+                        <span class="material-symbols-outlined">content_copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="cu-form-group">
+                <label class="cu-form-label">Mật khẩu tạm thời</label>
+                <div class="cu-cred-field">
+                    <span id="cu_cred_password"></span>
+                    <button type="button" class="cu-cred-copy" onclick="copyCredential('cu_cred_password', this)" title="Sao chép">
+                        <span class="material-symbols-outlined">content_copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="cu-cred-warning">
+                <span class="material-symbols-outlined">warning</span>
+                <span>Mật khẩu chỉ hiển thị một lần. Hãy sao chép và gửi cho khách hàng ngay bây giờ.</span>
+            </div>
+        </div>
+
+        <div class="cu-modal__footer">
+            <button type="button" class="cu-btn-primary" onclick="closeModal('cuCredModal')">Đã lưu, đóng</button>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+const CU_AVATAR_PALETTE = ['cu-avatar--0', 'cu-avatar--1', 'cu-avatar--2', 'cu-avatar--3', 'cu-avatar--4'];
+const CU_TIER_LABELS = { silver: '🥈 Silver', gold: '⭐ Gold', diamond: '💎 Diamond' };
+const CU_STATUS_LABELS = {
+    pending: 'Chờ xác nhận',
+    confirmed: 'Đã xác nhận',
+    'in-progress': 'Đang thực hiện',
+    done: 'Hoàn thành',
+    cancelled: 'Đã hủy'
+};
+
+const CU_ROUTES = {
+    adjustPoints: "{{ url_for('main.admin_adjust_points', customer_id=0) }}",
+    editCustomer: "{{ url_for('main.admin_edit_customer', customer_id=0) }}",
+    deleteCustomer: "{{ url_for('main.admin_delete_customer', customer_id=0) }}"
+};
+
+let currentCustomerRow = null;
+
+/* ── Modal management ── */
+function openModal(id) {
+    document.getElementById(id).classList.add('cu-modal-overlay--open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('cu-modal-overlay--open');
+    document.body.style.overflow = '';
+}
+
+function closeModalOnBackdrop(event, id) {
+    if (event.target === event.currentTarget) closeModal(id);
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal('cuDetailModal');
+        closeModal('cuAddModal');
+        closeModal('cuDeleteModal');
+        closeModal('cuCredModal');
+    }
+});
+
+function buildActionUrl(template, id) {
+    return template.replace('/0/', '/' + id + '/');
+}
+
+/* ── Detail modal ── */
+function openDetail(el) {
+    currentCustomerRow = el;
+    const d = el.dataset;
+
+    const avatarEl = document.getElementById('cu_detail_avatar');
+    const rowAvatarEl = el.querySelector('.cu-avatar');
+    avatarEl.className = 'cu-avatar ' + CU_AVATAR_PALETTE[parseInt(d.idx, 10) % 5];
+    avatarEl.textContent = rowAvatarEl ? rowAvatarEl.textContent.trim() : '';
+
+    document.getElementById('cu_detail_name').textContent = d.name;
+
+    const hasAccount = !!d.userId;
+    document.getElementById('cu_detail_acc_dot').className =
+        'cu-acc-dot ' + (hasAccount ? 'cu-acc-dot--verified' : 'cu-acc-dot--unverified');
+    document.getElementById('cu_detail_acc_label').textContent =
+        hasAccount ? 'Đã tạo tài khoản' : 'Chưa tạo tài khoản';
+    document.getElementById('cu_detail_id_label').textContent = 'ID #' + d.id;
+
+    const tierLabel = CU_TIER_LABELS[d.tier] || d.tier;
+    [document.getElementById('cu_detail_tier_pill'), document.getElementById('cu_detail_loyalty_tier_pill')]
+        .forEach((el) => {
+            el.className = 'cu-tier-pill cu-tier-pill--' + d.tier;
+            el.textContent = tierLabel;
+        });
+
+    document.getElementById('cu_detail_email').textContent = d.email || '—';
+    document.getElementById('cu_detail_phone').textContent = d.phone || '—';
+    document.getElementById('cu_detail_dob').textContent = d.dob || '—';
+    document.getElementById('cu_detail_joined').textContent = d.joined || '—';
+    document.getElementById('cu_detail_notes').textContent = d.notes || 'Không có';
+
+    document.getElementById('cu_detail_points').textContent = d.points;
+    document.getElementById('cu_detail_bookings').textContent = d.bookings;
+    document.getElementById('cu_detail_spend').textContent = '$' + parseFloat(d.spend || 0).toFixed(2);
+    document.getElementById('cu_detail_vouchers').textContent = d.vouchers;
+
+    document.getElementById('cu_points_form').action = buildActionUrl(CU_ROUTES.adjustPoints, d.id);
+    document.getElementById('cu_detail_edit_link').href = buildActionUrl(CU_ROUTES.editCustomer, d.id);
+
+    const listEl = document.getElementById('cu_detail_bookings_list');
+    listEl.innerHTML = '';
+    let bookings = [];
+    try { bookings = JSON.parse(d.recentBookings || '[]'); } catch (e) { bookings = []; }
+
+    if (bookings.length === 0) {
+        listEl.innerHTML = '<div class="cu-empty-mini">Chưa có booking nào</div>';
+    } else {
+        bookings.slice(0, 3).forEach((b) => {
+            const item = document.createElement('div');
+            item.className = 'cu-booking-item';
+            item.innerHTML =
+                '<div class="cu-booking-item__info">' +
+                    '<div class="cu-booking-item__service"></div>' +
+                    '<div class="cu-booking-item__meta"></div>' +
+                '</div>' +
+                '<span class="cu-b-pill cu-b-pill--' + b.status + '"></span>';
+            item.querySelector('.cu-booking-item__service').textContent = b.service_name;
+            item.querySelector('.cu-booking-item__meta').textContent = b.booking_date + ' · ' + b.staff_name;
+            item.querySelector('.cu-b-pill').textContent = CU_STATUS_LABELS[b.status] || b.status;
+            listEl.appendChild(item);
+        });
+    }
+
+    openModal('cuDetailModal');
+}
+
+/* ── Delete confirm modal ── */
+function openDelete(name, id) {
+    document.getElementById('cu_delete_name').textContent = name;
+    document.getElementById('cu_delete_form').action = buildActionUrl(CU_ROUTES.deleteCustomer, id);
+    openModal('cuDeleteModal');
+}
+
+function openDeleteFromDetail() {
+    if (!currentCustomerRow) return;
+    closeModal('cuDetailModal');
+    openDelete(currentCustomerRow.dataset.name, currentCustomerRow.dataset.id);
+}
+
+/* ── Pagination ── */
+function goToPage(page) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('page', page);
+    window.location.href = '?' + params.toString();
+}
+
+/* ── Credentials modal (shown once after Add customer creates a login account) ── */
+function copyCredential(fieldId, btn) {
+    const text = document.getElementById(fieldId).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        const icon = btn.querySelector('.material-symbols-outlined');
+        icon.textContent = 'check';
+        btn.classList.add('cu-cred-copy--done');
+        setTimeout(() => {
+            icon.textContent = 'content_copy';
+            btn.classList.remove('cu-cred-copy--done');
+        }, 1200);
+    });
+}
+
+{% set cred_flashes = get_flashed_messages(category_filter=['customer_credentials']) %}
+const CU_NEW_CREDENTIALS = {{ (cred_flashes[0].split('|') | tojson) if cred_flashes else 'null' }};
+if (CU_NEW_CREDENTIALS) {
+    document.getElementById('cu_cred_email').textContent = CU_NEW_CREDENTIALS[0];
+    document.getElementById('cu_cred_password').textContent = CU_NEW_CREDENTIALS[1];
+    openModal('cuCredModal');
+}
+</script>
+{% endblock %}
