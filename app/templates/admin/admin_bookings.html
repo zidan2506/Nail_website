@@ -1,0 +1,1414 @@
+{% extends "admin/admin_base.html" %}
+
+{#
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  ADMIN BOOKINGS PAGE — admin_bookings.html                          ║
+  ║  Extends: admin/admin_base.html                                     ║
+  ║  Blocks used: title, extra_css, page_title, content, extra_js       ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ⚠ STATUS MIGRATION REQUIRED (BREAKING CHANGE)                      ║
+  ║  Codebase hiện dùng: unverified, pending, confirmed, completed,     ║
+  ║  cancelled. Template này dùng status mới: pending, confirmed,       ║
+  ║  in-progress, done, cancelled.                                      ║
+  ║                                                                     ║
+  ║  Chạy migration TRƯỚC khi dùng template này:                        ║
+  ║    UPDATE bookings SET status = 'done'                              ║
+  ║      WHERE status = 'completed';                                    ║
+  ║    UPDATE bookings SET status = 'pending'                           ║
+  ║      WHERE status = 'unverified';                                   ║
+  ║  Đồng thời cập nhật tất cả routes.py dùng 'completed'/'unverified'. ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  CONTEXT VARIABLES EXPECTED:                                        ║
+  ║    bookings     : list[dict] — id, customer_name, customer_phone,   ║
+  ║                   customer_id, service_name, service_id, staff_name,║
+  ║                   staff_id, booking_date, start_time, end_time,     ║
+  ║                   duration_minutes, status, notes,                  ║
+  ║                   cancellation_reason                               ║
+  ║    staff_list   : list[dict] — id, full_name                        ║
+  ║    service_list : list[dict] — id, name, duration_minutes           ║
+  ║    customer_list: list[dict] — id, full_name, phone                 ║
+  ║    status_counts: dict — all, done, in_progress, confirmed,         ║
+  ║                          pending, cancelled                         ║
+  ║    pagination   : dict — start, end, total, page, pages,            ║
+  ║                          has_prev, has_next                         ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ROUTES NEEDED (create in routes.py):                               ║
+  ║    main.admin_bookings           GET  /admin/bookings               ║
+  ║      params: q, status, staff_id, service_id, date, page           ║
+  ║      DB: bookings JOIN customers JOIN staff JOIN services           ║
+  ║    main.admin_update_booking_status  POST /admin/booking/<id>/status║
+  ║      body: status (new status value)                                ║
+  ║    main.admin_create_booking     POST /admin/booking/create         ║
+  ║      body: customer_id, service_id, staff_id, booking_date,        ║
+  ║            start_time, notes                                        ║
+  ║    main.admin_update_booking     POST /admin/booking/<id>/update    ║
+  ║      body: staff_id, booking_date, start_time, notes               ║
+  ║  ⚠ CONFLICT: 'main.create_booking' đã tồn tại tại /public/...     ║
+  ║    Dùng 'main.admin_create_booking' thay thế.                       ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+#}
+
+{% block title %}Quản lý Booking - DahaCare Admin{% endblock %}
+{% block page_title %}Quản lý Booking{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   bk- BEM prefix — Booking Management Page
+   ═══════════════════════════════════════════ */
+
+/* ── Page header ── */
+.bk-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.bk-page-header__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #191c1e;
+    letter-spacing: -0.3px;
+}
+
+.bk-page-header__subtitle {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.bk-btn-create {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #4a90d9;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.bk-btn-create:hover { background: #3a7bc8; }
+.bk-btn-create:active { transform: scale(0.98); }
+
+.bk-btn-create .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Status summary cards ── */
+.bk-status-cards {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.bk-status-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.bk-status-card:hover {
+    border-color: #4a90d9;
+    box-shadow: 0 2px 8px rgba(74,144,217,0.12);
+    transform: translateY(-1px);
+}
+
+.bk-status-card--active {
+    border-color: #4a90d9;
+    background: #e8f2fc;
+}
+
+.bk-status-card__count {
+    font-size: 22px;
+    font-weight: 700;
+    color: #191c1e;
+    line-height: 1;
+}
+
+.bk-status-card--active .bk-status-card__count {
+    color: #1a5ea8;
+}
+
+.bk-status-card__label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #6b7280;
+    letter-spacing: 0.1px;
+}
+
+.bk-status-card--active .bk-status-card__label {
+    color: #3a7bc8;
+}
+
+/* ── Filter bar ── */
+.bk-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.bk-filter-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    flex: 1;
+    min-width: 160px;
+    max-width: 220px;
+}
+
+.bk-filter-search .material-symbols-outlined {
+    font-size: 16px;
+    color: #9ca3af;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    flex-shrink: 0;
+}
+
+.bk-filter-search input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    outline: none;
+    width: 100%;
+}
+
+.bk-filter-search input::placeholder { color: #9ca3af; }
+
+.bk-filter-select {
+    padding: 7px 10px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    min-width: 150px;
+    max-width: 180px;
+    transition: border-color 0.15s;
+}
+
+.bk-filter-select:focus { border-color: #4a90d9; }
+
+.bk-filter-date {
+    padding: 7px 10px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.bk-filter-date:focus { border-color: #4a90d9; }
+
+.bk-filter-clear {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 12px;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s;
+    margin-left: auto;
+}
+
+.bk-filter-clear:hover { color: #374151; background: #f3f4f6; }
+
+.bk-filter-clear .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Table ── */
+.bk-table-container {
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.bk-table-scroll { overflow-x: auto; }
+
+.bk-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+.bk-table thead {
+    background: #f7f9fb;
+    border-bottom: 1px solid #e4e6ea;
+}
+
+.bk-table th {
+    padding: 11px 16px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #6b7280;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.bk-table td {
+    padding: 13px 16px;
+    font-size: 13.5px;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.bk-table tbody tr:last-child td { border-bottom: none; }
+
+.bk-table tbody tr:hover td { background: #fafbfc; }
+
+/* ── Booking ID ── */
+.bk-booking-id {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Customer cell ── */
+.bk-customer-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bk-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.bk-customer-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #191c1e;
+    line-height: 1.3;
+}
+
+.bk-customer-phone {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+/* ── Date/time cell ── */
+.bk-date {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #191c1e;
+}
+
+.bk-time {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 1px;
+}
+
+/* ── Duration ── */
+.bk-duration {
+    font-size: 13px;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+/* ── Status pills ── */
+.bk-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.bk-pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.bk-pill--pending    { background: #FAEEDA; color: #633806; }
+.bk-pill--pending::before { background: #EF9F27; }
+
+.bk-pill--confirmed  { background: #E6F1FB; color: #0C447C; }
+.bk-pill--confirmed::before { background: #378ADD; }
+
+.bk-pill--in-progress { background: #F2EBFB; color: #5C2D91; }
+.bk-pill--in-progress::before { background: #9B59D0; }
+
+.bk-pill--done       { background: #E1F5EE; color: #085041; }
+.bk-pill--done::before { background: #1D9E75; }
+
+.bk-pill--cancelled  { background: #FCEBEB; color: #791F1F; }
+.bk-pill--cancelled::before { background: #E24B4A; }
+
+/* ── Action buttons ── */
+.bk-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+}
+
+.bk-actions form { display: inline; }
+
+.bk-action-btn {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+.bk-action-btn:active { transform: scale(0.97); }
+
+.bk-action-btn--confirm {
+    background: #e8f2fc;
+    color: #1a5ea8;
+}
+.bk-action-btn--confirm:hover { background: #d1e8f8; }
+
+.bk-action-btn--cancel {
+    background: #fef2f2;
+    color: #991b1b;
+}
+.bk-action-btn--cancel:hover { background: #fee2e2; }
+
+.bk-action-btn--done {
+    background: #d1fae5;
+    color: #065f46;
+}
+.bk-action-btn--done:hover { background: #a7f3d0; }
+
+.bk-action-btn--eye {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 6px;
+}
+.bk-action-btn--eye:hover { background: #e5e7eb; color: #374151; }
+
+.bk-action-btn--eye .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Empty state ── */
+.bk-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    gap: 10px;
+    text-align: center;
+}
+
+.bk-empty .material-symbols-outlined {
+    font-size: 40px;
+    color: #d1d5db;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
+}
+
+.bk-empty__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.bk-empty__subtitle {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* ── Pagination ── */
+.bk-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+}
+
+.bk-pagination__info {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.bk-pagination__pages {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bk-page-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    border: 1px solid #e4e6ea;
+    background: #ffffff;
+    color: #374151;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.bk-page-btn:hover:not(.bk-page-btn--active):not(.bk-page-btn--disabled) {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.bk-page-btn--active {
+    background: #4a90d9;
+    border-color: #4a90d9;
+    color: #ffffff;
+}
+
+.bk-page-btn--disabled {
+    color: #d1d5db;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.bk-page-btn .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Modals ── */
+.bk-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(25, 28, 30, 0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.bk-modal-overlay--open { display: flex; }
+
+.bk-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+}
+
+.bk-modal--wide { max-width: 600px; }
+
+.bk-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+    flex-shrink: 0;
+}
+
+.bk-modal__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #191c1e;
+}
+
+.bk-modal__close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.bk-modal__close:hover { background: #f3f4f6; color: #374151; }
+
+.bk-modal__close .material-symbols-outlined {
+    font-size: 20px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.bk-modal__body {
+    padding: 20px 24px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.bk-modal__footer {
+    padding: 0 24px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ── Form elements inside modal ── */
+.bk-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.bk-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+}
+
+.bk-form-group:last-child { margin-bottom: 0; }
+
+.bk-form-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.bk-form-input,
+.bk-form-select,
+.bk-form-textarea {
+    padding: 8px 12px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    background: #f7f9fb;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.bk-form-input:focus,
+.bk-form-select:focus,
+.bk-form-textarea:focus { border-color: #4a90d9; background: #ffffff; }
+
+.bk-form-input[readonly],
+.bk-form-select[disabled] {
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+.bk-form-textarea {
+    resize: vertical;
+    min-height: 72px;
+}
+
+.bk-detail-field {
+    padding: 9px 12px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: #374151;
+}
+
+.bk-detail-field--empty { color: #9ca3af; font-style: italic; }
+
+.bk-form-divider {
+    height: 1px;
+    background: #f3f4f6;
+    margin: 16px 0;
+}
+
+/* ── Modal footer buttons ── */
+.bk-btn-secondary {
+    padding: 8px 18px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #374151;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.bk-btn-secondary:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+.bk-btn-primary {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #4a90d9;
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.bk-btn-primary:hover { background: #3a7bc8; }
+.bk-btn-primary:active { transform: scale(0.98); }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{# ── Status display mapping — decoupled from internal enum values ── #}
+{% set STATUS_LABELS = {
+    'pending':     'Chờ xác nhận',
+    'confirmed':   'Đã xác nhận',
+    'in-progress': 'Đang thực hiện',
+    'done':        'Hoàn thành',
+    'cancelled':   'Đã hủy'
+} %}
+
+{# ── Currently active filter values ── #}
+{% set q_val       = request.args.get('q', '') %}
+{% set status_val  = request.args.get('status', '') %}
+{% set staff_val   = request.args.get('staff_id', '') %}
+{% set service_val = request.args.get('service_id', '') %}
+{% set date_val    = request.args.get('date', '') %}
+{% set page_val    = request.args.get('page', 1) | int %}
+
+{# ── Avatar color palette (matches existing admin_dashboard pattern) ── #}
+{% set AVATAR_PALETTE = [
+    ('#e0e7ff', '#3730a3'),
+    ('#fce7f3', '#9d174d'),
+    ('#fef3c7', '#92400e'),
+    ('#f3e8ff', '#6b21a8'),
+    ('#dcfce7', '#166534'),
+    ('#fee2e2', '#991b1b')
+] %}
+
+
+{# ══════════════════════════════════════════
+   1. PAGE HEADER
+   ══════════════════════════════════════════ #}
+<div class="bk-page-header">
+    <div>
+        <div class="bk-page-header__title">Quản lý Booking</div>
+        <div class="bk-page-header__subtitle">
+            Tổng cộng {{ status_counts.all }} booking
+        </div>
+    </div>
+    <button class="bk-btn-create" onclick="openModal('createBookingModal')">
+        <span class="material-symbols-outlined">add</span>
+        Tạo booking
+    </button>
+</div>
+
+
+{# ══════════════════════════════════════════
+   2. STATUS SUMMARY CARDS
+   Order: Tất cả → Hoàn thành → Đang thực hiện → Đã xác nhận → Chờ xác nhận → Đã hủy
+   Context: status_counts.all, .done, .in_progress, .confirmed, .pending, .cancelled
+   ══════════════════════════════════════════ #}
+<div class="bk-status-cards">
+
+    {# Tất cả — active khi không có status param #}
+    <a href="{{ url_for('main.admin_bookings', q=q_val or None, staff_id=staff_val or None, service_id=service_val or None, date=date_val or None) }}"
+       class="bk-status-card {% if status_val == '' %}bk-status-card--active{% endif %}">
+        <span class="bk-status-card__count">{{ status_counts.all }}</span>
+        <span class="bk-status-card__label">Tất cả</span>
+    </a>
+
+    <a href="{{ url_for('main.admin_bookings', status='done', q=q_val or None, staff_id=staff_val or None, service_id=service_val or None, date=date_val or None) }}"
+       class="bk-status-card {% if status_val == 'done' %}bk-status-card--active{% endif %}">
+        <span class="bk-status-card__count">{{ status_counts.done }}</span>
+        <span class="bk-status-card__label">Hoàn thành</span>
+    </a>
+
+    <a href="{{ url_for('main.admin_bookings', status='in-progress', q=q_val or None, staff_id=staff_val or None, service_id=service_val or None, date=date_val or None) }}"
+       class="bk-status-card {% if status_val == 'in-progress' %}bk-status-card--active{% endif %}">
+        <span class="bk-status-card__count">{{ status_counts.in_progress }}</span>
+        <span class="bk-status-card__label">Đang thực hiện</span>
+    </a>
+
+    <a href="{{ url_for('main.admin_bookings', status='confirmed', q=q_val or None, staff_id=staff_val or None, service_id=service_val or None, date=date_val or None) }}"
+       class="bk-status-card {% if status_val == 'confirmed' %}bk-status-card--active{% endif %}">
+        <span class="bk-status-card__count">{{ status_counts.confirmed }}</span>
+        <span class="bk-status-card__label">Đã xác nhận</span>
+    </a>
+
+    <a href="{{ url_for('main.admin_bookings', status='pending', q=q_val or None, staff_id=staff_val or None, service_id=service_val or None, date=date_val or None) }}"
+       class="bk-status-card {% if status_val == 'pending' %}bk-status-card--active{% endif %}">
+        <span class="bk-status-card__count">{{ status_counts.pending }}</span>
+        <span class="bk-status-card__label">Chờ xác nhận</span>
+    </a>
+
+    <a href="{{ url_for('main.admin_bookings', status='cancelled', q=q_val or None, staff_id=staff_val or None, service_id=service_val or None, date=date_val or None) }}"
+       class="bk-status-card {% if status_val == 'cancelled' %}bk-status-card--active{% endif %}">
+        <span class="bk-status-card__count">{{ status_counts.cancelled }}</span>
+        <span class="bk-status-card__label">Đã hủy</span>
+    </a>
+
+</div>
+
+
+{# ══════════════════════════════════════════
+   3. FILTER BAR
+   Single GET form — all controls submit together.
+   Changing any select auto-submits via JS.
+   Resets page to 1 on new filter.
+   ══════════════════════════════════════════ #}
+<form method="get" action="{{ url_for('main.admin_bookings') }}" class="bk-filters" id="filterForm">
+
+    {# Search by booking ID #}
+    <div class="bk-filter-search">
+        <span class="material-symbols-outlined">search</span>
+        <input
+            type="text"
+            name="q"
+            placeholder="Mã booking (#42)..."
+            value="{{ q_val }}"
+            autocomplete="off"
+        >
+    </div>
+
+    {# Status filter — syncs with status cards above #}
+    <select name="status" class="bk-filter-select" onchange="this.form.submit()">
+        <option value="" {% if status_val == '' %}selected{% endif %}>Tất cả trạng thái</option>
+        <option value="pending"     {% if status_val == 'pending' %}selected{% endif %}>Chờ xác nhận</option>
+        <option value="confirmed"   {% if status_val == 'confirmed' %}selected{% endif %}>Đã xác nhận</option>
+        <option value="in-progress" {% if status_val == 'in-progress' %}selected{% endif %}>Đang thực hiện</option>
+        <option value="done"        {% if status_val == 'done' %}selected{% endif %}>Hoàn thành</option>
+        <option value="cancelled"   {% if status_val == 'cancelled' %}selected{% endif %}>Đã hủy</option>
+    </select>
+
+    {# Stylist filter — context: staff_list (list of dicts: id, full_name) #}
+    <select name="staff_id" class="bk-filter-select" onchange="this.form.submit()">
+        <option value="">Tất cả stylist</option>
+        {% for s in staff_list %}
+        <option value="{{ s.id }}" {% if staff_val == s.id | string %}selected{% endif %}>
+            {{ s.full_name }}
+        </option>
+        {% endfor %}
+    </select>
+
+    {# Service filter — context: service_list (list of dicts: id, name) #}
+    <select name="service_id" class="bk-filter-select" onchange="this.form.submit()">
+        <option value="">Tất cả dịch vụ</option>
+        {% for sv in service_list %}
+        <option value="{{ sv.id }}" {% if service_val == sv.id | string %}selected{% endif %}>
+            {{ sv.name }}
+        </option>
+        {% endfor %}
+    </select>
+
+    {# Date filter #}
+    <input
+        type="date"
+        name="date"
+        class="bk-filter-date"
+        value="{{ date_val }}"
+        onchange="this.form.submit()"
+    >
+
+    {# Clear all filters #}
+    <a href="{{ url_for('main.admin_bookings') }}" class="bk-filter-clear">
+        <span class="material-symbols-outlined">close</span>
+        Xóa bộ lọc
+    </a>
+
+</form>
+
+
+{# ══════════════════════════════════════════
+   4. BOOKINGS TABLE
+   Context: bookings list — see file header for field list
+   DB JOIN: bookings JOIN customers JOIN staff JOIN services
+   ══════════════════════════════════════════ #}
+<div class="bk-table-container">
+    <div class="bk-table-scroll">
+        <table class="bk-table">
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Dịch vụ</th>
+                    <th>Stylist</th>
+                    <th>Ngày & Giờ</th>
+                    <th>Thời lượng</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            {% if bookings %}
+                {% for b in bookings %}
+                {# Avatar color cycles through 6 palettes #}
+                {% set cp = AVATAR_PALETTE[loop.index0 % 6] %}
+                {# Customer initials: up to 2 words #}
+                {% set name_parts = b.customer_name.split() %}
+                {% set initials = name_parts[0][0] | upper %}
+                {% if name_parts | length > 1 %}{% set initials = initials + name_parts[1][0] | upper %}{% endif %}
+
+                <tr>
+                    {# Mã đơn #}
+                    <td>
+                        <span class="bk-booking-id">#{{ b.id }}</span>
+                    </td>
+
+                    {# Khách hàng #}
+                    <td>
+                        <div class="bk-customer-cell">
+                            <div class="bk-avatar" style="background:{{ cp[0] }}; color:{{ cp[1] }};">
+                                {{ initials }}
+                            </div>
+                            <div>
+                                <div class="bk-customer-name">{{ b.customer_name }}</div>
+                                <div class="bk-customer-phone">{{ b.customer_phone or '' }}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    {# Dịch vụ #}
+                    <td>{{ b.service_name }}</td>
+
+                    {# Stylist #}
+                    <td>{{ b.staff_name }}</td>
+
+                    {# Ngày & Giờ — format_date filter nếu có, fallback dùng trực tiếp #}
+                    <td>
+                        <div class="bk-date">{{ b.booking_date }}</div>
+                        <div class="bk-time">{{ b.start_time }} – {{ b.end_time }}</div>
+                    </td>
+
+                    {# Thời lượng #}
+                    <td>
+                        <span class="bk-duration">{{ b.duration_minutes }} phút</span>
+                    </td>
+
+                    {# Trạng thái — CSS class từ internal value, label từ STATUS_LABELS dict #}
+                    <td>
+                        <span class="bk-pill bk-pill--{{ b.status }}">
+                            {{ STATUS_LABELS.get(b.status, b.status) }}
+                        </span>
+                    </td>
+
+                    {# Thao tác — logic theo từng trạng thái #}
+                    {#
+                      Backend routes cần tạo:
+                        POST /admin/booking/<id>/status  →  main.admin_update_booking_status
+                        POST /admin/booking/<id>/update  →  main.admin_update_booking
+                    #}
+                    <td>
+                        <div class="bk-actions">
+
+                            {# pending: Xác nhận + Hủy #}
+                            {% if b.status == 'pending' %}
+                            <form method="post" action="/admin/booking/{{ b.id }}/status">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="status" value="confirmed">
+                                <button type="submit" class="bk-action-btn bk-action-btn--confirm">
+                                    Xác nhận
+                                </button>
+                            </form>
+                            <form method="post" action="/admin/booking/{{ b.id }}/status"
+                                  onsubmit="return confirm('Xác nhận hủy booking #{{ b.id }}?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="status" value="cancelled">
+                                <button type="submit" class="bk-action-btn bk-action-btn--cancel">
+                                    Hủy
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            {# confirmed: Hủy #}
+                            {% if b.status == 'confirmed' %}
+                            <form method="post" action="/admin/booking/{{ b.id }}/status"
+                                  onsubmit="return confirm('Xác nhận hủy booking #{{ b.id }}?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="status" value="cancelled">
+                                <button type="submit" class="bk-action-btn bk-action-btn--cancel">
+                                    Hủy
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            {# in-progress: Hoàn thành #}
+                            {% if b.status == 'in-progress' %}
+                            <form method="post" action="/admin/booking/{{ b.id }}/status">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="status" value="done">
+                                <button type="submit" class="bk-action-btn bk-action-btn--done">
+                                    Hoàn thành
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            {# Xem chi tiết — luôn hiển thị, mở Edit modal #}
+                            <button
+                                type="button"
+                                class="bk-action-btn bk-action-btn--eye"
+                                title="Xem chi tiết"
+                                data-booking-id="{{ b.id }}"
+                                data-customer-name="{{ b.customer_name }}"
+                                data-customer-phone="{{ b.customer_phone or '' }}"
+                                data-service-name="{{ b.service_name }}"
+                                data-staff-id="{{ b.staff_id }}"
+                                data-staff-name="{{ b.staff_name }}"
+                                data-booking-date="{{ b.booking_date }}"
+                                data-start-time="{{ b.start_time }}"
+                                data-end-time="{{ b.end_time }}"
+                                data-duration="{{ b.duration_minutes }}"
+                                data-status="{{ b.status }}"
+                                data-status-label="{{ STATUS_LABELS.get(b.status, b.status) }}"
+                                data-notes="{{ b.notes or '' }}"
+                                data-cancel-reason="{{ b.cancellation_reason or '' }}"
+                                data-update-url="/admin/booking/{{ b.id }}/update"
+                                onclick="openEditModal(this)"
+                            >
+                                <span class="material-symbols-outlined">visibility</span>
+                            </button>
+
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            {% else %}
+                {# Empty state #}
+                <tr>
+                    <td colspan="8">
+                        <div class="bk-empty">
+                            <span class="material-symbols-outlined">calendar_month</span>
+                            <div class="bk-empty__title">Không có booking nào</div>
+                            <div class="bk-empty__subtitle">
+                                {% if q_val or status_val or staff_val or service_val or date_val %}
+                                    Không tìm thấy kết quả phù hợp với bộ lọc hiện tại.
+                                {% else %}
+                                    Chưa có booking nào được tạo.
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5. PAGINATION
+   Context: pagination.start, .end, .total, .page, .pages, .has_prev, .has_next
+   Preserves all current query params when navigating pages (JS buildPageUrl).
+   ══════════════════════════════════════════ #}
+{% if pagination and pagination.total > 0 %}
+<div class="bk-pagination">
+    <span class="bk-pagination__info">
+        Hiển thị {{ pagination.start }}–{{ pagination.end }} / {{ pagination.total }} booking
+    </span>
+    <div class="bk-pagination__pages">
+
+        {# Prev #}
+        {% if pagination.has_prev %}
+        <a href="javascript:void(0)" onclick="goToPage({{ pagination.page - 1 }})" class="bk-page-btn">
+            <span class="material-symbols-outlined">chevron_left</span>
+        </a>
+        {% else %}
+        <span class="bk-page-btn bk-page-btn--disabled">
+            <span class="material-symbols-outlined">chevron_left</span>
+        </span>
+        {% endif %}
+
+        {# Page numbers #}
+        {% for p in range(1, pagination.pages + 1) %}
+            {% if p == pagination.page %}
+            <span class="bk-page-btn bk-page-btn--active">{{ p }}</span>
+            {% elif p <= 2 or p >= pagination.pages - 1 or (p >= pagination.page - 1 and p <= pagination.page + 1) %}
+            <a href="javascript:void(0)" onclick="goToPage({{ p }})" class="bk-page-btn">{{ p }}</a>
+            {% elif p == 3 and pagination.page > 4 %}
+            <span class="bk-page-btn bk-page-btn--disabled">…</span>
+            {% elif p == pagination.pages - 2 and pagination.page < pagination.pages - 3 %}
+            <span class="bk-page-btn bk-page-btn--disabled">…</span>
+            {% endif %}
+        {% endfor %}
+
+        {# Next #}
+        {% if pagination.has_next %}
+        <a href="javascript:void(0)" onclick="goToPage({{ pagination.page + 1 }})" class="bk-page-btn">
+            <span class="material-symbols-outlined">chevron_right</span>
+        </a>
+        {% else %}
+        <span class="bk-page-btn bk-page-btn--disabled">
+            <span class="material-symbols-outlined">chevron_right</span>
+        </span>
+        {% endif %}
+
+    </div>
+</div>
+{% endif %}
+
+
+{# ══════════════════════════════════════════
+   6a. CREATE BOOKING MODAL
+   Backend: POST /admin/booking/create → main.admin_create_booking
+   Context needed: customer_list (id, full_name, phone), staff_list (id, full_name),
+                   service_list (id, name, duration_minutes)
+   Default status on creation: pending
+   ══════════════════════════════════════════ #}
+<div id="createBookingModal" class="bk-modal-overlay" onclick="closeModalOnBackdrop(event, 'createBookingModal')">
+    <div class="bk-modal" onclick="event.stopPropagation()">
+
+        <div class="bk-modal__header">
+            <span class="bk-modal__title">Tạo booking mới</span>
+            <button type="button" class="bk-modal__close" onclick="closeModal('createBookingModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" action="/admin/booking/create" id="createBookingForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="status" value="pending">
+
+            <div class="bk-modal__body">
+
+                {# Khách hàng #}
+                <div class="bk-form-group">
+                    <label class="bk-form-label" for="create_customer_id">Khách hàng</label>
+                    <select name="customer_id" id="create_customer_id" class="bk-form-select" required>
+                        <option value="">Chọn khách hàng...</option>
+                        {% for c in customer_list %}
+                        <option value="{{ c.id }}">{{ c.full_name }}{% if c.phone %} — {{ c.phone }}{% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Dịch vụ — auto-fill duration khi thay đổi #}
+                <div class="bk-form-group">
+                    <label class="bk-form-label" for="create_service_id">Dịch vụ</label>
+                    <select name="service_id" id="create_service_id" class="bk-form-select" required
+                            onchange="autoFillDuration(this)">
+                        <option value="">Chọn dịch vụ...</option>
+                        {% for sv in service_list %}
+                        <option value="{{ sv.id }}" data-duration="{{ sv.duration_minutes }}">
+                            {{ sv.name }} ({{ sv.duration_minutes }} phút)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Stylist #}
+                <div class="bk-form-group">
+                    <label class="bk-form-label" for="create_staff_id">Stylist</label>
+                    <select name="staff_id" id="create_staff_id" class="bk-form-select" required>
+                        <option value="">Chọn stylist...</option>
+                        {% for s in staff_list %}
+                        <option value="{{ s.id }}">{{ s.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="bk-form-row">
+                    {# Ngày #}
+                    <div class="bk-form-group">
+                        <label class="bk-form-label" for="create_date">Ngày</label>
+                        <input type="date" name="booking_date" id="create_date" class="bk-form-input" required>
+                    </div>
+                    {# Giờ bắt đầu #}
+                    <div class="bk-form-group">
+                        <label class="bk-form-label" for="create_start_time">Giờ bắt đầu</label>
+                        <input type="time" name="start_time" id="create_start_time" class="bk-form-input"
+                               min="09:00" max="18:00" step="1800" required>
+                    </div>
+                </div>
+
+                {# Ghi chú #}
+                <div class="bk-form-group">
+                    <label class="bk-form-label" for="create_notes">Ghi chú</label>
+                    <textarea name="notes" id="create_notes" class="bk-form-textarea"
+                              placeholder="Ghi chú thêm (tùy chọn)..."></textarea>
+                </div>
+
+            </div>
+
+            <div class="bk-modal__footer">
+                <button type="button" class="bk-btn-secondary" onclick="closeModal('createBookingModal')">
+                    Hủy bỏ
+                </button>
+                <button type="submit" class="bk-btn-primary">
+                    Tạo booking
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   6b. EDIT / DETAIL BOOKING MODAL
+   One modal instance, populated dynamically via JS from data-* on eye button.
+   Backend: POST /admin/booking/<id>/update → main.admin_update_booking
+           Fields: staff_id, booking_date, start_time, notes
+   Editable: stylist, ngày, giờ, ghi chú
+   Read-only: khách hàng, dịch vụ, trạng thái, thời lượng, lý do hủy
+   ══════════════════════════════════════════ #}
+<div id="editBookingModal" class="bk-modal-overlay" onclick="closeModalOnBackdrop(event, 'editBookingModal')">
+    <div class="bk-modal bk-modal--wide" onclick="event.stopPropagation()">
+
+        <div class="bk-modal__header">
+            <span class="bk-modal__title">Chi tiết booking <span id="edit_modal_id" style="color:#6b7280;font-weight:500;"></span></span>
+            <button type="button" class="bk-modal__close" onclick="closeModal('editBookingModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="bk-modal__body">
+
+            {# Read-only: thông tin khách hàng #}
+            <div class="bk-form-row">
+                <div class="bk-form-group">
+                    <label class="bk-form-label">Khách hàng</label>
+                    <div class="bk-detail-field" id="edit_customer_name"></div>
+                </div>
+                <div class="bk-form-group">
+                    <label class="bk-form-label">Số điện thoại</label>
+                    <div class="bk-detail-field" id="edit_customer_phone"></div>
+                </div>
+            </div>
+
+            {# Read-only: dịch vụ + trạng thái #}
+            <div class="bk-form-row">
+                <div class="bk-form-group">
+                    <label class="bk-form-label">Dịch vụ</label>
+                    <div class="bk-detail-field" id="edit_service_name"></div>
+                </div>
+                <div class="bk-form-group">
+                    <label class="bk-form-label">Trạng thái</label>
+                    <div class="bk-detail-field" id="edit_status_display"></div>
+                </div>
+            </div>
+
+            <div class="bk-form-divider"></div>
+
+            {# Editable fields #}
+            <form method="post" id="editBookingForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                {# Stylist #}
+                <div class="bk-form-group">
+                    <label class="bk-form-label" for="edit_staff_id">Stylist</label>
+                    <select name="staff_id" id="edit_staff_id" class="bk-form-select">
+                        {% for s in staff_list %}
+                        <option value="{{ s.id }}">{{ s.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="bk-form-row">
+                    {# Ngày #}
+                    <div class="bk-form-group">
+                        <label class="bk-form-label" for="edit_date">Ngày</label>
+                        <input type="date" name="booking_date" id="edit_date" class="bk-form-input">
+                    </div>
+                    {# Giờ bắt đầu #}
+                    <div class="bk-form-group">
+                        <label class="bk-form-label" for="edit_start_time">Giờ bắt đầu</label>
+                        <input type="time" name="start_time" id="edit_start_time" class="bk-form-input"
+                               min="09:00" max="18:00" step="1800">
+                    </div>
+                </div>
+
+                {# Ghi chú #}
+                <div class="bk-form-group">
+                    <label class="bk-form-label" for="edit_notes">Ghi chú</label>
+                    <textarea name="notes" id="edit_notes" class="bk-form-textarea"></textarea>
+                </div>
+
+                {# Lý do hủy — chỉ hiển thị khi status = cancelled #}
+                <div class="bk-form-group" id="edit_cancel_reason_row" style="display:none;">
+                    <label class="bk-form-label">Lý do hủy</label>
+                    <div class="bk-detail-field" id="edit_cancel_reason"></div>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="bk-modal__footer">
+            <button type="button" class="bk-btn-secondary" onclick="closeModal('editBookingModal')">
+                Đóng
+            </button>
+            <button type="button" class="bk-btn-primary" onclick="submitEditForm()">
+                Lưu thay đổi
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+/* ── Modal management ── */
+function openModal(id) {
+    document.getElementById(id).classList.add('bk-modal-overlay--open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('bk-modal-overlay--open');
+    document.body.style.overflow = '';
+}
+
+function closeModalOnBackdrop(event, id) {
+    if (event.target === event.currentTarget) closeModal(id);
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal('createBookingModal');
+        closeModal('editBookingModal');
+    }
+});
+
+
+/* ── Edit modal: populate from data-* attributes on eye button ── */
+function openEditModal(btn) {
+    const d = btn.dataset;
+
+    document.getElementById('edit_modal_id').textContent    = '#' + d.bookingId;
+    document.getElementById('edit_customer_name').textContent = d.customerName;
+    document.getElementById('edit_customer_phone').textContent = d.customerPhone || '—';
+    document.getElementById('edit_service_name').textContent = d.serviceName;
+    document.getElementById('edit_status_display').textContent = d.statusLabel;
+
+    /* Editable fields */
+    document.getElementById('edit_date').value       = d.bookingDate;
+    document.getElementById('edit_start_time').value = d.startTime;
+    document.getElementById('edit_notes').value      = d.notes || '';
+
+    /* Staff select: pre-select current staff */
+    const staffSel = document.getElementById('edit_staff_id');
+    for (let opt of staffSel.options) {
+        opt.selected = (opt.value === d.staffId);
+    }
+
+    /* Cancellation reason — only if cancelled */
+    const cancelRow = document.getElementById('edit_cancel_reason_row');
+    if (d.status === 'cancelled') {
+        cancelRow.style.display = '';
+        document.getElementById('edit_cancel_reason').textContent = d.cancelReason || '(Không có lý do)';
+    } else {
+        cancelRow.style.display = 'none';
+    }
+
+    /* Set form action URL for this booking */
+    document.getElementById('editBookingForm').action = d.updateUrl;
+
+    openModal('editBookingModal');
+}
+
+function submitEditForm() {
+    document.getElementById('editBookingForm').submit();
+}
+
+
+/* ── Create booking: auto-fill duration hint on service change ── */
+function autoFillDuration(select) {
+    const chosen = select.options[select.selectedIndex];
+    /* duration is available via data-duration but not displayed as a separate field —
+       backend calculates end_time from start_time + duration */
+}
+
+
+/* ── Pagination: preserve all current query params, change only page ── */
+function goToPage(page) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('page', page);
+    window.location.href = '?' + params.toString();
+}
+
+
+/* ── Filter bar: search input submits on Enter ── */
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('#filterForm input[name="q"]');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('filterForm').submit();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
