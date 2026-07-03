@@ -1,6 +1,19 @@
 import os
-from flask import Blueprint, flash,render_template, request, jsonify, redirect, url_for, session
-from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_active_tier, get_tier_by_name, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_user_email, update_user_password, cancel_booking_with_reason, get_gallery_images, get_active_staff
+import re
+import time
+import uuid
+import sqlite3
+import secrets
+import string
+import unicodedata
+import calendar
+from flask import Blueprint, flash,render_template, request, jsonify, redirect, url_for, session, Response
+from app.database.db import (
+    get_report_totals, get_report_revenue_by_day, get_report_revenue_by_hour, get_report_booking_status,
+    get_report_top_services, get_report_staff_performance, get_report_loyalty,
+    get_report_customer_growth,
+)
+from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_active_tier, get_tier_by_name, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_user_email, update_user_password, cancel_booking_with_reason, get_gallery_images, get_active_staff, get_admin_kpis, get_admin_today_appointments, get_admin_recent_activity, get_admin_revenue_chart, get_all_customers, get_admin_bookings, get_booking_status_counts, update_booking_details, get_staff_stats, get_staff_list, get_staff_role_list, create_staff, update_staff, delete_staff, toggle_staff_active, get_all_categories, get_service_categories_with_services, get_service_stats, create_service, update_service, delete_service, toggle_service_active, create_category, update_category, delete_category, get_admin_customer_stats, get_admin_customers, create_customer_admin, update_customer_admin, delete_customer_admin, get_gallery_images_admin, get_gallery_image_by_id, get_gallery_stats, create_gallery_images, update_gallery_image, delete_gallery_image, bulk_delete_gallery_images, reorder_gallery_images
 from datetime import datetime, timedelta, UTC, date
 from app.services.email_system import send_verification_email, send_thank_you_email, generate_verification_code
 from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days
@@ -12,15 +25,75 @@ from app.utils.helpers import split_customer_bookings, format_booking_date, form
 from collections import Counter
 main = Blueprint("main",__name__)
 
+_failed_logins = {}       # {ip: {"count": int, "blocked_until": float}}
+_MAX_LOGIN_ATTEMPTS = 5
+_LOGIN_LOCKOUT = 15 * 60  # 15 phút
+_ADMIN_IDLE_TIMEOUT = 30 * 60  # 30 phút
+
 _AVATAR_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "avatars")
 _ALLOWED_AVATAR_EXT = {"jpg", "jpeg", "png", "gif"}
+
+_SERVICE_IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "services")
+_ALLOWED_SERVICE_IMG_EXT = {"jpg", "jpeg", "png", "webp"}
+_MAX_SERVICE_IMG_SIZE = 2 * 1024 * 1024  # 2MB
+
+_GALLERY_IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "gallery")
+_ALLOWED_GALLERY_IMG_EXT = {"jpg", "jpeg", "png", "webp"}
+_MAX_GALLERY_IMG_SIZE = 2 * 1024 * 1024  # 2MB
+
+def _slugify(text):
+    text = text.replace("đ", "d").replace("Đ", "D")
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
+    text = re.sub(r"[^a-zA-Z0-9]+", "-", text).strip("-").lower()
+    return text
+
+def _save_service_image(file):
+    """Validates and saves an uploaded service image. Returns the stored filename, or None if no file given."""
+    if not file or not file.filename:
+        return None
+    safe_name = secure_filename(file.filename)
+    ext = safe_name.rsplit(".", 1)[-1].lower() if "." in safe_name else ""
+    if ext not in _ALLOWED_SERVICE_IMG_EXT:
+        raise ValueError("Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, WEBP.")
+
+    file.seek(0, 2)
+    size = file.tell()
+    file.seek(0)
+    if size > _MAX_SERVICE_IMG_SIZE:
+        raise ValueError("Ảnh quá lớn. Kích thước tối đa 2MB.")
+
+    os.makedirs(_SERVICE_IMG_DIR, exist_ok=True)
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    file.save(os.path.join(_SERVICE_IMG_DIR, filename))
+    return filename
+
+def _save_gallery_image(file):
+    """Validates and saves an uploaded gallery image. Returns the stored filename, or None if no file given."""
+    if not file or not file.filename:
+        return None
+    safe_name = secure_filename(file.filename)
+    ext = safe_name.rsplit(".", 1)[-1].lower() if "." in safe_name else ""
+    if ext not in _ALLOWED_GALLERY_IMG_EXT:
+        raise ValueError("Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, WEBP.")
+
+    file.seek(0, 2)
+    size = file.tell()
+    file.seek(0)
+    if size > _MAX_GALLERY_IMG_SIZE:
+        raise ValueError("Ảnh quá lớn. Kích thước tối đa 2MB.")
+
+    os.makedirs(_GALLERY_IMG_DIR, exist_ok=True)
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    file.save(os.path.join(_GALLERY_IMG_DIR, filename))
+    return filename
 
 #Server config
 def customer_login_required(view_func):
     @wraps(view_func)
     def wrapped_view(*args, **kwargs):
         customer_id = session.get('customer_id')
-        if not customer_id:
+        if not customer_id or not get_customer_by_customer_id(customer_id):
+            session.clear()
             flash("Please login!", "error")
             return redirect(url_for('main.login'))
         return view_func(*args, **kwargs)
@@ -36,6 +109,21 @@ def guest_only(view_func):
             if role == "admin":
                 return redirect(url_for("main.admin_dashboard"))
             return redirect(url_for("main.customer_dashboard"))
+        return view_func(*args, **kwargs)
+    return wrapped_view
+
+def admin_required(view_func):
+    @wraps(view_func)
+    def wrapped_view(*args, **kwargs):
+        if not session.get("user_id") or session.get("role") != "admin":
+            flash("Unauthorized.", "error")
+            return redirect(url_for("main.staff_login"))
+        now = time.time()
+        if now - session.get("admin_last_activity", 0) > _ADMIN_IDLE_TIMEOUT:
+            session.clear()
+            flash("Session expired. Please log in again.", "error")
+            return redirect(url_for("main.staff_login"))
+        session["admin_last_activity"] = now
         return view_func(*args, **kwargs)
     return wrapped_view
 
@@ -391,7 +479,7 @@ def customer_reschedule(booking_id):
         existing_bookings = [
             item for item in existing_bookings
             if item["id"] != booking["id"]
-            and item["status"] in ("pending", "confirmed")
+            and item["status"] in ("pending", "confirmed", "in-progress")
         ]
 
         available_slots = get_available_slots(
@@ -506,7 +594,7 @@ def get_reschedule_available_slots(booking_id):
     existing_bookings = [
         item for item in existing_bookings
         if item["id"] != booking["id"]
-        and item["status"] in ("pending", "confirmed")
+        and item["status"] in ("pending", "confirmed", "in-progress")
     ]
 
     raw_slots = get_available_slots(
@@ -766,7 +854,7 @@ def customer_history():
         else:
             appt['display_type'] = 'need_review'
 
-    completed_appointments = [a for a in appointments if a['status'] == 'completed']
+    completed_appointments = [a for a in appointments if a['status'] == 'done']
     
     total_visits = len(completed_appointments)    
     total_spent = sum([i['amount'] or 0 for i in invoices if i['invoice_status'] == 'paid'])
@@ -1235,22 +1323,39 @@ def staff_login():
     if request.method == "GET":
         return render_template("/staff/staff_login.html")
     
+    ip = request.remote_addr
+    now = time.time()
+    attempt = _failed_logins.get(ip, {"count": 0, "blocked_until": 0})
+    if now < attempt["blocked_until"]:
+        remaining = int((attempt["blocked_until"] - now) / 60) + 1
+        flash(f"Too many failed attempts. Try again in {remaining} minute(s).", "error")
+        return redirect(url_for("main.staff_login"))
+
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password","")
+
+    def _record_failure():
+        attempt["count"] += 1
+        if attempt["count"] >= _MAX_LOGIN_ATTEMPTS:
+            attempt["blocked_until"] = time.time() + _LOGIN_LOCKOUT
+            attempt["count"] = 0
+        _failed_logins[ip] = attempt
 
     if not email or not password:
         flash("Please enter email or password!", "error")
         return redirect(url_for("main.staff_login"))
-    
+
     user = get_user_by_email(email)
 
     if not user:
+        _record_failure()
         flash("Invalid email or password!", "error")
         return redirect(url_for("main.staff_login"))
-    
+
     user_id = user['id']
 
     if not check_password_hash(user["password_hash"], password):
+        _record_failure()
         flash("Invalid email or password!", "error")
         return redirect(url_for("main.staff_login"))
 
@@ -1258,6 +1363,7 @@ def staff_login():
         flash("Please use the customer login portal", "error")
         return redirect(url_for("main.login"))
 
+    _failed_logins.pop(ip, None)
     session.clear()
     session["user_id"] = user_id
     session["role"] = user["role"]
@@ -1268,12 +1374,16 @@ def staff_login():
         if not staff:
             flash("Staff profile not found!", "error")
             return redirect(url_for("main.staff_login"))
-        
+
         session["staff_id"] = staff['id']
         flash(f"Login successfully. Welcome {staff['full_name']}!", "success")
         return redirect(url_for("main.staff_dashboard"))
-    
+
     if user["role"] == "admin":
+        staff = get_staff_by_user_id(user_id)
+        session["admin_name"] = staff["full_name"] if staff else "Admin"
+        session["admin_email"] = user["email"]
+        session["admin_last_activity"] = time.time()
         flash(f"Login successfully. Welcome master!", "success")
         return redirect(url_for("main.admin_dashboard"))
     
@@ -1316,7 +1426,7 @@ def complete_booking(booking_id):
     conn = get_connection()
     try:
         conn.execute(
-            "UPDATE bookings SET status = 'completed' WHERE id = ?",
+            "UPDATE bookings SET status = 'done' WHERE id = ?",
             (booking_id,)
         )
 
@@ -1333,7 +1443,7 @@ def complete_booking(booking_id):
 
         # 3. First booking bonus — count AFTER the update (same conn sees uncommitted write)
         row = conn.execute(
-            "SELECT COUNT(*) FROM bookings WHERE customer_id = ? AND status = 'completed'",
+            "SELECT COUNT(*) FROM bookings WHERE customer_id = ? AND status = 'done'",
             (customer_id,)
         ).fetchone()
         if row[0] == 1:
@@ -1362,9 +1472,1080 @@ def complete_booking(booking_id):
 #====================================
 #               Admin
 #====================================
+
+##DASHBOARD
 @main.route("/admin")
+@admin_required
 def admin_dashboard():
-    return render_template("/admin/admin_dashboard.html")
+    today = date.today()
+    today_str = today.strftime("%Y-%m-%d")
+    today_label = today.strftime("%A, %b %d")
+
+    kpi = get_admin_kpis(today_str)
+
+    _avatar_palette = [
+        ("#e0e7ff", "#3730a3"), ("#fce7f3", "#9d174d"),
+        ("#fef3c7", "#92400e"), ("#f3e8ff", "#6b21a8"),
+        ("#dcfce7", "#166534"), ("#fee2e2", "#991b1b"),
+    ]
+    raw_appts = get_admin_today_appointments(today_str)
+    today_appointments = []
+    for i, a in enumerate(raw_appts):
+        bg, fg = _avatar_palette[i % len(_avatar_palette)]
+        parts = a["customer_name"].split()
+        initials = "".join(p[0].upper() for p in parts[:2])
+        today_appointments.append({
+            "time": format_booking_time(a["start_time"]),
+            "duration": f"{a['duration_minutes']} mins",
+            "initials": initials,
+            "avatar_bg": bg,
+            "avatar_color": fg,
+            "name": a["customer_name"],
+            "service": a["service_name"],
+            "staff": a["staff_name"],
+            "status": a["status"],
+        })
+
+    _dot_colors = {
+        "pending":     "#fca5a5",
+        "confirmed":   "#6fb2fd",
+        "in-progress": "#c4b5fd",
+        "done":        "#6ee7b7",
+        "cancelled":   "#cbd5e1",
+    }
+    _activity_text = {
+        "pending":     lambda r: f"<strong>{r['customer_name']}</strong> booked {r['service_name']}",
+        "confirmed":   lambda r: f"Booking confirmed for <strong>{r['customer_name']}</strong>",
+        "in-progress": lambda r: f"Service in progress for <strong>{r['customer_name']}</strong>",
+        "done":        lambda r: f"<strong>{r['customer_name']}</strong> completed {r['service_name']}",
+        "cancelled":   lambda r: f"<strong>{r['customer_name']}</strong> cancelled appointment",
+    }
+    now = datetime.now()
+    activity_feed = []
+    for r in get_admin_recent_activity(5):
+        try:
+            created = datetime.strptime(r["created_at"], "%Y-%m-%d %H:%M:%S")
+            mins = int((now - created).total_seconds() / 60)
+            if mins < 2:
+                time_str = "Just now"
+            elif mins < 60:
+                time_str = f"{mins} mins ago"
+            elif mins < 1440:
+                time_str = f"{mins // 60} hours ago"
+            else:
+                time_str = f"{mins // 1440} days ago"
+        except (ValueError, TypeError):
+            time_str = r["created_at"]
+
+        status = r["status"]
+        text_fn = _activity_text.get(status, lambda r: f"Booking #{r['id']} updated")
+        activity_feed.append({
+            "dot_color": _dot_colors.get(status, "#cbd5e1"),
+            "text": text_fn(r),
+            "time": time_str,
+        })
+
+    revenue_chart = get_admin_revenue_chart(today_str)
+
+    return render_template(
+        "/admin/admin_dashboard.html",
+        today_label=today_label,
+        kpi=kpi,
+        today_appointments=today_appointments,
+        activity_feed=activity_feed,
+        revenue_chart=revenue_chart,
+    )
+
+@main.route("/admin/bookings")
+@admin_required
+def admin_bookings():
+    q          = request.args.get("q", "").strip()
+    status     = request.args.get("status", "").strip()
+    staff_id   = request.args.get("staff_id", "").strip()
+    service_id = request.args.get("service_id", "").strip()
+    date       = request.args.get("date", "").strip()
+    page       = max(1, request.args.get("page", 1, type=int))
+    per_page   = 15
+
+    bookings, total = get_admin_bookings(
+        q=q, status=status, staff_id=staff_id,
+        service_id=service_id, date=date,
+        page=page, per_page=per_page,
+    )
+    status_counts = get_booking_status_counts(
+        q=q, staff_id=staff_id, service_id=service_id, date=date
+    )
+    pages = max(1, (total + per_page - 1) // per_page)
+    pagination = {
+        "start":    (page - 1) * per_page + 1 if total > 0 else 0,
+        "end":      min(page * per_page, total),
+        "total":    total,
+        "page":     page,
+        "pages":    pages,
+        "has_prev": page > 1,
+        "has_next": page < pages,
+    }
+    return render_template(
+        "admin/admin_bookings.html",
+        bookings=bookings,
+        staff_list=get_active_staff(),
+        service_list=get_all_services(),
+        customer_list=get_all_customers(),
+        status_counts=status_counts,
+        pagination=pagination,
+    )
+
+
+@main.route("/admin/booking/<int:booking_id>/status", methods=["POST"])
+@admin_required
+def admin_update_booking_status(booking_id):
+    new_status = request.form.get("status", "").strip()
+    if new_status not in {"pending", "confirmed", "in-progress", "done", "cancelled"}:
+        flash("Trạng thái không hợp lệ.", "error")
+        return redirect(url_for("main.admin_bookings"))
+    if new_status == "cancelled":
+        cancel_booking_with_reason(booking_id, None)
+    else:
+        update_status(booking_id, new_status)
+    flash(f"Đã cập nhật trạng thái booking #{booking_id}.", "success")
+    return redirect(request.referrer or url_for("main.admin_bookings"))
+
+
+@main.route("/admin/booking/create", methods=["POST"])
+@admin_required
+def admin_create_booking():
+    customer_id  = request.form.get("customer_id", type=int)
+    service_id   = request.form.get("service_id", type=int)
+    staff_id     = request.form.get("staff_id", type=int)
+    booking_date = request.form.get("booking_date", "").strip()
+    start_time   = request.form.get("start_time", "").strip()
+    notes        = request.form.get("notes", "").strip() or None
+
+    if not all([customer_id, service_id, staff_id, booking_date, start_time]):
+        flash("Vui lòng điền đầy đủ thông tin.", "error")
+        return redirect(url_for("main.admin_bookings"))
+
+    service = get_service_by_id(service_id)
+    if not service:
+        flash("Dịch vụ không tồn tại.", "error")
+        return redirect(url_for("main.admin_bookings"))
+
+    start_dt = datetime.strptime(start_time, "%H:%M")
+    end_time = (start_dt + timedelta(minutes=service["duration_minutes"])).strftime("%H:%M")
+
+    if check_booking_conflict(staff_id, booking_date, start_time, end_time):
+        flash("Stylist đã có lịch trong khung giờ này. Vui lòng chọn giờ khác.", "error")
+        return redirect(url_for("main.admin_bookings"))
+
+    create_booking(customer_id, staff_id, service_id, booking_date, start_time, end_time, "pending", notes)
+    flash("Tạo booking thành công!", "success")
+    return redirect(url_for("main.admin_bookings"))
+
+
+@main.route("/admin/booking/<int:booking_id>/update", methods=["POST"])
+@admin_required
+def admin_update_booking(booking_id):
+    staff_id     = request.form.get("staff_id", type=int)
+    booking_date = request.form.get("booking_date", "").strip()
+    start_time   = request.form.get("start_time", "").strip()
+    notes        = request.form.get("notes", "").strip() or None
+
+    if not all([staff_id, booking_date, start_time]):
+        flash("Vui lòng điền đầy đủ thông tin.", "error")
+        return redirect(url_for("main.admin_bookings"))
+
+    booking = get_booking_by_id(booking_id)
+    if not booking:
+        flash("Booking không tồn tại.", "error")
+        return redirect(url_for("main.admin_bookings"))
+
+    service = get_service_by_id(booking["service_id"])
+    start_dt = datetime.strptime(start_time, "%H:%M")
+    end_time = (start_dt + timedelta(minutes=service["duration_minutes"])).strftime("%H:%M")
+
+    update_booking_details(booking_id, staff_id, booking_date, start_time, end_time, notes)
+    flash(f"Đã cập nhật booking #{booking_id}.", "success")
+    return redirect(request.referrer or url_for("main.admin_bookings"))
+
+@main.route("/admin/staffs")
+@admin_required
+def admin_staffs():
+    today = date.today()
+    today_str = today.strftime("%Y-%m-%d")
+    month_start_str = today.replace(day=1).strftime("%Y-%m-%d")
+
+    q = request.args.get("q", "").strip()
+    role = request.args.get("role", "").strip()
+    active_raw = request.args.get("active", "").strip()
+    active = int(active_raw) if active_raw in ("0", "1") else None
+
+    return render_template(
+        "/admin/admin_staff.html",
+        staff_list=get_staff_list(today_str, month_start_str, q=q, role=role, active=active),
+        stats=get_staff_stats(month_start_str),
+        role_list=get_staff_role_list(),
+    )
+
+
+@main.route("/admin/staff/create", methods=["POST"])
+@admin_required
+def admin_create_staff():
+    full_name = request.form.get("full_name", "").strip()
+    email = request.form.get("email", "").strip()
+    phone = request.form.get("phone", "").strip()
+    role = request.form.get("role", "").strip() or None
+    hourly_rate = request.form.get("hourly_rate", type=float) or 0
+    commission_rate = request.form.get("commission_rate", type=float) or 0
+    is_active = 1 if request.form.get("is_active") == "1" else 0
+
+    if not full_name or not email:
+        flash("Vui lòng điền đầy đủ họ tên và email.", "error")
+        return redirect(url_for("main.admin_staffs"))
+
+    if get_user_by_email(email):
+        flash("Email này đã được dùng cho một tài khoản khác.", "error")
+        return redirect(url_for("main.admin_staffs"))
+
+    alphabet = string.ascii_letters + string.digits
+    password = "".join(secrets.choice(alphabet) for _ in range(12))
+    user_id = create_user(email, password, role="staff")
+
+    create_staff(full_name, email, phone, role, hourly_rate, commission_rate, is_active, user_id)
+    flash(f"{email}|{password}", "staff_credentials")
+    return redirect(url_for("main.admin_staffs"))
+
+
+@main.route("/admin/staff/<int:staff_id>/update", methods=["POST"])
+@admin_required
+def admin_update_staff(staff_id):
+    full_name = request.form.get("full_name", "").strip()
+    email = request.form.get("email", "").strip()
+    phone = request.form.get("phone", "").strip()
+    role = request.form.get("role", "").strip() or None
+    hourly_rate = request.form.get("hourly_rate", type=float) or 0
+    commission_rate = request.form.get("commission_rate", type=float) or 0
+    is_active = 1 if request.form.get("is_active") == "1" else 0
+
+    if not full_name or not email:
+        flash("Vui lòng điền đầy đủ họ tên và email.", "error")
+        return redirect(url_for("main.admin_staffs"))
+
+    update_staff(staff_id, full_name, email, phone, role, hourly_rate, commission_rate, is_active)
+    flash(f"Đã cập nhật nhân viên #{staff_id}.", "success")
+    return redirect(url_for("main.admin_staffs"))
+
+
+@main.route("/admin/staff/<int:staff_id>/delete", methods=["POST"])
+@admin_required
+def admin_delete_staff(staff_id):
+    try:
+        delete_staff(staff_id)
+        flash("Đã xóa nhân viên.", "success")
+    except sqlite3.IntegrityError:
+        flash("Không thể xóa nhân viên đang có lịch hẹn liên kết.", "error")
+    return redirect(url_for("main.admin_staffs"))
+
+
+@main.route("/admin/staff/<int:staff_id>/toggle-active", methods=["POST"])
+@admin_required
+def admin_toggle_staff_active(staff_id):
+    toggle_staff_active(staff_id)
+    flash("Đã cập nhật trạng thái nhân viên.", "success")
+    return redirect(url_for("main.admin_staffs"))
+
+@main.route("/admin/services")
+@admin_required
+def admin_services():
+    q = request.args.get("q", "").strip()
+    category_id = request.args.get("category_id", type=int)
+    active_raw = request.args.get("active", "").strip()
+    active = int(active_raw) if active_raw in ("0", "1") else None
+
+    return render_template(
+        "/admin/admin_services.html",
+        categories=get_service_categories_with_services(q=q, category_id=category_id, active=active),
+        all_categories=get_all_categories(),
+        stats=get_service_stats(),
+    )
+
+
+@main.route("/admin/service/create", methods=["POST"])
+@admin_required
+def admin_create_service():
+    name = request.form.get("name", "").strip()
+    description = request.form.get("description", "").strip() or None
+    category_id = request.form.get("category_id", type=int)
+    icon = request.form.get("icon", "").strip() or "spa"
+    price = request.form.get("price", type=float)
+    duration_minutes = request.form.get("duration_minutes", type=int)
+    points = request.form.get("points", type=int) or 0
+    badge = request.form.get("badge", "").strip() or None
+    is_active = 1 if request.form.get("is_active") == "1" else 0
+
+    if not name or not category_id or price is None or not duration_minutes:
+        flash("Vui lòng điền đầy đủ thông tin bắt buộc.", "error")
+        return redirect(url_for("main.admin_services"))
+
+    try:
+        image = _save_service_image(request.files.get("image"))
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(url_for("main.admin_services"))
+
+    create_service(category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon)
+    flash(f"Đã thêm dịch vụ {name}.", "success")
+    return redirect(url_for("main.admin_services"))
+
+
+@main.route("/admin/service/<int:service_id>/update", methods=["POST"])
+@admin_required
+def admin_update_service(service_id):
+    service = get_service_by_id(service_id)
+    if not service:
+        flash("Không tìm thấy dịch vụ.", "error")
+        return redirect(url_for("main.admin_services"))
+
+    name = request.form.get("name", "").strip()
+    description = request.form.get("description", "").strip() or None
+    category_id = request.form.get("category_id", type=int)
+    icon = request.form.get("icon", "").strip() or "spa"
+    price = request.form.get("price", type=float)
+    duration_minutes = request.form.get("duration_minutes", type=int)
+    points = request.form.get("points", type=int) or 0
+    badge = request.form.get("badge", "").strip() or None
+    is_active = 1 if request.form.get("is_active") == "1" else 0
+    remove_image = request.form.get("remove_image") == "1"
+
+    if not name or not category_id or price is None or not duration_minutes:
+        flash("Vui lòng điền đầy đủ thông tin bắt buộc.", "error")
+        return redirect(url_for("main.admin_services"))
+
+    try:
+        new_image = _save_service_image(request.files.get("image"))
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(url_for("main.admin_services"))
+
+    if (new_image or remove_image) and service["image"]:
+        old_path = os.path.join(_SERVICE_IMG_DIR, service["image"])
+        if os.path.exists(old_path):
+            os.remove(old_path)
+
+    if new_image:
+        image = new_image
+    elif remove_image:
+        image = None
+    else:
+        image = service["image"]
+
+    update_service(service_id, category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon)
+    flash(f"Đã cập nhật dịch vụ {name}.", "success")
+    return redirect(url_for("main.admin_services"))
+
+
+@main.route("/admin/service/<int:service_id>/delete", methods=["POST"])
+@admin_required
+def admin_delete_service(service_id):
+    try:
+        delete_service(service_id)
+        flash("Đã xóa dịch vụ.", "success")
+    except sqlite3.IntegrityError:
+        flash("Không thể xóa dịch vụ đang có lịch hẹn liên kết.", "error")
+    return redirect(url_for("main.admin_services"))
+
+
+@main.route("/admin/service/<int:service_id>/toggle-active", methods=["POST"])
+@admin_required
+def admin_toggle_service_active(service_id):
+    toggle_service_active(service_id)
+    flash("Đã cập nhật trạng thái dịch vụ.", "success")
+    return redirect(url_for("main.admin_services"))
+
+
+@main.route("/admin/category/create", methods=["POST"])
+@admin_required
+def admin_create_category():
+    name = request.form.get("name", "").strip()
+    slug = request.form.get("slug", "").strip() or _slugify(name)
+    is_active = 1 if request.form.get("is_active") == "1" else 0
+
+    if not name:
+        flash("Vui lòng nhập tên danh mục.", "error")
+        return redirect(url_for("main.admin_services"))
+
+    try:
+        create_category(name, slug, is_active)
+        flash(f"Đã thêm danh mục {name}.", "success")
+    except sqlite3.IntegrityError:
+        flash("Slug này đã tồn tại. Vui lòng chọn slug khác.", "error")
+    return redirect(url_for("main.admin_services"))
+
+
+@main.route("/admin/category/<int:category_id>/update", methods=["POST"])
+@admin_required
+def admin_update_category(category_id):
+    name = request.form.get("name", "").strip()
+    slug = request.form.get("slug", "").strip() or _slugify(name)
+    is_active = 1 if request.form.get("is_active") == "1" else 0
+
+    if not name:
+        flash("Vui lòng nhập tên danh mục.", "error")
+        return redirect(url_for("main.admin_services"))
+
+    try:
+        update_category(category_id, name, slug, is_active)
+        flash(f"Đã cập nhật danh mục {name}.", "success")
+    except sqlite3.IntegrityError:
+        flash("Slug này đã tồn tại. Vui lòng chọn slug khác.", "error")
+    return redirect(url_for("main.admin_services"))
+
+
+@main.route("/admin/category/<int:category_id>/delete", methods=["POST"])
+@admin_required
+def admin_delete_category(category_id):
+    try:
+        delete_category(category_id)
+        flash("Đã xóa danh mục.", "success")
+    except sqlite3.IntegrityError:
+        flash("Không thể xóa danh mục đang có dịch vụ. Vui lòng xóa hoặc chuyển dịch vụ sang danh mục khác trước.", "error")
+    return redirect(url_for("main.admin_services"))
+
+
+##GALLERY
+@main.route("/admin/gallery")
+@admin_required
+def admin_gallery():
+    q = request.args.get("q", "").strip()
+    filter_type = request.args.get("filter", "").strip()
+
+    images = get_gallery_images_admin()
+    if q:
+        images = [img for img in images if q.lower() in (img["alt_text"] or "").lower()]
+    if filter_type == "captioned":
+        images = [img for img in images if img["alt_text"]]
+    elif filter_type == "uncaptioned":
+        images = [img for img in images if not img["alt_text"]]
+
+    return render_template(
+        "/admin/admin_gallery.html",
+        images=images,
+        stats=get_gallery_stats(),
+    )
+
+
+@main.route("/admin/gallery/upload", methods=["POST"])
+@admin_required
+def admin_gallery_upload():
+    files = request.files.getlist("files[]")
+    alt_text = request.form.get("alt_text", "").strip()
+    sort_order_start = request.form.get("sort_order_start", type=int) or 0
+
+    files = [f for f in files if f and f.filename]
+    if not files:
+        flash("Vui lòng chọn ít nhất 1 ảnh.", "error")
+        return redirect(url_for("main.admin_gallery"))
+
+    rows = []
+    try:
+        for i, file in enumerate(files):
+            filename = _save_gallery_image(file)
+            rows.append((filename, alt_text, sort_order_start + i))
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(url_for("main.admin_gallery"))
+
+    create_gallery_images(rows)
+    flash(f"Đã tải lên {len(rows)} ảnh thành công.", "success")
+    return redirect(url_for("main.admin_gallery"))
+
+
+@main.route("/admin/gallery/<int:image_id>/update", methods=["POST"])
+@admin_required
+def admin_gallery_update(image_id):
+    image = get_gallery_image_by_id(image_id)
+    if not image:
+        flash("Không tìm thấy ảnh.", "error")
+        return redirect(url_for("main.admin_gallery"))
+
+    alt_text = request.form.get("alt_text", "").strip()
+    sort_order = request.form.get("sort_order", type=int) or 0
+    is_active = 1 if request.form.get("is_active") == "1" else 0
+
+    try:
+        new_image = _save_gallery_image(request.files.get("image"))
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(url_for("main.admin_gallery"))
+
+    if new_image:
+        old_path = os.path.join(_GALLERY_IMG_DIR, image["image_url"])
+        if os.path.exists(old_path):
+            os.remove(old_path)
+        update_gallery_image(image_id, alt_text, sort_order, is_active, image_url=new_image)
+    else:
+        update_gallery_image(image_id, alt_text, sort_order, is_active)
+
+    flash("Đã cập nhật ảnh.", "success")
+    return redirect(url_for("main.admin_gallery"))
+
+
+@main.route("/admin/gallery/<int:image_id>/delete", methods=["POST"])
+@admin_required
+def admin_gallery_delete(image_id):
+    image = get_gallery_image_by_id(image_id)
+    if image:
+        old_path = os.path.join(_GALLERY_IMG_DIR, image["image_url"])
+        try:
+            os.remove(old_path)
+        except OSError:
+            pass
+        delete_gallery_image(image_id)
+        flash("Đã xóa ảnh.", "success")
+    return redirect(url_for("main.admin_gallery"))
+
+
+@main.route("/admin/gallery/reorder", methods=["POST"])
+@admin_required
+def admin_gallery_reorder():
+    data = request.get_json(silent=True) or {}
+    order = data.get("order", [])
+    reorder_gallery_images([(item["sort_order"], item["id"]) for item in order])
+    return jsonify({"success": True})
+
+
+@main.route("/admin/gallery/bulk-delete", methods=["POST"])
+@admin_required
+def admin_gallery_bulk_delete():
+    ids_raw = request.form.get("image_ids", "")
+    image_ids = [int(i) for i in ids_raw.split(",") if i.strip().isdigit()]
+
+    for image_id in image_ids:
+        image = get_gallery_image_by_id(image_id)
+        if image:
+            old_path = os.path.join(_GALLERY_IMG_DIR, image["image_url"])
+            try:
+                os.remove(old_path)
+            except OSError:
+                pass
+
+    if image_ids:
+        bulk_delete_gallery_images(image_ids)
+        flash(f"Đã xóa {len(image_ids)} ảnh.", "success")
+    return redirect(url_for("main.admin_gallery"))
+
+
+@main.route("/admin/customers")
+@admin_required
+def admin_customers():
+    today = date.today()
+    month_start_str = today.replace(day=1).strftime("%Y-%m-%d")
+
+    q = request.args.get("q", "").strip()
+    sort = request.args.get("sort", "newest").strip()
+    tier = request.args.get("tier", "").strip()
+    page = max(1, request.args.get("page", 1, type=int))
+    per_page = 15
+
+    customers, total = get_admin_customers(q=q, sort=sort, tier=tier, page=page, per_page=per_page)
+    pages = max(1, (total + per_page - 1) // per_page)
+    pagination = {
+        "start":    (page - 1) * per_page + 1 if total > 0 else 0,
+        "end":      min(page * per_page, total),
+        "total":    total,
+        "page":     page,
+        "pages":    pages,
+        "has_prev": page > 1,
+        "has_next": page < pages,
+    }
+
+    return render_template(
+        "admin/admin_customers.html",
+        customers=customers,
+        stats=get_admin_customer_stats(month_start_str),
+        pagination=pagination,
+    )
+
+
+@main.route("/admin/customers/create", methods=["POST"])
+@admin_required
+def admin_create_customer():
+    full_name = request.form.get("full_name", "").strip()
+    phone = request.form.get("phone", "").strip()
+    date_of_birth = request.form.get("date_of_birth", "").strip() or None
+    notes = request.form.get("notes", "").strip()
+    email = request.form.get("email", "").strip()
+
+    if not full_name:
+        flash("Vui lòng điền họ và tên.", "error")
+        return redirect(url_for("main.admin_customers"))
+
+    if email and get_user_by_email(email):
+        flash("Không thể tạo khách hàng: email này đã được dùng để tạo một tài khoản khác.", "error")
+        return redirect(url_for("main.admin_customers"))
+
+    customer_id = create_customer_admin(full_name, email, phone, date_of_birth, notes)
+
+    silver_tier = get_tier_by_name("Silver")
+    if silver_tier:
+        upgrade_membership(customer_id, silver_tier["id"], silver_tier["duration_days"])
+
+    if not email:
+        flash("Đã thêm khách hàng mới.", "success")
+        return redirect(url_for("main.admin_customers"))
+
+    alphabet = string.ascii_letters + string.digits
+    password = "".join(secrets.choice(alphabet) for _ in range(12))
+    user_id = create_user(email, password, role="customer")
+    link_customer_to_user(customer_id, user_id)
+    flash(f"{email}|{password}", "customer_credentials")
+    return redirect(url_for("main.admin_customers"))
+
+
+@main.route("/admin/customers/<int:customer_id>/edit", methods=["GET", "POST"])
+@admin_required
+def admin_edit_customer(customer_id):
+    customer = get_customer_by_customer_id(customer_id)
+    if not customer:
+        flash("Không tìm thấy khách hàng.", "error")
+        return redirect(url_for("main.admin_customers"))
+
+    if request.method == "POST":
+        full_name = request.form.get("full_name", "").strip()
+        phone = request.form.get("phone", "").strip()
+        date_of_birth = request.form.get("date_of_birth", "").strip() or None
+        notes = request.form.get("notes", "").strip()
+        email = request.form.get("email", "").strip()
+
+        if not full_name:
+            flash("Vui lòng điền họ và tên.", "error")
+            return redirect(url_for("main.admin_edit_customer", customer_id=customer_id))
+
+        update_customer_admin(customer_id, full_name, email, phone, date_of_birth, notes)
+        flash(f"Đã cập nhật khách hàng #{customer_id}.", "success")
+        return redirect(url_for("main.admin_customers"))
+
+    # No dedicated edit-page template yet — admin_customers.html's Detail modal
+    # covers view-only info. Redirect back until an edit page/modal is built.
+    flash("Trang chỉnh sửa khách hàng chưa được xây dựng.", "error")
+    return redirect(url_for("main.admin_customers"))
+
+
+@main.route("/admin/customers/<int:customer_id>/adjust-points", methods=["POST"])
+@admin_required
+def admin_adjust_points(customer_id):
+    customer = get_customer_by_customer_id(customer_id)
+    if not customer:
+        flash("Không tìm thấy khách hàng.", "error")
+        return redirect(url_for("main.admin_customers"))
+
+    points = request.form.get("points", type=int)
+    if not points:
+        flash("Vui lòng nhập số điểm hợp lệ.", "error")
+        return redirect(url_for("main.admin_customers"))
+
+    admin_name = session.get("admin_name", "Admin")
+    award_points(customer_id, points, "admin_adjustment", note=f"Điều chỉnh bởi {admin_name}")
+    flash(f"Đã điều chỉnh {points:+d} điểm cho {customer['full_name']}.", "success")
+    return redirect(url_for("main.admin_customers"))
+
+
+@main.route("/admin/customers/<int:customer_id>/delete", methods=["POST"])
+@admin_required
+def admin_delete_customer(customer_id):
+    customer = get_customer_by_customer_id(customer_id)
+    if not customer:
+        flash("Không tìm thấy khách hàng.", "error")
+        return redirect(url_for("main.admin_customers"))
+
+    try:
+        delete_customer_admin(customer_id)
+        flash(f"Đã xóa khách hàng {customer['full_name']}.", "success")
+    except sqlite3.IntegrityError:
+        flash("Không thể xóa khách hàng đang có booking hoặc dữ liệu liên kết.", "error")
+
+    return redirect(url_for("main.admin_customers"))
+
+# ── Reports helpers ──────────────────────────────────────────
+_REPORT_STATUS_COLORS = {
+    "done":        "#1D9E75",
+    "confirmed":   "#378ADD",
+    "pending":     "#EF9F27",
+    "in-progress": "#9B59D0",
+    "cancelled":   "#E24B4A",
+}
+_REPORT_STATUS_LABELS = {
+    "done":        "Hoàn thành",
+    "confirmed":   "Đã xác nhận",
+    "pending":     "Chờ xác nhận",
+    "in-progress": "Đang thực hiện",
+    "cancelled":   "Đã hủy",
+}
+_REPORT_SOURCE_LABELS = {
+    "booking":          "Hoàn thành booking",
+    "first_booking":    "Booking đầu tiên",
+    "birthday":         "Sinh nhật",
+    "review":           "Viết đánh giá",
+    "streak":           "Chuỗi ghé thăm",
+    "admin":            "Admin điều chỉnh",
+    "admin_adjustment": "Admin điều chỉnh",
+    "referral":         "Giới thiệu bạn bè",
+}
+_REPORT_PRESETS = ("today", "7days", "month", "3months", "year")
+
+
+def _months_ago(d, n):
+    """First day of the month that is n months before d's month."""
+    m = d.month - n
+    y = d.year
+    while m <= 0:
+        m += 12
+        y -= 1
+    return date(y, m, 1)
+
+
+def _resolve_report_range(preset, date_from, date_to):
+    """Return (date_from, date_to, active_preset) as YYYY-MM-DD strings.
+    Custom date_from/date_to override the preset (active_preset = '')."""
+    today = date.today()
+    if date_from or date_to:
+        df = date_from or date_to
+        dt = date_to or date_from
+        if df > dt:
+            df, dt = dt, df
+        return df, dt, ""
+
+    if preset == "today":
+        start = end = today
+    elif preset == "7days":
+        start, end = today - timedelta(days=6), today
+    elif preset == "3months":
+        start, end = _months_ago(today, 2), today
+    elif preset == "year":
+        start, end = date(today.year, 1, 1), today
+    else:
+        preset = "month"
+        start, end = date(today.year, today.month, 1), today
+    return start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"), preset
+
+
+def _pct_trend(cur, prev):
+    """Signed percentage change vs previous period, rounded to 1 dp."""
+    if prev == 0:
+        return 100.0 if cur > 0 else 0.0
+    return round((cur - prev) / prev * 100, 1)
+
+
+_MONTH_ABBR_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+_WEEKDAY_ABBR_EN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+_WEEKDAY_VI = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"]
+
+
+def _month_span(d_from, d_to):
+    """List of (year, month) tuples spanned by [d_from, d_to], inclusive."""
+    months = []
+    y, m = d_from.year, d_from.month
+    while (y, m) <= (d_to.year, d_to.month):
+        months.append((y, m))
+        m += 1
+        if m > 12:
+            m = 1
+            y += 1
+    return months
+
+
+def _build_revenue_chart(df, dt, active_preset):
+    """Bucket paid revenue for the 'Doanh thu theo ngày' card.
+
+    Grouping is picked from active_preset; for a custom range (active_preset == '')
+    it's auto-selected from the range length: <=1 day hourly, <=14 daily,
+    <=90 biweekly, else monthly.
+    """
+    d_from = datetime.strptime(df, "%Y-%m-%d").date()
+    d_to = datetime.strptime(dt, "%Y-%m-%d").date()
+    length = (d_to - d_from).days
+    today = date.today()
+
+    if active_preset == "today":
+        grouping = "hourly"
+    elif active_preset == "7days":
+        grouping = "daily"
+    elif active_preset == "month":
+        grouping = "daily"
+    elif active_preset == "3months":
+        grouping = "biweekly"
+    elif active_preset == "year":
+        grouping = "monthly"
+    elif length <= 1:
+        grouping = "hourly"
+    elif length <= 14:
+        grouping = "daily"
+    elif length <= 90:
+        grouping = "biweekly"
+    else:
+        grouping = "monthly"
+
+    buckets = []  # (label, amount, tooltip, is_current)
+
+    if grouping == "hourly":
+        hour_amounts = get_report_revenue_by_hour(df)
+        now_hour = datetime.now().hour
+        for h in range(0, 24, 3):
+            amt = sum(hour_amounts.get(x, 0) for x in range(h, h + 3))
+            buckets.append((
+                f"{h:02d}:00", amt,
+                f"{h:02d}:00 - {(h + 3) % 24:02d}:00 · {amt:.0f}€",
+                active_preset == "today" and h <= now_hour < h + 3,
+            ))
+
+    elif grouping == "daily":
+        day_amount = {r["day"]: r["amount"] for r in get_report_revenue_by_day(df, dt)}
+        step = 2 if active_preset == "month" else 1
+        d = d_from
+        while d <= d_to:
+            amt = day_amount.get(d.strftime("%Y-%m-%d"), 0)
+            label = _WEEKDAY_ABBR_EN[d.weekday()] if active_preset == "7days" else f"{d.day}/{d.month}"
+            tooltip = f"{_WEEKDAY_VI[d.weekday()]} {d.day:02d}/{d.month:02d} · {amt:.0f}€"
+            buckets.append((label, amt, tooltip, d == today))
+            d += timedelta(days=step)
+
+    elif grouping == "biweekly":
+        day_amount = {r["day"]: r["amount"] for r in get_report_revenue_by_day(df, dt)}
+        for (y, m) in _month_span(d_from, d_to):
+            last_day = calendar.monthrange(y, m)[1]
+            for half_start, half_end in ((1, 14), (15, last_day)):
+                start = max(date(y, m, half_start), d_from)
+                end = min(date(y, m, half_end), d_to)
+                if start > end:
+                    continue
+                amt, is_current, d = 0.0, False, start
+                while d <= end:
+                    amt += day_amount.get(d.strftime("%Y-%m-%d"), 0)
+                    is_current = is_current or d == today
+                    d += timedelta(days=1)
+                buckets.append((
+                    f"{half_start}/{m}", amt,
+                    f"{half_start}-{half_end}/{m}/{y} · {amt:.0f}€",
+                    is_current,
+                ))
+
+    else:  # monthly
+        day_amount = {r["day"]: r["amount"] for r in get_report_revenue_by_day(df, dt)}
+        months = [(d_to.year, mo) for mo in range(1, 13)] if active_preset == "year" else _month_span(d_from, d_to)
+        for (y, m) in months:
+            last_day = calendar.monthrange(y, m)[1]
+            start, end = max(date(y, m, 1), d_from), min(date(y, m, last_day), d_to)
+            amt, d = 0.0, start
+            while d <= end:
+                amt += day_amount.get(d.strftime("%Y-%m-%d"), 0)
+                d += timedelta(days=1)
+            label = _MONTH_ABBR_EN[m - 1]
+            buckets.append((label, amt, f"{label} {y} · {amt:.0f}€", (y, m) == (today.year, today.month)))
+
+    max_amt = max((b[1] for b in buckets), default=0)
+    chart_data = [
+        {
+            "label": label,
+            "amount": amt,
+            "pct": round(amt / max_amt * 100) if max_amt else 0,
+            "tooltip": tooltip,
+            "is_current": is_current,
+        }
+        for label, amt, tooltip, is_current in buckets
+    ]
+    return chart_data, grouping
+
+
+def _build_report_context(df, dt, active_preset):
+    """Assemble every context dict the reports template needs."""
+    # Previous period of equal length, immediately before df.
+    d_from = datetime.strptime(df, "%Y-%m-%d").date()
+    d_to = datetime.strptime(dt, "%Y-%m-%d").date()
+    length = (d_to - d_from).days
+    prev_to = d_from - timedelta(days=1)
+    prev_from = prev_to - timedelta(days=length)
+    pdf, pdt = prev_from.strftime("%Y-%m-%d"), prev_to.strftime("%Y-%m-%d")
+
+    cur = get_report_totals(df, dt)
+    prev = get_report_totals(pdf, pdt)
+    kpi = {
+        "total_revenue":   cur["revenue"],
+        "revenue_trend":   _pct_trend(cur["revenue"], prev["revenue"]),
+        "total_bookings":  cur["bookings"],
+        "bookings_trend":  _pct_trend(cur["bookings"], prev["bookings"]),
+        "new_customers":   cur["new_customers"],
+        "customers_trend": cur["new_customers"] - prev["new_customers"],  # absolute delta
+        "points_issued":   cur["points_issued"],
+        "points_trend":    _pct_trend(cur["points_issued"], prev["points_issued"]),
+    }
+
+    # Revenue chart → dynamic grouping based on active_preset (see _build_revenue_chart).
+    revenue_chart_data, revenue_chart_grouping = _build_revenue_chart(df, dt, active_preset)
+
+    # Booking status donut → pct + cumulative offset for stroke-dasharray.
+    status_counts = get_report_booking_status(df, dt)
+    total_bk = sum(status_counts.values())
+    booking_status_breakdown = []
+    offset = 0.0
+    for status in ("done", "confirmed", "in-progress", "pending", "cancelled"):
+        count = status_counts.get(status, 0)
+        if count == 0:
+            continue
+        pct = round(count / total_bk * 100, 1) if total_bk else 0
+        booking_status_breakdown.append({
+            "status": status,
+            "label": _REPORT_STATUS_LABELS.get(status, status),
+            "count": count,
+            "pct": pct,
+            "color": _REPORT_STATUS_COLORS.get(status, "#8591a5"),
+            "cumulative_offset": round(offset, 2),
+        })
+        offset += pct
+
+    # Top services → revenue share of total paid revenue.
+    total_paid = kpi["total_revenue"]
+    top_services = []
+    for sv in get_report_top_services(df, dt):
+        top_services.append({
+            "name": sv["name"],
+            "booking_count": sv["booking_count"],
+            "revenue": sv["revenue"],
+            "revenue_pct": round(sv["revenue"] / total_paid * 100, 1) if total_paid else 0,
+        })
+
+    # Staff performance → bar fill relative to the top performer.
+    staff_rows = get_report_staff_performance(df, dt)
+    max_staff_rev = max((s["revenue"] for s in staff_rows), default=0)
+    staff_performance = []
+    for s in staff_rows:
+        parts = (s["full_name"] or "").split()
+        initials = "".join(p[0].upper() for p in parts[:2]) or "?"
+        staff_performance.append({
+            "full_name": s["full_name"],
+            "initials": initials,
+            "booking_count": s["booking_count"],
+            "revenue": s["revenue"],
+            "revenue_pct": round(s["revenue"] / max_staff_rev * 100, 1) if max_staff_rev else 0,
+        })
+
+    # Customer growth → always the last 6 calendar months.
+    today = date.today()
+    since = _months_ago(today, 5)
+    growth_map = get_report_customer_growth(since.strftime("%Y-%m-%d"))
+    months = [_months_ago(today, 5 - i) for i in range(6)]
+    counts = [growth_map.get(m.strftime("%Y-%m"), 0) for m in months]
+    max_count = max(counts, default=0)
+    customer_growth = []
+    for i, m in enumerate(months):
+        prev_c = counts[i - 1] if i > 0 else 0
+        customer_growth.append({
+            "label": f"T{m.month}",
+            "month": m.month,
+            "year": m.year,
+            "count": counts[i],
+            "pct": round(counts[i] / max_count * 100, 1) if max_count else 0,
+            "is_current": (m.year == today.year and m.month == today.month),
+            "growth_pct": _pct_trend(counts[i], prev_c),
+        })
+
+    # Loyalty summary.
+    loy = get_report_loyalty(df, dt)
+    loyalty = {
+        "total_issued": loy["total_issued"],
+        "total_redeemed": loy["total_redeemed"],
+        "net_points": loy["total_issued"] - loy["total_redeemed"],
+        "redemption_count": loy["redemption_count"],
+        "sources": [
+            {
+                "source": s["source"],
+                "source_label": _REPORT_SOURCE_LABELS.get(s["source"], s["source"]),
+                "points": int(s["points"]),
+            }
+            for s in loy["sources"]
+        ],
+    }
+
+    return {
+        "kpi": kpi,
+        "revenue_chart_data": revenue_chart_data,
+        "grouping": revenue_chart_grouping,
+        "booking_status_breakdown": booking_status_breakdown,
+        "total_bookings_count": total_bk,
+        "top_services": top_services,
+        "staff_performance": staff_performance,
+        "customer_growth": customer_growth,
+        "loyalty": loyalty,
+    }
+
+
+@main.route("/admin/reports")
+@admin_required
+def admin_reports():
+    preset = request.args.get("preset", "month").strip()
+    date_from = request.args.get("date_from", "").strip()
+    date_to = request.args.get("date_to", "").strip()
+
+    df, dt, active_preset = _resolve_report_range(preset, date_from, date_to)
+    ctx = _build_report_context(df, dt, active_preset)
+
+    return render_template(
+        "/admin/admin_reports.html",
+        date_from=df,
+        date_to=dt,
+        active_preset=active_preset,
+        **ctx,
+    )
+
+
+@main.route("/admin/reports/export.csv")
+@admin_required
+def export_report_csv():
+    import csv, io
+    preset = request.args.get("preset", "month").strip()
+    date_from = request.args.get("date_from", "").strip()
+    date_to = request.args.get("date_to", "").strip()
+
+    df, dt, active_preset = _resolve_report_range(preset, date_from, date_to)
+    ctx = _build_report_context(df, dt, active_preset)
+    kpi = ctx["kpi"]
+
+    buf = io.StringIO()
+    buf.write("﻿")  # BOM để Excel đọc đúng tiếng Việt
+    w = csv.writer(buf)
+
+    w.writerow(["Báo cáo DahaCare", f"Từ {df}", f"Đến {dt}"])
+    w.writerow([])
+    w.writerow(["Chỉ số", "Giá trị"])
+    w.writerow(["Tổng doanh thu", f"{kpi['total_revenue']:.0f}"])
+    w.writerow(["Tổng booking", kpi["total_bookings"]])
+    w.writerow(["Khách hàng mới", kpi["new_customers"]])
+    w.writerow(["Điểm loyalty đã phát", kpi["points_issued"]])
+    w.writerow([])
+
+    w.writerow(["Top dịch vụ", "Lượt", "Doanh thu", "Tỉ lệ %"])
+    for sv in ctx["top_services"]:
+        w.writerow([sv["name"], sv["booking_count"], f"{sv['revenue']:.0f}", sv["revenue_pct"]])
+    w.writerow([])
+
+    w.writerow(["Nhân viên", "Booking", "Doanh thu"])
+    for s in ctx["staff_performance"]:
+        w.writerow([s["full_name"], s["booking_count"], f"{s['revenue']:.0f}"])
+
+    filename = f"dahacare-bao-cao-{df}-{dt}.csv"
+    return Response(
+        buf.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+
+@main.route("/admin/logout")
+def admin_logout():
+    session.clear()
+    return redirect(url_for("main.staff_login"))
+
+@main.route("/admin/booking/walk-in")
+@admin_required
+def booking_walkin():
+    return redirect(url_for("main.admin_bookings"))
 
 #====================================
 #               Public
