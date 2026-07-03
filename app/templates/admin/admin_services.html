@@ -1,0 +1,1721 @@
+{% extends "admin/admin_base.html" %}
+
+{#
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  ADMIN SERVICE MANAGEMENT PAGE — admin_services.html                ║
+  ║  Extends: admin/admin_base.html                                     ║
+  ║  Blocks used: title, extra_css, page_title, content, extra_js       ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ⚠ CONFLICTS WITH ORIGINAL BRIEF (flagged, not silently overwritten)║
+  ║                                                                     ║
+  ║  1. Blueprint name: brief assumed endpoints named "admin.*".        ║
+  ║     Codebase's actual blueprint is "main" (main = Blueprint("main", ║
+  ║     __name__)). All routes below use "main.*", matching the         ║
+  ║     existing convention (main.admin_staffs, main.admin_bookings).   ║
+  ║                                                                     ║
+  ║  2. CSS variables: brief specified var(--surface-2), var(--border), ║
+  ║     var(--text-secondary). These do NOT exist in admin_base.html    ║
+  ║     (only hardcoded hex is used site-wide). This page uses the same ║
+  ║     hardcoded hex palette already established by admin_staff.html / ║
+  ║     admin_bookings.html (white cards, 0.5px #e4e6ea borders,        ║
+  ║     #6b7280 secondary text, #4a90d9 accent) — values match the      ║
+  ║     brief's intent so nothing looks different.                      ║
+  ║                                                                     ║
+  ║  3. Icon set: brief specified Tabler classes (ti-grip-vertical,     ║
+  ║     ti-photo-plus...). Not loaded anywhere in this project, and the ║
+  ║     services.icon column default is 'spa' — a Material Symbols      ║
+  ║     Outlined glyph name (the font already loaded in admin_base.html ║
+  ║     and used site-wide), not a Tabler class. This page uses         ║
+  ║     Material Symbols Outlined throughout instead of introducing a   ║
+  ║     second icon library.                                            ║
+  ║                                                                     ║
+  ║  4. CSRF: brief didn't mention it, but every POST form in           ║
+  ║     admin_staff.html / admin_bookings.html carries a hidden         ║
+  ║     csrf_token() input. Same here.                                  ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  CONTEXT VARIABLES (provided by main.admin_services in routes.py):  ║
+  ║    categories : list of dicts — id, name, slug, is_active,          ║
+  ║      sort_order, services (nested list, see below). Filtered by     ║
+  ║      q / category_id / active query params.                         ║
+  ║    categories[i].services : list of dicts — id, name, description,  ║
+  ║      category_id, duration_minutes, price, points, is_active,       ║
+  ║      image, badge, icon (services has NO sort_order column in       ║
+  ║      schema.sql, unlike service_categories — ordered by name)       ║
+  ║    all_categories : full, UNFILTERED list of categories (id, name)  ║
+  ║      used only for <select> option lists (toolbar filter, Add/Edit  ║
+  ║      Service category picker) so they don't collapse to one option  ║
+  ║      when the page itself is filtered to a single category.         ║
+  ║    stats : dict — total_categories, total_services, active_services,║
+  ║      avg_price                                                      ║
+  ║    DB tables: services JOIN service_categories                      ║
+  ║                                                                     ║
+  ║    Image path convention:                                           ║
+  ║      Stored at: static/uploads/services/<uuid>.ext                  ║
+  ║      Served via: url_for('static', filename='uploads/services/' +   ║
+  ║        s.image)                                                     ║
+  ║      NULL when no image uploaded                                    ║
+  ║      NOTE: static/uploads/services/ already exists on disk — keep   ║
+  ║      it excluded from any .gitignore reset / preserved on redeploy. ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ROUTES (implemented in routes.py / db.py):                         ║
+  ║    main.admin_services              GET  /admin/services            ║
+  ║      params: q, category_id, active                                 ║
+  ║    main.admin_create_service        POST /admin/service/create      ║
+  ║      multipart/form-data, handles image upload                     ║
+  ║    main.admin_update_service        POST /admin/service/<id>/update ║
+  ║      multipart/form-data, handles image replace/remove              ║
+  ║    main.admin_delete_service        POST /admin/service/<id>/delete ║
+  ║    main.admin_toggle_service_active POST                            ║
+  ║      /admin/service/<id>/toggle-active                              ║
+  ║    main.admin_create_category       POST /admin/category/create     ║
+  ║    main.admin_update_category       POST /admin/category/<id>/update║
+  ║    main.admin_delete_category       POST /admin/category/<id>/delete║
+  ║      blocked (IntegrityError) while the category still has services ║
+  ║    main.admin_reorder_services      NOT implemented — sort_order    ║
+  ║      update, drag handles are still visual-only. Implement          ║
+  ║      separately if drag-to-reorder is needed.                       ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+#}
+
+{% block title %}Quản lý dịch vụ - DahaCare Admin{% endblock %}
+{% block page_title %}Quản lý dịch vụ{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   sv- BEM prefix — Service Management Page
+   ═══════════════════════════════════════════ */
+
+/* ── Page header ── */
+.sv-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sv-page-header__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #191c1e;
+    letter-spacing: -0.3px;
+}
+
+.sv-page-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sv-btn-create {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #4a90d9;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.sv-btn-create:hover { background: #3a7bc8; }
+.sv-btn-create:active { transform: scale(0.98); }
+
+.sv-btn-ghost {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.sv-btn-ghost:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+.sv-page-header__actions .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Stat strip ── */
+.sv-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.sv-stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+}
+
+.sv-stat-card__value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #191c1e;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.sv-stat-card__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+/* ── Toolbar ── */
+.sv-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.sv-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 20px;
+    padding: 4px;
+}
+
+.sv-tab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+}
+
+.sv-tab:hover { color: #191c1e; }
+
+.sv-tab--active {
+    background: #4a90d9;
+    color: #ffffff;
+}
+
+.sv-tab--active:hover { color: #ffffff; }
+
+.sv-toolbar-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.sv-filter-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    min-width: 200px;
+}
+
+.sv-filter-search .material-symbols-outlined {
+    font-size: 16px;
+    color: #9ca3af;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    flex-shrink: 0;
+}
+
+.sv-filter-search input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    outline: none;
+    width: 100%;
+}
+
+.sv-filter-search input::placeholder { color: #9ca3af; }
+
+.sv-filter-select {
+    padding: 7px 10px;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    min-width: 180px;
+    transition: border-color 0.15s;
+}
+
+.sv-filter-select:focus { border-color: #4a90d9; }
+
+/* ── Category block ── */
+.sv-category {
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.sv-category__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: #f7f9fb;
+    border-bottom: 1px solid #e4e6ea;
+}
+
+.sv-drag-handle {
+    color: #c5c6cc;
+    cursor: grab;
+    flex-shrink: 0;
+}
+
+.sv-category__name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #191c1e;
+}
+
+.sv-count-badge {
+    padding: 3px 9px;
+    background: #eceef0;
+    color: #6b7280;
+    font-size: 11.5px;
+    font-weight: 600;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.sv-category__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+}
+
+.sv-icon-btn {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.sv-icon-btn:hover { background: #eceef0; color: #374151; }
+
+.sv-icon-btn .material-symbols-outlined {
+    font-size: 17px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.sv-collapse-btn {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.15s;
+    border-radius: 8px;
+}
+
+.sv-collapse-btn:hover { background: #eceef0; }
+
+.sv-collapse-btn--rotated { transform: rotate(-180deg); }
+
+.sv-category__body { overflow: hidden; }
+
+.sv-category__body--collapsed { display: none; }
+
+/* ── Service table ── */
+.sv-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sv-table thead {
+    background: #ffffff;
+    border-bottom: 1px solid #e4e6ea;
+}
+
+.sv-table th {
+    padding: 10px 16px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #6b7280;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.sv-table td {
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.sv-table tbody tr:last-child td { border-bottom: none; }
+
+.sv-table tbody tr:hover td { background: #fafbfc; }
+
+.sv-table th:first-child, .sv-table td:first-child { width: 36px; }
+
+/* ── Service name cell ── */
+.sv-service-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sv-service-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #e8f2fc;
+    color: #1a5ea8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sv-service-icon .material-symbols-outlined {
+    font-size: 17px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.sv-service-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #191c1e;
+    line-height: 1.3;
+}
+
+.sv-service-badge {
+    display: inline-block;
+    margin-top: 2px;
+    padding: 2px 8px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 10.5px;
+    font-weight: 700;
+    border-radius: 20px;
+    letter-spacing: 0.2px;
+}
+
+/* ── Status pill ── */
+.sv-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.sv-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.sv-badge--active { background: #E1F5EE; color: #085041; }
+.sv-badge--active::before { background: #1D9E75; }
+
+.sv-badge--inactive { background: #f1f3f5; color: #6b7280; }
+.sv-badge--inactive::before { background: #c5c6cc; }
+
+/* ── Row actions ── */
+.sv-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sv-actions form { display: inline; }
+
+.sv-action-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 6px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.sv-action-btn:hover { background: #e5e7eb; color: #374151; }
+
+.sv-action-btn .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Empty state (per category) ── */
+.sv-empty-cat {
+    padding: 20px 16px;
+    font-size: 13px;
+    color: #9ca3af;
+    text-align: center;
+}
+
+.sv-empty-cat a {
+    color: #4a90d9;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.sv-empty-cat a:hover { text-decoration: underline; }
+
+/* ── Global empty state (no categories at all) ── */
+.sv-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    gap: 10px;
+    text-align: center;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+}
+
+.sv-empty .material-symbols-outlined {
+    font-size: 40px;
+    color: #d1d5db;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
+}
+
+.sv-empty__title { font-size: 15px; font-weight: 600; color: #6b7280; }
+.sv-empty__subtitle { font-size: 13px; color: #9ca3af; }
+
+/* ── Modals ── */
+.sv-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(25, 28, 30, 0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.sv-modal-overlay--open { display: flex; }
+
+.sv-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+}
+
+.sv-modal--narrow { max-width: 400px; }
+
+.sv-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+    flex-shrink: 0;
+}
+
+.sv-modal__title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #191c1e;
+}
+
+.sv-modal__close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.sv-modal__close:hover { background: #f3f4f6; color: #374151; }
+
+.sv-modal__close .material-symbols-outlined {
+    font-size: 20px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.sv-modal__body { padding: 20px 24px; flex: 1; overflow-y: auto; }
+
+.sv-modal__footer {
+    padding: 0 24px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.sv-modal__footer--split { justify-content: space-between; }
+
+.sv-section-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #191c1e;
+    margin-bottom: 10px;
+}
+
+.sv-form-divider { height: 1px; background: #f3f4f6; margin: 18px 0; }
+
+/* ── Form elements ── */
+.sv-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.sv-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+}
+
+.sv-form-group:last-child { margin-bottom: 0; }
+
+.sv-form-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.sv-form-input,
+.sv-form-select,
+.sv-form-textarea {
+    padding: 8px 12px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    background: #f7f9fb;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.sv-form-textarea { resize: vertical; min-height: 64px; }
+
+.sv-form-input:focus,
+.sv-form-select:focus,
+.sv-form-textarea:focus { border-color: #4a90d9; background: #ffffff; }
+
+.sv-form-hint {
+    font-size: 11.5px;
+    color: #9ca3af;
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+/* ── Icon select + live preview ── */
+.sv-icon-select-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sv-icon-select-row .sv-form-select { flex: 1; }
+
+.sv-icon-preview {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #e8f2fc;
+    color: #1a5ea8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.sv-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    color: #374151;
+}
+
+/* ── Image dropzone ── */
+.sv-dropzone {
+    position: relative;
+    height: 140px;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 12px;
+    background: #f7f9fb;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.sv-dropzone:hover,
+.sv-dropzone--drag { border-color: #4a90d9; background: #eef5fc; }
+
+.sv-dropzone__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.sv-dropzone__empty .material-symbols-outlined {
+    font-size: 28px;
+    color: #c5c6cc;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 40;
+}
+
+.sv-dropzone__title { font-size: 13px; font-weight: 600; color: #6b7280; }
+.sv-dropzone__hint { font-size: 11.5px; color: #9ca3af; }
+
+.sv-dropzone__preview {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.sv-dropzone__preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sv-dropzone__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(25,28,30,0.55);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+}
+
+.sv-dropzone__preview:hover .sv-dropzone__overlay { opacity: 1; }
+
+.sv-image-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.sv-btn-sm { padding: 6px 14px; font-size: 12.5px; }
+
+/* ── Toggle switch ── */
+.sv-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+}
+
+.sv-toggle-label { font-size: 13px; font-weight: 600; color: #374151; }
+
+.sv-switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.sv-switch input { opacity: 0; width: 0; height: 0; }
+
+.sv-switch__slider {
+    position: absolute;
+    inset: 0;
+    background: #c5c6cc;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.sv-switch__slider::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 3px;
+    top: 3px;
+    background: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.15s;
+}
+
+.sv-switch input:checked + .sv-switch__slider { background: #4a90d9; }
+.sv-switch input:checked + .sv-switch__slider::before { transform: translateX(16px); }
+
+/* ── Buttons ── */
+.sv-btn-secondary {
+    padding: 8px 18px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #374151;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.sv-btn-secondary:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+.sv-btn-primary {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #4a90d9;
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.sv-btn-primary:hover { background: #3a7bc8; }
+.sv-btn-primary:active { transform: scale(0.98); }
+
+.sv-btn-danger {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.sv-btn-danger:hover { background: #fee2e2; }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{# ── Currently active filter values ── #}
+{% set q_val = request.args.get('q', '') %}
+{% set category_val = request.args.get('category_id', '') %}
+{% set active_val = request.args.get('active', '') %}
+
+{# ── Curated icon/badge options — Icon & Badge are free TEXT columns in the DB (no FK/enum),
+     so this list is a UX guardrail only: constrains admin input to values that render correctly
+     instead of free text that can typo into a broken/blank icon or an inconsistent badge label. ── #}
+{% set SV_ICON_OPTIONS = [
+    ('spa', 'Spa'),
+    ('content_cut', 'Cắt / Kéo'),
+    ('brush', 'Cọ vẽ'),
+    ('auto_awesome', 'Lấp lánh'),
+    ('diamond', 'Kim cương'),
+    ('favorite', 'Trái tim'),
+    ('star', 'Ngôi sao'),
+    ('health_and_beauty', 'Làm đẹp'),
+    ('colorize', 'Sơn màu'),
+    ('water_drop', 'Giọt nước'),
+    ('clean_hands', 'Bàn tay sạch'),
+    ('workspace_premium', 'Cao cấp'),
+    ('local_florist', 'Hoa'),
+    ('foundation', 'Nền tảng'),
+] %}
+{% set SV_BADGE_OPTIONS = ['Hot', 'New', 'Popular', 'Sale', 'Best Seller', 'Limited'] %}
+
+
+{# ══════════════════════════════════════════
+   1. PAGE HEADER
+   ══════════════════════════════════════════ #}
+<div class="sv-page-header">
+    <div class="sv-page-header__title">Quản lý dịch vụ</div>
+    <div class="sv-page-header__actions">
+        <button type="button" class="sv-btn-ghost" onclick="openAddCategory()">
+            <span class="material-symbols-outlined">create_new_folder</span>
+            Thêm danh mục
+        </button>
+        <button type="button" class="sv-btn-create" onclick="openAddService()">
+            <span class="material-symbols-outlined">add</span>
+            Thêm dịch vụ
+        </button>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   2. STAT STRIP
+   Context: stats.total_categories, .total_services, .active_services, .avg_price
+   ══════════════════════════════════════════ #}
+<div class="sv-stats">
+    <div class="sv-stat-card">
+        <span class="sv-stat-card__value">{{ stats.total_categories }}</span>
+        <span class="sv-stat-card__label">Danh mục</span>
+    </div>
+    <div class="sv-stat-card">
+        <span class="sv-stat-card__value">{{ stats.total_services }}</span>
+        <span class="sv-stat-card__label">Tổng dịch vụ</span>
+    </div>
+    <div class="sv-stat-card">
+        <span class="sv-stat-card__value">{{ stats.active_services }}</span>
+        <span class="sv-stat-card__label">Đang hiển thị</span>
+    </div>
+    <div class="sv-stat-card">
+        <span class="sv-stat-card__value">{{ stats.avg_price | round(2) }} €</span>
+        <span class="sv-stat-card__label">Giá trung bình</span>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   3. TOOLBAR — tabs (active filter) + search/category form
+   ══════════════════════════════════════════ #}
+<div class="sv-toolbar">
+
+    <div class="sv-tabs">
+        <a href="{{ url_for('main.admin_services', q=q_val or None, category_id=category_val or None) }}"
+           class="sv-tab {% if active_val == '' %}sv-tab--active{% endif %}">Tất cả</a>
+        <a href="{{ url_for('main.admin_services', q=q_val or None, category_id=category_val or None, active='1') }}"
+           class="sv-tab {% if active_val == '1' %}sv-tab--active{% endif %}">Đang hiển thị</a>
+        <a href="{{ url_for('main.admin_services', q=q_val or None, category_id=category_val or None, active='0') }}"
+           class="sv-tab {% if active_val == '0' %}sv-tab--active{% endif %}">Đã ẩn</a>
+    </div>
+
+    <form method="get" action="{{ url_for('main.admin_services') }}" class="sv-toolbar-form">
+        <input type="hidden" name="active" value="{{ active_val }}">
+
+        <div class="sv-filter-search">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" name="q" placeholder="Tìm dịch vụ..." value="{{ q_val }}" autocomplete="off">
+        </div>
+
+        <select name="category_id" class="sv-filter-select" onchange="this.form.submit()">
+            <option value="">Tất cả danh mục</option>
+            {% for c in all_categories %}
+            <option value="{{ c.id }}" {% if category_val == c.id | string %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+</div>
+
+
+{# ══════════════════════════════════════════
+   4. CATEGORY + SERVICE LAYOUT
+   ══════════════════════════════════════════ #}
+{% if categories %}
+    {% for cat in categories %}
+    <div class="sv-category" data-cat-id="{{ cat.id }}">
+
+        <div class="sv-category__header">
+            <span class="material-symbols-outlined sv-drag-handle" title="Kéo để sắp xếp">drag_indicator</span>
+            <span class="sv-category__name">{{ cat.name }}</span>
+            <span class="sv-count-badge">{{ cat.services | length }} dịch vụ</span>
+            {% if cat.is_active %}
+                <span class="sv-badge sv-badge--active">Hiển thị</span>
+            {% else %}
+                <span class="sv-badge sv-badge--inactive">Đã ẩn</span>
+            {% endif %}
+
+            <div class="sv-category__actions">
+                <button type="button" class="sv-icon-btn" title="Thêm dịch vụ vào danh mục này"
+                        onclick="openAddService({{ cat.id }})">
+                    <span class="material-symbols-outlined">add</span>
+                </button>
+                <button type="button" class="sv-icon-btn" title="Chỉnh sửa danh mục"
+                        data-id="{{ cat.id }}" data-name="{{ cat.name }}"
+                        data-slug="{{ cat.slug }}" data-active="{{ cat.is_active }}"
+                        onclick="openEditCategory(this)">
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button type="button" class="sv-collapse-btn" id="sv_chevron_{{ cat.id }}"
+                        onclick="toggleCollapse({{ cat.id }})" title="Thu gọn/Mở rộng">
+                    <span class="material-symbols-outlined">expand_more</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="sv-category__body" id="sv_body_{{ cat.id }}">
+            {% if cat.services %}
+            <table class="sv-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Tên dịch vụ</th>
+                        <th>Thời lượng</th>
+                        <th>Giá</th>
+                        <th>Điểm tích lũy</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {# sort_order: POST to admin.reorder_services with list of ids — implement separately #}
+                    {% for s in cat.services %}
+                    <tr>
+                        <td><span class="material-symbols-outlined sv-drag-handle" title="Kéo để sắp xếp">drag_indicator</span></td>
+                        <td>
+                            <div class="sv-service-cell">
+                                <div class="sv-service-icon">
+                                    <span class="material-symbols-outlined">{{ s.icon }}</span>
+                                </div>
+                                <div>
+                                    <div class="sv-service-name">{{ s.name }}</div>
+                                    {% if s.badge %}<span class="sv-service-badge">{{ s.badge }}</span>{% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ s.duration_minutes }} phút</td>
+                        <td>{{ s.price | round(2) }} €</td>
+                        <td>{{ s.points }}</td>
+                        <td>
+                            {% if s.is_active %}
+                                <span class="sv-badge sv-badge--active">Hiển thị</span>
+                            {% else %}
+                                <span class="sv-badge sv-badge--inactive">Đã ẩn</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="sv-actions">
+                                <button type="button" class="sv-action-btn" title="Chỉnh sửa"
+                                        data-id="{{ s.id }}"
+                                        data-name="{{ s.name }}"
+                                        data-description="{{ s.description or '' }}"
+                                        data-category-id="{{ s.category_id }}"
+                                        data-icon="{{ s.icon }}"
+                                        data-image="{{ s.image or '' }}"
+                                        data-price="{{ s.price }}"
+                                        data-duration="{{ s.duration_minutes }}"
+                                        data-points="{{ s.points }}"
+                                        data-badge="{{ s.badge or '' }}"
+                                        data-active="{{ s.is_active }}"
+                                        onclick="openEditService(this)">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                                <form method="post" action="{{ url_for('main.admin_toggle_service_active', service_id=s.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="sv-action-btn" title="{{ 'Ẩn dịch vụ' if s.is_active else 'Hiện dịch vụ' }}">
+                                        <span class="material-symbols-outlined">{{ 'visibility_off' if s.is_active else 'visibility' }}</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="sv-empty-cat">
+                Chưa có dịch vụ nào. <a onclick="openAddService({{ cat.id }})">Thêm dịch vụ đầu tiên →</a>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="sv-empty">
+        <span class="material-symbols-outlined">content_cut</span>
+        <div class="sv-empty__title">Chưa có danh mục nào</div>
+        <div class="sv-empty__subtitle">Thêm danh mục đầu tiên để bắt đầu quản lý dịch vụ.</div>
+    </div>
+{% endif %}
+
+
+{# ══════════════════════════════════════════
+   5a. ADD SERVICE MODAL
+   Backend: POST main.admin_create_service (multipart/form-data)
+   ══════════════════════════════════════════ #}
+<div id="svAddServiceModal" class="sv-modal-overlay" onclick="closeModalOnBackdrop(event, 'svAddServiceModal')">
+    <div class="sv-modal" onclick="event.stopPropagation()">
+
+        <div class="sv-modal__header">
+            <span class="sv-modal__title">Thêm dịch vụ mới</span>
+            <button type="button" class="sv-modal__close" onclick="closeModal('svAddServiceModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" action="{{ url_for('main.admin_create_service') }}" enctype="multipart/form-data" id="sv_add_form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="sv-modal__body">
+
+                <div class="sv-section-title">Thông tin cơ bản</div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_add_name">Tên dịch vụ *</label>
+                    <input type="text" name="name" id="sv_add_name" class="sv-form-input" required>
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_add_description">Mô tả</label>
+                    <textarea name="description" id="sv_add_description" class="sv-form-textarea"></textarea>
+                </div>
+
+                <div class="sv-form-row">
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_add_category_id">Danh mục *</label>
+                        <select name="category_id" id="sv_add_category_id" class="sv-form-select" required>
+                            <option value="" disabled selected>-- Chọn danh mục --</option>
+                            {% for c in all_categories %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_add_icon">Icon</label>
+                        <div class="sv-icon-select-row">
+                            <select name="icon" id="sv_add_icon" class="sv-form-select" onchange="svUpdateIconPreview('sv_add_icon', 'sv_add_icon_preview')">
+                                {% for value, label in SV_ICON_OPTIONS %}
+                                <option value="{{ value }}" {% if value == 'spa' %}selected{% endif %}>{{ label }} ({{ value }})</option>
+                                {% endfor %}
+                            </select>
+                            <span class="material-symbols-outlined sv-icon-preview" id="sv_add_icon_preview">spa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sv-form-divider"></div>
+
+                <div class="sv-section-title">Ảnh nền dịch vụ</div>
+
+                <div class="sv-dropzone" id="svAddDropzone" onclick="document.getElementById('sv_add_image').click()"
+                     ondragover="svDragOver(event, 'svAddDropzone')" ondragleave="svDragLeave(event, 'svAddDropzone')"
+                     ondrop="svDrop(event, 'sv_add_image', 'svAddDropzone')">
+                    <div class="sv-dropzone__empty" id="svAddDropzoneEmpty">
+                        <span class="material-symbols-outlined">add_photo_alternate</span>
+                        <span class="sv-dropzone__title">Kéo thả ảnh vào đây</span>
+                        <span class="sv-dropzone__hint">hoặc click để chọn file</span>
+                    </div>
+                    <div class="sv-dropzone__preview" id="svAddDropzonePreview" style="display:none;">
+                        <img id="svAddDropzoneImg" src="" alt="">
+                        <div class="sv-dropzone__overlay">Thay ảnh</div>
+                    </div>
+                </div>
+                <input type="file" name="image" id="sv_add_image" accept=".jpg,.jpeg,.png,.webp" style="display:none;"
+                       onchange="previewImage(this, 'svAddDropzone')">
+                <p class="sv-form-hint">Định dạng JPG, PNG, WEBP. Tối đa 2MB. Khuyến nghị tỉ lệ 16:9.</p>
+
+                <div class="sv-form-divider"></div>
+
+                <div class="sv-section-title">Giá &amp; Thời lượng</div>
+
+                <div class="sv-form-row">
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_add_price">Giá (€) *</label>
+                        <input type="number" step="0.01" min="0" name="price" id="sv_add_price" class="sv-form-input" required>
+                    </div>
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_add_duration">Thời lượng (phút) *</label>
+                        <input type="number" min="1" name="duration_minutes" id="sv_add_duration" class="sv-form-input" required>
+                    </div>
+                </div>
+
+                <div class="sv-form-row">
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_add_points">Điểm tích lũy</label>
+                        <input type="number" min="0" name="points" id="sv_add_points" class="sv-form-input">
+                        <span class="sv-form-hint">Điểm khách nhận sau khi hoàn thành</span>
+                    </div>
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_add_badge">Badge</label>
+                        <select name="badge" id="sv_add_badge" class="sv-form-select">
+                            <option value="">Không có badge</option>
+                            {% for b in SV_BADGE_OPTIONS %}
+                            <option value="{{ b }}">{{ b }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sv-form-divider"></div>
+
+                <div class="sv-toggle-row">
+                    <span class="sv-toggle-label">Hiển thị dịch vụ này</span>
+                    <label class="sv-switch">
+                        <input type="checkbox" name="is_active" id="sv_add_active" value="1" checked>
+                        <span class="sv-switch__slider"></span>
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="sv-modal__footer">
+                <button type="button" class="sv-btn-secondary" onclick="closeModal('svAddServiceModal')">Hủy</button>
+                <button type="submit" class="sv-btn-primary">Thêm dịch vụ</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5b. EDIT SERVICE MODAL
+   Backend: POST main.admin_update_service (multipart/form-data)
+   Populated via JS from data-* on each row's edit button
+   ══════════════════════════════════════════ #}
+<div id="svEditServiceModal" class="sv-modal-overlay" onclick="closeModalOnBackdrop(event, 'svEditServiceModal')">
+    <div class="sv-modal" onclick="event.stopPropagation()">
+
+        <div class="sv-modal__header">
+            <span class="sv-modal__title">Chỉnh sửa dịch vụ</span>
+            <button type="button" class="sv-modal__close" onclick="closeModal('svEditServiceModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" id="sv_edit_form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="sv-modal__body">
+
+                <div class="sv-section-title">Thông tin cơ bản</div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_edit_name">Tên dịch vụ *</label>
+                    <input type="text" name="name" id="sv_edit_name" class="sv-form-input" required>
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_edit_description">Mô tả</label>
+                    <textarea name="description" id="sv_edit_description" class="sv-form-textarea"></textarea>
+                </div>
+
+                <div class="sv-form-row">
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_edit_category_id">Danh mục *</label>
+                        <select name="category_id" id="sv_edit_category_id" class="sv-form-select" required>
+                            {% for c in all_categories %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_edit_icon">Icon</label>
+                        <div class="sv-icon-select-row">
+                            <select name="icon" id="sv_edit_icon" class="sv-form-select" onchange="svUpdateIconPreview('sv_edit_icon', 'sv_edit_icon_preview')">
+                                {% for value, label in SV_ICON_OPTIONS %}
+                                <option value="{{ value }}">{{ label }} ({{ value }})</option>
+                                {% endfor %}
+                            </select>
+                            <span class="material-symbols-outlined sv-icon-preview" id="sv_edit_icon_preview">spa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sv-form-divider"></div>
+
+                <div class="sv-section-title">Ảnh nền dịch vụ</div>
+
+                <div class="sv-dropzone" id="svEditDropzone" onclick="document.getElementById('sv_edit_image').click()"
+                     ondragover="svDragOver(event, 'svEditDropzone')" ondragleave="svDragLeave(event, 'svEditDropzone')"
+                     ondrop="svDrop(event, 'sv_edit_image', 'svEditDropzone')">
+                    <div class="sv-dropzone__empty" id="svEditDropzoneEmpty">
+                        <span class="material-symbols-outlined">add_photo_alternate</span>
+                        <span class="sv-dropzone__title">Kéo thả ảnh vào đây</span>
+                        <span class="sv-dropzone__hint">hoặc click để chọn file</span>
+                    </div>
+                    <div class="sv-dropzone__preview" id="svEditDropzonePreview" style="display:none;">
+                        <img id="svEditDropzoneImg" src="" alt="">
+                        <div class="sv-dropzone__overlay">Thay ảnh</div>
+                    </div>
+                </div>
+                <input type="file" name="image" id="sv_edit_image" accept=".jpg,.jpeg,.png,.webp" style="display:none;"
+                       onchange="previewImage(this, 'svEditDropzone')">
+                <input type="hidden" name="remove_image" id="svEditDropzoneRemoveImage" value="0">
+                <div class="sv-image-actions" id="svEditDropzoneActions" style="display:none;">
+                    <button type="button" class="sv-btn-secondary sv-btn-sm" onclick="document.getElementById('sv_edit_image').click()">Đổi ảnh</button>
+                    <button type="button" class="sv-btn-danger sv-btn-sm" onclick="removeImage('svEditDropzone', 'sv_edit_image', 'svEditDropzoneRemoveImage', 'svEditDropzoneActions')">Xóa ảnh</button>
+                </div>
+                <p class="sv-form-hint">Định dạng JPG, PNG, WEBP. Tối đa 2MB. Khuyến nghị tỉ lệ 16:9.</p>
+
+                <div class="sv-form-divider"></div>
+
+                <div class="sv-section-title">Giá &amp; Thời lượng</div>
+
+                <div class="sv-form-row">
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_edit_price">Giá (€) *</label>
+                        <input type="number" step="0.01" min="0" name="price" id="sv_edit_price" class="sv-form-input" required>
+                    </div>
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_edit_duration">Thời lượng (phút) *</label>
+                        <input type="number" min="1" name="duration_minutes" id="sv_edit_duration" class="sv-form-input" required>
+                    </div>
+                </div>
+
+                <div class="sv-form-row">
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_edit_points">Điểm tích lũy</label>
+                        <input type="number" min="0" name="points" id="sv_edit_points" class="sv-form-input">
+                        <span class="sv-form-hint">Điểm khách nhận sau khi hoàn thành</span>
+                    </div>
+                    <div class="sv-form-group">
+                        <label class="sv-form-label" for="sv_edit_badge">Badge</label>
+                        <select name="badge" id="sv_edit_badge" class="sv-form-select">
+                            <option value="">Không có badge</option>
+                            {% for b in SV_BADGE_OPTIONS %}
+                            <option value="{{ b }}">{{ b }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sv-form-divider"></div>
+
+                <div class="sv-toggle-row">
+                    <span class="sv-toggle-label">Hiển thị dịch vụ này</span>
+                    <label class="sv-switch">
+                        <input type="checkbox" name="is_active" id="sv_edit_active" value="1">
+                        <span class="sv-switch__slider"></span>
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="sv-modal__footer sv-modal__footer--split">
+                <button type="button" class="sv-btn-danger" onclick="openDeleteServiceFromEdit()">Xóa dịch vụ</button>
+                <div style="display:flex; gap:8px;">
+                    <button type="button" class="sv-btn-secondary" onclick="closeModal('svEditServiceModal')">Hủy</button>
+                    <button type="submit" class="sv-btn-primary">Lưu thay đổi</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5c. ADD/EDIT CATEGORY MODAL — single modal, mode toggled by JS
+   Add    → POST main.admin_create_category
+   Edit   → POST main.admin_update_category
+   ══════════════════════════════════════════ #}
+<div id="svCategoryModal" class="sv-modal-overlay" onclick="closeModalOnBackdrop(event, 'svCategoryModal')">
+    <div class="sv-modal sv-modal--narrow" onclick="event.stopPropagation()">
+
+        <div class="sv-modal__header">
+            <span class="sv-modal__title" id="sv_category_modal_title">Thêm danh mục</span>
+            <button type="button" class="sv-modal__close" onclick="closeModal('svCategoryModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" id="sv_category_form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="sv-modal__body">
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_category_name">Tên danh mục *</label>
+                    <input type="text" name="name" id="sv_category_name" class="sv-form-input" required>
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_category_slug">Slug</label>
+                    <input type="text" name="slug" id="sv_category_slug" class="sv-form-input">
+                    <span class="sv-form-hint">Tự động tạo nếu để trống</span>
+                </div>
+
+                <div class="sv-form-divider"></div>
+
+                <div class="sv-toggle-row">
+                    <span class="sv-toggle-label">Hiển thị danh mục này</span>
+                    <label class="sv-switch">
+                        <input type="checkbox" name="is_active" id="sv_category_active" value="1" checked>
+                        <span class="sv-switch__slider"></span>
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="sv-modal__footer sv-modal__footer--split">
+                <button type="button" class="sv-btn-danger" id="sv_category_delete_btn" style="display:none;" onclick="openDeleteCategoryFromEdit()">Xóa danh mục</button>
+                <div style="display:flex; gap:8px; margin-left:auto;">
+                    <button type="button" class="sv-btn-secondary" onclick="closeModal('svCategoryModal')">Hủy</button>
+                    <button type="submit" class="sv-btn-primary" id="sv_category_submit_btn">Lưu</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5d. DELETE CATEGORY CONFIRM MODAL
+   Backend: POST main.admin_delete_category
+   Triggered from Category modal's "Xóa danh mục" button (edit mode only)
+   ══════════════════════════════════════════ #}
+<div id="svDeleteCategoryModal" class="sv-modal-overlay" onclick="closeModalOnBackdrop(event, 'svDeleteCategoryModal')">
+    <div class="sv-modal sv-modal--narrow" onclick="event.stopPropagation()">
+
+        <div class="sv-modal__header">
+            <span class="sv-modal__title">Xác nhận xóa danh mục</span>
+            <button type="button" class="sv-modal__close" onclick="closeModal('svDeleteCategoryModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="sv-modal__body">
+            <p style="font-size: 13.5px; color: #374151; line-height: 1.5;">
+                Bạn có chắc chắn muốn xóa danh mục <strong id="sv_delete_category_name"></strong>?
+                Hành động này không thể hoàn tác. Danh mục đang có dịch vụ sẽ không xóa được cho tới khi
+                bạn xóa hoặc chuyển hết dịch vụ trong danh mục này sang danh mục khác.
+            </p>
+        </div>
+
+        <div class="sv-modal__footer">
+            <button type="button" class="sv-btn-secondary" onclick="closeModal('svDeleteCategoryModal')">Hủy</button>
+            <form method="post" id="sv_delete_category_form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="sv-btn-danger">Xác nhận xóa</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   5e. DELETE SERVICE CONFIRM MODAL
+   Backend: POST main.admin_delete_service
+   ══════════════════════════════════════════ #}
+<div id="svDeleteServiceModal" class="sv-modal-overlay" onclick="closeModalOnBackdrop(event, 'svDeleteServiceModal')">
+    <div class="sv-modal sv-modal--narrow" onclick="event.stopPropagation()">
+
+        <div class="sv-modal__header">
+            <span class="sv-modal__title">Xác nhận xóa dịch vụ</span>
+            <button type="button" class="sv-modal__close" onclick="closeModal('svDeleteServiceModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="sv-modal__body">
+            <p style="font-size: 13.5px; color: #374151; line-height: 1.5;">
+                Bạn có chắc chắn muốn xóa dịch vụ <strong id="sv_delete_service_name"></strong>?
+                Hành động này không thể hoàn tác.
+            </p>
+        </div>
+
+        <div class="sv-modal__footer">
+            <button type="button" class="sv-btn-secondary" onclick="closeModal('svDeleteServiceModal')">Hủy</button>
+            <form method="post" id="sv_delete_service_form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="sv-btn-danger">Xác nhận xóa</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+const SV_ROUTES = {
+    updateService: "{{ url_for('main.admin_update_service', service_id=0) }}",
+    deleteService: "{{ url_for('main.admin_delete_service', service_id=0) }}",
+    updateCategory: "{{ url_for('main.admin_update_category', category_id=0) }}",
+    deleteCategory: "{{ url_for('main.admin_delete_category', category_id=0) }}"
+};
+
+let currentServiceEl = null;
+let currentCategoryEl = null;
+
+/* ── Modal management ── */
+function openModal(id) {
+    document.getElementById(id).classList.add('sv-modal-overlay--open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('sv-modal-overlay--open');
+    document.body.style.overflow = '';
+}
+
+function closeModalOnBackdrop(event, id) {
+    if (event.target === event.currentTarget) closeModal(id);
+}
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        closeModal('svAddServiceModal');
+        closeModal('svEditServiceModal');
+        closeModal('svCategoryModal');
+        closeModal('svDeleteServiceModal');
+        closeModal('svDeleteCategoryModal');
+    }
+});
+
+function svBuildUrl(template, id) {
+    return template.replace('/0/', '/' + id + '/');
+}
+
+/* ── Collapse / expand category ── */
+function toggleCollapse(catId) {
+    document.getElementById('sv_body_' + catId).classList.toggle('sv-category__body--collapsed');
+    document.getElementById('sv_chevron_' + catId).classList.toggle('sv-collapse-btn--rotated');
+}
+
+/* ── Image dropzone helpers ── */
+function resetDropzone(zoneId) {
+    document.getElementById(zoneId + 'Empty').style.display = 'flex';
+    document.getElementById(zoneId + 'Preview').style.display = 'none';
+    document.getElementById(zoneId + 'Img').src = '';
+    const actionsEl = document.getElementById(zoneId + 'Actions');
+    if (actionsEl) actionsEl.style.display = 'none';
+    const removeInput = document.getElementById(zoneId + 'RemoveImage');
+    if (removeInput) removeInput.value = '0';
+}
+
+function previewImage(input, zoneId) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        document.getElementById(zoneId + 'Empty').style.display = 'none';
+        document.getElementById(zoneId + 'Preview').style.display = 'block';
+        document.getElementById(zoneId + 'Img').src = e.target.result;
+
+        const removeInput = document.getElementById(zoneId + 'RemoveImage');
+        if (removeInput) removeInput.value = '0';
+
+        const actionsEl = document.getElementById(zoneId + 'Actions');
+        if (actionsEl) actionsEl.style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeImage(zoneId, inputId, removeInputId, actionsId) {
+    document.getElementById(inputId).value = '';
+    resetDropzone(zoneId);
+    document.getElementById(removeInputId).value = '1';
+}
+
+function svDragOver(e, zoneId) {
+    e.preventDefault();
+    document.getElementById(zoneId).classList.add('sv-dropzone--drag');
+}
+
+function svDragLeave(e, zoneId) {
+    document.getElementById(zoneId).classList.remove('sv-dropzone--drag');
+}
+
+function svDrop(e, inputId, zoneId) {
+    e.preventDefault();
+    document.getElementById(zoneId).classList.remove('sv-dropzone--drag');
+    const input = document.getElementById(inputId);
+    if (e.dataTransfer.files.length) {
+        input.files = e.dataTransfer.files;
+        previewImage(input, zoneId);
+    }
+}
+
+/* ── Icon select preview ── */
+function svUpdateIconPreview(selectId, previewId) {
+    document.getElementById(previewId).textContent = document.getElementById(selectId).value;
+}
+
+/* ── Keeps a legacy icon/badge value (typed in before this dropdown existed, or otherwise
+   outside the curated list) selectable and visible instead of silently blanking it out ── */
+function svEnsureOption(selectEl, value, legacyLabelSuffix) {
+    if (!value) return;
+    const exists = Array.from(selectEl.options).some((o) => o.value === value);
+    if (!exists) {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = value + legacyLabelSuffix;
+        selectEl.appendChild(opt);
+    }
+}
+
+/* ── Add service modal ── */
+function openAddService(catId) {
+    const form = document.getElementById('sv_add_form');
+    form.reset();
+    resetDropzone('svAddDropzone');
+    svUpdateIconPreview('sv_add_icon', 'sv_add_icon_preview');
+    if (catId) document.getElementById('sv_add_category_id').value = catId;
+    openModal('svAddServiceModal');
+}
+
+/* ── Edit service modal ── */
+function openEditService(el) {
+    currentServiceEl = el;
+    const d = el.dataset;
+
+    const form = document.getElementById('sv_edit_form');
+    form.reset(); // clears the file input from any previously-open edit session
+    form.action = svBuildUrl(SV_ROUTES.updateService, d.id);
+
+    document.getElementById('sv_edit_name').value = d.name;
+    document.getElementById('sv_edit_description').value = d.description || '';
+    document.getElementById('sv_edit_category_id').value = d.categoryId;
+
+    const iconSelect = document.getElementById('sv_edit_icon');
+    svEnsureOption(iconSelect, d.icon, ' (giá trị cũ)');
+    iconSelect.value = d.icon || 'spa';
+    svUpdateIconPreview('sv_edit_icon', 'sv_edit_icon_preview');
+
+    document.getElementById('sv_edit_price').value = d.price;
+    document.getElementById('sv_edit_duration').value = d.duration;
+    document.getElementById('sv_edit_points').value = d.points;
+
+    const badgeSelect = document.getElementById('sv_edit_badge');
+    svEnsureOption(badgeSelect, d.badge, ' (giá trị cũ)');
+    badgeSelect.value = d.badge || '';
+
+    document.getElementById('sv_edit_active').checked = d.active === '1';
+
+    resetDropzone('svEditDropzone');
+    if (d.image) {
+        document.getElementById('svEditDropzoneEmpty').style.display = 'none';
+        document.getElementById('svEditDropzonePreview').style.display = 'block';
+        document.getElementById('svEditDropzoneImg').src = "{{ url_for('static', filename='uploads/services/') }}" + d.image;
+        document.getElementById('svEditDropzoneActions').style.display = 'flex';
+    }
+
+    openModal('svEditServiceModal');
+}
+
+/* ── Delete service confirm modal ── */
+function openDeleteService(name, id) {
+    document.getElementById('sv_delete_service_name').textContent = name;
+    document.getElementById('sv_delete_service_form').action = svBuildUrl(SV_ROUTES.deleteService, id);
+    openModal('svDeleteServiceModal');
+}
+
+function openDeleteServiceFromEdit() {
+    if (!currentServiceEl) return;
+    closeModal('svEditServiceModal');
+    openDeleteService(currentServiceEl.dataset.name, currentServiceEl.dataset.id);
+}
+
+/* ── Add/Edit category modal ── */
+function openAddCategory() {
+    currentCategoryEl = null;
+    const form = document.getElementById('sv_category_form');
+    form.reset();
+    form.action = "{{ url_for('main.admin_create_category') }}";
+    document.getElementById('sv_category_modal_title').textContent = 'Thêm danh mục';
+    document.getElementById('sv_category_submit_btn').textContent = 'Lưu';
+    document.getElementById('sv_category_active').checked = true;
+    document.getElementById('sv_category_delete_btn').style.display = 'none';
+    openModal('svCategoryModal');
+}
+
+function openEditCategory(el) {
+    currentCategoryEl = el;
+    const d = el.dataset;
+    const form = document.getElementById('sv_category_form');
+    form.action = svBuildUrl(SV_ROUTES.updateCategory, d.id);
+    document.getElementById('sv_category_modal_title').textContent = 'Chỉnh sửa danh mục';
+    document.getElementById('sv_category_submit_btn').textContent = 'Lưu';
+    document.getElementById('sv_category_name').value = d.name;
+    document.getElementById('sv_category_slug').value = d.slug || '';
+    document.getElementById('sv_category_active').checked = d.active === '1';
+    document.getElementById('sv_category_delete_btn').style.display = 'inline-flex';
+    openModal('svCategoryModal');
+}
+
+/* ── Delete category confirm modal ── */
+function openDeleteCategory(name, id) {
+    document.getElementById('sv_delete_category_name').textContent = name;
+    document.getElementById('sv_delete_category_form').action = svBuildUrl(SV_ROUTES.deleteCategory, id);
+    openModal('svDeleteCategoryModal');
+}
+
+function openDeleteCategoryFromEdit() {
+    if (!currentCategoryEl) return;
+    closeModal('svCategoryModal');
+    openDeleteCategory(currentCategoryEl.dataset.name, currentCategoryEl.dataset.id);
+}
+</script>
+{% endblock %}
