@@ -25,9 +25,9 @@ VALUES
 -- ============================================
 INSERT INTO users (password_hash, email, role)
 VALUES
-("scrypt:32768:8:1$WjbfcQVhEJ2iH7Cu$ac3742bf7abcdf8fca4cb76fdbd2d4d6bb5e16e603750d0f57602c503cca37ba1c6e4cf0b9b8250925f94156936c3f36c593ee77467ae461e684d0218e6d8d04", "mon@admin.com",    "admin"),
-("scrypt:32768:8:1$WjbfcQVhEJ2iH7Cu$ac3742bf7abcdf8fca4cb76fdbd2d4d6bb5e16e603750d0f57602c503cca37ba1c6e4cf0b9b8250925f94156936c3f36c593ee77467ae461e684d0218e6d8d04", "mon@staff.com",    "staff"),
-("scrypt:32768:8:1$eyrwAm1eM5x8ogfP$ecf8bf2a308643a63aee46c6eb3af307d3b93dd046cf8fd9623daa4266ca8f4490ab107a5311bb1a63ada539bae8d98daa4e9ccc32a95968f60b441a16581ac9", "mon@customer.com", "customer");
+("scrypt:32768:8:1$E79PFmE43XkwUaoJ$bb50aad268e09a79c72b68f2fec4e1d84cd02810fefff942c1b31da4bb1d883bc91848a80c528efce3ad8e75e8dbde0ab5a1a376196866d5bcd7b014536b2b5b", "mon@admin.com",    "admin"),
+("scrypt:32768:8:1$E79PFmE43XkwUaoJ$bb50aad268e09a79c72b68f2fec4e1d84cd02810fefff942c1b31da4bb1d883bc91848a80c528efce3ad8e75e8dbde0ab5a1a376196866d5bcd7b014536b2b5b", "mon@staff.com",    "staff"),
+("scrypt:32768:8:1$E79PFmE43XkwUaoJ$bb50aad268e09a79c72b68f2fec4e1d84cd02810fefff942c1b31da4bb1d883bc91848a80c528efce3ad8e75e8dbde0ab5a1a376196866d5bcd7b014536b2b5b", "mon@customer.com", "customer");
 
 -- ============================================
 -- STAFF
@@ -89,34 +89,34 @@ VALUES
 ('double_points_day',   '2',   'Day of week for double points: 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat 7=Sun');
 
 -- ============================================
--- BOOKINGS (giữ nguyên từ seed cũ)
--- 22 completed | 4 cancelled | 2 pending | 2 confirmed
+-- BOOKINGS
+-- 22 done | 4 cancelled | 2 pending | 2 confirmed | 2 in-progress
 -- ============================================
 INSERT INTO bookings (customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes)
 VALUES
--- id 1-22: completed
-(1, 1, 1, '2024-03-15', '10:00', '10:45', 'completed', 'Visa paid'),
-(1, 2, 2, '2024-05-20', '14:00', '15:00', 'completed', 'Mastercard paid'),
-(1, 3, 3, '2024-07-08', '09:00', '10:15', 'completed', 'Mobile pay paid'),
-(1, 1, 2, '2024-09-12', '11:00', '12:00', 'completed', 'Apple pay paid'),
-(1, 2, 1, '2024-11-25', '13:30', '14:15', 'completed', 'Google pay refunded'),
-(1, 3, 3, '2025-01-18', '15:00', '16:15', 'completed', 'Cash paid'),
-(1, 1, 1, '2025-02-14', '10:00', '10:45', 'completed', 'Bank transfer paid'),
-(1, 2, 2, '2025-03-22', '14:30', '15:30', 'completed', 'Visa pending'),
-(1, 3, 3, '2025-04-10', '09:00', '10:15', 'completed', 'Mastercard paid'),
-(1, 1, 2, '2025-05-19', '11:00', '12:00', 'completed', 'Mobile pay refunded'),
-(1, 2, 1, '2025-07-08', '13:00', '13:45', 'completed', 'Apple pay paid'),
-(1, 3, 3, '2025-08-15', '15:00', '16:15', 'completed', 'Google pay paid'),
-(1, 1, 1, '2025-09-20', '10:00', '10:45', 'completed', 'Cash paid'),
-(1, 2, 2, '2025-10-12', '14:00', '15:00', 'completed', 'Bank transfer refunded'),
-(1, 3, 3, '2025-11-25', '09:30', '10:45', 'completed', 'Visa paid'),
-(1, 1, 2, '2025-12-18', '11:00', '12:00', 'completed', 'Mastercard paid'),
-(1, 2, 1, '2026-02-22', '13:30', '14:15', 'completed', 'Mobile pay paid'),
-(1, 3, 3, '2026-03-15', '15:00', '16:15', 'completed', 'Apple pay paid'),
-(1, 1, 1, '2026-04-05', '10:00', '10:45', 'completed', 'Google pay pending'),
-(1, 2, 2, '2026-04-20', '14:00', '15:00', 'completed', 'Cash paid'),
-(1, 3, 2, '2026-05-08', '11:00', '12:00', 'completed', 'Visa paid'),
-(1, 1, 3, '2026-05-22', '09:00', '10:15', 'completed', 'Mastercard pending'),
+-- id 1-22: done
+(1, 1, 1, '2024-03-15', '10:00', '10:45', 'done', 'Visa paid'),
+(1, 2, 2, '2024-05-20', '14:00', '15:00', 'done', 'Mastercard paid'),
+(1, 3, 3, '2024-07-08', '09:00', '10:15', 'done', 'Mobile pay paid'),
+(1, 1, 2, '2024-09-12', '11:00', '12:00', 'done', 'Apple pay paid'),
+(1, 2, 1, '2024-11-25', '13:30', '14:15', 'done', 'Google pay refunded'),
+(1, 3, 3, '2025-01-18', '15:00', '16:15', 'done', 'Cash paid'),
+(1, 1, 1, '2025-02-14', '10:00', '10:45', 'done', 'Bank transfer paid'),
+(1, 2, 2, '2025-03-22', '14:30', '15:30', 'done', 'Visa pending'),
+(1, 3, 3, '2025-04-10', '09:00', '10:15', 'done', 'Mastercard paid'),
+(1, 1, 2, '2025-05-19', '11:00', '12:00', 'done', 'Mobile pay refunded'),
+(1, 2, 1, '2025-07-08', '13:00', '13:45', 'done', 'Apple pay paid'),
+(1, 3, 3, '2025-08-15', '15:00', '16:15', 'done', 'Google pay paid'),
+(1, 1, 1, '2025-09-20', '10:00', '10:45', 'done', 'Cash paid'),
+(1, 2, 2, '2025-10-12', '14:00', '15:00', 'done', 'Bank transfer refunded'),
+(1, 3, 3, '2025-11-25', '09:30', '10:45', 'done', 'Visa paid'),
+(1, 1, 2, '2025-12-18', '11:00', '12:00', 'done', 'Mastercard paid'),
+(1, 2, 1, '2026-02-22', '13:30', '14:15', 'done', 'Mobile pay paid'),
+(1, 3, 3, '2026-03-15', '15:00', '16:15', 'done', 'Apple pay paid'),
+(1, 1, 1, '2026-04-05', '10:00', '10:45', 'done', 'Google pay pending'),
+(1, 2, 2, '2026-04-20', '14:00', '15:00', 'done', 'Cash paid'),
+(1, 3, 2, '2026-05-08', '11:00', '12:00', 'done', 'Visa paid'),
+(1, 1, 3, '2026-05-22', '09:00', '10:15', 'done', 'Mastercard pending'),
 
 -- id 23-26: cancelled
 (1, 1, 1, '2024-08-15', '10:00', '10:45', 'cancelled', 'Customer cancelled - old'),
@@ -130,7 +130,11 @@ VALUES
 
 -- id 29-30: confirmed
 (1, 1, 3, '2026-06-25', '14:00', '15:15', 'confirmed', 'Upcoming visit'),
-(1, 2, 1, '2026-07-05', '11:00', '11:45', 'confirmed', 'Birthday treat');
+(1, 2, 1, '2026-07-05', '11:00', '11:45', 'confirmed', 'Birthday treat'),
+
+-- id 31-32: in-progress (today 2026-07-01, no conflicts with existing staff slots)
+(1, 1, 1, '2026-07-01', '09:00', '09:45', 'in-progress', 'Currently in session'),
+(1, 2, 3, '2026-07-01', '10:00', '11:15', 'in-progress', 'Session ongoing');
 
 -- ============================================
 -- INVOICES (giữ nguyên)

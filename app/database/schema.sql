@@ -225,6 +225,7 @@ CREATE TABLE gallery_images (
     image_url TEXT NOT NULL,
     alt_text TEXT,
     sort_order INTEGER NOT NULL DEFAULT 0,
+    is_active INTEGER NOT NULL DEFAULT 1,
     uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

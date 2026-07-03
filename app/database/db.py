@@ -58,7 +58,7 @@ def check_booking_conflict(staff_id, booking_date, start_at, end_at):
         AND booking_date = ?
         AND start_time < ?
         AND end_time > ?
-        AND status IN ('pending', 'confirmed')
+        AND status IN ('pending', 'confirmed', 'in-progress')
 
 """, (staff_id, booking_date, end_at, start_at)).fetchone()
     conn.close()
@@ -441,13 +441,219 @@ def get_active_services_with_category():
     conn.close()
     return services
 
+
+def get_all_categories():
+    conn = get_connection()
+    categories = conn.execute(
+        "SELECT * FROM service_categories ORDER BY sort_order ASC, name ASC"
+    ).fetchall()
+    conn.close()
+    return categories
+
+
+def get_service_categories_with_services(q='', category_id=None, active=None):
+    conn = get_connection()
+
+    cat_where = "WHERE 1=1"
+    cat_params = []
+    if category_id:
+        cat_where += " AND id = ?"
+        cat_params.append(category_id)
+
+    categories = conn.execute(
+        f"SELECT * FROM service_categories {cat_where} ORDER BY sort_order ASC, name ASC",
+        cat_params
+    ).fetchall()
+
+    result = []
+    for cat in categories:
+        c = dict(cat)
+
+        svc_where = "WHERE category_id = ?"
+        svc_params = [c["id"]]
+        if q:
+            svc_where += " AND name LIKE ?"
+            svc_params.append(f"%{q}%")
+        if active is not None:
+            svc_where += " AND is_active = ?"
+            svc_params.append(active)
+
+        # services has no sort_order column (unlike service_categories), so order by name
+        services = conn.execute(
+            f"SELECT * FROM services {svc_where} ORDER BY name ASC",
+            svc_params
+        ).fetchall()
+        c["services"] = [dict(s) for s in services]
+        result.append(c)
+
+    conn.close()
+    return result
+
+
+def get_service_stats():
+    conn = get_connection()
+    total_categories = conn.execute("SELECT COUNT(*) FROM service_categories").fetchone()[0]
+    total_services = conn.execute("SELECT COUNT(*) FROM services").fetchone()[0]
+    active_services = conn.execute("SELECT COUNT(*) FROM services WHERE is_active = 1").fetchone()[0]
+    avg_price = conn.execute("SELECT COALESCE(AVG(price), 0) FROM services").fetchone()[0]
+    conn.close()
+    return {
+        "total_categories": total_categories,
+        "total_services": total_services,
+        "active_services": active_services,
+        "avg_price": avg_price,
+    }
+
+
+def create_service(category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon):
+    conn = get_connection()
+    cur = conn.execute("""
+        INSERT INTO services (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon))
+    conn.commit()
+    service_id = cur.lastrowid
+    conn.close()
+    return service_id
+
+
+def update_service(service_id, category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon):
+    conn = get_connection()
+    conn.execute("""
+        UPDATE services
+        SET category_id=?, name=?, description=?, duration_minutes=?, price=?, points=?,
+            is_active=?, image=?, badge=?, icon=?, updated_at=CURRENT_TIMESTAMP
+        WHERE id=?
+    """, (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon, service_id))
+    conn.commit()
+    conn.close()
+
+
+def delete_service(service_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM services WHERE id = ?", (service_id,))
+    conn.commit()
+    conn.close()
+
+
+def toggle_service_active(service_id):
+    conn = get_connection()
+    conn.execute("UPDATE services SET is_active = 1 - is_active WHERE id = ?", (service_id,))
+    conn.commit()
+    conn.close()
+
+
+def create_category(name, slug, is_active):
+    conn = get_connection()
+    max_sort = conn.execute("SELECT COALESCE(MAX(sort_order), -1) FROM service_categories").fetchone()[0]
+    cur = conn.execute("""
+        INSERT INTO service_categories (name, slug, is_active, sort_order)
+        VALUES (?, ?, ?, ?)
+    """, (name, slug, is_active, max_sort + 1))
+    conn.commit()
+    category_id = cur.lastrowid
+    conn.close()
+    return category_id
+
+
+def update_category(category_id, name, slug, is_active):
+    conn = get_connection()
+    conn.execute("""
+        UPDATE service_categories
+        SET name=?, slug=?, is_active=?, updated_at=CURRENT_TIMESTAMP
+        WHERE id=?
+    """, (name, slug, is_active, category_id))
+    conn.commit()
+    conn.close()
+
+
+def delete_category(category_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM service_categories WHERE id = ?", (category_id,))
+    conn.commit()
+    conn.close()
+
+
 def get_gallery_images():
+    conn = get_connection()
+    images = conn.execute(
+        "SELECT * FROM gallery_images WHERE is_active = 1 ORDER BY sort_order ASC, id ASC"
+    ).fetchall()
+    conn.close()
+    return images
+
+
+def get_gallery_images_admin():
     conn = get_connection()
     images = conn.execute(
         "SELECT * FROM gallery_images ORDER BY sort_order ASC, id ASC"
     ).fetchall()
     conn.close()
-    return images
+    return [dict(r) for r in images]
+
+
+def get_gallery_image_by_id(image_id):
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM gallery_images WHERE id = ?", (image_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def get_gallery_stats():
+    conn = get_connection()
+    total = conn.execute("SELECT COUNT(*) FROM gallery_images").fetchone()[0]
+    active = conn.execute("SELECT COUNT(*) FROM gallery_images WHERE is_active = 1").fetchone()[0]
+    conn.close()
+    return {"total": total, "active": active, "hidden": total - active}
+
+
+def create_gallery_images(rows):
+    """rows: list of (image_url, alt_text, sort_order) tuples."""
+    conn = get_connection()
+    conn.executemany(
+        "INSERT INTO gallery_images (image_url, alt_text, sort_order, is_active) VALUES (?, ?, ?, 1)",
+        rows
+    )
+    conn.commit()
+    conn.close()
+
+
+def update_gallery_image(image_id, alt_text, sort_order, is_active, image_url=None):
+    conn = get_connection()
+    if image_url is not None:
+        conn.execute(
+            "UPDATE gallery_images SET alt_text=?, sort_order=?, is_active=?, image_url=? WHERE id=?",
+            (alt_text, sort_order, is_active, image_url, image_id)
+        )
+    else:
+        conn.execute(
+            "UPDATE gallery_images SET alt_text=?, sort_order=?, is_active=? WHERE id=?",
+            (alt_text, sort_order, is_active, image_id)
+        )
+    conn.commit()
+    conn.close()
+
+
+def delete_gallery_image(image_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM gallery_images WHERE id = ?", (image_id,))
+    conn.commit()
+    conn.close()
+
+
+def bulk_delete_gallery_images(image_ids):
+    conn = get_connection()
+    conn.executemany("DELETE FROM gallery_images WHERE id = ?", [(i,) for i in image_ids])
+    conn.commit()
+    conn.close()
+
+
+def reorder_gallery_images(order):
+    """order: list of (sort_order, id) tuples."""
+    conn = get_connection()
+    conn.executemany("UPDATE gallery_images SET sort_order = ? WHERE id = ?", order)
+    conn.commit()
+    conn.close()
 
 def get_available_staff_for_slot(booking_date, start_time, end_time):
     conn = get_connection()
@@ -494,7 +700,7 @@ def get_customer_appointment_history(customer_id):
         JOIN staff st       ON b.staff_id = st.id
         LEFT JOIN reviews r ON b.id = r.booking_id
         WHERE b.customer_id = ?
-          AND b.status IN ('completed', 'cancelled')
+          AND b.status IN ('done', 'cancelled')
         ORDER BY b.booking_date DESC, b.start_time DESC
     """, (customer_id,))
     
@@ -542,7 +748,7 @@ def has_pending_review(customer_id):
     conn = get_connection()
     row = conn.execute("""
         SELECT COUNT(*) FROM bookings
-        WHERE customer_id = ? AND status = 'completed'
+        WHERE customer_id = ? AND status = 'done'
         AND id NOT IN (SELECT booking_id FROM reviews)
     """, (customer_id,)).fetchone()
     conn.close()
@@ -766,3 +972,635 @@ def update_user_password(user_id, password_hash):
     conn.execute("UPDATE users SET password_hash=? WHERE id=?", (password_hash, user_id))
     conn.commit()
     conn.close()
+
+def get_admin_kpis(date_str):
+    conn = get_connection()
+    revenue = conn.execute(
+        "SELECT COALESCE(SUM(amount), 0) FROM invoices WHERE DATE(issued_at) = ? AND status = 'paid'",
+        (date_str,)
+    ).fetchone()[0]
+    bookings = conn.execute(
+        "SELECT COUNT(*) FROM bookings WHERE booking_date = ? AND status NOT IN ('unverified', 'cancelled')",
+        (date_str,)
+    ).fetchone()[0]
+    new_customers = conn.execute(
+        "SELECT COUNT(*) FROM customers WHERE DATE(created_at) = ?",
+        (date_str,)
+    ).fetchone()[0]
+    pending = conn.execute(
+        "SELECT COUNT(*) FROM bookings WHERE status = 'pending'"
+    ).fetchone()[0]
+    conn.close()
+    return {
+        "revenue": f"{revenue:,.0f}",
+        "bookings": bookings,
+        "new_customers": new_customers,
+        "pending": pending,
+    }
+
+def get_admin_today_appointments(date_str):
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT b.start_time, b.status,
+               c.full_name AS customer_name,
+               s.name AS service_name, s.duration_minutes,
+               st.full_name AS staff_name
+        FROM bookings b
+        JOIN customers c ON c.id = b.customer_id
+        JOIN services s ON s.id = b.service_id
+        JOIN staff st ON st.id = b.staff_id
+        WHERE b.booking_date = ?
+          AND b.status NOT IN ('unverified', 'cancelled')
+        ORDER BY b.start_time ASC
+    """, (date_str,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def get_admin_revenue_chart(date_str):
+    from datetime import datetime as _dt, timedelta as _td
+    today = _dt.strptime(date_str, "%Y-%m-%d").date()
+    conn = get_connection()
+
+    # Week: last 7 days, one point per day
+    week_start = (today - _td(days=6)).strftime("%Y-%m-%d")
+    week_rows = conn.execute("""
+        SELECT DATE(issued_at) AS day, COALESCE(SUM(amount), 0) AS revenue
+        FROM invoices
+        WHERE DATE(issued_at) >= ? AND DATE(issued_at) <= ? AND status = 'paid'
+        GROUP BY day ORDER BY day ASC
+    """, (week_start, date_str)).fetchall()
+    week_map = {r["day"]: r["revenue"] for r in week_rows}
+    week_data = []
+    for i in range(7):
+        d = today - _td(days=6 - i)
+        week_data.append({"label": d.strftime("%a"), "value": week_map.get(d.strftime("%Y-%m-%d"), 0)})
+
+    # Month: last 4 weeks grouped by week
+    month_start = (today - _td(days=27)).strftime("%Y-%m-%d")
+    month_rows = conn.execute("""
+        SELECT strftime('%Y-W%W', issued_at) AS wk, COALESCE(SUM(amount), 0) AS revenue
+        FROM invoices
+        WHERE DATE(issued_at) >= ? AND DATE(issued_at) <= ? AND status = 'paid'
+        GROUP BY wk ORDER BY wk ASC
+    """, (month_start, date_str)).fetchall()
+    month_map = {r["wk"]: r["revenue"] for r in month_rows}
+    month_data = []
+    for i in range(4):
+        d = today - _td(weeks=3 - i)
+        month_data.append({"label": f"Week {i + 1}", "value": month_map.get(d.strftime("%Y-W%W"), 0)})
+
+    conn.close()
+    return {"week": week_data, "month": month_data}
+
+def get_admin_recent_activity(limit=5):
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT b.id, b.status, b.created_at,
+               c.full_name AS customer_name,
+               s.name AS service_name
+        FROM bookings b
+        JOIN customers c ON c.id = b.customer_id
+        JOIN services s ON s.id = b.service_id
+        WHERE b.status != 'unverified'
+        ORDER BY b.created_at DESC
+        LIMIT ?
+    """, (limit,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_all_customers():
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT id, full_name, phone FROM customers ORDER BY full_name ASC"
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_admin_bookings(q='', status='', staff_id='', service_id='', date='', page=1, per_page=15):
+    conn = get_connection()
+
+    joins = """
+        FROM bookings b
+        JOIN customers c ON c.id = b.customer_id
+        JOIN staff st ON st.id = b.staff_id
+        JOIN services sv ON sv.id = b.service_id
+        WHERE 1=1
+    """
+    params = []
+    if q:
+        search = q.lstrip('#')
+        joins += " AND (CAST(b.id AS TEXT) LIKE ? OR c.full_name LIKE ?)"
+        params.extend([f'%{search}%', f'%{search}%'])
+    if status:
+        joins += " AND b.status = ?"
+        params.append(status)
+    if staff_id:
+        joins += " AND b.staff_id = ?"
+        params.append(staff_id)
+    if service_id:
+        joins += " AND b.service_id = ?"
+        params.append(service_id)
+    if date:
+        joins += " AND b.booking_date = ?"
+        params.append(date)
+
+    total = conn.execute("SELECT COUNT(*) " + joins, params).fetchone()[0]
+
+    select = (
+        "SELECT b.id, b.booking_date, b.start_time, b.end_time, b.status, "
+        "b.notes, b.cancellation_reason, "
+        "c.id AS customer_id, c.full_name AS customer_name, c.phone AS customer_phone, "
+        "st.id AS staff_id, st.full_name AS staff_name, "
+        "sv.id AS service_id, sv.name AS service_name, sv.duration_minutes "
+    )
+    rows = conn.execute(
+        select + joins + " ORDER BY b.booking_date DESC, b.start_time DESC LIMIT ? OFFSET ?",
+        params + [per_page, (page - 1) * per_page]
+    ).fetchall()
+
+    conn.close()
+    return [dict(r) for r in rows], total
+
+
+def get_booking_status_counts(q='', staff_id='', service_id='', date=''):
+    conn = get_connection()
+
+    joins = """
+        FROM bookings b
+        JOIN customers c ON c.id = b.customer_id
+        WHERE 1=1
+    """
+    params = []
+    if q:
+        search = q.lstrip('#')
+        joins += " AND (CAST(b.id AS TEXT) LIKE ? OR c.full_name LIKE ?)"
+        params.extend([f'%{search}%', f'%{search}%'])
+    if staff_id:
+        joins += " AND b.staff_id = ?"
+        params.append(staff_id)
+    if service_id:
+        joins += " AND b.service_id = ?"
+        params.append(service_id)
+    if date:
+        joins += " AND b.booking_date = ?"
+        params.append(date)
+
+    rows = conn.execute(
+        "SELECT b.status, COUNT(*) AS cnt " + joins + " GROUP BY b.status",
+        params
+    ).fetchall()
+    conn.close()
+
+    counts = {r['status']: r['cnt'] for r in rows}
+    return {
+        'all':         sum(counts.values()),
+        'pending':     counts.get('pending', 0),
+        'confirmed':   counts.get('confirmed', 0),
+        'in_progress': counts.get('in-progress', 0),
+        'done':        counts.get('done', 0),
+        'cancelled':   counts.get('cancelled', 0),
+    }
+
+
+def update_booking_details(booking_id, staff_id, booking_date, start_time, end_time, notes):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE bookings SET staff_id=?, booking_date=?, start_time=?, end_time=?, notes=? WHERE id=?",
+        (staff_id, booking_date, start_time, end_time, notes, booking_id)
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_staff_stats(month_start_str):
+    conn = get_connection()
+    total_staff = conn.execute("SELECT COUNT(*) FROM staff").fetchone()[0]
+    active_staff = conn.execute("SELECT COUNT(*) FROM staff WHERE is_active = 1").fetchone()[0]
+    bookings_this_month = conn.execute(
+        "SELECT COUNT(*) FROM bookings WHERE booking_date >= ? AND status NOT IN ('unverified', 'cancelled')",
+        (month_start_str,)
+    ).fetchone()[0]
+    avg_hourly_rate = conn.execute("SELECT COALESCE(AVG(hourly_rate), 0) FROM staff").fetchone()[0]
+    conn.close()
+    return {
+        "total_staff": total_staff,
+        "active_staff": active_staff,
+        "bookings_this_month": bookings_this_month,
+        "avg_hourly_rate": avg_hourly_rate,
+    }
+
+
+def get_staff_role_list():
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT DISTINCT role FROM staff WHERE role IS NOT NULL AND role != '' ORDER BY role ASC"
+    ).fetchall()
+    conn.close()
+    return [r["role"] for r in rows]
+
+
+def get_staff_list(today_str, month_start_str, q='', role='', active=None):
+    conn = get_connection()
+
+    where = "WHERE 1=1"
+    params = []
+    if q:
+        where += " AND (s.full_name LIKE ? OR s.email LIKE ?)"
+        params.extend([f'%{q}%', f'%{q}%'])
+    if role:
+        where += " AND s.role = ?"
+        params.append(role)
+    if active is not None:
+        where += " AND s.is_active = ?"
+        params.append(active)
+
+    rows = conn.execute(f"SELECT s.* FROM staff s {where} ORDER BY s.full_name ASC", params).fetchall()
+
+    staff_list = []
+    for row in rows:
+        s = dict(row)
+        s["bookings_this_month"] = conn.execute(
+            "SELECT COUNT(*) FROM bookings WHERE staff_id = ? AND booking_date >= ? AND status NOT IN ('unverified', 'cancelled')",
+            (s["id"], month_start_str)
+        ).fetchone()[0]
+        s["total_today"] = conn.execute(
+            "SELECT COUNT(*) FROM bookings WHERE staff_id = ? AND booking_date = ? AND status NOT IN ('unverified', 'cancelled')",
+            (s["id"], today_str)
+        ).fetchone()[0]
+        s["done_today"] = conn.execute(
+            "SELECT COUNT(*) FROM bookings WHERE staff_id = ? AND booking_date = ? AND status = 'done'",
+            (s["id"], today_str)
+        ).fetchone()[0]
+        staff_list.append(s)
+
+    conn.close()
+    return staff_list
+
+
+def create_staff(full_name, email, phone, role, hourly_rate, commission_rate, is_active, user_id):
+    conn = get_connection()
+    cur = conn.execute("""
+        INSERT INTO staff (full_name, email, phone, role, hourly_rate, commission_rate, is_active, user_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (full_name, email, phone, role, hourly_rate, commission_rate, is_active, user_id))
+    conn.commit()
+    staff_id = cur.lastrowid
+    conn.close()
+    return staff_id
+
+
+def update_staff(staff_id, full_name, email, phone, role, hourly_rate, commission_rate, is_active):
+    conn = get_connection()
+    conn.execute("""
+        UPDATE staff
+        SET full_name = ?, email = ?, phone = ?, role = ?, hourly_rate = ?, commission_rate = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """, (full_name, email, phone, role, hourly_rate, commission_rate, is_active, staff_id))
+    conn.commit()
+    conn.close()
+
+
+def delete_staff(staff_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM staff WHERE id = ?", (staff_id,))
+    conn.commit()
+    conn.close()
+
+
+def toggle_staff_active(staff_id):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE staff SET is_active = 1 - is_active, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (staff_id,)
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_admin_customer_stats(month_start_str):
+    conn = get_connection()
+    total = conn.execute("SELECT COUNT(*) FROM customers").fetchone()[0]
+    has_account = conn.execute("SELECT COUNT(*) FROM customers WHERE user_id IS NOT NULL").fetchone()[0]
+    new_this_month = conn.execute(
+        "SELECT COUNT(*) FROM customers WHERE created_at >= ?", (month_start_str,)
+    ).fetchone()[0]
+    tier_rows = conn.execute("""
+        SELECT LOWER(mt.name) AS tier, COUNT(*) AS cnt
+        FROM customer_memberships cm
+        JOIN membership_tiers mt ON cm.tier_id = mt.id
+        WHERE cm.is_active = 1
+        GROUP BY LOWER(mt.name)
+    """).fetchall()
+    conn.close()
+
+    tier_counts = {r["tier"]: r["cnt"] for r in tier_rows}
+    return {
+        "total": total,
+        "has_account": has_account,
+        "new_this_month": new_this_month,
+        "silver_count": tier_counts.get("silver", 0),
+        "gold_count": tier_counts.get("gold", 0),
+        "diamond_count": tier_counts.get("diamond", 0),
+    }
+
+
+def get_admin_customers(q='', sort='newest', tier='', page=1, per_page=15):
+    conn = get_connection()
+
+    joins = """
+        FROM customers c
+        LEFT JOIN customer_memberships cm ON cm.customer_id = c.id AND cm.is_active = 1
+        LEFT JOIN membership_tiers mt ON mt.id = cm.tier_id
+        LEFT JOIN (
+            SELECT customer_id, SUM(points) AS total_points
+            FROM loyalty_points_log GROUP BY customer_id
+        ) pts ON pts.customer_id = c.id
+        LEFT JOIN (
+            SELECT customer_id, COUNT(*) AS total_bookings, MAX(booking_date) AS last_visit
+            FROM bookings GROUP BY customer_id
+        ) bk ON bk.customer_id = c.id
+        LEFT JOIN (
+            SELECT b.customer_id, SUM(i.amount) AS total_spend
+            FROM invoices i JOIN bookings b ON i.booking_id = b.id
+            WHERE i.status = 'paid' GROUP BY b.customer_id
+        ) sp ON sp.customer_id = c.id
+        LEFT JOIN (
+            SELECT customer_id, COUNT(*) AS voucher_count
+            FROM reward_redemptions WHERE is_used = 0 GROUP BY customer_id
+        ) vc ON vc.customer_id = c.id
+        WHERE 1=1
+    """
+    params = []
+    if q:
+        joins += " AND (c.full_name LIKE ? OR c.email LIKE ? OR c.phone LIKE ?)"
+        params.extend([f'%{q}%', f'%{q}%', f'%{q}%'])
+    if tier:
+        joins += " AND LOWER(mt.name) = ?"
+        params.append(tier.lower())
+
+    total = conn.execute("SELECT COUNT(*) " + joins, params).fetchone()[0]
+
+    sort_map = {
+        "points":   "COALESCE(pts.total_points, 0) DESC",
+        "bookings": "COALESCE(bk.total_bookings, 0) DESC",
+        "newest":   "c.created_at DESC",
+    }
+    order_by = sort_map.get(sort, sort_map["newest"])
+
+    select = """
+        SELECT c.id, c.full_name, c.email, c.phone, c.date_of_birth, c.notes,
+               c.user_id, c.created_at,
+               LOWER(COALESCE(mt.name, 'silver')) AS tier_name,
+               COALESCE(pts.total_points, 0) AS total_points,
+               COALESCE(bk.total_bookings, 0) AS total_bookings,
+               bk.last_visit,
+               COALESCE(sp.total_spend, 0) AS total_spend,
+               COALESCE(vc.voucher_count, 0) AS voucher_count
+    """
+    rows = conn.execute(
+        select + joins + f" ORDER BY {order_by} LIMIT ? OFFSET ?",
+        params + [per_page, (page - 1) * per_page]
+    ).fetchall()
+
+    customers = []
+    for row in rows:
+        c = dict(row)
+        recent = conn.execute("""
+            SELECT s.name AS service_name, b.booking_date, st.full_name AS staff_name, b.status
+            FROM bookings b
+            JOIN services s ON s.id = b.service_id
+            JOIN staff st ON st.id = b.staff_id
+            WHERE b.customer_id = ?
+            ORDER BY b.booking_date DESC, b.start_time DESC
+            LIMIT 3
+        """, (c["id"],)).fetchall()
+        c["recent_bookings"] = [dict(r) for r in recent]
+        customers.append(c)
+
+    conn.close()
+    return customers, total
+
+
+def create_customer_admin(full_name, email, phone, date_of_birth, notes):
+    conn = get_connection()
+    cur = conn.execute(
+        """
+        INSERT INTO customers (full_name, email, phone, date_of_birth, notes)
+        VALUES (?, ?, ?, ?, ?)
+        """, (full_name, email or '', phone or None, date_of_birth, notes or None)
+    )
+    conn.commit()
+    customer_id = cur.lastrowid
+    conn.close()
+    return customer_id
+
+
+def delete_customer_admin(customer_id):
+    # Every customer always has a customer_memberships row (auto-assigned Silver on
+    # registration) and may have loyalty_points_log rows — both are bookkeeping tied
+    # 1:1 to the customer, not standalone business records, so they cascade with the
+    # delete. bookings/reviews/reward_redemptions/referrals are real history and are
+    # left to raise IntegrityError, blocking deletion as intended.
+    conn = get_connection()
+    try:
+        row = conn.execute("SELECT user_id FROM customers WHERE id = ?", (customer_id,)).fetchone()
+        user_id = row["user_id"] if row else None
+
+        conn.execute("DELETE FROM customer_memberships WHERE customer_id = ?", (customer_id,))
+        conn.execute("DELETE FROM loyalty_points_log WHERE customer_id = ?", (customer_id,))
+        conn.execute("DELETE FROM customers WHERE id = ?", (customer_id,))
+        if user_id:
+            conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def update_customer_admin(customer_id, full_name, email, phone, date_of_birth, notes):
+    conn = get_connection()
+    conn.execute(
+        """
+        UPDATE customers
+        SET full_name = ?, email = ?, phone = ?, date_of_birth = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+        """, (full_name, email or '', phone, date_of_birth, notes, customer_id)
+    )
+    conn.commit()
+    conn.close()
+
+
+# ─────────────────────────────────────────────────────────────
+#  ADMIN REPORTS & STATISTICS
+#  All revenue is attributed to bookings.booking_date (date of
+#  service), joined to paid invoices. All date filters are
+#  inclusive [date_from, date_to] on 'YYYY-MM-DD' strings.
+# ─────────────────────────────────────────────────────────────
+
+def get_report_totals(date_from, date_to):
+    """4 KPI scalars for a date range. Reused for the previous period too."""
+    conn = get_connection()
+    revenue = conn.execute(
+        """
+        SELECT COALESCE(SUM(i.amount), 0)
+        FROM invoices i
+        JOIN bookings b ON b.id = i.booking_id
+        WHERE i.status = 'paid' AND b.booking_date BETWEEN ? AND ?
+        """, (date_from, date_to)
+    ).fetchone()[0]
+    bookings = conn.execute(
+        """
+        SELECT COUNT(*) FROM bookings
+        WHERE booking_date BETWEEN ? AND ? AND status != 'unverified'
+        """, (date_from, date_to)
+    ).fetchone()[0]
+    new_customers = conn.execute(
+        "SELECT COUNT(*) FROM customers WHERE DATE(created_at) BETWEEN ? AND ?",
+        (date_from, date_to)
+    ).fetchone()[0]
+    points_issued = conn.execute(
+        "SELECT COALESCE(SUM(points), 0) FROM loyalty_points_log WHERE points > 0 AND DATE(created_at) BETWEEN ? AND ?",
+        (date_from, date_to)
+    ).fetchone()[0]
+    conn.close()
+    return {
+        "revenue": revenue,
+        "bookings": bookings,
+        "new_customers": new_customers,
+        "points_issued": int(points_issued),
+    }
+
+
+def get_report_revenue_by_day(date_from, date_to):
+    """Paid revenue per service day. Only days with revenue are returned."""
+    conn = get_connection()
+    rows = conn.execute(
+        """
+        SELECT b.booking_date AS day, COALESCE(SUM(i.amount), 0) AS amount
+        FROM invoices i
+        JOIN bookings b ON b.id = i.booking_id
+        WHERE i.status = 'paid' AND b.booking_date BETWEEN ? AND ?
+        GROUP BY b.booking_date
+        ORDER BY b.booking_date ASC
+        """, (date_from, date_to)
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_report_revenue_by_hour(date_str):
+    """Paid revenue per hour-of-day (0-23) for a single date."""
+    conn = get_connection()
+    rows = conn.execute(
+        """
+        SELECT CAST(substr(b.start_time, 1, 2) AS INTEGER) AS hour,
+               COALESCE(SUM(i.amount), 0) AS amount
+        FROM invoices i
+        JOIN bookings b ON b.id = i.booking_id
+        WHERE i.status = 'paid' AND b.booking_date = ?
+        GROUP BY hour
+        """, (date_str,)
+    ).fetchall()
+    conn.close()
+    return {int(r["hour"]): r["amount"] for r in rows}
+
+
+def get_report_booking_status(date_from, date_to):
+    """{status: count} for bookings in range (excluding unverified)."""
+    conn = get_connection()
+    rows = conn.execute(
+        """
+        SELECT status, COUNT(*) AS cnt FROM bookings
+        WHERE booking_date BETWEEN ? AND ? AND status != 'unverified'
+        GROUP BY status
+        """, (date_from, date_to)
+    ).fetchall()
+    conn.close()
+    return {r["status"]: r["cnt"] for r in rows}
+
+
+def get_report_top_services(date_from, date_to, limit=5):
+    conn = get_connection()
+    rows = conn.execute(
+        """
+        SELECT sv.name AS name,
+               COUNT(DISTINCT b.id) AS booking_count,
+               COALESCE(SUM(i.amount), 0) AS revenue
+        FROM bookings b
+        JOIN services sv ON sv.id = b.service_id
+        JOIN invoices i ON i.booking_id = b.id AND i.status = 'paid'
+        WHERE b.booking_date BETWEEN ? AND ?
+        GROUP BY sv.id
+        ORDER BY revenue DESC
+        LIMIT ?
+        """, (date_from, date_to, limit)
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_report_staff_performance(date_from, date_to):
+    conn = get_connection()
+    rows = conn.execute(
+        """
+        SELECT st.id AS staff_id, st.full_name AS full_name,
+               COUNT(DISTINCT b.id) AS booking_count,
+               COALESCE(SUM(i.amount), 0) AS revenue
+        FROM bookings b
+        JOIN staff st ON st.id = b.staff_id
+        JOIN invoices i ON i.booking_id = b.id AND i.status = 'paid'
+        WHERE b.booking_date BETWEEN ? AND ?
+        GROUP BY st.id
+        ORDER BY revenue DESC
+        """, (date_from, date_to)
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_report_loyalty(date_from, date_to):
+    """Points issued (log, points>0) + redeemed (reward_redemptions)."""
+    conn = get_connection()
+    total_issued = conn.execute(
+        "SELECT COALESCE(SUM(points), 0) FROM loyalty_points_log WHERE points > 0 AND DATE(created_at) BETWEEN ? AND ?",
+        (date_from, date_to)
+    ).fetchone()[0]
+    red = conn.execute(
+        "SELECT COUNT(*) AS cnt, COALESCE(SUM(points_spent), 0) AS spent FROM reward_redemptions WHERE DATE(redeemed_at) BETWEEN ? AND ?",
+        (date_from, date_to)
+    ).fetchone()
+    sources = conn.execute(
+        """
+        SELECT source, SUM(points) AS points
+        FROM loyalty_points_log
+        WHERE points > 0 AND DATE(created_at) BETWEEN ? AND ?
+        GROUP BY source
+        ORDER BY points DESC
+        """, (date_from, date_to)
+    ).fetchall()
+    conn.close()
+    return {
+        "total_issued": int(total_issued),
+        "total_redeemed": int(red["spent"]),
+        "redemption_count": red["cnt"],
+        "sources": [dict(s) for s in sources],
+    }
+
+
+def get_report_customer_growth(since_str):
+    """{ 'YYYY-MM': count } of new customers since since_str. Route fills the 6-month window."""
+    conn = get_connection()
+    rows = conn.execute(
+        """
+        SELECT strftime('%Y-%m', created_at) AS ym, COUNT(*) AS cnt
+        FROM customers
+        WHERE DATE(created_at) >= ?
+        GROUP BY ym
+        """, (since_str,)
+    ).fetchall()
+    conn.close()
+    return {r["ym"]: r["cnt"] for r in rows}
