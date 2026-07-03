@@ -59,7 +59,7 @@
             <div class="gal-item__hover-icon">
                 <span class="material-symbols-outlined">zoom_in</span>
             </div>
-            <img class="gal-item__img" src="{{ image.image_url }}" alt="{{ image.alt_text }}">
+            <img class="gal-item__img" src="{{ image.image_url if image.image_url.startswith('http') else url_for('static', filename='uploads/gallery/' + image.image_url) }}" alt="{{ image.alt_text }}">
         </div>
         {% endfor %}
     </div>

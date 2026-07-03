@@ -85,7 +85,7 @@ def check_streak(customer_id: int, booking_date, conn=None) -> bool:
         row = conn.execute("""
             SELECT 1 FROM bookings
             WHERE customer_id = ?
-              AND status = 'completed'
+              AND status = 'done'
               AND strftime('%Y', booking_date) = ?
               AND strftime('%m', booking_date) = ?
             LIMIT 1
