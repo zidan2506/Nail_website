@@ -1,0 +1,434 @@
+{#
+  ===== STAFF HISTORY — "Lịch sử" =====
+  File: templates/staff/staff_history.html
+
+  ===== CONTEXT VARIABLES =====
+  current_staff:    dict — id, name, role
+  grouped_bookings: dict[str -> list[dict]]
+    key: 'YYYY-MM', value: list of booking dicts (đã enrich ở route qua _enrich_history_booking)
+    booking dict: id, booking_date, start_time, end_time, status, customer_name, customer_phone,
+      service_name, total_price, invoice_method, invoice_status,
+      staff_commission, staff_hourly_earning, staff_total_earning,
+      pay_method, is_paid, pay_tag_class, pay_tag_label, badge_class, badge_label,
+      code, start, end, date_display, hourly_display, commission_display, total_income_display
+      (hourly_display/commission_display/total_income_display = '' nếu status='cancelled')
+  month_keys:    list[str] — ['YYYY-MM', ...] sorted DESC, chỉ những tháng có booking sau filter
+  month_display: dict[str -> str] — {'YYYY-MM': 'Tháng M/YYYY'}, phủ cả month_options
+  month_options: list[str] — toàn bộ 'YYYY-MM' có booking done/cancelled của staff (cho dropdown)
+  stats:         dict — total, done, cancelled, incomplete (tính trên toàn bộ record, không theo filter)
+  active_month:  str — 'YYYY-MM' hoặc '' (tất cả)
+  active_search: str
+  active_status: str — all|done|cancelled|incomplete
+  today_str:     str — 'YYYY-MM-DD'
+  now:           datetime
+
+  ===== ROUTES EXPECTED (blueprint 'main', không tách 'staff') =====
+  main.staff_history  GET  /staff/history  — trang lịch sử
+
+  ===== SCHEMA MIGRATIONS =====
+  Đã áp dụng (xem app/database/schema.sql + ALTER TABLE thủ công lên database.db hiện có):
+    ALTER TABLE bookings ADD COLUMN staff_commission     REAL DEFAULT 0;
+    ALTER TABLE bookings ADD COLUMN staff_hourly_earning REAL DEFAULT 0;
+    ALTER TABLE bookings ADD COLUMN staff_total_earning  REAL DEFAULT 0;
+  Giá trị được snapshot 1 lần trong _complete_booking_txn (routes.py) tại thời điểm
+  staff bấm "Hoàn thành" — không tính live theo hourly_rate/commission_rate hiện tại của staff.
+
+  ===== FILE STORAGE =====
+  Không có
+#}
+{% extends "staff/staff_base.html" %}
+
+{% block title %}Lịch sử — DahaCare{% endblock %}
+
+{% block page_styles %}
+<style>
+/* ═══════ sf- Staff history ═══════ */
+.sf-page { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+
+/* ── Header + filter ── */
+.sf-hdr { background: #FFFFFF; border-bottom: 1px solid #E8D5CE; padding: 24px 30px 18px; flex-shrink: 0; }
+.sf-hdr-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px; }
+.sf-title { font-size: 25px; font-weight: 700; color: #1C1917; letter-spacing: -0.4px; }
+.sf-title em { font-style: italic; font-weight: 400; color: #C084A0; }
+.sf-hdr-date { font-size: 14px; color: #B0A09A; }
+
+.sf-filters { display: flex; flex-direction: column; gap: 13px; }
+.sf-frow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.sf-flabel { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px;
+    color: #B0A09A; min-width: 118px; white-space: nowrap; }
+
+.sf-msel {
+    font-size: 14px; padding: 8px 30px 8px 12px; border-radius: 8px;
+    border: 1px solid #E8D5CE; background-color: #F0EBE8; color: #1C1917;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238C7B75' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+}
+.sf-msel:focus { outline: none; border-color: #C084A0; }
+
+.sf-search { display: flex; align-items: center; gap: 7px; background: #F0EBE8;
+    border: 1px solid #E8D5CE; border-radius: 8px; padding: 8px 12px; }
+.sf-search:focus-within { border-color: #C084A0; }
+.sf-search .ti { font-size: 15px; color: #B0A09A; }
+.sf-search input { font-size: 14px; background: transparent; border: none; outline: none;
+    width: 180px; color: #1C1917; font-family: inherit; }
+.sf-search input::placeholder { color: #B0A09A; }
+
+.sf-ch { font-size: 14px; padding: 8px 16px; border-radius: 99px; border: 1px solid #E8D5CE;
+    background: transparent; color: #8C7B75; cursor: pointer; transition: all .15s ease; font-family: inherit; }
+.sf-ch:hover { border-color: #D4BAB0; color: #1C1917; }
+.sf-ch--active { font-weight: 500; }
+.sf-ch--active.all-chip     { background: #F9F0F5; border-color: #C084A0; color: #C084A0; }
+.sf-ch--active.done-chip    { background: #F0FDF4; border-color: #86EFAC; color: #15803D; }
+.sf-ch--active.cancelled-chip { background: #F0EBE8; border-color: #D4BAB0; color: #8C7B75; }
+.sf-ch--active.incomplete-chip { background: #FFFBEB; border-color: #FDE68A; color: #92400E; }
+
+.sf-clear { font-size: 13px; color: #B0A09A; text-decoration: none; margin-left: 4px; }
+.sf-clear:hover { color: #8C7B75; }
+
+/* ── Stats bar ── */
+.sf-stats { display: flex; background: #FFFFFF; border-bottom: 1px solid #E8D5CE; flex-shrink: 0; }
+.sf-sc { flex: 1; padding: 16px 22px; border-right: 1px solid #E8D5CE; }
+.sf-sc:last-child { border-right: none; }
+.sf-sn { font-size: 33px; font-weight: 300; letter-spacing: -0.5px; line-height: 1.1; }
+.sf-sl { font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+    color: #B0A09A; display: flex; align-items: center; gap: 7px; margin-top: 3px; }
+.sf-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── List ── */
+.sf-list { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; background: #FAFAF8; }
+.sf-month-group { margin-bottom: 26px; }
+.sf-month-hdr { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.sf-month-label { display: flex; align-items: center; gap: 8px; }
+.sf-month-name { font-size: 16px; font-weight: 700; color: #1C1917; letter-spacing: -0.2px; }
+.sf-month-dot { width: 3px; height: 3px; border-radius: 50%; background: #D4BAB0; flex-shrink: 0; }
+.sf-month-count { font-size: 12px; color: #B0A09A; }
+.sf-month-line { flex: 1; height: 1px; background: #E8D5CE; }
+
+/* ── Booking card ── */
+.sf-card { background: #FFFFFF; border: 1px solid #E8D5CE; border-left: 3px solid #D4BAB0;
+    border-radius: 0 10px 10px 0; padding: 17px 20px; display: flex; align-items: flex-start; gap: 18px;
+    cursor: pointer; margin-bottom: 10px; transition: box-shadow .15s ease, border-color .15s ease; }
+.sf-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.07); border-color: #D4BAB0; }
+.sf-card--done { opacity: .75; }
+.sf-card--cancelled { opacity: .60; }
+.sf-cbody { flex: 1; min-width: 0; }
+
+.sf-cr1 { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 5px; }
+.sf-bid { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: 12px; color: #B0A09A;
+    background: #F0EBE8; border: 1px solid #E8D5CE; padding: 2px 8px; border-radius: 5px; }
+.sf-cname { font-size: 17px; font-weight: 700; color: #1C1917; }
+.sf-svc { font-size: 15px; font-weight: 500; color: #8C7B75; margin-bottom: 10px; }
+.sf-meta { display: flex; gap: 18px; flex-wrap: wrap; }
+.sf-mi { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #8C7B75; }
+.sf-mi .ti { font-size: 16px; }
+
+/* Status badges */
+.sf-badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px; }
+.b-done      { background: #F0FDF4; color: #166534; }
+.b-cancelled { background: #F0EBE8; color: #8C7B75; }
+
+/* Payment tags */
+.sf-ptag { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 99px; border: 1px solid transparent; }
+.pt-unpaid { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+.pt-paid   { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
+.pt-online { background: #DBEAFE; color: #1E40AF; border-color: #BFDBFE; }
+.pt-na     { background: #F0EBE8; color: #B0A09A; border-color: #E8D5CE; }
+
+/* Right label thay action buttons */
+.sf-hist-label { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #B0A09A; flex-shrink: 0; white-space: nowrap; }
+.sf-hist-label.done .ti { color: #4ADE80; font-size: 16px; }
+.sf-hist-label.cancelled .ti { color: #D4BAB0; font-size: 16px; }
+
+/* Empty state */
+.sf-empty { display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 13px; padding: 70px 20px; text-align: center; }
+.sf-empty .ti { font-size: 58px; color: #B0A09A; }
+.sf-empty-text { font-size: 16px; color: #8C7B75; }
+.sf-empty a { font-size: 14px; color: #C084A0; text-decoration: none; }
+.sf-empty a:hover { text-decoration: underline; }
+
+/* ── Modal ── */
+.sf-overlay { position: absolute; inset: 0; background: rgba(28,25,23,.45); display: none;
+    align-items: center; justify-content: center; z-index: 10; border-radius: 14px; }
+.sf-overlay.open { display: flex; }
+.sf-modal { background: #FFFFFF; border-radius: 12px; border: 1px solid #E8D5CE; width: 380px;
+    max-width: calc(100% - 32px); display: flex; flex-direction: column; overflow: hidden; }
+.sf-mhdr { padding: 16px 18px 12px; border-bottom: 1px solid #E8D5CE; display: flex;
+    justify-content: space-between; align-items: center; background: #FFFFFF; }
+.sf-mtitle { font-size: 18px; font-weight: 700; color: #1C1917; }
+.sf-mclose { width: 32px; height: 32px; border-radius: 7px; border: none; background: transparent;
+    color: #8C7B75; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.sf-mclose:hover { background: #F0EBE8; }
+.sf-mclose .ti { font-size: 20px; }
+.sf-mbody { padding: 18px; overflow-y: auto; max-height: 440px; display: flex;
+    flex-direction: column; gap: 15px; }
+.sf-msec { display: flex; flex-direction: column; gap: 8px; }
+.sf-msec + .sf-msec { border-top: 1px solid #E8D5CE; padding-top: 15px; }
+.sf-mlabel { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: #B0A09A; }
+.sf-mid { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: 14px; color: #B0A09A;
+    background: #F0EBE8; border: 1px solid #E8D5CE; border-radius: 6px; padding: 8px 12px; }
+.sf-mrow { display: flex; justify-content: space-between; align-items: center; }
+.sf-mk { font-size: 14.5px; color: #8C7B75; }
+.sf-mv { font-size: 15px; font-weight: 600; color: #1C1917; text-align: right; }
+.sf-mftr { padding: 12px 18px; border-top: 1px solid #E8D5CE; display: flex; justify-content: flex-end;
+    background: #FFFFFF; }
+.sf-mbtn { font-size: 14px; padding: 8px 15px; border-radius: 8px; border: 1px solid #E8D5CE;
+    background: #F0EBE8; color: #5F524C; cursor: pointer; font-family: inherit; }
+.sf-mbtn:hover { background: #E8D5CE; }
+
+/* Income section */
+.sf-income-box { background: #F9F0F5; border: 1px solid #E8D5CE; border-radius: 8px; padding: 12px 15px;
+    display: flex; flex-direction: column; gap: 8px; }
+.sf-income-row { display: flex; justify-content: space-between; }
+.sf-income-k { font-size: 14.5px; color: #8C7B75; }
+.sf-income-v { font-size: 15px; font-weight: 600; color: #1C1917; }
+.sf-income-divider { padding-top: 8px; border-top: 1px solid #E8D5CE; }
+.sf-income-total-row { display: flex; justify-content: space-between; }
+.sf-income-total-k { font-size: 15px; font-weight: 500; color: #1C1917; }
+.sf-income-total-v { font-size: 16px; font-weight: 500; color: #C084A0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sf-page">
+
+  {# ── Header + filter ── #}
+  <div class="sf-hdr">
+    <div class="sf-hdr-top">
+      <div class="sf-title">Lịch sử của <em>{{ current_staff.name }}</em></div>
+      <div class="sf-hdr-date">{{ now.strftime('%d/%m/%Y') }}</div>
+    </div>
+
+    <form method="GET" action="{{ url_for('main.staff_history') }}" class="sf-filters" id="sfFilterForm">
+      <input type="hidden" name="status" id="sfStatus" value="{{ active_status }}">
+
+      {# Row 1: tháng #}
+      <div class="sf-frow">
+        <span class="sf-flabel">Lọc theo tháng</span>
+        <select class="sf-msel" name="month" onchange="document.getElementById('sfFilterForm').submit()">
+          <option value="" {% if active_month == '' %}selected{% endif %}>Tất cả</option>
+          {% for ym in month_options %}
+          <option value="{{ ym }}" {% if active_month == ym %}selected{% endif %}>{{ month_display[ym] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {# Row 2: tìm kiếm #}
+      <div class="sf-frow">
+        <span class="sf-flabel">Tìm kiếm</span>
+        <label class="sf-search">
+          <i class="ti ti-search"></i>
+          <input type="text" name="search" value="{{ active_search }}" placeholder="Tên khách hàng..."
+                 onkeydown="if(event.key==='Enter'){document.getElementById('sfFilterForm').submit();}">
+        </label>
+      </div>
+
+      {# Row 3: trạng thái #}
+      <div class="sf-frow">
+        <span class="sf-flabel">Lọc theo trạng thái</span>
+        {% set chips = [('all','Tất cả','all-chip'),('done','Hoàn thành','done-chip'),
+                        ('cancelled','Đã hủy','cancelled-chip'),('incomplete','Chưa hoàn thành','incomplete-chip')] %}
+        {% for val, label, extra_class in chips %}
+        <button type="button"
+                class="sf-ch {{ extra_class }} {% if active_status == val %}sf-ch--active{% endif %}"
+                onclick="document.getElementById('sfStatus').value='{{ val }}'; document.getElementById('sfFilterForm').submit();">{{ label }}</button>
+        {% endfor %}
+        <a href="{{ url_for('main.staff_history') }}" class="sf-clear">Xóa bộ lọc</a>
+      </div>
+    </form>
+  </div>
+
+  {# ── Stats ── #}
+  <div class="sf-stats">
+    <div class="sf-sc">
+      <div class="sf-sn">{{ stats.total }}</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#60A5FA"></span>Tổng lịch sử</div>
+    </div>
+    <div class="sf-sc">
+      <div class="sf-sn" style="color:#16A34A">{{ stats.done }}</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#4ADE80"></span>Hoàn thành</div>
+    </div>
+    <div class="sf-sc">
+      <div class="sf-sn" style="color:#8C7B75">{{ stats.cancelled }}</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#D4BAB0"></span>Đã hủy</div>
+    </div>
+    <div class="sf-sc">
+      <div class="sf-sn" style="color:#B45309">{{ stats.incomplete }}</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#FDE68A"></span>Chưa hoàn thành</div>
+    </div>
+  </div>
+
+  {# ── List ── #}
+  <div class="sf-list">
+    {% if not month_keys %}
+      <div class="sf-empty">
+        <i class="ti ti-clock-off"></i>
+        <div class="sf-empty-text">Không có lịch sử nào trong khoảng thời gian này.</div>
+        <a href="{{ url_for('main.staff_history') }}">Xem tất cả</a>
+      </div>
+    {% else %}
+      {% for ym in month_keys %}
+      <div class="sf-month-group">
+        <div class="sf-month-hdr">
+          <div class="sf-month-label">
+            <span class="sf-month-name">{{ month_display[ym] }}</span>
+            <span class="sf-month-dot"></span>
+            <span class="sf-month-count">{{ grouped_bookings[ym] | length }} lịch hẹn</span>
+          </div>
+          <div class="sf-month-line"></div>
+        </div>
+
+        {% for b in grouped_bookings[ym] %}
+        <div class="sf-card {% if b.status == 'done' %}sf-card--done{% else %}sf-card--cancelled{% endif %}"
+             style="border-left-color: {{ '#4ADE80' if b.status == 'done' else '#D4BAB0' }}"
+             onclick="sfOpenModal(this)"
+             data-id="{{ b.code }}" data-name="{{ b.customer_name }}" data-phone="{{ b.customer_phone or '' }}"
+             data-svc="{{ b.service_name }}" data-date="{{ b.date_display }}"
+             data-time="{{ b.start }} – {{ b.end }}" data-status="{{ b.status }}"
+             data-pay="{{ b.pay_method }}" data-paid="{{ b.is_paid }}" data-price="{{ '%.2f' | format(b.total_price or 0) }}"
+             data-hourly="{{ b.hourly_display }}" data-commission="{{ b.commission_display }}"
+             data-total-income="{{ b.total_income_display }}">
+          <div class="sf-cbody">
+            <div class="sf-cr1">
+              <span class="sf-bid">#{{ b.code }}</span>
+              <span class="sf-cname">{{ b.customer_name }}</span>
+              <span class="sf-badge {{ b.badge_class }}">{{ b.badge_label }}</span>
+              <span class="sf-ptag {{ b.pay_tag_class }}">{{ b.pay_tag_label }}</span>
+            </div>
+            <div class="sf-svc">{{ b.service_name }}</div>
+            <div class="sf-meta">
+              <span class="sf-mi"><i class="ti ti-calendar"></i>{{ b.date_display }}</span>
+              <span class="sf-mi"><i class="ti ti-clock"></i>{{ b.start }} – {{ b.end }}</span>
+              <span class="sf-mi"><i class="ti ti-coin"></i>€{{ '%.2f' | format(b.total_price or 0) }}</span>
+            </div>
+          </div>
+
+          {% if b.status == 'done' %}
+          <div class="sf-hist-label done"><i class="ti ti-circle-check"></i>Đã xong</div>
+          {% else %}
+          <div class="sf-hist-label cancelled"><i class="ti ti-ban"></i>Đã hủy</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  {# ── Modal ── #}
+  <div class="sf-overlay" id="sfOverlay" onclick="if(event.target===this) sfCloseModal()">
+    <div class="sf-modal">
+      <div class="sf-mhdr">
+        <span class="sf-mtitle">Chi tiết lịch hẹn</span>
+        <button type="button" class="sf-mclose" onclick="sfCloseModal()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="sf-mbody">
+        <div class="sf-msec">
+          <span class="sf-mlabel">Mã booking</span>
+          <div class="sf-mid" id="m-id"></div>
+        </div>
+        <div class="sf-msec">
+          <span class="sf-mlabel">Khách hàng</span>
+          <div class="sf-mrow"><span class="sf-mk">Họ tên</span><span class="sf-mv" id="m-name"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">Số điện thoại</span><span class="sf-mv" id="m-phone"></span></div>
+        </div>
+        <div class="sf-msec">
+          <span class="sf-mlabel">Dịch vụ</span>
+          <div class="sf-mrow"><span class="sf-mk">Tên dịch vụ</span><span class="sf-mv" id="m-svc"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">Ngày hẹn</span><span class="sf-mv" id="m-date"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">Thời gian</span><span class="sf-mv" id="m-time"></span></div>
+        </div>
+        <div class="sf-msec">
+          <span class="sf-mlabel">Thanh toán</span>
+          <div class="sf-mrow"><span class="sf-mk">Tổng tiền dịch vụ</span><span class="sf-mv" id="m-price"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">Phương thức</span><span class="sf-mv" id="m-pay"></span></div>
+        </div>
+        <div class="sf-msec">
+          <span class="sf-mlabel">Trạng thái</span>
+          <div><span id="m-status-badge"></span></div>
+        </div>
+        <div class="sf-msec" id="m-income-section" style="display:none">
+          <span class="sf-mlabel">Thu nhập</span>
+          <div class="sf-income-box">
+            <div class="sf-income-row">
+              <span class="sf-income-k">Lương theo giờ</span>
+              <span class="sf-income-v" id="m-hourly"></span>
+            </div>
+            <div class="sf-income-row">
+              <span class="sf-income-k">Hoa hồng booking</span>
+              <span class="sf-income-v" id="m-commission"></span>
+            </div>
+            <div class="sf-income-divider">
+              <div class="sf-income-total-row">
+                <span class="sf-income-total-k">Thu nhập sau booking</span>
+                <span class="sf-income-total-v" id="m-total-income"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sf-mftr">
+        <button type="button" class="sf-mbtn" onclick="sfCloseModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+function sfPayTag(status, method, isPaid) {
+  if (status === 'cancelled') return '<span class="sf-ptag pt-na">—</span>';
+  if (method === 'cash') {
+    return isPaid === '1'
+      ? '<span class="sf-ptag pt-paid">Tiền mặt – đã thanh toán</span>'
+      : '<span class="sf-ptag pt-unpaid">Tiền mặt – chưa thanh toán</span>';
+  }
+  if (method === 'online') return '<span class="sf-ptag pt-online">Online</span>';
+  return '<span class="sf-ptag pt-na">—</span>';
+}
+
+function sfBadge(status) {
+  return status === 'done'
+    ? '<span class="sf-badge b-done">Hoàn thành</span>'
+    : '<span class="sf-badge b-cancelled">Đã hủy</span>';
+}
+
+function sfOpenModal(card) {
+  const d = card.dataset;
+  document.getElementById('m-id').textContent = '#' + d.id;
+  document.getElementById('m-name').textContent = d.name;
+  document.getElementById('m-phone').textContent = d.phone || '-';
+  document.getElementById('m-svc').textContent = d.svc;
+  document.getElementById('m-date').textContent = d.date;
+  document.getElementById('m-time').textContent = d.time;
+  document.getElementById('m-price').textContent = '€' + d.price;
+  document.getElementById('m-pay').innerHTML = sfPayTag(d.status, d.pay, d.paid);
+  document.getElementById('m-status-badge').innerHTML = sfBadge(d.status);
+
+  const incomeSection = document.getElementById('m-income-section');
+  if (d.status === 'done') {
+    document.getElementById('m-hourly').textContent = '€' + d.hourly;
+    document.getElementById('m-commission').textContent = '€' + d.commission;
+    document.getElementById('m-total-income').textContent = '€' + d.totalIncome;
+    incomeSection.style.display = 'flex';
+  } else {
+    incomeSection.style.display = 'none';
+  }
+
+  document.getElementById('sfOverlay').classList.add('open');
+}
+
+function sfCloseModal() {
+  document.getElementById('sfOverlay').classList.remove('open');
+}
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') sfCloseModal();
+});
+</script>
+{% endblock %}
