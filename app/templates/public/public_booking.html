@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  <form method="POST" action="{{ url_for('main.create_booking') }}">
+  <form method="POST" action="{{ url_for('main.create_public_booking') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="booking_date" id="hidden-booking-date">
     <input type="hidden" name="start_time" id="hidden-start-time">
