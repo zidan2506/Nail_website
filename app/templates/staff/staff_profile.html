@@ -1,0 +1,406 @@
+{#
+  ===== CONTEXT VARIABLES =====
+  current_staff: dict — id, user_id, name, role, email, phone, avatar (ready-to-use src hoặc None),
+                 hourly_rate, commission_rate, created_at
+  stats: dict — bookings_this_month (int), income_this_month (float)
+  now: datetime
+
+  ===== ROUTES =====
+  main.staff_profile           GET   /staff/profile                    — trang hồ sơ
+  main.staff_update_avatar     POST  /staff/profile/update-avatar      — upload ảnh
+  main.staff_send_pw_otp       POST  /staff/profile/send-otp           — gửi mã xác thực (AJAX)
+  main.staff_change_password   POST  /staff/profile/change-password    — xác thực mã + đổi mật khẩu (1 form)
+
+  ===== JINJA2 FILTERS =====
+  mask_email, initials  — đăng ký trong app/template_filters.py
+  format_date, format_currency — filter có sẵn
+
+  Đổi mật khẩu mô phỏng theo card "Security" trong customer/customer_setting.html:
+  modal 2 bước (bước 1: xác nhận gửi mã, bước 2: nhập mã + mật khẩu mới trong 1 form),
+  không cần current_password vì mã OTP gửi qua email đã xác thực danh tính.
+#}
+{% extends "staff/staff_base.html" %}
+
+{% block title %}Hồ sơ — DahaCare{% endblock %}
+
+{% block page_styles %}
+<style>
+/* ═══════ sf- Staff profile ═══════ */
+.sf-page { display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+
+/* ── Header ── */
+.sf-hdr {
+    background: #FFFFFF; border-bottom: 1px solid var(--sf-border);
+    padding: 24px 30px 18px; flex-shrink: 0;
+    display: flex; justify-content: space-between; align-items: baseline;
+}
+.sf-title { font-size: 25px; font-weight: 700; color: var(--sf-text); letter-spacing: -0.4px; }
+.sf-title em { font-style: italic; font-weight: 400; color: var(--sf-accent); }
+.sf-hdr-date { font-size: 14px; color: #B0A09A; }
+
+/* ── Scrollable body ── */
+.sf-body {
+    flex: 1; min-height: 0; overflow-y: auto; padding: 20px 24px;
+    display: flex; flex-direction: column; gap: 18px; background: #FAFAF8;
+}
+
+/* ── Hero ── */
+.sf-hero {
+    background: #FFFFFF; border: 1px solid var(--sf-border); border-radius: 14px;
+    padding: 24px; display: flex; align-items: center; gap: 20px; flex-shrink: 0;
+}
+.sf-avatar-wrap { position: relative; flex-shrink: 0; }
+.sf-avatar {
+    width: 84px; height: 84px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; overflow: hidden;
+    background: var(--sf-accent-bg); border: 2px solid var(--sf-accent);
+    font-size: 26px; font-weight: 600; color: var(--sf-accent);
+}
+.sf-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.sf-avatar-edit {
+    position: absolute; bottom: 0; right: 0;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--sf-accent); border: 2px solid #FFFFFF;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.sf-avatar-edit .ti { font-size: 12px; color: #fff; }
+.sf-hero-name { font-size: 20px; font-weight: 700; color: var(--sf-text); margin-bottom: 4px; letter-spacing: -0.2px; }
+.sf-hero-role { font-size: 14px; color: #8C7B75; margin-bottom: 9px; }
+.sf-hero-since { font-size: 12.5px; color: #B0A09A; display: flex; align-items: center; gap: 5px; }
+.sf-hero-since .ti { font-size: 14px; }
+.sf-avatar-hint { font-size: 12px; color: #B0A09A; margin-top: 7px; }
+
+/* ── Mini stats ── */
+.sf-mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex-shrink: 0; }
+.sf-mstat { background: #FFFFFF; border: 1px solid var(--sf-border); border-radius: 12px; padding: 18px 20px; }
+.sf-mstat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.sf-mstat-label { font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: #B0A09A; }
+.sf-mstat-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+.sf-mstat-val { font-size: 33px; font-weight: 300; color: var(--sf-text); letter-spacing: -0.5px; line-height: 1.1; }
+.sf-mstat-sub { font-size: 13px; color: #B0A09A; margin-top: 2px; }
+
+/* ── Card block ── */
+.sf-card-block { background: #FFFFFF; border: 1px solid var(--sf-border); border-radius: 14px; overflow: hidden; flex-shrink: 0; }
+.sf-card-block-hdr {
+    padding: 16px 20px; border-bottom: 1px solid var(--sf-border);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.sf-card-block-title { font-size: 15px; font-weight: 700; color: var(--sf-text); display: flex; align-items: center; gap: 8px; }
+.sf-readonly-badge {
+    font-size: 11px; color: #B0A09A; background: #F0EBE8;
+    border: 1px solid var(--sf-border); border-radius: 99px; padding: 2px 10px;
+}
+
+.sf-info-rows { display: flex; flex-direction: column; }
+.sf-info-row { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--sf-border); }
+.sf-info-row:last-child { border-bottom: none; }
+.sf-info-k { font-size: 13.5px; color: #8C7B75; min-width: 150px; flex-shrink: 0; }
+.sf-info-v { font-size: 14.5px; color: var(--sf-text); font-weight: 500; flex: 1; }
+.sf-commission-tag {
+    font-size: 12px; background: var(--sf-accent-bg); color: var(--sf-accent);
+    border: 1px solid var(--sf-accent); border-radius: 99px; padding: 2px 11px; font-weight: 600;
+}
+
+/* ── Password row (mimic customer_setting .password-row-container) ── */
+.sf-pw-row {
+    margin: 18px 20px 20px; background: var(--sf-surface); border-radius: 12px;
+    padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.sf-pw-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #8C7B75; margin-bottom: 6px; }
+.sf-pw-dots { font-size: 18px; letter-spacing: 4px; color: var(--sf-text); }
+.sf-pw-btn {
+    padding: 10px 20px; background: var(--sf-accent); color: #fff; border: none; border-radius: 10px;
+    font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; white-space: nowrap;
+    flex-shrink: 0; transition: opacity .15s ease;
+}
+.sf-pw-btn:hover { opacity: .9; }
+
+/* ── Modal (mimic customer_setting modal) ── */
+.sf-overlay {
+    position: absolute; inset: 0; background: rgba(28,25,23,.45);
+    display: none; align-items: center; justify-content: center; z-index: 10; border-radius: 14px;
+}
+.sf-overlay.open { display: flex; }
+.sf-modal {
+    background: #FFFFFF; border-radius: 16px; border: 1px solid var(--sf-border);
+    width: 400px; max-width: calc(100% - 32px); padding: 28px;
+}
+.sf-mhdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.sf-mhdr h3 { margin: 0; font-size: 17px; font-weight: 700; color: var(--sf-text); }
+.sf-mclose {
+    background: none; border: none; font-size: 20px; cursor: pointer; color: #8C7B75;
+    line-height: 1; padding: 4px; border-radius: 8px;
+}
+.sf-mclose:hover { background: var(--sf-surface); color: var(--sf-accent); }
+.sf-merror {
+    display: none; margin-bottom: 16px; padding: 11px 15px; border-radius: 10px;
+    background: #FEE2E2; color: #B91C1C; font-size: 13px; font-weight: 600;
+}
+.sf-mdesc { font-size: 13px; color: #5F524C; margin: 0 0 14px; line-height: 1.5; }
+.sf-memail { background: var(--sf-surface); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; font-size: 13px; font-weight: 700; color: var(--sf-text); }
+.sf-mfield { margin-bottom: 16px; }
+.sf-mfield label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #8C7B75; margin-bottom: 7px; }
+.sf-mfield input {
+    width: 100%; padding: 10px 14px; border: 1.5px solid var(--sf-border); border-radius: 10px;
+    font-size: 13.5px; font-family: inherit; color: var(--sf-text); background: var(--sf-surface);
+    outline: none; box-sizing: border-box; transition: border-color .15s ease;
+}
+.sf-mfield input:focus { border-color: var(--sf-accent); background: #fff; }
+.sf-mactions { display: flex; gap: 10px; margin-top: 22px; }
+.sf-mcancel {
+    flex: 1; padding: 11px; background: var(--sf-surface); color: #5F524C; border: none;
+    border-radius: 10px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+}
+.sf-mcancel:hover { background: var(--sf-border); }
+.sf-msubmit {
+    flex: 1; padding: 11px; background: var(--sf-accent); color: #fff; border: none;
+    border-radius: 10px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+    transition: opacity .15s ease;
+}
+.sf-msubmit:hover { opacity: .9; }
+.sf-msubmit:disabled { opacity: .5; cursor: not-allowed; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sf-page">
+
+    {# ── Header ── #}
+    <div class="sf-hdr">
+        <div class="sf-title">Hồ sơ của <em>{{ current_staff.name }}</em></div>
+        <div class="sf-hdr-date">{{ now.strftime('%d/%m/%Y') }}</div>
+    </div>
+
+    <div class="sf-body">
+
+        {# ── Block 1: Hero ── #}
+        <div class="sf-hero">
+            <div class="sf-avatar-wrap">
+                <div class="sf-avatar" onclick="document.getElementById('sf-avatar-input').click()">
+                    {% if current_staff.avatar %}
+                        <img src="{{ current_staff.avatar }}" alt="{{ current_staff.name }}">
+                    {% else %}
+                        {{ current_staff.name | initials }}
+                    {% endif %}
+                </div>
+                <div class="sf-avatar-edit" onclick="document.getElementById('sf-avatar-input').click()">
+                    <i class="ti ti-camera"></i>
+                </div>
+            </div>
+            <div>
+                <div class="sf-hero-name">{{ current_staff.name }}</div>
+                <div class="sf-hero-role">{{ current_staff.role or 'Nhân viên' }}</div>
+                <div class="sf-hero-since">
+                    <i class="ti ti-calendar-plus"></i>
+                    Tham gia từ {{ current_staff.created_at | format_date('%d/%m/%Y') }}
+                </div>
+                <div class="sf-avatar-hint">Nhấn vào ảnh để thay đổi &middot; JPG, PNG tối đa 2MB</div>
+            </div>
+        </div>
+
+        <form id="sf-avatar-form" method="POST" action="{{ url_for('main.staff_update_avatar') }}" enctype="multipart/form-data" style="display:none">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="file" id="sf-avatar-input" name="avatar" accept="image/jpeg,image/png,image/webp">
+        </form>
+
+        {# ── Block 2: Mini stats ── #}
+        <div class="sf-mini-stats">
+            <div class="sf-mstat">
+                <div class="sf-mstat-top">
+                    <span class="sf-mstat-label">Booking tháng này</span>
+                    <div class="sf-mstat-icon" style="background:#EFF6FF;">
+                        <i class="ti ti-calendar-check" style="color:#3B82F6; font-size:16px;"></i>
+                    </div>
+                </div>
+                <div class="sf-mstat-val">{{ stats.bookings_this_month }}</div>
+                <div class="sf-mstat-sub">lịch hẹn hoàn thành</div>
+            </div>
+            <div class="sf-mstat">
+                <div class="sf-mstat-top">
+                    <span class="sf-mstat-label">Thu nhập tháng này</span>
+                    <div class="sf-mstat-icon" style="background:var(--sf-accent-bg);">
+                        <i class="ti ti-wallet" style="color:var(--sf-accent); font-size:16px;"></i>
+                    </div>
+                </div>
+                <div class="sf-mstat-val">{{ stats.income_this_month | format_currency('€') }}</div>
+                <div class="sf-mstat-sub">lương + hoa hồng</div>
+            </div>
+        </div>
+
+        {# ── Block 3: Thông tin cá nhân ── #}
+        <div class="sf-card-block">
+            <div class="sf-card-block-hdr">
+                <div class="sf-card-block-title">
+                    <i class="ti ti-id-badge" style="color:var(--sf-accent); font-size:16px;"></i>
+                    Thông tin cá nhân
+                </div>
+                <span class="sf-readonly-badge">Chỉ xem</span>
+            </div>
+            <div class="sf-info-rows">
+                <div class="sf-info-row">
+                    <span class="sf-info-k">Họ và tên</span>
+                    <span class="sf-info-v">{{ current_staff.name }}</span>
+                </div>
+                <div class="sf-info-row">
+                    <span class="sf-info-k">Số điện thoại</span>
+                    <span class="sf-info-v">{{ current_staff.phone }}</span>
+                </div>
+                <div class="sf-info-row">
+                    <span class="sf-info-k">Email</span>
+                    <span class="sf-info-v">{{ current_staff.email }}</span>
+                </div>
+                <div class="sf-info-row">
+                    <span class="sf-info-k">Vai trò</span>
+                    <span class="sf-info-v">{{ current_staff.role or 'Nhân viên' }}</span>
+                </div>
+                <div class="sf-info-row">
+                    <span class="sf-info-k">Ngày vào làm</span>
+                    <span class="sf-info-v">{{ current_staff.created_at | format_date('%d/%m/%Y') }}</span>
+                </div>
+                <div class="sf-info-row">
+                    <span class="sf-info-k">Lương theo giờ</span>
+                    <span class="sf-info-v">{{ current_staff.hourly_rate | format_currency('€') }} / giờ</span>
+                </div>
+                <div class="sf-info-row">
+                    <span class="sf-info-k">Hoa hồng</span>
+                    <span class="sf-info-v"><span class="sf-commission-tag">{{ current_staff.commission_rate }}% / booking</span></span>
+                </div>
+            </div>
+        </div>
+
+        {# ── Block 4: Bảo mật ── #}
+        <div class="sf-card-block">
+            <div class="sf-card-block-hdr">
+                <div class="sf-card-block-title">
+                    <i class="ti ti-lock" style="color:var(--sf-accent); font-size:16px;"></i>
+                    Bảo mật
+                </div>
+            </div>
+            <div class="sf-pw-row">
+                <div>
+                    <div class="sf-pw-label">Mật khẩu</div>
+                    <div class="sf-pw-dots">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+                </div>
+                <button type="button" class="sf-pw-btn" onclick="openPwModal()">Đổi mật khẩu</button>
+            </div>
+        </div>
+
+    </div>
+
+    {# ── Modal đổi mật khẩu (2 bước, mô phỏng customer_setting.html) ── #}
+    <div class="sf-overlay" id="sf-pw-overlay">
+        <div class="sf-modal">
+            <div class="sf-mhdr">
+                <h3>Đổi mật khẩu</h3>
+                <button type="button" class="sf-mclose" onclick="closePwModal()">&#10005;</button>
+            </div>
+
+            <div class="sf-merror" id="sf-pw-error"></div>
+
+            {# Bước 1: xác nhận gửi mã #}
+            <div id="sf-pw-step-1">
+                <p class="sf-mdesc">Để xác nhận danh tính, chúng tôi sẽ gửi mã xác thực đến email của bạn.</p>
+                <div class="sf-memail">{{ current_staff.email | mask_email }}</div>
+                <div class="sf-mactions">
+                    <button type="button" class="sf-mcancel" onclick="closePwModal()">Hủy</button>
+                    <button type="button" class="sf-msubmit" id="sf-pw-send-btn" onclick="sendPwCode()">Gửi mã</button>
+                </div>
+            </div>
+
+            {# Bước 2: nhập mã + mật khẩu mới #}
+            <div id="sf-pw-step-2" style="display:none">
+                <p class="sf-mdesc">Nhập mã xác thực đã gửi đến <strong>{{ current_staff.email | mask_email }}</strong> và mật khẩu mới.</p>
+                <form method="POST" action="{{ url_for('main.staff_change_password') }}" id="sf-pw-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="sf-mfield">
+                        <label for="sf-pw-code">Mã xác thực</label>
+                        <input id="sf-pw-code" type="text" name="verification_code" placeholder="Nhập mã gồm 6 chữ số" required autocomplete="off">
+                    </div>
+                    <div class="sf-mfield">
+                        <label for="sf-pw-new">Mật khẩu mới</label>
+                        <input id="sf-pw-new" type="password" name="new_password" placeholder="Tối thiểu 8 ký tự" required autocomplete="new-password">
+                    </div>
+                    <div class="sf-mfield">
+                        <label for="sf-pw-confirm">Xác nhận mật khẩu mới</label>
+                        <input id="sf-pw-confirm" type="password" name="confirm_password" placeholder="Nhập lại mật khẩu mới" required autocomplete="new-password">
+                    </div>
+                    <div class="sf-mactions">
+                        <button type="button" class="sf-mcancel" onclick="closePwModal()">Hủy</button>
+                        <button type="submit" class="sf-msubmit">Cập nhật mật khẩu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+const sfPwOverlay = document.getElementById('sf-pw-overlay');
+
+function openPwModal() {
+    sfPwOverlay.classList.add('open');
+    document.getElementById('sf-pw-step-1').style.display = 'block';
+    document.getElementById('sf-pw-step-2').style.display = 'none';
+    const errorDiv = document.getElementById('sf-pw-error');
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+    const sendBtn = document.getElementById('sf-pw-send-btn');
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Gửi mã';
+}
+
+function closePwModal() {
+    sfPwOverlay.classList.remove('open');
+    document.getElementById('sf-pw-form').reset();
+}
+
+sfPwOverlay.addEventListener('click', (e) => {
+    if (e.target === sfPwOverlay) closePwModal();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sfPwOverlay.classList.contains('open')) closePwModal();
+});
+
+async function sendPwCode() {
+    const sendBtn = document.getElementById('sf-pw-send-btn');
+    const errorDiv = document.getElementById('sf-pw-error');
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Đang gửi...';
+    errorDiv.style.display = 'none';
+
+    try {
+        const res = await fetch("{{ url_for('main.staff_send_pw_otp') }}", {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' }
+        });
+        const data = await res.json();
+        if (data.ok) {
+            document.getElementById('sf-pw-step-1').style.display = 'none';
+            document.getElementById('sf-pw-step-2').style.display = 'block';
+            document.getElementById('sf-pw-code').focus();
+        } else {
+            errorDiv.textContent = data.error || 'Có lỗi xảy ra. Vui lòng thử lại.';
+            errorDiv.style.display = 'block';
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Gửi mã';
+        }
+    } catch {
+        errorDiv.textContent = 'Lỗi mạng. Vui lòng thử lại.';
+        errorDiv.style.display = 'block';
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Gửi mã';
+    }
+}
+
+document.getElementById('sf-avatar-input').addEventListener('change', function () {
+    if (this.files && this.files[0]) {
+        document.getElementById('sf-avatar-form').submit();
+    }
+});
+</script>
+{% endblock %}
