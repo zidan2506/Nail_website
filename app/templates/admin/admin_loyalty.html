@@ -1,0 +1,1770 @@
+{% extends "admin/admin_base.html" %}
+
+{#
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  ADMIN LOYALTY MANAGEMENT PAGE — admin_loyalty.html                  ║
+  ║  Extends: admin/admin_base.html                                     ║
+  ║  Blocks used: title, extra_css, page_title, content, extra_js       ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ⚠ CONFLICTS WITH ORIGINAL BRIEF (flagged, confirmed with user)     ║
+  ║                                                                     ║
+  ║  1. Blueprint name is "main", not "admin" — routes below are all   ║
+  ║     main.admin_loyalty*, matching admin_customers.html.             ║
+  ║                                                                     ║
+  ║  2. CSS variables (var(--surface-2) etc.) don't exist in            ║
+  ║     admin_base.html — uses the hardcoded hex palette already        ║
+  ║     established across the admin panel instead.                     ║
+  ║                                                                     ║
+  ║  3. rewards.is_active already exists in schema.sql — no migration   ║
+  ║     needed.                                                         ║
+  ║                                                                     ║
+  ║  4. "Missions" tab edits the 5 REAL loyalty_config rows that        ║
+  ║     already drive award_points() in the booking flow                ║
+  ║     (first_booking_bonus, streak_bonus, review_bonus,               ║
+  ║     birthday_bonus, referral_bonus — see app/services/loyalty.py    ║
+  ║     and routes.py's create_booking flow). This is NOT the brief's   ║
+  ║     original "mission:<key>" free-form CRUD namespace — that would  ║
+  ║     have been disconnected from real point-awarding logic. The key  ║
+  ║     set is fixed (hardcoded at the award_points() call sites), so   ║
+  ║     there is no create/delete mission route, only update + toggle.  ║
+  ║     is_active is derived as points > 0, not a stored column —       ║
+  ║     toggling off sets points to 0; toggling back on restores a      ║
+  ║     sensible default (see _MISSION_DEFAULT_POINTS in routes.py).    ║
+  ║     double_points_day was excluded from this tab: it's a weekday    ║
+  ║     number, not a point-earning action.                             ║
+  ║                                                                     ║
+  ║  5. Membership adjustment has no "Lý do" field — customer_          ║
+  ║     memberships has no column to store a reason, and the brief's    ║
+  ║     modal didn't map to any persisted field, so it was left out     ║
+  ║     rather than collecting input that silently goes nowhere.        ║
+  ║                                                                     ║
+  ║  6. No pagination on the customers tab — brief didn't specify a     ║
+  ║     pagination dict for this page; all account-holders are loaded   ║
+  ║     and filtered/sorted client-side, matching the brief's own       ║
+  ║     "client-side filter" toolbar spec.                              ║
+  ║                                                                     ║
+  ║  7. Sidebar: admin_base.html was updated to add a "Loyalty" nav     ║
+  ║     item (between Customers and Reports) — otherwise this page      ║
+  ║     would be unreachable from the admin UI. Confirmed with user.    ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  CONTEXT VARIABLES EXPECTED:                                        ║
+  ║    customers: list of dicts — id, full_name, email, tier_name,      ║
+  ║      total_points, voucher_count, membership_expires_at,            ║
+  ║      membership_tier_id                                             ║
+  ║    vouchers: list of dicts from rewards — id, name, cost,           ║
+  ║      description, is_active, max_redeems_per_customer,              ║
+  ║      cooldown_days, stock, created_at                               ║
+  ║    missions: list of dicts — source_key, name, icon, icon_color,    ║
+  ║      description, points, is_active                                 ║
+  ║    membership_tiers: list — id, name, price, duration_days,         ║
+  ║      point_multiplier                                               ║
+  ║    stats: dict — total_customers_with_account,                      ║
+  ║      total_points_circulating, active_vouchers, active_missions     ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ROUTES (in routes.py, blueprint "main"):                           ║
+  ║    main.admin_loyalty                        GET                    ║
+  ║    main.admin_loyalty_adjust_points          POST                   ║
+  ║    main.admin_loyalty_adjust_membership      POST                   ║
+  ║    main.admin_loyalty_create_voucher         POST                   ║
+  ║    main.admin_loyalty_update_voucher         POST /int:reward_id    ║
+  ║    main.admin_loyalty_delete_voucher         POST /int:reward_id    ║
+  ║    main.admin_loyalty_update_mission         POST /<key>            ║
+  ║    main.admin_loyalty_toggle_mission         POST /<key> → JSON     ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+#}
+
+{% block title %}Quản lý Loyalty - DahaCare Admin{% endblock %}
+{% block page_title %}Quản lý Loyalty{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   ly- BEM prefix — Loyalty Management Page
+   ═══════════════════════════════════════════ */
+
+/* ── Page header ── */
+.ly-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.ly-page-header__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #191c1e;
+    letter-spacing: -0.3px;
+}
+
+.ly-page-header__subtitle {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.ly-btn-create {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #4a90d9;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.ly-btn-create:hover { background: #3a7bc8; }
+.ly-btn-create:active { transform: scale(0.98); }
+
+.ly-btn-create .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Stat strip ── */
+.ly-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.ly-stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+}
+
+.ly-stat-card__value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #191c1e;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.ly-stat-card__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+/* ── Main tabs ── */
+.ly-maintabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-bottom: 1px solid #e4e6ea;
+    margin-bottom: 20px;
+}
+
+.ly-maintab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 16px;
+    border: none;
+    background: none;
+    border-bottom: 2px solid transparent;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #6b7280;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: color 0.15s;
+    margin-bottom: -1px;
+}
+
+.ly-maintab:hover { color: #191c1e; }
+
+.ly-maintab--active {
+    color: #4a90d9;
+    border-bottom-color: #4a90d9;
+}
+
+.ly-maintab .material-symbols-outlined {
+    font-size: 18px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.ly-maintab__count {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 20px;
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.ly-maintab--active .ly-maintab__count { background: rgba(74,144,217,0.14); color: #4a90d9; }
+
+.ly-tab-panel { display: none; }
+.ly-tab-panel--active { display: block; }
+
+/* ── Toolbar ── */
+.ly-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.ly-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ly-subtabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 20px;
+    padding: 4px;
+}
+
+.ly-subtab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: none;
+    background: none;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+}
+
+.ly-subtab:hover { color: #191c1e; }
+
+.ly-subtab--active {
+    background: #4a90d9;
+    color: #ffffff;
+}
+
+.ly-subtab__count {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.06);
+}
+
+.ly-subtab--active .ly-subtab__count { background: rgba(255,255,255,0.25); }
+
+.ly-filter-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    min-width: 220px;
+}
+
+.ly-filter-search .material-symbols-outlined {
+    font-size: 16px;
+    color: #9ca3af;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    flex-shrink: 0;
+}
+
+.ly-filter-search input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    outline: none;
+    width: 100%;
+}
+
+.ly-filter-search input::placeholder { color: #9ca3af; }
+
+.ly-filter-select {
+    padding: 7px 10px;
+    background: #ffffff;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    min-width: 160px;
+    transition: border-color 0.15s;
+}
+
+.ly-filter-select:focus { border-color: #4a90d9; }
+
+/* ── Table (Customers tab) ── */
+.ly-table-container {
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.ly-table-scroll { overflow-x: auto; }
+
+.ly-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+.ly-table thead {
+    background: #f7f9fb;
+    border-bottom: 1px solid #e4e6ea;
+}
+
+.ly-table th {
+    padding: 11px 16px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #6b7280;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.ly-table td {
+    padding: 13px 16px;
+    font-size: 13.5px;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.ly-table tbody tr:last-child td { border-bottom: none; }
+.ly-table tbody tr:hover td { background: #fafbfc; }
+
+.ly-customer-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ly-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.ly-avatar--0 { background: #e0e7ff; color: #3730a3; }
+.ly-avatar--1 { background: #fce7f3; color: #9d174d; }
+.ly-avatar--2 { background: #fef3c7; color: #92400e; }
+.ly-avatar--3 { background: #dcfce7; color: #166534; }
+.ly-avatar--4 { background: #f3e8ff; color: #6b21a8; }
+
+.ly-customer-name { font-size: 13.5px; font-weight: 600; color: #191c1e; line-height: 1.3; }
+.ly-customer-email { font-size: 12px; color: #9ca3af; }
+
+.ly-tier-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ly-tier-pill--silver  { background: #F0F0F0; color: #555555; }
+.ly-tier-pill--gold    { background: #FEF3C7; color: #92400E; }
+.ly-tier-pill--diamond { background: #EDE9FE; color: #4C1D95; }
+
+.ly-points { font-variant-numeric: tabular-nums; font-weight: 600; color: #191c1e; }
+
+.ly-row-actions { display: flex; align-items: center; gap: 6px; }
+
+.ly-action-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ly-action-btn .material-symbols-outlined {
+    font-size: 16px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.ly-action-btn--coin { border-color: #bcd8f2; color: #4a90d9; }
+.ly-action-btn--coin:hover { background: #E6F1FB; }
+
+.ly-action-btn--crown { border-color: #dcc9f2; color: #6b21a8; }
+.ly-action-btn--crown:hover { background: #F2EBFB; }
+
+/* ── Empty state ── */
+.ly-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    gap: 10px;
+    text-align: center;
+}
+
+.ly-empty .material-symbols-outlined {
+    font-size: 40px;
+    color: #d1d5db;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48;
+}
+
+.ly-empty__title { font-size: 15px; font-weight: 600; color: #6b7280; }
+.ly-empty__subtitle { font-size: 13px; color: #9ca3af; }
+
+/* ── Voucher grid (Vouchers tab) ── */
+.ly-voucher-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.ly-voucher-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    transition: opacity 0.15s;
+}
+
+.ly-voucher-card--hidden { opacity: 0.6; }
+
+.ly-voucher-card__banner {
+    margin: -16px -16px 0;
+    height: 120px;
+    border-radius: 12px 12px 0 0;
+    overflow: hidden;
+}
+
+.ly-voucher-card__banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.ly-voucher-card__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.ly-voucher-card__name { font-size: 14.5px; font-weight: 700; color: #191c1e; line-height: 1.35; }
+
+.ly-voucher-cost {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #FEF3C7;
+    color: #92400E;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.ly-voucher-card__desc {
+    font-size: 12.5px;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.ly-voucher-meta { display: flex; flex-direction: column; gap: 5px; }
+
+.ly-voucher-meta__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.ly-voucher-meta__row span:last-child { font-weight: 600; color: #374151; }
+
+.ly-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.ly-status-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+.ly-status-pill--active   { background: #E1F5EE; color: #085041; }
+.ly-status-pill--active::before   { background: #1D9E75; }
+.ly-status-pill--hidden   { background: #F3F4F6; color: #6b7280; }
+.ly-status-pill--hidden::before   { background: #9ca3af; }
+
+.ly-voucher-card__footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.ly-btn-sm-secondary,
+.ly-btn-sm-danger {
+    flex: 1;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.15s;
+}
+
+.ly-btn-sm-secondary { border: 1px solid #e4e6ea; background: #ffffff; color: #374151; }
+.ly-btn-sm-secondary:hover { background: #f3f4f6; }
+
+.ly-btn-sm-danger { border: none; background: #fef2f2; color: #991b1b; }
+.ly-btn-sm-danger:hover { background: #fee2e2; }
+
+/* ── Mission list (Missions tab) ── */
+.ly-missions-note {
+    font-size: 12.5px;
+    color: #9ca3af;
+    margin-bottom: 16px;
+}
+
+.ly-mission-list { display: flex; flex-direction: column; gap: 10px; }
+
+.ly-mission-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    transition: opacity 0.15s;
+}
+
+.ly-mission-card--inactive { opacity: 0.55; }
+
+.ly-mission-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ly-mission-icon--green   { background: #dcfce7; color: #166534; }
+.ly-mission-icon--pink    { background: #fce7f3; color: #9d174d; }
+.ly-mission-icon--orange  { background: #FEF3C7; color: #92400E; }
+.ly-mission-icon--blue    { background: #e0e7ff; color: #3730a3; }
+.ly-mission-icon--purple  { background: #f3e8ff; color: #6b21a8; }
+
+.ly-mission-icon .material-symbols-outlined {
+    font-size: 22px;
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.ly-mission-body { flex: 1; min-width: 0; }
+.ly-mission-name { font-size: 14px; font-weight: 700; color: #191c1e; }
+.ly-mission-desc { font-size: 12.5px; color: #6b7280; margin-top: 2px; }
+
+.ly-mission-points {
+    flex-shrink: 0;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: #E6F1FB;
+    color: #0C447C;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.ly-mission-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+.ly-icon-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border: none;
+    color: #6b7280;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ly-icon-btn:hover { background: #e5e7eb; color: #374151; }
+
+.ly-icon-btn .material-symbols-outlined {
+    font-size: 17px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.ly-toggle {
+    position: relative;
+    width: 38px;
+    height: 22px;
+    border: none;
+    border-radius: 20px;
+    background: #d1d5db;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.ly-toggle--on { background: #1D9E75; }
+
+.ly-toggle__knob {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.15s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.ly-toggle--on .ly-toggle__knob { transform: translateX(16px); }
+
+/* ── Modals ── */
+.ly-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(25, 28, 30, 0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.ly-modal-overlay--open { display: flex; }
+
+.ly-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 460px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+}
+
+.ly-modal--wide { max-width: 560px; }
+
+.ly-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+    flex-shrink: 0;
+}
+
+.ly-modal__title { font-size: 16px; font-weight: 700; color: #191c1e; }
+
+.ly-modal__close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ly-modal__close:hover { background: #f3f4f6; color: #374151; }
+
+.ly-modal__close .material-symbols-outlined {
+    font-size: 20px;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.ly-modal__body { padding: 20px 24px; flex: 1; overflow-y: auto; }
+
+.ly-modal__footer {
+    padding: 0 24px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.ly-modal__footer--split { justify-content: space-between; }
+
+/* ── Customer info box (Points / Membership modals) ── */
+.ly-info-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 10px;
+    margin-bottom: 18px;
+}
+
+.ly-info-header .ly-avatar { width: 42px; height: 42px; font-size: 14px; }
+.ly-info-header__name { font-size: 14px; font-weight: 700; color: #191c1e; }
+.ly-info-header__meta { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+.ly-current-points {
+    text-align: center;
+    padding: 10px;
+    background: #f7f9fb;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.ly-current-points__value { font-size: 20px; font-weight: 700; color: #191c1e; font-variant-numeric: tabular-nums; }
+.ly-current-points__label { font-size: 11.5px; color: #9ca3af; }
+
+/* ── Points type toggle ── */
+.ly-type-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.ly-type-btn {
+    flex: 1;
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid #e4e6ea;
+    background: #ffffff;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.ly-type-btn--add.ly-type-btn--active { background: #E1F5EE; border-color: #1D9E75; color: #085041; }
+.ly-type-btn--sub.ly-type-btn--active { background: #FCEBEB; border-color: #E24B4A; color: #791F1F; }
+
+/* ── Form elements ── */
+.ly-form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.ly-form-group:last-child { margin-bottom: 0; }
+.ly-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.ly-form-label { font-size: 12.5px; font-weight: 600; color: #374151; }
+
+.ly-form-input,
+.ly-form-textarea,
+.ly-form-select {
+    padding: 8px 12px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    background: #f7f9fb;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+}
+
+.ly-form-textarea { resize: vertical; min-height: 64px; }
+
+.ly-form-input:focus,
+.ly-form-textarea:focus,
+.ly-form-select:focus { border-color: #4a90d9; background: #ffffff; }
+
+.ly-form-input:disabled { background: #f3f4f6; color: #9ca3af; }
+
+.ly-form-hint { font-size: 12px; color: #9ca3af; }
+
+.ly-form-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+}
+
+.ly-form-toggle-row__label { font-size: 13px; font-weight: 600; color: #374151; }
+
+/* ── Image dropzone (Voucher modal) ── */
+.ly-dropzone {
+    position: relative;
+    height: 130px;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 10px;
+    background: #f7f9fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.15s;
+}
+
+.ly-dropzone:hover { border-color: #4a90d9; }
+
+.ly-dropzone__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #9ca3af;
+}
+
+.ly-dropzone__empty .material-symbols-outlined { font-size: 26px; }
+.ly-dropzone__empty span { font-size: 12px; font-weight: 600; color: #6b7280; }
+
+.ly-dropzone__preview { width: 100%; height: 100%; }
+.ly-dropzone__preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.ly-image-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+/* ── Buttons ── */
+.ly-btn-secondary {
+    padding: 8px 18px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #374151;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.ly-btn-secondary:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+.ly-btn-primary {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #4a90d9;
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.ly-btn-primary:hover { background: #3a7bc8; }
+.ly-btn-primary:active { transform: scale(0.98); }
+
+.ly-btn-danger {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ly-btn-danger:hover { background: #fee2e2; }
+
+@media (max-width: 1100px) {
+    .ly-stats { grid-template-columns: repeat(2, 1fr); }
+    .ly-voucher-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .ly-stats { grid-template-columns: 1fr; }
+    .ly-voucher-grid { grid-template-columns: 1fr; }
+    .ly-form-row { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{% set AVATAR_PALETTE = ['ly-avatar--0', 'ly-avatar--1', 'ly-avatar--2', 'ly-avatar--3', 'ly-avatar--4'] %}
+{% set TIER_LABELS = {'silver': '🥈 Silver', 'gold': '⭐ Gold', 'diamond': '💎 Diamond'} %}
+{% set active_voucher_count = vouchers | selectattr('is_active') | list | length %}
+{% set hidden_voucher_count = (vouchers | length) - active_voucher_count %}
+
+
+{# ══════════════════════════════════════════
+   1. PAGE HEADER
+   ══════════════════════════════════════════ #}
+<div class="ly-page-header">
+    <div>
+        <div class="ly-page-header__title">Quản lý Loyalty</div>
+        <div class="ly-page-header__subtitle">Điểm thưởng, membership, voucher và mission</div>
+    </div>
+    <button class="ly-btn-create" onclick="openCreateVoucherModal()">
+        <span class="material-symbols-outlined">add</span>
+        Tạo Voucher mới
+    </button>
+</div>
+
+
+{# ══════════════════════════════════════════
+   2. STAT STRIP
+   ══════════════════════════════════════════ #}
+<div class="ly-stats">
+    <div class="ly-stat-card">
+        <span class="ly-stat-card__value">{{ stats.total_customers_with_account }}</span>
+        <span class="ly-stat-card__label">Khách có tài khoản</span>
+    </div>
+    <div class="ly-stat-card">
+        <span class="ly-stat-card__value">{{ stats.total_points_circulating }}</span>
+        <span class="ly-stat-card__label">Tổng điểm đang lưu hành</span>
+    </div>
+    <div class="ly-stat-card">
+        <span class="ly-stat-card__value">{{ stats.active_vouchers }}</span>
+        <span class="ly-stat-card__label">Voucher đang active</span>
+    </div>
+    <div class="ly-stat-card">
+        <span class="ly-stat-card__value">{{ stats.active_missions }}</span>
+        <span class="ly-stat-card__label">Mission đang chạy</span>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   3. MAIN TABS
+   ══════════════════════════════════════════ #}
+<div class="ly-maintabs">
+    <button type="button" class="ly-maintab ly-maintab--active" data-tab="customers" onclick="switchTab('customers')">
+        <span class="material-symbols-outlined">group</span>
+        Khách hàng
+        <span class="ly-maintab__count">{{ customers | length }}</span>
+    </button>
+    <button type="button" class="ly-maintab" data-tab="vouchers" onclick="switchTab('vouchers')">
+        <span class="material-symbols-outlined">confirmation_number</span>
+        Vouchers
+        <span class="ly-maintab__count">{{ vouchers | length }}</span>
+    </button>
+    <button type="button" class="ly-maintab" data-tab="missions" onclick="switchTab('missions')">
+        <span class="material-symbols-outlined">target</span>
+        Missions
+        <span class="ly-maintab__count">{{ missions | length }}</span>
+    </button>
+</div>
+
+
+{# ══════════════════════════════════════════
+   TAB 1 — KHÁCH HÀNG
+   customers: id, full_name, email, tier_name, total_points,
+   voucher_count, membership_expires_at, membership_tier_id
+   ══════════════════════════════════════════ #}
+<div class="ly-tab-panel ly-tab-panel--active" id="lyTabCustomers">
+
+    <div class="ly-toolbar">
+        <div class="ly-filter-search">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" id="lyCustomerSearch" placeholder="Tìm tên, email..." autocomplete="off" oninput="filterCustomers()">
+        </div>
+        <div class="ly-toolbar-left">
+            <select id="lyTierFilter" class="ly-filter-select" onchange="filterCustomers()">
+                <option value="">Tất cả hạng</option>
+                <option value="silver">🥈 Silver</option>
+                <option value="gold">⭐ Gold</option>
+                <option value="diamond">💎 Diamond</option>
+            </select>
+            <select id="lySortSelect" class="ly-filter-select" onchange="filterCustomers()">
+                <option value="name">Tên A-Z</option>
+                <option value="points_desc">Điểm cao nhất</option>
+                <option value="points_asc">Điểm thấp nhất</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="ly-table-container">
+        <div class="ly-table-scroll">
+            <table class="ly-table">
+                <thead>
+                    <tr>
+                        <th>Khách hàng</th>
+                        <th>Hạng hiện tại</th>
+                        <th>Loyalty Points</th>
+                        <th>Voucher đang có</th>
+                        <th>Membership hết hạn</th>
+                        <th>Điều chỉnh</th>
+                    </tr>
+                </thead>
+                <tbody id="lyCustomerBody">
+                {% if customers %}
+                    {% for c in customers %}
+                    {% set name_parts = c.full_name.split() %}
+                    {% set last_two = name_parts[-2:] if name_parts | length > 1 else name_parts %}
+                    {% set initials = last_two[0][0] | upper %}
+                    {% if last_two | length > 1 %}{% set initials = initials + (last_two[1][0] | upper) %}{% endif %}
+                    {% set avatar_class = AVATAR_PALETTE[loop.index0 % 5] %}
+                    {% set tier_key = (c.tier_name or 'silver') | lower %}
+
+                    <tr class="ly-row"
+                        data-id="{{ c.id }}"
+                        data-name="{{ c.full_name }}"
+                        data-email="{{ c.email or '' }}"
+                        data-tier="{{ tier_key }}"
+                        data-points="{{ c.total_points or 0 }}"
+                        data-membership-tier-id="{{ c.membership_tier_id or '' }}">
+                        <td>
+                            <div class="ly-customer-cell">
+                                <div class="ly-avatar {{ avatar_class }}">{{ initials }}</div>
+                                <div>
+                                    <div class="ly-customer-name">{{ c.full_name }}</div>
+                                    <div class="ly-customer-email">{{ c.email or '—' }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="ly-tier-pill ly-tier-pill--{{ tier_key }}">{{ TIER_LABELS.get(tier_key, tier_key) }}</span></td>
+                        <td class="ly-points">{{ c.total_points or 0 }} pts</td>
+                        <td>{{ c.voucher_count or 0 }} voucher</td>
+                        <td>{{ c.membership_expires_at | format_date | default('—', true) }}</td>
+                        <td>
+                            <div class="ly-row-actions">
+                                <button type="button" class="ly-action-btn ly-action-btn--coin" title="Điều chỉnh điểm"
+                                        onclick="openPtsModal(this)">
+                                    <span class="material-symbols-outlined">monetization_on</span>
+                                </button>
+                                <button type="button" class="ly-action-btn ly-action-btn--crown" title="Điều chỉnh membership"
+                                        onclick="openMemberModal(this)">
+                                    <span class="material-symbols-outlined">workspace_premium</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="ly-empty">
+                                <span class="material-symbols-outlined">group</span>
+                                <div class="ly-empty__title">Chưa có khách hàng nào có tài khoản</div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="ly-empty" id="lyCustomerNoMatch" style="display:none;">
+        <span class="material-symbols-outlined">search_off</span>
+        <div class="ly-empty__title">Không tìm thấy khách hàng phù hợp</div>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   TAB 2 — VOUCHERS
+   vouchers: id, name, cost, description, is_active,
+   max_redeems_per_customer, cooldown_days, stock
+   ══════════════════════════════════════════ #}
+<div class="ly-tab-panel" id="lyTabVouchers">
+
+    <div class="ly-toolbar">
+        <div class="ly-filter-search">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" id="lyVoucherSearch" placeholder="Tìm voucher..." autocomplete="off" oninput="filterVouchers()">
+        </div>
+        <div class="ly-subtabs">
+            <button type="button" class="ly-subtab ly-subtab--active" data-filter="all" onclick="setVoucherFilter('all', this)">
+                Tất cả <span class="ly-subtab__count">{{ vouchers | length }}</span>
+            </button>
+            <button type="button" class="ly-subtab" data-filter="active" onclick="setVoucherFilter('active', this)">
+                Đang active <span class="ly-subtab__count">{{ active_voucher_count }}</span>
+            </button>
+            <button type="button" class="ly-subtab" data-filter="hidden" onclick="setVoucherFilter('hidden', this)">
+                Đã ẩn <span class="ly-subtab__count">{{ hidden_voucher_count }}</span>
+            </button>
+        </div>
+    </div>
+
+    {% if vouchers %}
+    <div class="ly-voucher-grid" id="lyVoucherGrid">
+        {% for v in vouchers %}
+        <div class="ly-voucher-card {{ 'ly-voucher-card--hidden' if not v.is_active }}"
+             data-name="{{ v.name | lower }}"
+             data-status="{{ 'active' if v.is_active else 'hidden' }}"
+             data-id="{{ v.id }}"
+             data-cname="{{ v.name | e }}"
+             data-description="{{ v.description or '' | e }}"
+             data-cost="{{ v.cost }}"
+             data-stock="{{ v.stock if v.stock is not none else '' }}"
+             data-max-redeems="{{ v.max_redeems_per_customer if v.max_redeems_per_customer is not none else '' }}"
+             data-cooldown="{{ v.cooldown_days if v.cooldown_days is not none else '' }}"
+             data-active="{{ v.is_active }}"
+             data-banner="{{ url_for('static', filename='uploads/rewards/' + v.banner_image) if v.banner_image else '' }}">
+            {% if v.banner_image %}
+            <div class="ly-voucher-card__banner">
+                <img src="{{ url_for('static', filename='uploads/rewards/' + v.banner_image) }}" alt="{{ v.name }}">
+            </div>
+            {% endif %}
+            <div class="ly-voucher-card__top">
+                <div class="ly-voucher-card__name">{{ v.name }}</div>
+                <div class="ly-voucher-cost">{{ v.cost }} pts</div>
+            </div>
+            <div class="ly-voucher-card__desc">{{ v.description or 'Không có mô tả.' }}</div>
+            <div class="ly-voucher-meta">
+                <div class="ly-voucher-meta__row">
+                    <span>Tồn kho</span>
+                    <span>{{ v.stock if v.stock is not none else 'Không giới hạn' }}</span>
+                </div>
+                <div class="ly-voucher-meta__row">
+                    <span>Đổi tối đa/người</span>
+                    <span>{{ v.max_redeems_per_customer if v.max_redeems_per_customer is not none else 'Không giới hạn' }}</span>
+                </div>
+                <div class="ly-voucher-meta__row">
+                    <span>Cooldown</span>
+                    <span>{{ v.cooldown_days ~ ' ngày' if v.cooldown_days is not none else 'Không có' }}</span>
+                </div>
+                <div class="ly-voucher-meta__row">
+                    <span>Trạng thái</span>
+                    <span class="ly-status-pill {{ 'ly-status-pill--active' if v.is_active else 'ly-status-pill--hidden' }}">
+                        {{ 'Đang active' if v.is_active else 'Đã ẩn' }}
+                    </span>
+                </div>
+            </div>
+            <div class="ly-voucher-card__footer">
+                <button type="button" class="ly-btn-sm-secondary" onclick="openEditVoucherModal(this.closest('.ly-voucher-card'))">Chỉnh sửa</button>
+                <form method="post" action="{{ url_for('main.admin_loyalty_delete_voucher', reward_id=v.id) }}"
+                      onsubmit="return confirmDeleteVoucher(this);">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="ly-btn-sm-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="ly-empty">
+        <span class="material-symbols-outlined">confirmation_number</span>
+        <div class="ly-empty__title">Chưa có voucher nào</div>
+    </div>
+    {% endif %}
+    <div class="ly-empty" id="lyVoucherNoMatch" style="display:none;">
+        <span class="material-symbols-outlined">search_off</span>
+        <div class="ly-empty__title">Không tìm thấy voucher phù hợp</div>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   TAB 3 — MISSIONS
+   missions: source_key, name, icon, icon_color, description, points, is_active
+   Fixed set of 5 real loyalty_config keys — không tạo/xóa được.
+   ══════════════════════════════════════════ #}
+<div class="ly-tab-panel" id="lyTabMissions">
+
+    <div class="ly-missions-note">5 mission mặc định của hệ thống, đang chạy trực tiếp trong luồng đặt lịch. Chỉ có thể sửa mô tả, số điểm và bật/tắt.</div>
+
+    {% if missions %}
+    <div class="ly-mission-list">
+        {% for m in missions %}
+        <div class="ly-mission-card {{ 'ly-mission-card--inactive' if not m.is_active }}" id="lyMissionCard_{{ m.source_key }}"
+             data-key="{{ m.source_key }}"
+             data-name="{{ m.name | e }}"
+             data-description="{{ (m.description or '') | e }}"
+             data-points="{{ m.points }}"
+             data-active="{{ m.is_active }}">
+            <div class="ly-mission-icon ly-mission-icon--{{ m.icon_color }}">
+                <span class="material-symbols-outlined">{{ m.icon }}</span>
+            </div>
+            <div class="ly-mission-body">
+                <div class="ly-mission-name">{{ m.name }}</div>
+                <div class="ly-mission-desc">{{ m.description or 'Không có mô tả.' }}</div>
+            </div>
+            <div class="ly-mission-points">{{ m.points }} pts</div>
+            <div class="ly-mission-actions">
+                <button type="button" class="ly-icon-btn" title="Chỉnh sửa"
+                        onclick="openEditMissionModal(this.closest('.ly-mission-card'))">
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button type="button" class="ly-toggle {{ 'ly-toggle--on' if m.is_active }}" id="lyMissionToggle_{{ m.source_key }}"
+                        title="Bật/tắt mission" onclick="toggleMission('{{ m.source_key }}', this)">
+                    <span class="ly-toggle__knob"></span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="ly-empty">
+        <span class="material-symbols-outlined">target</span>
+        <div class="ly-empty__title">Chưa có mission nào. Tạo mission đầu tiên →</div>
+    </div>
+    {% endif %}
+</div>
+
+
+{# ══════════════════════════════════════════
+   MODAL a — ĐIỀU CHỈNH ĐIỂM
+   Backend: POST /admin/loyalty/adjust-points → main.admin_loyalty_adjust_points
+   ══════════════════════════════════════════ #}
+<div id="lyPtsModal" class="ly-modal-overlay" onclick="closeModalOnBackdrop(event, 'lyPtsModal')">
+    <div class="ly-modal" onclick="event.stopPropagation()">
+        <div class="ly-modal__header">
+            <span class="ly-modal__title">Điều chỉnh Loyalty Points</span>
+            <button type="button" class="ly-modal__close" onclick="closeModal('lyPtsModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" action="{{ url_for('main.admin_loyalty_adjust_points') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="customer_id" id="lyPts_customerId">
+            <input type="hidden" name="type" id="lyPts_type" value="add">
+
+            <div class="ly-modal__body">
+                <div class="ly-info-header">
+                    <div class="ly-avatar" id="lyPts_avatar"></div>
+                    <div>
+                        <div class="ly-info-header__name" id="lyPts_name"></div>
+                        <div class="ly-info-header__meta" id="lyPts_email"></div>
+                    </div>
+                </div>
+
+                <div class="ly-current-points">
+                    <div class="ly-current-points__value" id="lyPts_current"></div>
+                    <div class="ly-current-points__label">điểm hiện tại</div>
+                </div>
+
+                <div class="ly-type-toggle">
+                    <button type="button" class="ly-type-btn ly-type-btn--add ly-type-btn--active" id="lyPts_btnAdd" onclick="setPtsType('add')">Cộng điểm</button>
+                    <button type="button" class="ly-type-btn ly-type-btn--sub" id="lyPts_btnSub" onclick="setPtsType('sub')">Trừ điểm</button>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyPts_points">Số điểm *</label>
+                    <input type="number" name="points" id="lyPts_points" class="ly-form-input" min="1" required>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyPts_note">Lý do</label>
+                    <input type="text" name="note" id="lyPts_note" class="ly-form-input" placeholder="VD: tặng điểm sự kiện">
+                    <span class="ly-form-hint">Ghi vào loyalty_points_log với source='admin_adjustment'</span>
+                </div>
+            </div>
+
+            <div class="ly-modal__footer">
+                <button type="button" class="ly-btn-secondary" onclick="closeModal('lyPtsModal')">Hủy</button>
+                <button type="submit" class="ly-btn-primary">Áp dụng</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   MODAL b — ĐIỀU CHỈNH MEMBERSHIP
+   Backend: POST /admin/loyalty/adjust-membership → main.admin_loyalty_adjust_membership
+   ══════════════════════════════════════════ #}
+<div id="lyMemberModal" class="ly-modal-overlay" onclick="closeModalOnBackdrop(event, 'lyMemberModal')">
+    <div class="ly-modal" onclick="event.stopPropagation()">
+        <div class="ly-modal__header">
+            <span class="ly-modal__title">Điều chỉnh Membership</span>
+            <button type="button" class="ly-modal__close" onclick="closeModal('lyMemberModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" action="{{ url_for('main.admin_loyalty_adjust_membership') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="customer_id" id="lyMember_customerId">
+
+            <div class="ly-modal__body">
+                <div class="ly-info-header">
+                    <div class="ly-avatar" id="lyMember_avatar"></div>
+                    <div>
+                        <div class="ly-info-header__name" id="lyMember_name"></div>
+                        <div class="ly-info-header__meta" id="lyMember_tier"></div>
+                    </div>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyMember_tierId">Hạng mới *</label>
+                    <select name="tier_id" id="lyMember_tierId" class="ly-form-select" required>
+                        {% for t in membership_tiers %}
+                        <option value="{{ t.id }}">{{ t.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="ly-form-row">
+                    <div class="ly-form-group">
+                        <label class="ly-form-label" for="lyMember_startedAt">Ngày bắt đầu *</label>
+                        <input type="date" name="started_at" id="lyMember_startedAt" class="ly-form-input" required>
+                    </div>
+                    <div class="ly-form-group">
+                        <label class="ly-form-label" for="lyMember_expiresAt">Ngày hết hạn *</label>
+                        <input type="date" name="expires_at" id="lyMember_expiresAt" class="ly-form-input" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ly-modal__footer">
+                <button type="button" class="ly-btn-secondary" onclick="closeModal('lyMemberModal')">Hủy</button>
+                <button type="submit" class="ly-btn-primary">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   MODAL c — TẠO / SỬA VOUCHER
+   Create: POST /admin/loyalty/vouchers/create → main.admin_loyalty_create_voucher
+   Edit:   POST /admin/loyalty/vouchers/<id>/update → main.admin_loyalty_update_voucher
+   ══════════════════════════════════════════ #}
+<div id="lyVoucherModal" class="ly-modal-overlay" onclick="closeModalOnBackdrop(event, 'lyVoucherModal')">
+    <div class="ly-modal" onclick="event.stopPropagation()">
+        <div class="ly-modal__header">
+            <span class="ly-modal__title" id="lyVoucherModalTitle">Tạo Voucher mới</span>
+            <button type="button" class="ly-modal__close" onclick="closeModal('lyVoucherModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" id="lyVoucherForm" action="{{ url_for('main.admin_loyalty_create_voucher') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="ly-modal__body">
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyVoucher_name">Tên Voucher *</label>
+                    <input type="text" name="name" id="lyVoucher_name" class="ly-form-input" required>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyVoucher_description">Mô tả</label>
+                    <textarea name="description" id="lyVoucher_description" class="ly-form-textarea" rows="3"></textarea>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label">Ảnh minh họa</label>
+                    <div class="ly-dropzone" id="lyVoucherDropzone" onclick="document.getElementById('lyVoucher_image').click()">
+                        <div class="ly-dropzone__empty" id="lyVoucherDropzoneEmpty">
+                            <span class="material-symbols-outlined">add_photo_alternate</span>
+                            <span>Click để chọn ảnh</span>
+                        </div>
+                        <div class="ly-dropzone__preview" id="lyVoucherDropzonePreview" style="display:none;">
+                            <img id="lyVoucherDropzoneImg" src="" alt="">
+                        </div>
+                    </div>
+                    <input type="file" name="image" id="lyVoucher_image" accept=".jpg,.jpeg,.png,.webp" style="display:none;"
+                           onchange="lyPreviewVoucherImage(this)">
+                    <input type="hidden" name="remove_image" id="lyVoucher_removeImage" value="0">
+                    <div class="ly-image-actions" id="lyVoucherDropzoneActions" style="display:none;">
+                        <button type="button" class="ly-btn-sm-secondary" onclick="document.getElementById('lyVoucher_image').click()">Đổi ảnh</button>
+                        <button type="button" class="ly-btn-sm-danger" onclick="lyRemoveVoucherImage()">Xóa ảnh</button>
+                    </div>
+                    <span class="ly-form-hint">Định dạng JPG, PNG, WEBP. Tối đa 2MB.</span>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyVoucher_cost">Chi phí điểm *</label>
+                    <input type="number" name="cost" id="lyVoucher_cost" class="ly-form-input" min="1" required>
+                </div>
+
+                <div class="ly-form-row">
+                    <div class="ly-form-group">
+                        <label class="ly-form-label" for="lyVoucher_stock">Tồn kho</label>
+                        <input type="number" name="stock" id="lyVoucher_stock" class="ly-form-input" min="0" placeholder="Không giới hạn">
+                    </div>
+                    <div class="ly-form-group">
+                        <label class="ly-form-label" for="lyVoucher_maxRedeems">Đổi tối đa/người</label>
+                        <input type="number" name="max_redeems_per_customer" id="lyVoucher_maxRedeems" class="ly-form-input" min="0" placeholder="Không giới hạn">
+                    </div>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyVoucher_cooldown">Cooldown (ngày)</label>
+                    <input type="number" name="cooldown_days" id="lyVoucher_cooldown" class="ly-form-input" min="0" placeholder="Không có">
+                </div>
+
+                <div class="ly-form-toggle-row" id="lyVoucher_activeRow" style="display:none;">
+                    <span class="ly-form-toggle-row__label">Hiển thị voucher này</span>
+                    <input type="checkbox" name="is_active" id="lyVoucher_isActive" value="1" checked>
+                </div>
+            </div>
+
+            <div class="ly-modal__footer ly-modal__footer--split">
+                <button type="button" class="ly-btn-danger" id="lyVoucher_deleteBtn" style="display:none;" onclick="deleteCurrentVoucher()">Xóa Voucher</button>
+                <div style="display:flex; gap:8px; margin-left:auto;">
+                    <button type="button" class="ly-btn-secondary" onclick="closeModal('lyVoucherModal')">Hủy</button>
+                    <button type="submit" class="ly-btn-primary">Lưu</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Hidden delete form for the voucher modal's "Xóa Voucher" button #}
+<form method="post" id="lyVoucherDeleteForm" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+</form>
+
+
+{# ══════════════════════════════════════════
+   MODAL d — SỬA MISSION
+   Backend: POST /admin/loyalty/missions/<key>/update → main.admin_loyalty_update_mission
+   ══════════════════════════════════════════ #}
+<div id="lyMissionModal" class="ly-modal-overlay" onclick="closeModalOnBackdrop(event, 'lyMissionModal')">
+    <div class="ly-modal" onclick="event.stopPropagation()">
+        <div class="ly-modal__header">
+            <span class="ly-modal__title">Chỉnh sửa Mission</span>
+            <button type="button" class="ly-modal__close" onclick="closeModal('lyMissionModal')">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form method="post" id="lyMissionForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="ly-modal__body">
+                <div class="ly-form-group">
+                    <label class="ly-form-label">Tên Mission</label>
+                    <div class="ly-form-input" style="background:#f3f4f6; color:#6b7280;" id="lyMission_nameDisplay"></div>
+                    <span class="ly-form-hint">Tên mission cố định trong hệ thống, không đổi được.</span>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyMission_description">Mô tả</label>
+                    <textarea name="description" id="lyMission_description" class="ly-form-textarea" rows="3"></textarea>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyMission_points">Điểm thưởng *</label>
+                    <input type="number" name="points" id="lyMission_points" class="ly-form-input" min="0" required>
+                </div>
+
+                <div class="ly-form-toggle-row">
+                    <span class="ly-form-toggle-row__label">Mission đang hoạt động</span>
+                    <input type="checkbox" id="lyMission_isActive" onchange="onMissionActiveToggle()">
+                </div>
+            </div>
+
+            <div class="ly-modal__footer">
+                <button type="button" class="ly-btn-secondary" onclick="closeModal('lyMissionModal')">Hủy</button>
+                <button type="submit" class="ly-btn-primary">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+const LY_AVATAR_PALETTE = ['ly-avatar--0', 'ly-avatar--1', 'ly-avatar--2', 'ly-avatar--3', 'ly-avatar--4'];
+const LY_TIER_LABELS = { silver: '🥈 Silver', gold: '⭐ Gold', diamond: '💎 Diamond' };
+
+const LY_ROUTES = {
+    updateVoucher: "{{ url_for('main.admin_loyalty_update_voucher', reward_id=0) }}",
+    deleteVoucher: "{{ url_for('main.admin_loyalty_delete_voucher', reward_id=0) }}",
+    createVoucher: "{{ url_for('main.admin_loyalty_create_voucher') }}",
+    updateMission: "{{ url_for('main.admin_loyalty_update_mission', key='__KEY__') }}",
+    toggleMission: "{{ url_for('main.admin_loyalty_toggle_mission', key='__KEY__') }}"
+};
+
+function buildActionUrl(template, id) {
+    return template.replace('/0/', '/' + id + '/');
+}
+
+/* ── Modal management ── */
+function openModal(id) {
+    document.getElementById(id).classList.add('ly-modal-overlay--open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('ly-modal-overlay--open');
+    document.body.style.overflow = '';
+}
+
+function closeModalOnBackdrop(event, id) {
+    if (event.target === event.currentTarget) closeModal(id);
+}
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        ['lyPtsModal', 'lyMemberModal', 'lyVoucherModal', 'lyMissionModal'].forEach(closeModal);
+    }
+});
+
+/* ── Main tab switching ── */
+function switchTab(name) {
+    document.querySelectorAll('.ly-maintab').forEach((el) => {
+        el.classList.toggle('ly-maintab--active', el.dataset.tab === name);
+    });
+    document.querySelectorAll('.ly-tab-panel').forEach((el) => {
+        el.classList.toggle('ly-tab-panel--active', el.id === 'lyTab' + name.charAt(0).toUpperCase() + name.slice(1));
+    });
+}
+
+/* ── Points adjustment modal ── */
+function openPtsModal(btn) {
+    const d = btn.closest('tr').dataset;
+    document.getElementById('lyPts_customerId').value = d.id;
+    document.getElementById('lyPts_avatar').className = 'ly-avatar ' + LY_AVATAR_PALETTE[d.id % 5];
+    document.getElementById('lyPts_avatar').textContent = d.name.split(' ').slice(-2).map(w => w[0]).join('').toUpperCase();
+    document.getElementById('lyPts_name').textContent = d.name;
+    document.getElementById('lyPts_email').textContent = (d.email || '—') + ' · ' + (LY_TIER_LABELS[d.tier] || d.tier);
+    document.getElementById('lyPts_current').textContent = d.points + ' pts';
+    document.getElementById('lyPts_points').value = '';
+    document.getElementById('lyPts_note').value = '';
+    setPtsType('add');
+    openModal('lyPtsModal');
+}
+
+function setPtsType(type) {
+    document.getElementById('lyPts_type').value = type;
+    document.getElementById('lyPts_btnAdd').classList.toggle('ly-type-btn--active', type === 'add');
+    document.getElementById('lyPts_btnSub').classList.toggle('ly-type-btn--active', type === 'sub');
+}
+
+/* ── Membership modal ── */
+function openMemberModal(btn) {
+    const d = btn.closest('tr').dataset;
+    document.getElementById('lyMember_customerId').value = d.id;
+    document.getElementById('lyMember_avatar').className = 'ly-avatar ' + LY_AVATAR_PALETTE[d.id % 5];
+    document.getElementById('lyMember_avatar').textContent = d.name.split(' ').slice(-2).map(w => w[0]).join('').toUpperCase();
+    document.getElementById('lyMember_name').textContent = d.name;
+    document.getElementById('lyMember_tier').textContent = 'Hạng hiện tại: ' + (LY_TIER_LABELS[d.tier] || d.tier);
+    if (d.membershipTierId) document.getElementById('lyMember_tierId').value = d.membershipTierId;
+
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById('lyMember_startedAt').value = today;
+    document.getElementById('lyMember_expiresAt').value = '';
+    openModal('lyMemberModal');
+}
+
+/* ── Voucher modal (create / edit) ── */
+function lyResetVoucherDropzone() {
+    document.getElementById('lyVoucher_image').value = '';
+    document.getElementById('lyVoucher_removeImage').value = '0';
+    document.getElementById('lyVoucherDropzoneEmpty').style.display = 'flex';
+    document.getElementById('lyVoucherDropzonePreview').style.display = 'none';
+    document.getElementById('lyVoucherDropzoneImg').src = '';
+    document.getElementById('lyVoucherDropzoneActions').style.display = 'none';
+}
+
+function lyShowVoucherPreview(src) {
+    document.getElementById('lyVoucherDropzoneEmpty').style.display = 'none';
+    document.getElementById('lyVoucherDropzonePreview').style.display = 'block';
+    document.getElementById('lyVoucherDropzoneImg').src = src;
+    document.getElementById('lyVoucherDropzoneActions').style.display = 'flex';
+}
+
+function lyPreviewVoucherImage(input) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById('lyVoucher_removeImage').value = '0';
+        lyShowVoucherPreview(e.target.result);
+    };
+    reader.readAsDataURL(file);
+}
+
+function lyRemoveVoucherImage() {
+    document.getElementById('lyVoucher_image').value = '';
+    document.getElementById('lyVoucher_removeImage').value = '1';
+    document.getElementById('lyVoucherDropzoneEmpty').style.display = 'flex';
+    document.getElementById('lyVoucherDropzonePreview').style.display = 'none';
+    document.getElementById('lyVoucherDropzoneImg').src = '';
+    document.getElementById('lyVoucherDropzoneActions').style.display = 'none';
+}
+
+function openCreateVoucherModal() {
+    document.getElementById('lyVoucherModalTitle').textContent = 'Tạo Voucher mới';
+    document.getElementById('lyVoucherForm').action = LY_ROUTES.createVoucher;
+    document.getElementById('lyVoucherForm').reset();
+    document.getElementById('lyVoucher_activeRow').style.display = 'none';
+    document.getElementById('lyVoucher_deleteBtn').style.display = 'none';
+    lyResetVoucherDropzone();
+    openModal('lyVoucherModal');
+}
+
+function openEditVoucherModal(card) {
+    const d = card.dataset;
+    document.getElementById('lyVoucherModalTitle').textContent = 'Chỉnh sửa Voucher';
+    document.getElementById('lyVoucherForm').action = buildActionUrl(LY_ROUTES.updateVoucher, d.id);
+    document.getElementById('lyVoucher_name').value = d.cname;
+    document.getElementById('lyVoucher_description').value = d.description;
+    document.getElementById('lyVoucher_cost').value = d.cost;
+    document.getElementById('lyVoucher_stock').value = d.stock;
+    document.getElementById('lyVoucher_maxRedeems').value = d.maxRedeems;
+    document.getElementById('lyVoucher_cooldown').value = d.cooldown;
+    document.getElementById('lyVoucher_isActive').checked = d.active === '1';
+    document.getElementById('lyVoucher_activeRow').style.display = 'flex';
+    document.getElementById('lyVoucher_deleteBtn').style.display = 'inline-block';
+    document.getElementById('lyVoucherDeleteForm').action = buildActionUrl(LY_ROUTES.deleteVoucher, d.id);
+    lyResetVoucherDropzone();
+    if (d.banner) {
+        lyShowVoucherPreview(d.banner);
+    }
+    openModal('lyVoucherModal');
+}
+
+function deleteCurrentVoucher() {
+    if (confirm('Xóa voucher này?')) {
+        document.getElementById('lyVoucherDeleteForm').submit();
+    }
+}
+
+function confirmDeleteVoucher(form) {
+    const name = form.closest('.ly-voucher-card').dataset.cname;
+    return confirm('Xóa voucher "' + name + '"?');
+}
+
+/* ── Mission edit modal ── */
+function openEditMissionModal(card) {
+    const d = card.dataset;
+    document.getElementById('lyMissionForm').action = LY_ROUTES.updateMission.replace('__KEY__', d.key);
+    document.getElementById('lyMission_nameDisplay').textContent = d.name;
+    document.getElementById('lyMission_description').value = d.description;
+    document.getElementById('lyMission_points').value = d.points;
+    document.getElementById('lyMission_isActive').checked = d.active === '1';
+    openModal('lyMissionModal');
+}
+
+function onMissionActiveToggle() {
+    const active = document.getElementById('lyMission_isActive').checked;
+    const pointsInput = document.getElementById('lyMission_points');
+    if (!active) {
+        pointsInput.dataset.prev = pointsInput.value;
+        pointsInput.value = 0;
+        pointsInput.disabled = true;
+    } else {
+        pointsInput.disabled = false;
+        pointsInput.value = pointsInput.dataset.prev && pointsInput.dataset.prev !== '0' ? pointsInput.dataset.prev : pointsInput.value;
+    }
+}
+
+/* ── Mission quick toggle (card switch) ── */
+function toggleMission(sourceKey, el) {
+    fetch(LY_ROUTES.toggleMission.replace('__KEY__', sourceKey), {
+        method: 'POST',
+        headers: { 'X-CSRFToken': '{{ csrf_token() }}' }
+    })
+        .then((res) => res.json())
+        .then((data) => {
+            if (!data.success) return;
+            el.classList.toggle('ly-toggle--on', !!data.is_active);
+            const card = document.getElementById('lyMissionCard_' + sourceKey);
+            card.classList.toggle('ly-mission-card--inactive', !data.is_active);
+            card.querySelector('.ly-mission-points').textContent = data.points + ' pts';
+        });
+}
+
+/* ── Customer tab: client-side search + tier filter + sort ── */
+function filterCustomers() {
+    const q = document.getElementById('lyCustomerSearch').value.toLowerCase().trim();
+    const tier = document.getElementById('lyTierFilter').value;
+    const sort = document.getElementById('lySortSelect').value;
+    const tbody = document.getElementById('lyCustomerBody');
+    const rows = Array.from(tbody.querySelectorAll('.ly-row'));
+
+    let visibleCount = 0;
+    rows.forEach((row) => {
+        const matchesQ = !q || row.dataset.name.toLowerCase().includes(q) || row.dataset.email.toLowerCase().includes(q);
+        const matchesTier = !tier || row.dataset.tier === tier;
+        const visible = matchesQ && matchesTier;
+        row.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+    });
+
+    document.getElementById('lyCustomerNoMatch').style.display = visibleCount === 0 ? 'flex' : 'none';
+
+    const sorted = rows.slice().sort((a, b) => {
+        if (sort === 'points_desc') return parseInt(b.dataset.points, 10) - parseInt(a.dataset.points, 10);
+        if (sort === 'points_asc') return parseInt(a.dataset.points, 10) - parseInt(b.dataset.points, 10);
+        return a.dataset.name.localeCompare(b.dataset.name);
+    });
+    sorted.forEach((row) => tbody.appendChild(row));
+}
+
+/* ── Vouchers tab: client-side search + status filter ── */
+let lyVoucherStatusFilter = 'all';
+
+function setVoucherFilter(filter, btn) {
+    lyVoucherStatusFilter = filter;
+    document.querySelectorAll('.ly-subtab').forEach((el) => el.classList.remove('ly-subtab--active'));
+    btn.classList.add('ly-subtab--active');
+    filterVouchers();
+}
+
+function filterVouchers() {
+    const q = document.getElementById('lyVoucherSearch').value.toLowerCase().trim();
+    const grid = document.getElementById('lyVoucherGrid');
+    if (!grid) return;
+    const cards = grid.querySelectorAll('.ly-voucher-card');
+
+    let visibleCount = 0;
+    cards.forEach((card) => {
+        const matchesQ = !q || card.dataset.name.includes(q);
+        const matchesStatus = lyVoucherStatusFilter === 'all' || card.dataset.status === lyVoucherStatusFilter;
+        const visible = matchesQ && matchesStatus;
+        card.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+    });
+
+    document.getElementById('lyVoucherNoMatch').style.display = visibleCount === 0 ? 'flex' : 'none';
+}
+</script>
+{% endblock %}
