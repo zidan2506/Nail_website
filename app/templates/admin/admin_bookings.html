@@ -28,7 +28,7 @@
   ║    service_list : list[dict] — id, name, duration_minutes           ║
   ║    customer_list: list[dict] — id, full_name, phone                 ║
   ║    status_counts: dict — all, done, in_progress, confirmed,         ║
-  ║                          pending, cancelled                         ║
+  ║                          pending, cancelled, no_show                ║
   ║    pagination   : dict — start, end, total, page, pages,            ║
   ║                          has_prev, has_next                         ║
   ╠══════════════════════════════════════════════════════════════════════╣
@@ -394,6 +394,9 @@
 .bk-pill--cancelled  { background: #FCEBEB; color: #791F1F; }
 .bk-pill--cancelled::before { background: #E24B4A; }
 
+.bk-pill--no-show    { background: #F5E6E6; color: #6B2C2C; }
+.bk-pill--no-show::before { background: #9B4444; }
+
 /* ── Action buttons ── */
 .bk-actions {
     display: flex;
@@ -730,7 +733,8 @@
     'confirmed':   'Đã xác nhận',
     'in-progress': 'Đang thực hiện',
     'done':        'Hoàn thành',
-    'cancelled':   'Đã hủy'
+    'cancelled':   'Đã hủy',
+    'no-show':     'Không hoàn thành'
 } %}
 
 {# ── Currently active filter values ── #}
@@ -772,7 +776,7 @@
 {# ══════════════════════════════════════════
    2. STATUS SUMMARY CARDS
    Order: Tất cả → Hoàn thành → Đang thực hiện → Đã xác nhận → Chờ xác nhận → Đã hủy
-   Context: status_counts.all, .done, .in_progress, .confirmed, .pending, .cancelled
+   Context: status_counts.all, .done, .in_progress, .confirmed, .pending, .cancelled, .no_show
    ══════════════════════════════════════════ #}
 <div class="bk-status-cards">
 
@@ -813,6 +817,12 @@
         <span class="bk-status-card__label">Đã hủy</span>
     </a>
 
+    <a href="{{ url_for('main.admin_bookings', status='no-show', q=q_val or None, staff_id=staff_val or None, service_id=service_val or None, date=date_val or None) }}"
+       class="bk-status-card {% if status_val == 'no-show' %}bk-status-card--active{% endif %}">
+        <span class="bk-status-card__count">{{ status_counts.no_show }}</span>
+        <span class="bk-status-card__label">Không hoàn thành</span>
+    </a>
+
 </div>
 
 
@@ -844,6 +854,7 @@
         <option value="in-progress" {% if status_val == 'in-progress' %}selected{% endif %}>Đang thực hiện</option>
         <option value="done"        {% if status_val == 'done' %}selected{% endif %}>Hoàn thành</option>
         <option value="cancelled"   {% if status_val == 'cancelled' %}selected{% endif %}>Đã hủy</option>
+        <option value="no-show"     {% if status_val == 'no-show' %}selected{% endif %}>Không đến</option>
     </select>
 
     {# Stylist filter — context: staff_list (list of dicts: id, full_name) #}

@@ -758,6 +758,9 @@
 .cu-b-pill--cancelled  { background: #FCEBEB; color: #791F1F; }
 .cu-b-pill--cancelled::before { background: #E24B4A; }
 
+.cu-b-pill--no-show    { background: #F5E6E6; color: #6B2C2C; }
+.cu-b-pill--no-show::before { background: #9B4444; }
+
 .cu-empty-mini {
     padding: 16px;
     text-align: center;
@@ -1460,7 +1463,8 @@ const CU_STATUS_LABELS = {
     confirmed: 'Đã xác nhận',
     'in-progress': 'Đang thực hiện',
     done: 'Hoàn thành',
-    cancelled: 'Đã hủy'
+    cancelled: 'Đã hủy',
+    'no-show': 'Không đến'
 };
 
 const CU_ROUTES = {

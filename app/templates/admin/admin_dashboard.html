@@ -112,16 +112,29 @@
 
 /* ── Status Pills ── */
 .db-pill {
-  display: inline-flex; align-items: center;
+  display: inline-flex; align-items: center; gap: 5px;
   font-size: 11px; font-weight: 600;
   padding: 3px 10px; border-radius: var(--db-r-pill);
-  white-space: nowrap; text-transform: capitalize;
+  white-space: nowrap;
 }
-.db-pill--pending    { background: #FAEEDA; color: #633806; }
-.db-pill--unverified { background: #FAEEDA; color: #633806; }
-.db-pill--confirmed  { background: #E1F5EE; color: #085041; }
-.db-pill--completed  { background: #E6F1FB; color: #0C447C; }
-.db-pill--cancelled  { background: #FCEBEB; color: #791F1F; }
+.db-pill::before {
+  content: ""; width: 6px; height: 6px;
+  border-radius: 50%; flex-shrink: 0;
+}
+.db-pill--pending     { background: #FAEEDA; color: #633806; }
+.db-pill--pending::before { background: #EF9F27; }
+.db-pill--unverified  { background: #FAEEDA; color: #633806; }
+.db-pill--unverified::before { background: #EF9F27; }
+.db-pill--confirmed   { background: #E6F1FB; color: #0C447C; }
+.db-pill--confirmed::before { background: #378ADD; }
+.db-pill--in-progress { background: #F2EBFB; color: #5C2D91; }
+.db-pill--in-progress::before { background: #9B59D0; }
+.db-pill--done        { background: #E1F5EE; color: #085041; }
+.db-pill--done::before { background: #1D9E75; }
+.db-pill--cancelled   { background: #FCEBEB; color: #791F1F; }
+.db-pill--cancelled::before { background: #E24B4A; }
+.db-pill--no-show     { background: #F5E6E6; color: #6B2C2C; }
+.db-pill--no-show::before { background: #9B4444; }
 
 /* ── Status Summary ── */
 .db-status-grid {
@@ -134,18 +147,21 @@
 }
 .db-status-box__count { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
 .db-status-box__label { font-size: 11px; font-weight: 500; }
-.db-status-box--pending   { background: #fffbf5; }
-.db-status-box--confirmed { background: #f4fdf9; }
-.db-status-box--completed { background: #f3f8fe; }
-.db-status-box--cancelled { background: #fdf5f5; }
-.db-status-box--pending   .db-status-box__count { color: #633806; }
-.db-status-box--confirmed .db-status-box__count { color: #085041; }
-.db-status-box--completed .db-status-box__count { color: #0C447C; }
-.db-status-box--cancelled .db-status-box__count { color: #791F1F; }
-.db-status-box--pending   .db-status-box__label { color: #9a6420; }
-.db-status-box--confirmed .db-status-box__label { color: #1d7555; }
-.db-status-box--completed .db-status-box__label { color: #1e60a0; }
-.db-status-box--cancelled .db-status-box__label { color: #9b2020; }
+.db-status-box--pending      { background: #fffbf5; }
+.db-status-box--confirmed    { background: #f4fdf9; }
+.db-status-box--in-progress  { background: #f7f4fd; }
+.db-status-box--done         { background: #f3f8fe; }
+.db-status-box--cancelled    { background: #fdf5f5; }
+.db-status-box--pending      .db-status-box__count { color: #633806; }
+.db-status-box--confirmed    .db-status-box__count { color: #085041; }
+.db-status-box--in-progress  .db-status-box__count { color: #5C2D91; }
+.db-status-box--done         .db-status-box__count { color: #0C447C; }
+.db-status-box--cancelled    .db-status-box__count { color: #791F1F; }
+.db-status-box--pending      .db-status-box__label { color: #9a6420; }
+.db-status-box--confirmed    .db-status-box__label { color: #1d7555; }
+.db-status-box--in-progress  .db-status-box__label { color: #5C2D91; }
+.db-status-box--done         .db-status-box__label { color: #1e60a0; }
+.db-status-box--cancelled    .db-status-box__label { color: #9b2020; }
 
 /* ── Activity Feed ── */
 .db-activity-list { display: flex; flex-direction: column; }
@@ -264,6 +280,16 @@
    - revenue_chart    : dict — keys: week (list {label,value}), month (list {label,value})
    ════════════════════════════════════════════════ #}
 
+{# ── Status display mapping — same convention as admin_bookings.html — decoupled from internal enum values ── #}
+{% set STATUS_LABELS = {
+    'pending':     'Chờ xác nhận',
+    'confirmed':   'Đã xác nhận',
+    'in-progress': 'Đang thực hiện',
+    'done':        'Hoàn thành',
+    'cancelled':   'Đã hủy',
+    'no-show':     'Không đến'
+} %}
+
 <div class="db-page">
 
   {# ── 1. PAGE HEADER ── #}
@@ -380,7 +406,7 @@
                 </td>
                 <td>
                   <span class="db-pill db-pill--{{ a.status | default('pending') }}">
-                    {{ a.status | default('pending') }}
+                    {{ STATUS_LABELS.get(a.status, a.status) | default('Chờ xác nhận') }}
                   </span>
                 </td>
               </tr>
@@ -401,10 +427,11 @@
 
       {# Status summary — derived from today_appointments via Jinja2 selectattr #}
       {# No additional DB query needed: computed client-side from available context #}
-      {% set cnt_pending   = today_appointments | selectattr('status', 'equalto', 'pending')   | list | length %}
-      {% set cnt_confirmed = today_appointments | selectattr('status', 'equalto', 'confirmed') | list | length %}
-      {% set cnt_completed = today_appointments | selectattr('status', 'equalto', 'completed') | list | length %}
-      {% set cnt_cancelled = today_appointments | selectattr('status', 'equalto', 'cancelled') | list | length %}
+      {% set cnt_pending     = today_appointments | selectattr('status', 'equalto', 'pending')     | list | length %}
+      {% set cnt_confirmed   = today_appointments | selectattr('status', 'equalto', 'confirmed')   | list | length %}
+      {% set cnt_in_progress = today_appointments | selectattr('status', 'equalto', 'in-progress') | list | length %}
+      {% set cnt_done        = today_appointments | selectattr('status', 'equalto', 'done')        | list | length %}
+      {% set cnt_cancelled   = today_appointments | selectattr('status', 'equalto', 'cancelled')   | list | length %}
       <div class="db-card">
         <div class="db-card__head">
           <span class="db-card__title">Tình trạng hôm nay</span>
@@ -418,8 +445,12 @@
             <span class="db-status-box__count">{{ cnt_confirmed }}</span>
             <span class="db-status-box__label">Xác nhận</span>
           </div>
-          <div class="db-status-box db-status-box--completed">
-            <span class="db-status-box__count">{{ cnt_completed }}</span>
+          <div class="db-status-box db-status-box--in-progress">
+            <span class="db-status-box__count">{{ cnt_in_progress }}</span>
+            <span class="db-status-box__label">Đang thực hiện</span>
+          </div>
+          <div class="db-status-box db-status-box--done">
+            <span class="db-status-box__count">{{ cnt_done }}</span>
             <span class="db-status-box__label">Hoàn thành</span>
           </div>
           <div class="db-status-box db-status-box--cancelled">
@@ -431,7 +462,7 @@
 
       {# Activity Feed #}
       {# Depends on: activity_feed (list from get_admin_recent_activity(5)) #}
-      {# Tables: bookings JOIN customers JOIN services ORDER BY created_at DESC LIMIT 5 #}
+      {# Tables: bookings JOIN customers JOIN services ORDER BY updated_at DESC LIMIT 5 #}
       {# Fields: item.dot_color (hex string), item.text (HTML with <strong>), item.time (relative string) #}
       <div class="db-card">
         <div class="db-card__head">
@@ -479,12 +510,7 @@
   <div class="db-bottom">
 
     {# Col 1: Top services this month #}
-    {# TODO: add top_services to admin_dashboard route #}
-    {# Query: SELECT sv.name, COUNT(b.id) AS booking_count, COALESCE(SUM(i.amount),0) AS revenue #}
-    {#        FROM bookings b JOIN services sv ON sv.id=b.service_id #}
-    {#        LEFT JOIN invoices i ON i.booking_id=b.id AND i.status='paid' #}
-    {#        WHERE strftime('%Y-%m', b.booking_date) = strftime('%Y-%m', 'now') #}
-    {#        GROUP BY b.service_id ORDER BY booking_count DESC LIMIT 5 #}
+    {# top_services: get_admin_top_services(month_start_str, today_str, limit=3) — ranked by booking count, not revenue #}
     <div class="db-card">
       <div class="db-card__head">
         <span class="db-card__title">Dịch vụ nổi bật tháng này</span>
@@ -516,12 +542,7 @@
     </div>
 
     {# Col 2: Loyalty top customers #}
-    {# TODO: add top_loyalty to admin_dashboard route #}
-    {# Query: SELECT c.full_name, mt.name AS tier_name, COALESCE(SUM(lpl.points),0) AS total_points #}
-    {#        FROM loyalty_points_log lpl JOIN customers c ON c.id=lpl.customer_id #}
-    {#        LEFT JOIN customer_memberships cm ON cm.customer_id=c.id AND cm.is_active=1 #}
-    {#        LEFT JOIN membership_tiers mt ON mt.id=cm.tier_id #}
-    {#        GROUP BY lpl.customer_id HAVING total_points > 0 ORDER BY total_points DESC LIMIT 5 #}
+    {# top_loyalty: get_admin_top_loyalty(limit=5) — all-time net points, not month-scoped #}
     <div class="db-card">
       <div class="db-card__head">
         <span class="db-card__title">Khách hàng thân thiết</span>
@@ -547,10 +568,7 @@
     </div>
 
     {# Col 3: New members this month #}
-    {# TODO: add new_members to admin_dashboard route #}
-    {# Query: SELECT full_name, email, DATE(created_at) AS joined_date FROM customers #}
-    {#        WHERE strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now') #}
-    {#        ORDER BY created_at DESC LIMIT 8 #}
+    {# new_members: get_admin_new_members(this_month_str, limit=8), joined_date formatted in the route #}
     <div class="db-card">
       <div class="db-card__head">
         <span class="db-card__title">Khách mới tháng này</span>

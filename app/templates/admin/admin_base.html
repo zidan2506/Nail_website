@@ -419,6 +419,16 @@ body {
             <span class="material-symbols-outlined">person</span>
             Customers
         </a>
+        <a href="{{ url_for('main.admin_loyalty') }}"
+           class="adm-nav-item {% if request.endpoint == 'main.admin_loyalty' %}adm-nav-item--active{% endif %}">
+            <span class="material-symbols-outlined">loyalty</span>
+            Loyalty
+        </a>
+        <a href="{{ url_for('main.admin_carousels') }}"
+           class="adm-nav-item {% if request.endpoint == 'main.admin_carousels' %}adm-nav-item--active{% endif %}">
+            <span class="material-symbols-outlined">view_carousel</span>
+            Carousels
+        </a>
         <a href="{{ url_for('main.admin_reports') }}"
            class="adm-nav-item {% if request.endpoint == 'main.admin_reports' %}adm-nav-item--active{% endif %}">
             <span class="material-symbols-outlined">assessment</span>
