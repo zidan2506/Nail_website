@@ -1,0 +1,366 @@
+{#
+  ===== STAFF BASE TEMPLATE =====
+  File: templates/staff/staff_base.html
+
+  ===== CONTEXT VARIABLES =====
+  current_staff: dict — id, name, role
+    DB: get_staff_by_user_id(session['user_id']) → map full_name → name
+        (bảng staff dùng cột full_name, không có 'name')
+
+  ===== ROUTES EXPECTED =====
+  App chỉ có 1 blueprint 'main' (không tách 'staff'/'auth' blueprint),
+  nên endpoint dùng prefix main.* thay vì staff.*:
+    main.staff_dashboard  GET  /staff          — trang chính (bookings)
+    main.staff_history    GET  /staff/history  — lịch sử
+    main.staff_profile    GET  /staff/profile  — hồ sơ
+    main.staff_login      GET  /staff/login    — login (không có auth blueprint)
+
+  ===== SCHEMA MIGRATIONS =====
+  Không có
+
+  ===== FILE STORAGE =====
+  Không có
+
+  ===== FONTS / ICONS =====
+  admin_base chỉ load Plus Jakarta Sans + Material Symbols.
+  Staff base là 1 document HTML độc lập nên tự load:
+    - Plus Jakarta Sans (đồng bộ brand với admin)
+    - Tabler Icons webfont (class 'ti ti-*' — admin CHƯA load bộ này)
+
+  ===== BEM PREFIX =====
+  sf- (staff frontend) — dùng cho toàn bộ staff pages
+#}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Staff — DahaCare{% endblock %}</title>
+
+{# ── Fonts / Icons ── #}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css">
+
+<style>
+/* ═══════════════════════════════════════════
+   sf- BEM prefix — Staff base layout
+   ═══════════════════════════════════════════ */
+
+:root {
+    --sf-bg:            #FAFAF8;
+    --sf-surface:       #F0EBE8;
+    --sf-surface-2:     #FFFFFF;
+    --sf-border:        #E8D5CE;
+    --sf-border-strong: #D4BAB0;
+    --sf-text:          #1C1917;
+    --sf-muted:         #6F615B;
+    --sf-xs:            #8A7A72;
+    --sf-accent:        #C084A0;
+    --sf-accent-bg:     #F9F0F5;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: var(--sf-bg);
+    color: var(--sf-text);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.sf-sidebar {
+    width: 210px;
+    flex-shrink: 0;
+    height: 100vh;
+    background: var(--sf-surface-2);
+    border-right: 1px solid var(--sf-border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px;
+}
+
+.sf-sidebar__logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 6px 18px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--sf-border);
+}
+
+.sf-sidebar__logo-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--sf-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sf-sidebar__logo-mark svg { width: 18px; height: 18px; }
+
+.sf-sidebar__logo-name { font-size: 16px; font-weight: 700; color: var(--sf-text); letter-spacing: -0.2px; }
+.sf-sidebar__logo-sub { font-size: 11.5px; font-weight: 500; color: var(--sf-muted); }
+
+.sf-sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.sf-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 12px;
+    border-radius: 10px;
+    color: var(--sf-muted);
+    font-size: 14.5px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sf-nav-item:hover {
+    background: var(--sf-surface);
+    color: var(--sf-text);
+}
+
+.sf-nav-item--active {
+    background: var(--sf-accent-bg);
+    color: var(--sf-accent);
+    font-weight: 600;
+}
+
+.sf-nav-item .ti { font-size: 21px; flex-shrink: 0; }
+
+.sf-sidebar__spacer { flex: 1; }
+
+.sf-sidebar__user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 6px 0;
+    margin-top: 8px;
+    border-top: 1px solid var(--sf-border);
+}
+
+.sf-sidebar__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--sf-surface);
+    border: 1.5px solid var(--sf-border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--sf-muted);
+    flex-shrink: 0;
+}
+
+.sf-sidebar__user-info { display: flex; flex-direction: column; min-width: 0; }
+.sf-sidebar__user-name {
+    font-size: 13.5px; font-weight: 600; color: var(--sf-text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sf-sidebar__user-role { font-size: 11.5px; color: var(--sf-muted); text-transform: capitalize; }
+
+/* ── Logout ── */
+.sf-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    margin-top: 6px;
+    padding: 11px 12px;
+    border: none;
+    background: none;
+    border-radius: 10px;
+    color: var(--sf-muted);
+    font-size: 14.5px;
+    font-weight: 500;
+    font-family: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.sf-logout-btn:hover { background: #FEE2E2; color: #DC2626; }
+.sf-logout-btn .ti { font-size: 21px; flex-shrink: 0; }
+
+/* ── Content ── */
+.sf-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* ── Flash messages ── */
+.sf-flash-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 360px;
+    max-width: calc(100vw - 48px);
+}
+
+.sf-flash {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    font-size: 13.5px;
+    line-height: 1.4;
+    animation: sf-flash-in 0.2s ease;
+}
+
+@keyframes sf-flash-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.sf-flash--fade-out { animation: sf-flash-out 0.2s ease forwards; }
+
+@keyframes sf-flash-out {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-6px); }
+}
+
+.sf-flash--success { background: #E1F5EE; color: #085041; }
+.sf-flash--error { background: #FCEBEB; color: #791F1F; }
+
+.sf-flash .ti { font-size: 18px; flex-shrink: 0; }
+.sf-flash__text { flex: 1; }
+
+.sf-flash__close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: 0.6;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.sf-flash__close:hover { opacity: 1; }
+.sf-flash__close .ti { font-size: 15px; }
+</style>
+
+{% block page_styles %}{% endblock %}
+</head>
+
+<body>
+
+{# ════════════════════════════════════════════════
+   SIDEBAR
+   - request.endpoint : highlight nav item active
+   - current_staff    : {id, name, role}
+   ════════════════════════════════════════════════ #}
+<aside class="sf-sidebar">
+
+    {# Logo #}
+    <div class="sf-sidebar__logo">
+        <div class="sf-sidebar__logo-mark">
+            <svg viewBox="0 0 16 16" fill="none">
+                <path d="M8 1.5C8 1.5 4.5 4.5 4.5 8.5C4.5 11 6 13 8 13C10 13 11.5 11 11.5 8.5C11.5 4.5 8 1.5 8 1.5Z" fill="white" fill-opacity=".9"/>
+                <circle cx="8" cy="13.5" r="1.2" fill="white" fill-opacity=".7"/>
+            </svg>
+        </div>
+        <div>
+            <div class="sf-sidebar__logo-name">DahaCare</div>
+            <div class="sf-sidebar__logo-sub">Staff</div>
+        </div>
+    </div>
+
+    {# Nav #}
+    <nav class="sf-sidebar__nav">
+        <a href="{{ url_for('main.staff_dashboard') }}"
+           class="sf-nav-item {% if request.endpoint == 'main.staff_dashboard' %}sf-nav-item--active{% endif %}">
+            <i class="ti ti-calendar-event"></i><span>Lịch của tôi</span>
+        </a>
+        <a href="{{ url_for('main.staff_history') }}"
+           class="sf-nav-item {% if request.endpoint == 'main.staff_history' %}sf-nav-item--active{% endif %}">
+            <i class="ti ti-clock-hour-4"></i><span>Lịch sử</span>
+        </a>
+        <a href="{{ url_for('main.staff_profile') }}"
+           class="sf-nav-item {% if request.endpoint == 'main.staff_profile' %}sf-nav-item--active{% endif %}">
+            <i class="ti ti-user"></i><span>Hồ sơ</span>
+        </a>
+    </nav>
+
+    {# Spacer đẩy user xuống đáy #}
+    <div class="sf-sidebar__spacer"></div>
+
+    {# User #}
+    <div class="sf-sidebar__user">
+        <div class="sf-sidebar__avatar">{{ current_staff.name[:2] | upper }}</div>
+        <div class="sf-sidebar__user-info">
+            <div class="sf-sidebar__user-name">{{ current_staff.name }}</div>
+            <div class="sf-sidebar__user-role">{{ current_staff.role or 'Staff' }}</div>
+        </div>
+    </div>
+
+    {# Logout #}
+    <a href="{{ url_for('main.admin_logout') }}" class="sf-logout-btn">
+        <i class="ti ti-logout"></i><span>Đăng xuất</span>
+    </a>
+
+</aside>
+
+{# ════════════════════════════════════════════════
+   FLASH MESSAGES
+   ════════════════════════════════════════════════ #}
+<div class="sf-flash-container" id="sfFlashContainer">
+    {% for category, message in get_flashed_messages(with_categories=true, category_filter=['success', 'error']) %}
+    <div class="sf-flash sf-flash--{{ category }}">
+        <i class="ti {{ 'ti-circle-check' if category == 'success' else 'ti-alert-circle' }}"></i>
+        <span class="sf-flash__text">{{ message }}</span>
+        <button type="button" class="sf-flash__close" onclick="sfDismissFlash(this.parentElement)">
+            <i class="ti ti-x"></i>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+
+{# ════════════════════════════════════════════════
+   CONTENT
+   ════════════════════════════════════════════════ #}
+<main class="sf-content">
+    {% block content %}{% endblock %}
+</main>
+
+<script>
+function sfDismissFlash(el) {
+    if (!el || el.classList.contains('sf-flash--fade-out')) return;
+    el.classList.add('sf-flash--fade-out');
+    setTimeout(() => el.remove(), 200);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('#sfFlashContainer .sf-flash').forEach((el) => {
+        setTimeout(() => sfDismissFlash(el), 4000);
+    });
+});
+</script>
+
+{% block page_scripts %}{% endblock %}
+
+</body>
+</html>
