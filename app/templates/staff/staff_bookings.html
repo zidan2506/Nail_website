@@ -1,0 +1,541 @@
+{#
+  ===== STAFF BOOKINGS — "Lịch của tôi" =====
+  File: templates/staff/staff_bookings.html
+
+  ===== CONTEXT VARIABLES =====
+  current_staff:  dict — id, name, role
+  staff_name:     str
+  now_display:    str — "Thứ …, DD/MM/YYYY" (precompute ở route, không dùng filter)
+  stats:          dict — total, in_progress, done, pending_payment
+  active_preset:  str — today|week|month|last_month|custom|all
+  active_status:  str — all|confirmed|in-progress|done
+  date_from_val:  str — 'YYYY-MM-DD' (value cho <input type=date>), '' nếu all
+  date_to_val:    str — 'YYYY-MM-DD', '' nếu all
+  today_str:      str — 'YYYY-MM-DD'
+  is_multi_day:   bool
+  has_any:        bool — có booking nào (sau lọc status) trong range
+  days:           list[dict] — mỗi ngày: date_str, date_display (DD/MM/YYYY),
+                  dow_vi, is_today, bookings[]
+  Mỗi booking (đã enrich ở route):
+    id, code, customer_name, customer_phone, service_name, total_price,
+    start, end, date_display, status, badge_class, badge_label,
+    pay_method ('cash'|'online'|''), is_paid (0|1),
+    pay_tag_class, pay_tag_label, border, faded
+
+  ===== ROUTES EXPECTED (blueprint 'main', không tách 'staff') =====
+  main.staff_dashboard    GET   /staff                — trang chính (bookings)
+  main.mark_in_progress   POST  /staff/booking/start  — staff bắt đầu làm (confirmed -> in-progress)
+  main.mark_done          POST  /staff/booking/done   — mark done (+loyalty, dùng lại complete_booking)
+  main.mark_paid          POST  /staff/booking/paid   — xác nhận thu tiền mặt (UPDATE invoices)
+
+  ===== PAYMENT MODEL =====
+  bookings KHÔNG có payment_method/is_paid. Payment suy từ bảng invoices
+  (LEFT JOIN): cash chưa/đã thanh toán, hoặc online. Booking chưa có invoice → không tag.
+
+  ===== SCHEMA MIGRATIONS =====
+  Không có (dùng invoices sẵn có, không ALTER bookings).
+
+  ===== FILE STORAGE =====
+  Không có
+#}
+{% extends "staff/staff_base.html" %}
+
+{% block title %}Lịch của tôi — DahaCare{% endblock %}
+
+{% block page_styles %}
+<style>
+/* ═══════ sf- Staff bookings ═══════ */
+.sf-page { display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+
+/* ── Header + filter ── */
+.sf-hdr { background: #FFFFFF; border-bottom: 1px solid #E8D5CE; padding: 24px 30px 18px; flex-shrink: 0; }
+.sf-hdr-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 18px; }
+/* TITLE (cấp cao nhất) */
+.sf-title { font-size: 25px; font-weight: 700; color: #1C1917; letter-spacing: -0.4px; }
+.sf-title em { font-style: italic; font-weight: 400; color: #C084A0; }
+/* SUBTEXT */
+.sf-date { font-size: 14px; color: #7A6A63; }
+
+.sf-filters { display: flex; flex-direction: column; gap: 13px; }
+.sf-frow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+/* LABEL */
+.sf-flabel { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px;
+    color: #7A6A63; min-width: 118px; white-space: nowrap; }
+.sf-fcontrols { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.sf-fp { font-size: 14px; padding: 8px 16px; border-radius: 99px; border: 1px solid #E8D5CE;
+    background: transparent; color: #5F524C; cursor: pointer; transition: all .15s ease; }
+.sf-fp:hover { border-color: #D4BAB0; color: #1C1917; }
+.sf-fp--active { background: #1C1917; border-color: #1C1917; color: #fff; font-weight: 500; }
+
+.sf-dr { display: flex; align-items: center; gap: 7px; }
+.sf-di { font-size: 14px; padding: 8px 12px; border-radius: 8px; border: 1px solid #E8D5CE;
+    background: #F0EBE8; color: #1C1917; font-family: inherit; }
+.sf-di:focus { outline: none; border-color: #C084A0; }
+.sf-darr { color: #7A6A63; font-size: 15px; }
+
+.sf-ch { font-size: 14px; padding: 8px 16px; border-radius: 99px; border: 1px solid #E8D5CE;
+    background: transparent; color: #5F524C; cursor: pointer; transition: all .15s ease; }
+.sf-ch:hover { border-color: #D4BAB0; color: #1C1917; }
+.sf-ch--active { background: #F9F0F5; border-color: #C084A0; color: #C084A0; font-weight: 600; }
+
+.sf-clear { font-size: 13px; color: #7A6A63; text-decoration: none; margin-left: 4px; }
+.sf-clear:hover { color: #5F524C; }
+
+/* ── Stats bar ── */
+.sf-stats { display: flex; background: #FFFFFF; border-bottom: 1px solid #E8D5CE; flex-shrink: 0; }
+.sf-sc { flex: 1; padding: 16px 22px; border-right: 1px solid #E8D5CE; }
+.sf-sc:last-child { border-right: none; }
+.sf-sc--link { cursor: pointer; transition: background .15s ease; }
+.sf-sc--link:hover { background: #F9F0F5; }
+.sf-sc--link .sf-sl { align-items: center; }
+.sf-sc--link .sf-sl .ti { margin-left: auto; color: #4F46E5; }
+
+/* Alert: đang có lịch hẹn sắp tới cần xử lý */
+.sf-sc--alert { position: relative; }
+.sf-sc--link.sf-sc--alert:hover { background: #EEF0FF; }
+.sf-sc--alert .sf-sn { animation: sf-nudge 2.4s ease-in-out infinite; }
+.sf-sc--alert::after {
+    content: "";
+    position: absolute;
+    top: 13px; right: 15px;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: #4F46E5;
+    box-shadow: 0 0 0 0 rgba(79,70,229,.5);
+    animation: sf-pulse 1.9s ease-out infinite;
+}
+@keyframes sf-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(79,70,229,.5); }
+    70%  { box-shadow: 0 0 0 11px rgba(79,70,229,0); }
+    100% { box-shadow: 0 0 0 0 rgba(79,70,229,0); }
+}
+@keyframes sf-nudge {
+    0%, 92%, 100% { transform: translateY(0); }
+    96%           { transform: translateY(-2px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sf-sc--alert::after { animation: none; }
+    .sf-sc--alert .sf-sn { animation: none; }
+}
+/* STAT NUMBER (nổi bật nhất) */
+.sf-sn { font-size: 33px; font-weight: 300; letter-spacing: -0.5px; line-height: 1.1; }
+/* STAT LABEL */
+.sf-sl { font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: #7A6A63;
+    display: flex; align-items: center; gap: 7px; margin-top: 3px; }
+.sf-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+/* ── List ── */
+.sf-list { flex: 1; overflow-y: auto; padding: 20px 24px; background: #FAFAF8; }
+.sf-day-group { margin-bottom: 26px; }
+
+.sf-day-hdr { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.sf-day-label { display: flex; align-items: center; gap: 10px; }
+/* weekday: micro-label uppercase, de-emphasize */
+.sf-day-dow { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .7px;
+    color: #A5948C; padding-right: 2px; }
+/* DAY HEADER: ngày là anchor */
+.sf-day-date { font-size: 16px; font-weight: 700; color: #1C1917; letter-spacing: -0.2px; }
+/* count: pill mềm thay cho dot + text */
+.sf-day-count { font-size: 12px; font-weight: 500; color: #7A6A63; background: #F0EBE8;
+    border: 1px solid #E8D5CE; padding: 3px 10px; border-radius: 99px; white-space: nowrap; line-height: 1; }
+.sf-day-line { flex: 1; height: 1px; background: #E8D5CE; }
+.sf-day-today { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+    background: #F9F0F5; color: #C084A0; border: 1px solid #C084A0; border-radius: 99px; padding: 3px 10px; }
+.sf-day-empty { font-size: 14.5px; color: #7A6A63; padding: 14px 18px; background: #F0EBE8;
+    border-radius: 8px; border: 1px dashed #E8D5CE; text-align: center; }
+
+/* ── Booking card ── */
+.sf-card { background: #FFFFFF; border: 1px solid #E8D5CE; border-left: 3px solid #D4BAB0;
+    border-radius: 0 10px 10px 0; padding: 17px 20px; display: flex; align-items: flex-start; gap: 18px;
+    cursor: pointer; margin-bottom: 10px; transition: box-shadow .15s ease, border-color .15s ease; }
+.sf-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.07); border-color: #D4BAB0; }
+.sf-card--done { opacity: .72; }
+.sf-card--focus { box-shadow: 0 0 0 2px #C084A0, 0 6px 18px rgba(192,132,160,.28); border-color: #C084A0; }
+.sf-cbody { flex: 1; min-width: 0; }
+
+.sf-cr1 { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 5px; }
+/* SUBTEXT: mã booking */
+.sf-bid { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: 12px; color: #7A6A63;
+    background: #F0EBE8; border: 1px solid #E8D5CE; padding: 2px 8px; border-radius: 5px; }
+/* CARD TITLE: tên khách */
+.sf-cname { font-size: 17px; font-weight: 700; color: #1C1917; }
+/* SUBTITLE: dịch vụ */
+.sf-svc { font-size: 15px; font-weight: 500; color: #4A3F3A; margin-bottom: 10px; }
+/* BODY/META */
+.sf-meta { display: flex; gap: 18px; flex-wrap: wrap; }
+.sf-mi { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #6B5D57; }
+.sf-mi .ti { font-size: 16px; }
+
+/* Status badges */
+.sf-badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px; }
+.b-pending { background: #FFFBEB; color: #92400E; }
+.b-confirm { background: #EFF6FF; color: #1E40AF; }
+.b-inprog  { background: #F9F0F5; color: #86366A; }
+.b-done    { background: #F0FDF4; color: #166534; }
+.b-cancel  { background: #F0EBE8; color: #5F524C; }
+.b-noshow  { background: #FBEAEA; color: #8B3A3A; }
+
+/* Payment tags */
+.sf-ptag { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 99px; border: 1px solid transparent; }
+.pt-unpaid { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+.pt-paid   { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
+.pt-online { background: #DBEAFE; color: #1E40AF; border-color: #BFDBFE; }
+
+/* Action buttons */
+.sf-acts { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; flex-shrink: 0; }
+.sf-acts form { margin: 0; }
+.sf-btn { font-size: 14px; padding: 8px 15px; border-radius: 8px; border: 1px solid #D4BAB0;
+    background: #F0EBE8; color: #5F524C; display: flex; align-items: center; gap: 6px; white-space: nowrap;
+    cursor: pointer; font-family: inherit; font-weight: 500; transition: background .15s ease; }
+.sf-btn .ti { font-size: 16px; }
+.done-btn { background: #F0FDF4; border-color: #86EFAC; color: #15803D; }
+.done-btn:hover { background: #DCFCE7; }
+.paid-btn { background: #F9F0F5; border-color: #C084A0; color: #C084A0; }
+.paid-btn:hover { background: #F3E0EC; }
+.sf-btn:disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
+.sf-xdone { font-size: 14px; color: #6B5D57; display: flex; align-items: center; gap: 6px; }
+.sf-xdone .ti { color: #16A34A; font-size: 16px; }
+
+/* Empty state */
+.sf-empty { display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 13px; padding: 70px 20px; text-align: center; }
+.sf-empty .ti { font-size: 58px; color: #A5948C; }
+.sf-empty-text { font-size: 16px; color: #6B5D57; }
+.sf-empty a { font-size: 14px; color: #C084A0; text-decoration: none; }
+.sf-empty a:hover { text-decoration: underline; }
+
+/* ── Modal ── */
+.sf-overlay { position: absolute; inset: 0; background: rgba(28,25,23,.45); display: none;
+    align-items: center; justify-content: center; z-index: 10; border-radius: 14px; }
+.sf-overlay.open { display: flex; }
+.sf-modal { background: #FFFFFF; border-radius: 12px; border: 1px solid #E8D5CE; width: 380px;
+    max-width: calc(100% - 32px); display: flex; flex-direction: column; overflow: hidden; }
+.sf-mhdr { padding: 16px 18px 12px; border-bottom: 1px solid #E8D5CE; display: flex;
+    justify-content: space-between; align-items: center; background: #FFFFFF; }
+.sf-mtitle { font-size: 18px; font-weight: 700; color: #1C1917; }
+.sf-mclose { width: 32px; height: 32px; border-radius: 7px; border: none; background: transparent;
+    color: #5F524C; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.sf-mclose:hover { background: #F0EBE8; }
+.sf-mclose .ti { font-size: 20px; }
+.sf-mbody { padding: 18px; overflow-y: auto; max-height: 440px; display: flex;
+    flex-direction: column; gap: 15px; }
+.sf-msec { display: flex; flex-direction: column; gap: 8px; }
+.sf-msec + .sf-msec { border-top: 1px solid #E8D5CE; padding-top: 15px; }
+.sf-mlabel { font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: #7A6A63; }
+.sf-mid { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: 14px; color: #6B5D57;
+    background: #F0EBE8; border: 1px solid #E8D5CE; border-radius: 6px; padding: 8px 12px; }
+.sf-mrow { display: flex; justify-content: space-between; align-items: center; }
+.sf-mk { font-size: 14.5px; color: #5F524C; }
+.sf-mv { font-size: 15px; font-weight: 600; color: #1C1917; text-align: right; }
+.sf-mftr { padding: 12px 18px; border-top: 1px solid #E8D5CE; display: flex; justify-content: flex-end;
+    gap: 7px; background: #FFFFFF; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sf-page">
+
+  {# ── Header + filter ── #}
+  <div class="sf-hdr">
+    <div class="sf-hdr-top">
+      <div class="sf-title">Lịch của <em>{{ staff_name }}</em></div>
+      <div class="sf-date">{{ now_display }}</div>
+    </div>
+
+    <form method="GET" action="{{ url_for('main.staff_dashboard') }}" class="sf-filters" id="sfFilterForm">
+      <input type="hidden" name="preset" id="sfPreset" value="{{ active_preset }}">
+      <input type="hidden" name="status" id="sfStatus" value="{{ active_status }}">
+
+      {# Row 1: date presets + range #}
+      <div class="sf-frow">
+        <span class="sf-flabel">Lọc theo ngày</span>
+        <div class="sf-fcontrols">
+          {% set presets = [('today','Hôm nay'),('week','Tuần này'),('month','Tháng này'),
+                            ('last_month','Tháng trước'),('custom','Tùy chọn'),('all','Tất cả')] %}
+          {% for val, label in presets %}
+          <button type="button"
+                  class="sf-fp {% if active_preset == val %}sf-fp--active{% endif %}"
+                  onclick="sfSetPreset('{{ val }}')">{{ label }}</button>
+          {% endfor %}
+
+          <div class="sf-dr">
+            <input type="date" name="date_from" class="sf-di" value="{{ date_from_val }}"
+                   onchange="sfCustomDates()">
+            <span class="sf-darr">→</span>
+            <input type="date" name="date_to" class="sf-di" value="{{ date_to_val }}"
+                   onchange="sfCustomDates()">
+          </div>
+        </div>
+      </div>
+
+      {# Row 2: status chips #}
+      <div class="sf-frow">
+        <span class="sf-flabel">Lọc theo trạng thái</span>
+        <div class="sf-fcontrols">
+          {% set chips = [('all','Tất cả'),('confirmed','Đã xác nhận'),
+                         ('in-progress','Đang thực hiện'),('done','Hoàn thành')] %}
+          {% for val, label in chips %}
+          <button type="button"
+                  class="sf-ch {% if active_status == val %}sf-ch--active{% endif %}"
+                  onclick="sfSetStatus('{{ val }}')">{{ label }}</button>
+          {% endfor %}
+          <a href="{{ url_for('main.staff_dashboard') }}" class="sf-clear">Xóa bộ lọc</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {# ── Stats ── #}
+  <div class="sf-stats">
+    <div class="sf-sc">
+      <div class="sf-sn">{{ stats.total }}</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#60A5FA"></span>Tổng lịch hẹn</div>
+    </div>
+    <div class="sf-sc {% if next_upcoming_id %}sf-sc--link{% endif %} {% if stats.upcoming > 0 %}sf-sc--alert{% endif %}"
+         {% if next_upcoming_id %}onclick="sfFocusBooking({{ next_upcoming_id }})"
+         title="Tới lịch hẹn sắp tới gần nhất"{% endif %}>
+      <div class="sf-sn" style="color:#4F46E5">{{ stats.upcoming }}</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#818CF8"></span>Lịch hẹn sắp tới{% if next_upcoming_id %}<i class="ti ti-arrow-narrow-right" style="font-size:15px"></i>{% endif %}</div>
+    </div>
+    <div class="sf-sc">
+      <div class="sf-sn" style="color:#C084A0">{{ stats.in_progress }}</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#C084A0"></span>Đang thực hiện</div>
+    </div>
+    <div class="sf-sc">
+      <div class="sf-sn" style="color:#16A34A">{{ stats.done }}</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#4ADE80"></span>Hoàn thành</div>
+    </div>
+    <div class="sf-sc">
+      <div class="sf-sn" style="color:#C084A0">{{ stats.pending_payment }}</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#F9A8C9"></span>Chờ thanh toán</div>
+    </div>
+  </div>
+
+  {# ── List ── #}
+  <div class="sf-list">
+    {% if not has_any %}
+      <div class="sf-empty">
+        <i class="ti ti-calendar-off"></i>
+        <div class="sf-empty-text">Không có lịch hẹn nào{% if empty_scope %} {{ empty_scope }}{% endif %}.</div>
+        <a href="{{ url_for('main.staff_dashboard') }}">Xem tất cả</a>
+      </div>
+    {% else %}
+      {% for day in days %}
+      <div class="sf-day-group">
+        <div class="sf-day-hdr">
+          <div class="sf-day-label">
+            {% if is_multi_day %}<span class="sf-day-dow">{{ day.dow_vi }}</span>{% endif %}
+            <span class="sf-day-date">{{ day.date_display }}</span>
+            <span class="sf-day-count">{{ day.bookings | length }} lịch hẹn</span>
+          </div>
+          <div class="sf-day-line"></div>
+          {% if day.is_today %}<span class="sf-day-today">Hôm nay</span>{% endif %}
+        </div>
+
+        {% if day.bookings %}
+          {% for b in day.bookings %}
+          <div class="sf-card {% if b.faded %}sf-card--done{% endif %}"
+               id="bk-{{ b.id }}"
+               style="border-left-color: {{ b.border }}"
+               onclick="sfOpenModal(this)"
+               data-id="{{ b.id }}" data-code="{{ b.code }}"
+               data-name="{{ b.customer_name }}" data-phone="{{ b.customer_phone or '' }}"
+               data-svc="{{ b.service_name }}" data-date="{{ b.date_display }}"
+               data-time="{{ b.start }} - {{ b.end }}" data-status="{{ b.status }}"
+               data-can-start="{{ b.can_start | int }}"
+               data-badge-class="{{ b.badge_class }}" data-badge-label="{{ b.badge_label }}"
+               data-pay-method="{{ b.pay_method }}" data-is-paid="{{ b.is_paid }}"
+               data-price="{{ b.total_price }}">
+            <div class="sf-cbody">
+              <div class="sf-cr1">
+                <span class="sf-bid">#{{ b.code }}</span>
+                <span class="sf-cname">{{ b.customer_name }}</span>
+                <span class="sf-badge {{ b.badge_class }}">{{ b.badge_label }}</span>
+                {% if b.pay_tag_class %}
+                <span class="sf-ptag {{ b.pay_tag_class }}">{{ b.pay_tag_label }}</span>
+                {% endif %}
+              </div>
+              <div class="sf-svc">{{ b.service_name }}</div>
+              <div class="sf-meta">
+                <span class="sf-mi"><i class="ti ti-clock"></i>{{ b.start }} - {{ b.end }}</span>
+                <span class="sf-mi"><i class="ti ti-coin"></i>€{{ b.total_price }}</span>
+                {% if b.customer_phone %}
+                <span class="sf-mi"><i class="ti ti-phone"></i>{{ b.customer_phone }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="sf-acts">
+              {% if b.status == 'in-progress' %}
+                <form method="POST" action="{{ url_for('main.mark_done') }}" onclick="event.stopPropagation()">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="booking_id" value="{{ b.id }}">
+                  <button type="submit" class="sf-btn done-btn"><i class="ti ti-check"></i>Hoàn thành</button>
+                </form>
+                {% if b.pay_method == 'cash' and b.is_paid == 0 %}
+                <form method="POST" action="{{ url_for('main.mark_paid') }}" onclick="event.stopPropagation()">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="booking_id" value="{{ b.id }}">
+                  <button type="submit" class="sf-btn paid-btn"><i class="ti ti-coin"></i>Đã thu tiền</button>
+                </form>
+                {% endif %}
+              {% elif b.status == 'done' %}
+                {% if b.pay_method == 'cash' and b.is_paid == 0 %}
+                <form method="POST" action="{{ url_for('main.mark_paid') }}" onclick="event.stopPropagation()">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="booking_id" value="{{ b.id }}">
+                  <button type="submit" class="sf-btn paid-btn"><i class="ti ti-coin"></i>Đã thu tiền</button>
+                </form>
+                {% else %}
+                <span class="sf-xdone"><i class="ti ti-circle-check"></i>Đã xong</span>
+                {% endif %}
+              {% elif b.status == 'confirmed' and b.can_start %}
+                <form method="POST" action="{{ url_for('main.mark_in_progress') }}" onclick="event.stopPropagation()">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="booking_id" value="{{ b.id }}">
+                  <button type="submit" class="sf-btn done-btn"><i class="ti ti-player-play"></i>Bắt đầu làm</button>
+                </form>
+              {% elif b.status in ('confirmed', 'pending') %}
+                <button type="button" class="sf-btn done-btn" disabled
+                        onclick="event.stopPropagation()"><i class="ti ti-player-play"></i>Bắt đầu làm</button>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        {% elif is_multi_day %}
+          <div class="sf-day-empty">Không có lịch hẹn</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  {# ── Modal ── #}
+  <div class="sf-overlay" id="sfOverlay" onclick="if(event.target===this) sfCloseModal()">
+    <div class="sf-modal">
+      <div class="sf-mhdr">
+        <span class="sf-mtitle">Chi tiết lịch hẹn</span>
+        <button type="button" class="sf-mclose" onclick="sfCloseModal()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="sf-mbody">
+        <div class="sf-msec">
+          <span class="sf-mlabel">Mã booking</span>
+          <div class="sf-mid" id="m-id"></div>
+        </div>
+        <div class="sf-msec">
+          <span class="sf-mlabel">Khách hàng</span>
+          <div class="sf-mrow"><span class="sf-mk">Họ tên</span><span class="sf-mv" id="m-name"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">Số điện thoại</span><span class="sf-mv" id="m-phone"></span></div>
+        </div>
+        <div class="sf-msec">
+          <span class="sf-mlabel">Dịch vụ</span>
+          <div class="sf-mrow"><span class="sf-mk">Tên dịch vụ</span><span class="sf-mv" id="m-svc"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">Ngày hẹn</span><span class="sf-mv" id="m-date"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">Thời gian</span><span class="sf-mv" id="m-time"></span></div>
+        </div>
+        <div class="sf-msec">
+          <span class="sf-mlabel">Thanh toán</span>
+          <div class="sf-mrow"><span class="sf-mk">Tổng tiền</span><span class="sf-mv" id="m-price"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">Phương thức</span><span class="sf-mv" id="m-pay"></span></div>
+        </div>
+        <div class="sf-msec">
+          <span class="sf-mlabel">Trạng thái</span>
+          <div><span id="m-status-badge"></span></div>
+        </div>
+      </div>
+      <div class="sf-mftr">
+        <button type="button" class="sf-btn" onclick="sfCloseModal()">Đóng</button>
+        <button type="button" class="sf-btn done-btn" id="m-btn-start" style="display:none"
+                onclick="sfModalAction('start')"><i class="ti ti-player-play"></i>Bắt đầu làm</button>
+        <button type="button" class="sf-btn done-btn" id="m-btn-done" style="display:none"
+                onclick="sfModalAction('done')"><i class="ti ti-check"></i>Hoàn thành</button>
+        <button type="button" class="sf-btn paid-btn" id="m-btn-paid" style="display:none"
+                onclick="sfModalAction('paid')"><i class="ti ti-coin"></i>Đã thu tiền</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+const SF_CSRF = "{{ csrf_token() }}";
+const SF_START_URL = "{{ url_for('main.mark_in_progress') }}";
+const SF_DONE_URL = "{{ url_for('main.mark_done') }}";
+const SF_PAID_URL = "{{ url_for('main.mark_paid') }}";
+
+let sfCurrentId = null;
+
+function sfFocusBooking(id) {
+  const el = document.getElementById('bk-' + id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.add('sf-card--focus');
+  setTimeout(() => el.classList.remove('sf-card--focus'), 1800);
+}
+
+function sfSetPreset(v) {
+  document.getElementById('sfPreset').value = v;
+  document.getElementById('sfFilterForm').submit();
+}
+function sfSetStatus(v) {
+  document.getElementById('sfStatus').value = v;
+  document.getElementById('sfFilterForm').submit();
+}
+function sfCustomDates() {
+  document.getElementById('sfPreset').value = 'custom';
+  document.getElementById('sfFilterForm').submit();
+}
+
+function sfPayTag(method, isPaid) {
+  if (method === 'cash') {
+    return isPaid === '1'
+      ? '<span class="sf-ptag pt-paid">Tiền mặt - đã thanh toán</span>'
+      : '<span class="sf-ptag pt-unpaid">Tiền mặt - chưa thanh toán</span>';
+  }
+  if (method === 'online') return '<span class="sf-ptag pt-online">Online</span>';
+  return '<span class="sf-mk">Chưa có hóa đơn</span>';
+}
+
+function sfOpenModal(card) {
+  const d = card.dataset;
+  sfCurrentId = d.id;
+  document.getElementById('m-id').textContent = '#' + d.code;
+  document.getElementById('m-name').textContent = d.name;
+  document.getElementById('m-phone').textContent = d.phone || '-';
+  document.getElementById('m-svc').textContent = d.svc;
+  document.getElementById('m-date').textContent = d.date;
+  document.getElementById('m-time').textContent = d.time;
+  document.getElementById('m-price').textContent = '€' + d.price;
+  document.getElementById('m-pay').innerHTML = sfPayTag(d.payMethod, d.isPaid);
+  document.getElementById('m-status-badge').innerHTML =
+    '<span class="sf-badge ' + d.badgeClass + '">' + d.badgeLabel + '</span>';
+
+  document.getElementById('m-btn-start').style.display =
+    (d.status === 'confirmed' && d.canStart === '1') ? 'flex' : 'none';
+  document.getElementById('m-btn-done').style.display = d.status === 'in-progress' ? 'flex' : 'none';
+  document.getElementById('m-btn-paid').style.display =
+    (d.payMethod === 'cash' && d.isPaid === '0') ? 'flex' : 'none';
+
+  document.getElementById('sfOverlay').classList.add('open');
+}
+
+function sfCloseModal() {
+  document.getElementById('sfOverlay').classList.remove('open');
+  sfCurrentId = null;
+}
+
+function sfModalAction(kind) {
+  if (!sfCurrentId) return;
+  const f = document.createElement('form');
+  f.method = 'POST';
+  f.action = kind === 'start' ? SF_START_URL : (kind === 'done' ? SF_DONE_URL : SF_PAID_URL);
+  f.innerHTML = '<input type="hidden" name="csrf_token" value="' + SF_CSRF + '">' +
+                '<input type="hidden" name="booking_id" value="' + sfCurrentId + '">';
+  document.body.appendChild(f);
+  f.submit();
+}
+</script>
+{% endblock %}
