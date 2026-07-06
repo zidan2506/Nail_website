@@ -32,7 +32,7 @@
                 <p class="hero__subtitle">{{ slide.subtitle }}</p>
                 <div class="hero__cta-group">
                     {% for btn in slide.cta %}
-                    <a href="{{ url_for(btn.route) }}" class="hero__btn-{{ btn.style }}">{{ btn.label }}</a>
+                    <a href="{{ btn.url }}" class="hero__btn-{{ btn.style }}">{{ btn.label }}</a>
                     {% endfor %}
                 </div>
             </div>

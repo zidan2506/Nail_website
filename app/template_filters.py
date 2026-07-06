@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from app.utils.helpers import now_helsinki, mask_email
 
 PAYMENT_METHOD_LABELS = {
     'visa': 'Visa',
@@ -116,7 +117,7 @@ def time_ago(value):
             value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
         except ValueError:
             return value
-    delta = datetime.now() - value
+    delta = now_helsinki() - value
     days = delta.days
     if days < 1:
         return 'today'
@@ -129,6 +130,16 @@ def time_ago(value):
     return f'{years} year{"s" if years != 1 else ""} ago'
 
 
+def initials(value):
+    """'Nguyễn Lan Hương' -> 'LH' (chữ cái đầu của từ đầu và từ cuối)."""
+    if not value:
+        return ''
+    parts = value.strip().split()
+    if len(parts) == 1:
+        return parts[0][:2].upper()
+    return (parts[0][0] + parts[-1][0]).upper()
+
+
 def register_filters(app):
     """Đăng ký tất cả filters với Flask app"""
     app.template_filter('format_date')(format_date)
@@ -139,3 +150,5 @@ def register_filters(app):
     app.template_filter('payment_label')(payment_label)
     app.template_filter('format_number')(format_number)
     app.template_filter('time_ago')(time_ago)
+    app.template_filter('mask_email')(mask_email)
+    app.template_filter('initials')(initials)

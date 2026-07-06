@@ -1,5 +1,5 @@
-from app.utils.helpers import parse_time
-from datetime import timedelta, date, UTC
+from app.utils.helpers import parse_time, now_helsinki, today_helsinki
+from datetime import timedelta
 from datetime import datetime
 from app.services.email_system import generate_verification_code, send_verification_email
 from app.database.db import get_staff_by_id, get_available_staff_for_slot , get_customer_by_email , create_customer, create_verification, create_booking, get_customer_id
@@ -38,7 +38,7 @@ def get_available_slots(duration_min, existing_bookings, open_time="09:00", clos
 
 def get_following_days(n_days):
     date_list = []
-    today = date.today()
+    today = today_helsinki()
 
     for i in range(n_days):
         current_date = today + timedelta(days=i)
@@ -123,7 +123,7 @@ class VerificationService:
     def create_booking_verification(email):
         code = generate_verification_code()
         send_verification_email(email, code, "booking")
-        expires_at = (datetime.now(UTC) + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+        expires_at = (now_helsinki() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
         verification_id = create_verification(code, "booking", expires_at)
         return verification_id
 

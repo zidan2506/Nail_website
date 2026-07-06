@@ -500,18 +500,18 @@
 <section class="carousel-section">
     <div class="carousel-track" id="carouselTrack">
 
-        {% for reward in carousel_rewards %}
+        {% for slide in carousel_rewards %}
         <div class="carousel-slide">
-            <div class="slide-bg{% if not reward.get('banner_image') %} slide-{{ (loop.index0 % 3) + 1 }}-bg{% endif %}"
-                 {% if reward.get('banner_image') %}
-                 style="background-image: url('{{ url_for('static', filename='images/carousel/' + reward.get('banner_image')) }}'); background-size: cover; background-position: center;"
+            <div class="slide-bg{% if not slide.image %} slide-{{ (loop.index0 % 3) + 1 }}-bg{% endif %}"
+                 {% if slide.image %}
+                 style="background-image: url('{{ slide.image }}'); background-size: cover; background-position: center;"
                  {% endif %}
             ></div>
             <div class="slide-content">
-                <div class="slide-badge">✦ Loyalty Reward</div>
-                <h2 class="slide-title">{{ reward.name }}</h2>
-                <p class="slide-desc">{{ reward.description }}</p>
-                <a href="{{ url_for('main.customer_loyalty_points') }}" class="slide-cta">Redeem for {{ reward.cost }} pts</a>
+                <div class="slide-badge">{{ slide.badge or '✦ Loyalty Reward' }}</div>
+                <h2 class="slide-title">{{ slide.title }}</h2>
+                <p class="slide-desc">{{ slide.subtitle }}</p>
+                <a href="{{ slide.cta_url }}" class="slide-cta">{{ slide.cta_label }}</a>
             </div>
         </div>
         {% endfor %}

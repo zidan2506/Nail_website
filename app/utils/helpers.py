@@ -1,5 +1,18 @@
 from datetime import datetime, timedelta, UTC
 from urllib.parse import urlencode
+from zoneinfo import ZoneInfo
+
+HELSINKI_TZ = ZoneInfo("Europe/Helsinki")
+
+def now_helsinki():
+    """Current Helsinki wall-clock time, naive (tzinfo stripped). SQLite has no
+    timezone-aware column type, so every timestamp this app stores/compares is
+    a naive string — this is the single source of truth for what that string
+    means. Do not mix with datetime.now() (server-local) or datetime.now(UTC)."""
+    return datetime.now(HELSINKI_TZ).replace(tzinfo=None)
+
+def today_helsinki():
+    return now_helsinki().date()
 
 def parse_time(time_str):
     return datetime.strptime(time_str, "%H:%M")
@@ -32,7 +45,7 @@ def split_customer_bookings(bookings):
                 "booking": booking,
                 "booking_date": format_booking_date(booking["booking_date"]),
                 "booking_time": format_booking_time(booking["start_time"]),
-                "cancelled_date": format_booking_date(booking["created_at"])
+                "cancelled_date": format_booking_date(booking["updated_at"])
 
             })
         elif status == "completed":
