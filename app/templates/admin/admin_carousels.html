@@ -1,0 +1,1036 @@
+{% extends "admin/admin_base.html" %}
+
+{#
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  ADMIN CAROUSEL MANAGEMENT PAGE — admin_carousels.html                ║
+  ║  Extends: admin/admin_base.html                                      ║
+  ║  Blocks used: title, extra_css, page_title, content, extra_js        ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  Manages 3 unrelated carousels that used to be hardcoded in Python/   ║
+  ║  Jinja, told apart by carousel_slides.carousel_key:                   ║
+  ║   - homepage: full CRUD, public/index.html hero. 2 CTA buttons/slide. ║
+  ║   - dashboard_offers: full CRUD, customer_dashboard.html "Offers &    ║
+  ║     Deals". Same shape as homepage slides (title/subtitle/badge/      ║
+  ║     image/cta_label/cta_url/cta_style), just 1 CTA instead of 2 —     ║
+  ║     each slide is independent content, not linked to a reward row.   ║
+  ║   - loyalty_missions: fixed 3 rows (slot_key: first_booking/review/   ║
+  ║     referral), update-only — no create/delete. The "claimed" button   ║
+  ║     state on loyalty_points.html stays hardcoded in routes.py keyed   ║
+  ║     by slot_key; only cosmetic fields (icon/title/pts_label/image)    ║
+  ║     are editable here.                                                ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  CONTEXT VARIABLES:                                                   ║
+  ║    homepage_slides: list — id, title, subtitle, badge, image_url,     ║
+  ║      cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, ║
+  ║      sort_order, is_active                                            ║
+  ║    offer_slides: list — id, title, subtitle, badge, image_url,        ║
+  ║      cta_label, cta_url, cta_style, sort_order, is_active             ║
+  ║    mission_slides: list — id, slot_key, title, icon, pts_label,       ║
+  ║      image_url, sort_order                                            ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  ROUTES (blueprint "main"):                                           ║
+  ║    main.admin_carousels                   GET                        ║
+  ║    main.admin_carousel_homepage_create    POST                       ║
+  ║    main.admin_carousel_homepage_update    POST /int:slide_id          ║
+  ║    main.admin_carousel_offer_create       POST                       ║
+  ║    main.admin_carousel_offer_update       POST /int:slide_id          ║
+  ║    main.admin_carousel_delete             POST /int:slide_id (shared) ║
+  ║    main.admin_carousel_mission_update      POST /<slot_key>           ║
+  ║    main.admin_carousel_reorder            POST → JSON                ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+#}
+
+{% block title %}Quản lý Carousel - DahaCare Admin{% endblock %}
+{% block page_title %}Quản lý Carousel{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   cr- BEM prefix — Carousel Management Page
+   ═══════════════════════════════════════════ */
+
+.cr-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.cr-page-header__title { font-size: 20px; font-weight: 700; color: #191c1e; letter-spacing: -0.3px; }
+.cr-page-header__subtitle { font-size: 13px; color: #6b7280; margin-top: 2px; }
+
+.cr-btn-create {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #4a90d9;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.cr-btn-create:hover { background: #3a7bc8; }
+.cr-btn-create:active { transform: scale(0.98); }
+.cr-btn-create .material-symbols-outlined { font-size: 18px; font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24; }
+
+/* ── Main tabs ── */
+.cr-maintabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-bottom: 1px solid #e4e6ea;
+    margin-bottom: 20px;
+}
+
+.cr-maintab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 16px;
+    border: none;
+    background: none;
+    border-bottom: 2px solid transparent;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #6b7280;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: color 0.15s;
+    margin-bottom: -1px;
+}
+
+.cr-maintab:hover { color: #191c1e; }
+.cr-maintab--active { color: #4a90d9; border-bottom-color: #4a90d9; }
+.cr-maintab .material-symbols-outlined { font-size: 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+.cr-maintab__count {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 20px;
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.cr-maintab--active .cr-maintab__count { background: rgba(74,144,217,0.14); color: #4a90d9; }
+
+.cr-tab-panel { display: none; }
+.cr-tab-panel--active { display: block; }
+
+.cr-tab-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.cr-tab-note { font-size: 12.5px; color: #9ca3af; margin-bottom: 16px; }
+
+/* ── Slide list ── */
+.cr-slide-list { display: flex; flex-direction: column; gap: 10px; }
+
+.cr-slide-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    transition: opacity 0.15s;
+}
+
+.cr-slide-card--inactive { opacity: 0.55; }
+
+.cr-slide-thumb {
+    width: 88px;
+    height: 56px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cr-slide-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cr-slide-thumb .material-symbols-outlined { color: #d1d5db; font-size: 24px; }
+
+.cr-slide-body { flex: 1; min-width: 0; }
+.cr-slide-title { font-size: 14px; font-weight: 700; color: #191c1e; }
+.cr-slide-sub { font-size: 12.5px; color: #6b7280; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.cr-slide-meta { display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+
+.cr-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.cr-tag--reward { background: #FEF3C7; color: #92400E; }
+
+.cr-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.cr-status-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.cr-status-pill--active { background: #E1F5EE; color: #085041; }
+.cr-status-pill--active::before { background: #1D9E75; }
+.cr-status-pill--hidden { background: #F3F4F6; color: #6b7280; }
+.cr-status-pill--hidden::before { background: #9ca3af; }
+
+.cr-slide-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+.cr-icon-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border: none;
+    color: #6b7280;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.cr-icon-btn:hover { background: #e5e7eb; color: #374151; }
+.cr-icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.cr-icon-btn:disabled:hover { background: #f3f4f6; }
+.cr-icon-btn .material-symbols-outlined { font-size: 17px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+.cr-icon-btn--danger:hover { background: #fee2e2; color: #991b1b; }
+
+/* ── Mission icon (Loyalty Missions tab) ── */
+.cr-mission-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+    background: #f3f4f6;
+}
+
+/* ── Empty state ── */
+.cr-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    gap: 10px;
+    text-align: center;
+}
+
+.cr-empty .material-symbols-outlined { font-size: 36px; color: #d1d5db; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48; }
+.cr-empty__title { font-size: 14px; font-weight: 600; color: #6b7280; }
+
+/* ── Modals (shared with admin_loyalty.html patterns) ── */
+.cr-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(25, 28, 30, 0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.cr-modal-overlay--open { display: flex; }
+
+.cr-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+}
+
+.cr-modal__header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 0; flex-shrink: 0; }
+.cr-modal__title { font-size: 16px; font-weight: 700; color: #191c1e; }
+
+.cr-modal__close {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: none; border: none;
+    color: #6b7280; cursor: pointer; transition: background 0.15s;
+}
+
+.cr-modal__close:hover { background: #f3f4f6; color: #374151; }
+.cr-modal__close .material-symbols-outlined { font-size: 20px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+.cr-modal__body { padding: 20px 24px; flex: 1; overflow-y: auto; }
+.cr-modal__footer { padding: 0 24px 20px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+.cr-modal__footer--split { justify-content: space-between; }
+
+.cr-form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.cr-form-group:last-child { margin-bottom: 0; }
+.cr-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.cr-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+.cr-form-label { font-size: 12.5px; font-weight: 600; color: #374151; }
+
+.cr-form-input, .cr-form-textarea, .cr-form-select {
+    padding: 8px 12px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    background: #f7f9fb;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+}
+
+.cr-form-textarea { resize: vertical; min-height: 56px; }
+.cr-form-input:focus, .cr-form-textarea:focus, .cr-form-select:focus { border-color: #4a90d9; background: #ffffff; }
+.cr-form-hint { font-size: 12px; color: #9ca3af; }
+
+.cr-form-divider { height: 1px; background: #f3f4f6; margin: 16px 0; }
+.cr-section-title { font-size: 12.5px; font-weight: 700; color: #191c1e; margin-bottom: 10px; }
+
+.cr-form-toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; background: #f7f9fb; border: 1px solid #e4e6ea; border-radius: 8px;
+}
+.cr-form-toggle-row__label { font-size: 13px; font-weight: 600; color: #374151; }
+
+/* ── Image dropzone (shared pattern) ── */
+.cr-dropzone {
+    position: relative;
+    height: 120px;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 10px;
+    background: #f7f9fb;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; overflow: hidden; transition: border-color 0.15s;
+}
+.cr-dropzone:hover { border-color: #4a90d9; }
+.cr-dropzone__empty { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #9ca3af; }
+.cr-dropzone__empty .material-symbols-outlined { font-size: 24px; }
+.cr-dropzone__empty span { font-size: 12px; font-weight: 600; color: #6b7280; }
+.cr-dropzone__preview { width: 100%; height: 100%; }
+.cr-dropzone__preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cr-image-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+.cr-btn-secondary {
+    padding: 8px 18px; border: 1px solid #e4e6ea; border-radius: 8px;
+    background: #ffffff; color: #374151; font-size: 13.5px; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: background 0.15s, border-color 0.15s;
+}
+.cr-btn-secondary:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+.cr-btn-sm {
+    padding: 7px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: background 0.15s;
+}
+.cr-btn-sm-secondary { border: 1px solid #e4e6ea; background: #ffffff; color: #374151; }
+.cr-btn-sm-secondary:hover { background: #f3f4f6; }
+.cr-btn-sm-danger { border: none; background: #fef2f2; color: #991b1b; }
+.cr-btn-sm-danger:hover { background: #fee2e2; }
+
+.cr-btn-primary {
+    padding: 8px 18px; border: none; border-radius: 8px;
+    background: #4a90d9; color: #ffffff; font-size: 13.5px; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: background 0.15s, transform 0.1s;
+}
+.cr-btn-primary:hover { background: #3a7bc8; }
+.cr-btn-primary:active { transform: scale(0.98); }
+
+.cr-btn-danger {
+    padding: 8px 18px; border: none; border-radius: 8px;
+    background: #fef2f2; color: #991b1b; font-size: 13.5px; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: background 0.15s;
+}
+.cr-btn-danger:hover { background: #fee2e2; }
+
+@media (max-width: 640px) {
+    .cr-form-row, .cr-form-row-3 { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{# ══════════════════════════════════════════
+   1. PAGE HEADER
+   ══════════════════════════════════════════ #}
+<div class="cr-page-header">
+    <div>
+        <div class="cr-page-header__title">Quản lý Carousel</div>
+        <div class="cr-page-header__subtitle">Trang chủ, ưu đãi trên dashboard khách hàng, và mission trên trang loyalty</div>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   2. MAIN TABS
+   ══════════════════════════════════════════ #}
+<div class="cr-maintabs">
+    <button type="button" class="cr-maintab cr-maintab--active" data-tab="homepage" onclick="switchTab('homepage')">
+        <span class="material-symbols-outlined">home</span>
+        Trang chủ
+        <span class="cr-maintab__count">{{ homepage_slides | length }}</span>
+    </button>
+    <button type="button" class="cr-maintab" data-tab="offers" onclick="switchTab('offers')">
+        <span class="material-symbols-outlined">local_offer</span>
+        Customer Dashboard
+        <span class="cr-maintab__count">{{ offer_slides | length }}</span>
+    </button>
+    <button type="button" class="cr-maintab" data-tab="missions" onclick="switchTab('missions')">
+        <span class="material-symbols-outlined">target</span>
+        Loyalty Missions
+        <span class="cr-maintab__count">{{ mission_slides | length }}</span>
+    </button>
+</div>
+
+
+{# ══════════════════════════════════════════
+   TAB 1 — TRANG CHỦ (homepage)
+   Full CRUD. public/index.html hero carousel.
+   ══════════════════════════════════════════ #}
+<div class="cr-tab-panel cr-tab-panel--active" id="crTabHomepage">
+
+    <div class="cr-tab-toolbar">
+        <span class="cr-tab-note" style="margin:0;">Hero carousel ở trang chủ công khai. Mỗi slide tối đa 2 nút CTA.</span>
+        <button class="cr-btn-create" onclick="openHomepageModal()">
+            <span class="material-symbols-outlined">add</span>
+            Thêm slide mới
+        </button>
+    </div>
+
+    {% if homepage_slides %}
+    <div class="cr-slide-list" id="crHomepageList">
+        {% for s in homepage_slides %}
+        <div class="cr-slide-card {{ 'cr-slide-card--inactive' if not s.is_active }}"
+             data-id="{{ s.id }}"
+             data-title="{{ s.title | e }}"
+             data-subtitle="{{ s.subtitle or '' | e }}"
+             data-badge="{{ s.badge or '' | e }}"
+             data-image="{{ s.image_url or '' }}"
+             data-cta-label="{{ s.cta_label or '' | e }}"
+             data-cta-url="{{ s.cta_url or '' | e }}"
+             data-cta-style="{{ s.cta_style or 'primary' }}"
+             data-cta2-label="{{ s.cta2_label or '' | e }}"
+             data-cta2-url="{{ s.cta2_url or '' | e }}"
+             data-cta2-style="{{ s.cta2_style or 'outline' }}"
+             data-active="{{ s.is_active }}"
+             data-delete-name="{{ s.title | e }}">
+            <div class="cr-slide-thumb">
+                {% if s.image_url %}<img src="{{ s.image_url }}" alt="{{ s.title }}">
+                {% else %}<span class="material-symbols-outlined">image</span>{% endif %}
+            </div>
+            <div class="cr-slide-body">
+                <div class="cr-slide-title">{{ s.title }}</div>
+                <div class="cr-slide-sub">{{ s.subtitle or 'Không có subtitle.' }}</div>
+                <div class="cr-slide-meta">
+                    {% if s.badge %}<span class="cr-tag">{{ s.badge }}</span>{% endif %}
+                    {% if s.cta_label %}<span class="cr-tag">{{ s.cta_label }}</span>{% endif %}
+                    {% if s.cta2_label %}<span class="cr-tag">{{ s.cta2_label }}</span>{% endif %}
+                    <span class="cr-status-pill {{ 'cr-status-pill--active' if s.is_active else 'cr-status-pill--hidden' }}">
+                        {{ 'Đang active' if s.is_active else 'Đã ẩn' }}
+                    </span>
+                </div>
+            </div>
+            <div class="cr-slide-actions">
+                <button type="button" class="cr-icon-btn" title="Lên" onclick="moveSlide('crHomepageList', this, -1)"><span class="material-symbols-outlined">arrow_upward</span></button>
+                <button type="button" class="cr-icon-btn" title="Xuống" onclick="moveSlide('crHomepageList', this, 1)"><span class="material-symbols-outlined">arrow_downward</span></button>
+                <button type="button" class="cr-icon-btn" title="Sửa" onclick="openHomepageModal(this.closest('.cr-slide-card'))"><span class="material-symbols-outlined">edit</span></button>
+                <button type="button" class="cr-icon-btn cr-icon-btn--danger" title="Xóa" onclick="deleteSlide(this.closest('.cr-slide-card'))"><span class="material-symbols-outlined">delete</span></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="cr-empty"><span class="material-symbols-outlined">home</span><div class="cr-empty__title">Chưa có slide trang chủ nào.</div></div>
+    {% endif %}
+</div>
+
+
+{# ══════════════════════════════════════════
+   TAB 2 — DASHBOARD OFFERS
+   Full CRUD, independent slides — same shape as the homepage carousel
+   (title/subtitle/badge/image/cta_label/cta_url/cta_style), just no cta2.
+   Not tied to any reward row.
+   ══════════════════════════════════════════ #}
+<div class="cr-tab-panel" id="crTabOffers">
+
+    <div class="cr-tab-toolbar">
+        <span class="cr-tab-note" style="margin:0;">Carousel "Offers & Deals" ở dashboard khách hàng.</span>
+        <button class="cr-btn-create" onclick="openOfferModal()">
+            <span class="material-symbols-outlined">add</span>
+            Thêm slide mới
+        </button>
+    </div>
+
+    {% if offer_slides %}
+    <div class="cr-slide-list" id="crOffersList">
+        {% for s in offer_slides %}
+        <div class="cr-slide-card {{ 'cr-slide-card--inactive' if not s.is_active }}"
+             data-id="{{ s.id }}"
+             data-title="{{ s.title | e }}"
+             data-subtitle="{{ s.subtitle or '' | e }}"
+             data-badge="{{ s.badge or '' | e }}"
+             data-image="{{ s.image_url or '' }}"
+             data-cta-label="{{ s.cta_label or '' | e }}"
+             data-cta-url="{{ s.cta_url or '' | e }}"
+             data-cta-style="{{ s.cta_style or 'primary' }}"
+             data-active="{{ s.is_active }}"
+             data-delete-name="{{ s.title | e }}">
+            <div class="cr-slide-thumb">
+                {% if s.image_url %}<img src="{{ s.image_url }}" alt="{{ s.title }}">
+                {% else %}<span class="material-symbols-outlined">local_offer</span>{% endif %}
+            </div>
+            <div class="cr-slide-body">
+                <div class="cr-slide-title">{{ s.title }}</div>
+                <div class="cr-slide-sub">{{ s.subtitle or 'Không có subtitle.' }}</div>
+                <div class="cr-slide-meta">
+                    {% if s.badge %}<span class="cr-tag">{{ s.badge }}</span>{% endif %}
+                    {% if s.cta_label %}<span class="cr-tag">{{ s.cta_label }}</span>{% endif %}
+                    <span class="cr-status-pill {{ 'cr-status-pill--active' if s.is_active else 'cr-status-pill--hidden' }}">
+                        {{ 'Đang active' if s.is_active else 'Đã ẩn' }}
+                    </span>
+                </div>
+            </div>
+            <div class="cr-slide-actions">
+                <button type="button" class="cr-icon-btn" title="Lên" onclick="moveSlide('crOffersList', this, -1)"><span class="material-symbols-outlined">arrow_upward</span></button>
+                <button type="button" class="cr-icon-btn" title="Xuống" onclick="moveSlide('crOffersList', this, 1)"><span class="material-symbols-outlined">arrow_downward</span></button>
+                <button type="button" class="cr-icon-btn" title="Sửa" onclick="openOfferModal(this.closest('.cr-slide-card'))"><span class="material-symbols-outlined">edit</span></button>
+                <button type="button" class="cr-icon-btn cr-icon-btn--danger" title="Xóa" onclick="deleteSlide(this.closest('.cr-slide-card'))"><span class="material-symbols-outlined">delete</span></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="cr-empty"><span class="material-symbols-outlined">local_offer</span><div class="cr-empty__title">Chưa có slide ưu đãi nào.</div></div>
+    {% endif %}
+</div>
+
+
+{# ══════════════════════════════════════════
+   TAB 3 — LOYALTY MISSIONS
+   Fixed 3 slots (slot_key). Update-only — no create/delete.
+   ══════════════════════════════════════════ #}
+<div class="cr-tab-panel" id="crTabMissions">
+
+    <div class="cr-tab-note">3 mission cố định trên carousel "Earn Points" ở trang loyalty. Chỉ sửa được icon/tên/nhãn điểm/ảnh — nút đích và trạng thái "đã nhận" vẫn do hệ thống tự xử lý.</div>
+
+    {% if mission_slides %}
+    <div class="cr-slide-list">
+        {% for m in mission_slides %}
+        <div class="cr-slide-card"
+             data-slot="{{ m.slot_key }}"
+             data-icon="{{ m.icon or '' | e }}"
+             data-title="{{ m.title | e }}"
+             data-pts-label="{{ m.pts_label or '' | e }}"
+             data-image="{{ m.image_url or '' }}">
+            <div class="cr-mission-icon">{{ m.icon }}</div>
+            <div class="cr-slide-body">
+                <div class="cr-slide-title">{{ m.title }}</div>
+                <div class="cr-slide-sub">Slot: {{ m.slot_key }}</div>
+                <div class="cr-slide-meta">
+                    <span class="cr-tag">{{ m.pts_label }}</span>
+                </div>
+            </div>
+            <div class="cr-slide-actions">
+                <button type="button" class="cr-icon-btn" title="Sửa" onclick="openMissionModal(this.closest('.cr-slide-card'))"><span class="material-symbols-outlined">edit</span></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="cr-empty"><span class="material-symbols-outlined">target</span><div class="cr-empty__title">Chưa có dữ liệu mission.</div></div>
+    {% endif %}
+</div>
+
+
+{# ══════════════════════════════════════════
+   MODAL a — TẠO / SỬA SLIDE TRANG CHỦ
+   ══════════════════════════════════════════ #}
+<div id="crHomepageModal" class="cr-modal-overlay" onclick="closeModalOnBackdrop(event, 'crHomepageModal')">
+    <div class="cr-modal" onclick="event.stopPropagation()">
+        <div class="cr-modal__header">
+            <span class="cr-modal__title" id="crHomepageModalTitle">Thêm slide mới</span>
+            <button type="button" class="cr-modal__close" onclick="closeModal('crHomepageModal')"><span class="material-symbols-outlined">close</span></button>
+        </div>
+
+        <form method="post" id="crHomepageForm" action="{{ url_for('main.admin_carousel_homepage_create') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="cr-modal__body">
+                <div class="cr-form-group">
+                    <label class="cr-form-label">Ảnh nền *</label>
+                    <div class="cr-dropzone" id="crHomepageDropzone" onclick="document.getElementById('crHomepage_image').click()">
+                        <div class="cr-dropzone__empty" id="crHomepageDropzoneEmpty">
+                            <span class="material-symbols-outlined">add_photo_alternate</span>
+                            <span>Click để chọn ảnh</span>
+                        </div>
+                        <div class="cr-dropzone__preview" id="crHomepageDropzonePreview" style="display:none;">
+                            <img id="crHomepageDropzoneImg" src="" alt="">
+                        </div>
+                    </div>
+                    <input type="file" name="image" id="crHomepage_image" accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="crPreviewImage(this, 'crHomepage')">
+                    <input type="hidden" name="remove_image" id="crHomepage_removeImage" value="0">
+                    <div class="cr-image-actions" id="crHomepageDropzoneActions" style="display:none;">
+                        <button type="button" class="cr-btn-sm cr-btn-sm-secondary" onclick="document.getElementById('crHomepage_image').click()">Đổi ảnh</button>
+                        <button type="button" class="cr-btn-sm cr-btn-sm-danger" onclick="crRemoveImage('crHomepage')">Xóa ảnh</button>
+                    </div>
+                    <span class="cr-form-hint">JPG, PNG, WEBP. Tối đa 2MB.</span>
+                </div>
+
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_title">Tiêu đề *</label>
+                    <input type="text" name="title" id="crHomepage_title" class="cr-form-input" required>
+                </div>
+
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_subtitle">Subtitle</label>
+                    <textarea name="subtitle" id="crHomepage_subtitle" class="cr-form-textarea" rows="2"></textarea>
+                </div>
+
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_badge">Badge</label>
+                    <input type="text" name="badge" id="crHomepage_badge" class="cr-form-input" placeholder="VD: New season collection">
+                </div>
+
+                <div class="cr-form-divider"></div>
+                <div class="cr-section-title">Nút CTA chính</div>
+                <div class="cr-form-row">
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crHomepage_ctaLabel">Nhãn nút</label>
+                        <input type="text" name="cta_label" id="crHomepage_ctaLabel" class="cr-form-input" placeholder="Book Now">
+                    </div>
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crHomepage_ctaUrl">Đường dẫn</label>
+                        <input type="text" name="cta_url" id="crHomepage_ctaUrl" class="cr-form-input" placeholder="/public/booking">
+                    </div>
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_ctaStyle">Kiểu nút</label>
+                    <select name="cta_style" id="crHomepage_ctaStyle" class="cr-form-select">
+                        <option value="primary">Primary (đặc)</option>
+                        <option value="outline">Outline (viền)</option>
+                    </select>
+                </div>
+
+                <div class="cr-form-divider"></div>
+                <div class="cr-section-title">Nút CTA phụ (tùy chọn)</div>
+                <div class="cr-form-row">
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crHomepage_cta2Label">Nhãn nút</label>
+                        <input type="text" name="cta2_label" id="crHomepage_cta2Label" class="cr-form-input" placeholder="Explore Services">
+                    </div>
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crHomepage_cta2Url">Đường dẫn</label>
+                        <input type="text" name="cta2_url" id="crHomepage_cta2Url" class="cr-form-input" placeholder="/services">
+                    </div>
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_cta2Style">Kiểu nút</label>
+                    <select name="cta2_style" id="crHomepage_cta2Style" class="cr-form-select">
+                        <option value="outline" selected>Outline (viền)</option>
+                        <option value="primary">Primary (đặc)</option>
+                    </select>
+                </div>
+
+                <div class="cr-form-toggle-row" id="crHomepage_activeRow" style="display:none; margin-top: 14px;">
+                    <span class="cr-form-toggle-row__label">Hiển thị slide này</span>
+                    <input type="checkbox" name="is_active" id="crHomepage_isActive" value="1" checked>
+                </div>
+            </div>
+
+            <div class="cr-modal__footer cr-modal__footer--split">
+                <button type="button" class="cr-btn-danger" id="crHomepage_deleteBtn" style="display:none;" onclick="deleteCurrentSlide()">Xóa slide</button>
+                <div style="display:flex; gap:8px; margin-left:auto;">
+                    <button type="button" class="cr-btn-secondary" onclick="closeModal('crHomepageModal')">Hủy</button>
+                    <button type="submit" class="cr-btn-primary">Lưu</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   MODAL b — TẠO / SỬA SLIDE OFFER (dashboard)
+   ══════════════════════════════════════════ #}
+<div id="crOfferModal" class="cr-modal-overlay" onclick="closeModalOnBackdrop(event, 'crOfferModal')">
+    <div class="cr-modal" onclick="event.stopPropagation()">
+        <div class="cr-modal__header">
+            <span class="cr-modal__title" id="crOfferModalTitle">Thêm slide ưu đãi</span>
+            <button type="button" class="cr-modal__close" onclick="closeModal('crOfferModal')"><span class="material-symbols-outlined">close</span></button>
+        </div>
+
+        <form method="post" id="crOfferForm" action="{{ url_for('main.admin_carousel_offer_create') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="cr-modal__body">
+                <div class="cr-form-group">
+                    <label class="cr-form-label">Ảnh</label>
+                    <div class="cr-dropzone" id="crOfferDropzone" onclick="document.getElementById('crOffer_image').click()">
+                        <div class="cr-dropzone__empty" id="crOfferDropzoneEmpty">
+                            <span class="material-symbols-outlined">add_photo_alternate</span>
+                            <span>Click để chọn ảnh</span>
+                        </div>
+                        <div class="cr-dropzone__preview" id="crOfferDropzonePreview" style="display:none;">
+                            <img id="crOfferDropzoneImg" src="" alt="">
+                        </div>
+                    </div>
+                    <input type="file" name="image" id="crOffer_image" accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="crPreviewImage(this, 'crOffer')">
+                    <input type="hidden" name="remove_image" id="crOffer_removeImage" value="0">
+                    <div class="cr-image-actions" id="crOfferDropzoneActions" style="display:none;">
+                        <button type="button" class="cr-btn-sm cr-btn-sm-secondary" onclick="document.getElementById('crOffer_image').click()">Đổi ảnh</button>
+                        <button type="button" class="cr-btn-sm cr-btn-sm-danger" onclick="crRemoveImage('crOffer')">Xóa ảnh</button>
+                    </div>
+                    <span class="cr-form-hint">JPG, PNG, WEBP. Tối đa 2MB. Nếu không có ảnh, slide sẽ hiện nền gradient mặc định.</span>
+                </div>
+
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crOffer_title">Tiêu đề *</label>
+                    <input type="text" name="title" id="crOffer_title" class="cr-form-input" required>
+                </div>
+
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crOffer_subtitle">Mô tả</label>
+                    <textarea name="subtitle" id="crOffer_subtitle" class="cr-form-textarea" rows="2"></textarea>
+                </div>
+
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crOffer_badge">Badge</label>
+                    <input type="text" name="badge" id="crOffer_badge" class="cr-form-input" placeholder="✦ Loyalty Reward">
+                </div>
+
+                <div class="cr-form-divider"></div>
+                <div class="cr-section-title">Nút CTA</div>
+                <div class="cr-form-row">
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crOffer_ctaLabel">Nhãn nút</label>
+                        <input type="text" name="cta_label" id="crOffer_ctaLabel" class="cr-form-input" placeholder="Redeem for 300 pts">
+                    </div>
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crOffer_ctaUrl">Đường dẫn</label>
+                        <input type="text" name="cta_url" id="crOffer_ctaUrl" class="cr-form-input" placeholder="/customer/loyalty-points">
+                    </div>
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crOffer_ctaStyle">Kiểu nút</label>
+                    <select name="cta_style" id="crOffer_ctaStyle" class="cr-form-select">
+                        <option value="primary">Primary (đặc)</option>
+                        <option value="outline">Outline (viền)</option>
+                    </select>
+                </div>
+
+                <div class="cr-form-toggle-row" id="crOffer_activeRow" style="display:none; margin-top: 14px;">
+                    <span class="cr-form-toggle-row__label">Hiển thị slide này</span>
+                    <input type="checkbox" name="is_active" id="crOffer_isActive" value="1" checked>
+                </div>
+            </div>
+
+            <div class="cr-modal__footer cr-modal__footer--split">
+                <button type="button" class="cr-btn-danger" id="crOffer_deleteBtn" style="display:none;" onclick="deleteCurrentSlide()">Xóa slide</button>
+                <div style="display:flex; gap:8px; margin-left:auto;">
+                    <button type="button" class="cr-btn-secondary" onclick="closeModal('crOfferModal')">Hủy</button>
+                    <button type="submit" class="cr-btn-primary">Lưu</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   MODAL c — SỬA MISSION
+   ══════════════════════════════════════════ #}
+<div id="crMissionModal" class="cr-modal-overlay" onclick="closeModalOnBackdrop(event, 'crMissionModal')">
+    <div class="cr-modal" onclick="event.stopPropagation()">
+        <div class="cr-modal__header">
+            <span class="cr-modal__title">Chỉnh sửa Mission</span>
+            <button type="button" class="cr-modal__close" onclick="closeModal('crMissionModal')"><span class="material-symbols-outlined">close</span></button>
+        </div>
+
+        <form method="post" id="crMissionForm" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="cr-modal__body">
+                <div class="cr-form-group">
+                    <label class="cr-form-label">Ảnh minh họa</label>
+                    <div class="cr-dropzone" id="crMissionDropzone" onclick="document.getElementById('crMission_image').click()">
+                        <div class="cr-dropzone__empty" id="crMissionDropzoneEmpty">
+                            <span class="material-symbols-outlined">add_photo_alternate</span>
+                            <span>Click để chọn ảnh</span>
+                        </div>
+                        <div class="cr-dropzone__preview" id="crMissionDropzonePreview" style="display:none;">
+                            <img id="crMissionDropzoneImg" src="" alt="">
+                        </div>
+                    </div>
+                    <input type="file" name="image" id="crMission_image" accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="crPreviewImage(this, 'crMission')">
+                    <input type="hidden" name="remove_image" id="crMission_removeImage" value="0">
+                    <div class="cr-image-actions" id="crMissionDropzoneActions" style="display:none;">
+                        <button type="button" class="cr-btn-sm cr-btn-sm-secondary" onclick="document.getElementById('crMission_image').click()">Đổi ảnh</button>
+                        <button type="button" class="cr-btn-sm cr-btn-sm-danger" onclick="crRemoveImage('crMission')">Xóa ảnh</button>
+                    </div>
+                    <span class="cr-form-hint">Nếu không có ảnh, slide sẽ hiện icon + nền gradient mặc định.</span>
+                </div>
+
+                <div class="cr-form-row">
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crMission_icon">Icon (emoji)</label>
+                        <input type="text" name="icon" id="crMission_icon" class="cr-form-input" maxlength="4">
+                    </div>
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crMission_ptsLabel">Nhãn điểm</label>
+                        <input type="text" name="pts_label" id="crMission_ptsLabel" class="cr-form-input" placeholder="+50 pts">
+                    </div>
+                </div>
+
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crMission_title">Tên mission *</label>
+                    <input type="text" name="title" id="crMission_title" class="cr-form-input" required>
+                </div>
+            </div>
+
+            <div class="cr-modal__footer">
+                <button type="button" class="cr-btn-secondary" onclick="closeModal('crMissionModal')">Hủy</button>
+                <button type="submit" class="cr-btn-primary">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Hidden delete form shared by homepage + offer modals #}
+<form method="post" id="crDeleteForm" style="display:none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+</form>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+const CR_ROUTES = {
+    homepageCreate: "{{ url_for('main.admin_carousel_homepage_create') }}",
+    homepageUpdate: "{{ url_for('main.admin_carousel_homepage_update', slide_id=0) }}",
+    offerCreate:    "{{ url_for('main.admin_carousel_offer_create') }}",
+    offerUpdate:    "{{ url_for('main.admin_carousel_offer_update', slide_id=0) }}",
+    deleteSlide:    "{{ url_for('main.admin_carousel_delete', slide_id=0) }}",
+    missionUpdate:  "{{ url_for('main.admin_carousel_mission_update', slot_key='__SLOT__') }}",
+    reorder:        "{{ url_for('main.admin_carousel_reorder') }}"
+};
+const CR_CSRF = "{{ csrf_token() }}";
+
+function buildActionUrl(template, id) {
+    return template.replace('/0/', '/' + id + '/');
+}
+
+/* ── Modal management ── */
+function openModal(id) {
+    document.getElementById(id).classList.add('cr-modal-overlay--open');
+    document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('cr-modal-overlay--open');
+    document.body.style.overflow = '';
+}
+function closeModalOnBackdrop(event, id) {
+    if (event.target === event.currentTarget) closeModal(id);
+}
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') ['crHomepageModal', 'crOfferModal', 'crMissionModal'].forEach(closeModal);
+});
+
+/* ── Main tab switching ── */
+function switchTab(name) {
+    document.querySelectorAll('.cr-maintab').forEach((el) => el.classList.toggle('cr-maintab--active', el.dataset.tab === name));
+    document.querySelectorAll('.cr-tab-panel').forEach((el) => el.classList.toggle('cr-tab-panel--active', el.id === 'crTab' + name.charAt(0).toUpperCase() + name.slice(1)));
+}
+
+/* ── Shared image dropzone helpers (prefix param: 'crHomepage' | 'crMission') ── */
+function crResetDropzone(prefix) {
+    document.getElementById(prefix + '_image').value = '';
+    document.getElementById(prefix + '_removeImage').value = '0';
+    document.getElementById(prefix + 'DropzoneEmpty').style.display = 'flex';
+    document.getElementById(prefix + 'DropzonePreview').style.display = 'none';
+    document.getElementById(prefix + 'DropzoneImg').src = '';
+    document.getElementById(prefix + 'DropzoneActions').style.display = 'none';
+}
+function crShowPreview(prefix, src) {
+    document.getElementById(prefix + 'DropzoneEmpty').style.display = 'none';
+    document.getElementById(prefix + 'DropzonePreview').style.display = 'block';
+    document.getElementById(prefix + 'DropzoneImg').src = src;
+    document.getElementById(prefix + 'DropzoneActions').style.display = 'flex';
+}
+function crPreviewImage(input, prefix) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById(prefix + '_removeImage').value = '0';
+        crShowPreview(prefix, e.target.result);
+    };
+    reader.readAsDataURL(file);
+}
+function crRemoveImage(prefix) {
+    document.getElementById(prefix + '_image').value = '';
+    document.getElementById(prefix + '_removeImage').value = '1';
+    document.getElementById(prefix + 'DropzoneEmpty').style.display = 'flex';
+    document.getElementById(prefix + 'DropzonePreview').style.display = 'none';
+    document.getElementById(prefix + 'DropzoneImg').src = '';
+    document.getElementById(prefix + 'DropzoneActions').style.display = 'none';
+}
+
+/* ── Homepage slide modal ── */
+function openHomepageModal(card) {
+    const form = document.getElementById('crHomepageForm');
+    form.reset();
+    crResetDropzone('crHomepage');
+
+    if (!card) {
+        document.getElementById('crHomepageModalTitle').textContent = 'Thêm slide mới';
+        form.action = CR_ROUTES.homepageCreate;
+        document.getElementById('crHomepage_activeRow').style.display = 'none';
+        document.getElementById('crHomepage_deleteBtn').style.display = 'none';
+        document.getElementById('crHomepage_ctaStyle').value = 'primary';
+        document.getElementById('crHomepage_cta2Style').value = 'outline';
+    } else {
+        const d = card.dataset;
+        document.getElementById('crHomepageModalTitle').textContent = 'Chỉnh sửa slide';
+        form.action = buildActionUrl(CR_ROUTES.homepageUpdate, d.id);
+        document.getElementById('crHomepage_title').value = d.title;
+        document.getElementById('crHomepage_subtitle').value = d.subtitle;
+        document.getElementById('crHomepage_badge').value = d.badge;
+        document.getElementById('crHomepage_ctaLabel').value = d.ctaLabel;
+        document.getElementById('crHomepage_ctaUrl').value = d.ctaUrl;
+        document.getElementById('crHomepage_ctaStyle').value = d.ctaStyle;
+        document.getElementById('crHomepage_cta2Label').value = d.cta2Label;
+        document.getElementById('crHomepage_cta2Url').value = d.cta2Url;
+        document.getElementById('crHomepage_cta2Style').value = d.cta2Style;
+        document.getElementById('crHomepage_isActive').checked = d.active === '1';
+        document.getElementById('crHomepage_activeRow').style.display = 'flex';
+        document.getElementById('crHomepage_deleteBtn').style.display = 'inline-block';
+        document.getElementById('crHomepage_deleteBtn').dataset.id = d.id;
+        document.getElementById('crHomepage_deleteBtn').dataset.name = d.title;
+        if (d.image) crShowPreview('crHomepage', d.image);
+    }
+    openModal('crHomepageModal');
+}
+
+/* ── Offer slide modal ── */
+function openOfferModal(card) {
+    const form = document.getElementById('crOfferForm');
+    form.reset();
+    crResetDropzone('crOffer');
+
+    if (!card) {
+        document.getElementById('crOfferModalTitle').textContent = 'Thêm slide ưu đãi';
+        form.action = CR_ROUTES.offerCreate;
+        document.getElementById('crOffer_activeRow').style.display = 'none';
+        document.getElementById('crOffer_deleteBtn').style.display = 'none';
+        document.getElementById('crOffer_ctaStyle').value = 'primary';
+    } else {
+        const d = card.dataset;
+        document.getElementById('crOfferModalTitle').textContent = 'Chỉnh sửa slide ưu đãi';
+        form.action = buildActionUrl(CR_ROUTES.offerUpdate, d.id);
+        document.getElementById('crOffer_title').value = d.title;
+        document.getElementById('crOffer_subtitle').value = d.subtitle;
+        document.getElementById('crOffer_badge').value = d.badge;
+        document.getElementById('crOffer_ctaLabel').value = d.ctaLabel;
+        document.getElementById('crOffer_ctaUrl').value = d.ctaUrl;
+        document.getElementById('crOffer_ctaStyle').value = d.ctaStyle;
+        document.getElementById('crOffer_isActive').checked = d.active === '1';
+        document.getElementById('crOffer_activeRow').style.display = 'flex';
+        document.getElementById('crOffer_deleteBtn').style.display = 'inline-block';
+        document.getElementById('crOffer_deleteBtn').dataset.id = d.id;
+        document.getElementById('crOffer_deleteBtn').dataset.name = d.title;
+        if (d.image) crShowPreview('crOffer', d.image);
+    }
+    openModal('crOfferModal');
+}
+
+/* ── Mission modal ── */
+function openMissionModal(card) {
+    const d = card.dataset;
+    const form = document.getElementById('crMissionForm');
+    form.action = CR_ROUTES.missionUpdate.replace('__SLOT__', d.slot);
+    document.getElementById('crMission_icon').value = d.icon;
+    document.getElementById('crMission_ptsLabel').value = d.ptsLabel;
+    document.getElementById('crMission_title').value = d.title;
+    crResetDropzone('crMission');
+    if (d.image) crShowPreview('crMission', d.image);
+    openModal('crMissionModal');
+}
+
+/* ── Delete (shared: homepage + offer) ── */
+function deleteSlideById(id, name) {
+    if (!confirm('Xóa slide "' + name + '"?')) return;
+    const form = document.getElementById('crDeleteForm');
+    form.action = buildActionUrl(CR_ROUTES.deleteSlide, id);
+    form.submit();
+}
+function deleteSlide(card) {
+    deleteSlideById(card.dataset.id, card.dataset.deleteName);
+}
+function deleteCurrentSlide() {
+    const homepageBtn = document.getElementById('crHomepage_deleteBtn');
+    const offerBtn = document.getElementById('crOffer_deleteBtn');
+    const btn = homepageBtn.style.display !== 'none' ? homepageBtn : offerBtn;
+    deleteSlideById(btn.dataset.id, btn.dataset.name || 'slide này');
+}
+
+/* ── Reorder (up/down swap within the visible list, POST full order) ── */
+function moveSlide(listId, btn, direction) {
+    const container = document.getElementById(listId);
+    const cards = Array.from(container.querySelectorAll('.cr-slide-card'));
+    const card = btn.closest('.cr-slide-card');
+    const idx = cards.indexOf(card);
+    const swapIdx = idx + direction;
+    if (swapIdx < 0 || swapIdx >= cards.length) return;
+
+    if (direction < 0) {
+        container.insertBefore(card, cards[swapIdx]);
+    } else {
+        container.insertBefore(cards[swapIdx], card);
+    }
+
+    const order = Array.from(container.querySelectorAll('.cr-slide-card')).map((c, i) => ({
+        id: parseInt(c.dataset.id, 10),
+        sort_order: i + 1,
+    }));
+
+    fetch(CR_ROUTES.reorder, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CR_CSRF },
+        body: JSON.stringify({ order }),
+    });
+}
+</script>
+{% endblock %}
