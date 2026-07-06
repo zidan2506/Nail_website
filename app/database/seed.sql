@@ -77,6 +77,38 @@ VALUES
 ('VIP Day Package',         4000, 'Full day of premium nail treatments',               1, 1,    7, 2);
 
 -- ============================================
+-- CAROUSEL SLIDES
+-- homepage: migrated from the old hardcoded _CAROUSEL_SLIDES list in routes.py
+-- dashboard_offers: independent slides (same shape as homepage, minus cta2),
+--   seeded here with content copied from the 3 cheapest rewards to replicate
+--   the old "top 3 active rewards" default — NOT linked to the rewards table
+-- loyalty_missions: fixed 3 slots (slot_key), cosmetic-only, matched to the
+--   award_points() call sites in the booking flow — see MISSION_KEYS in db.py
+-- ============================================
+INSERT INTO carousel_slides (carousel_key, slot_key, reward_id, title, subtitle, badge, icon, pts_label, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order, is_active)
+VALUES
+('homepage', NULL, NULL, 'Your nails, perfectly cared.', 'Premium nail care & art services crafted just for you. Experience the intersection of precision and relaxation.', 'New season collection', NULL, NULL,
+ 'https://lh3.googleusercontent.com/aida-public/AB6AXuBdLs7y_erczKwTFAkkULT1a042tLNhFZGl9Ah7tK1zkNUMr0o9u-X8GVtruUJ8m-Kajy88JyX1pSLbZlovykcDs0Rxw67LR_aip4hxOtv-IGtso02wXGW7UX54KpBWBoe2H-wZStp_ArLDpO8BzT-8iTORkuh4yO39_AKE-kN4J9NFmdwpo1vkJiAbAJb_5wQy0bJv5B_gUha00oYboCESO-c5MCJ0gc7fZnXL1YkzurU2-V5iWdq_K_X3i_nrZXwOKzVhewpDx6Ti',
+ 'Book Now', '/public/booking', 'primary', 'Explore Services', '/services', 'outline', 1, 1),
+('homepage', NULL, NULL, 'Your nails, perfectly cared.', 'Premium nail care & art services crafted just for you. Experience the intersection of precision and relaxation.', 'New season collection', NULL, NULL,
+ '/static/images/Homepage_Carousel_Slides/slide_2.jpg',
+ 'Book Now', '/public/booking', 'primary', 'Explore Services', '/services', 'outline', 2, 1),
+('homepage', NULL, NULL, 'Your nails, perfectly cared.', 'Premium nail care & art services crafted just for you. Experience the intersection of precision and relaxation.', 'New season collection', NULL, NULL,
+ '/static/images/Homepage_Carousel_Slides/slide_3.jpg',
+ 'Book Now', '/public/booking', 'primary', 'Explore Services', '/services', 'outline', 3, 1),
+
+('dashboard_offers', NULL, NULL, 'Free Nail Art (2 nails)', 'Complimentary nail art on 2 nails of your choice', '✦ Loyalty Reward', NULL, NULL, NULL,
+ 'Redeem for 300 pts', '/customer/loyalty-points', 'primary', NULL, NULL, 'outline', 1, 1),
+('dashboard_offers', NULL, NULL, 'Free Classic Manicure', 'One free Classic Manicure session', '✦ Loyalty Reward', NULL, NULL, NULL,
+ 'Redeem for 600 pts', '/customer/loyalty-points', 'primary', NULL, NULL, 'outline', 2, 1),
+('dashboard_offers', NULL, NULL, 'Free Gel Manicure', 'One free Gel Manicure session', '✦ Loyalty Reward', NULL, NULL, NULL,
+ 'Redeem for 1000 pts', '/customer/loyalty-points', 'primary', NULL, NULL, 'outline', 3, 1),
+
+('loyalty_missions', 'review',        NULL, 'Write a Review',              NULL, NULL, '⭐', '+50 pts',  '/static/images/customer/Loyalty Points/leave_review.png',   NULL, NULL, 'primary', NULL, NULL, 'outline', 1, 1),
+('loyalty_missions', 'referral',      NULL, 'Refer a Friend',              NULL, NULL, '👥', '+200 pts', '/static/images/customer/Loyalty Points/invite_friends.png', NULL, NULL, 'primary', NULL, NULL, 'outline', 2, 1),
+('loyalty_missions', 'first_booking', NULL, 'Book Your First Appointment', NULL, NULL, '📅', '+100 pts', '/static/images/customer/Loyalty Points/first_visit.png',    NULL, NULL, 'primary', NULL, NULL, 'outline', 3, 1);
+
+-- ============================================
 -- LOYALTY CONFIG
 -- ============================================
 INSERT INTO loyalty_config (key, value, description)

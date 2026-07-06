@@ -3,6 +3,7 @@ import secrets
 import string
 from pathlib import Path
 from werkzeug.security import generate_password_hash
+from app.utils.helpers import now_helsinki
 
 base_dir = Path(__file__).resolve().parent
 db_path = base_dir / "database.db"
@@ -66,6 +67,7 @@ def check_booking_conflict(staff_id, booking_date, start_at, end_at):
 
 def create_booking(customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes):
     conn = get_connection()
+    updated_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     cur = conn.execute("""
     INSERT INTO bookings (
         customer_id,
@@ -75,11 +77,12 @@ def create_booking(customer_id, staff_id, service_id, booking_date, start_time, 
         start_time,
         end_time,
         status,
-        notes
+        notes,
+        updated_at
 
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes))
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes, updated_at))
     booking_id = cur.lastrowid
     conn.commit()
     conn.close()
@@ -102,13 +105,15 @@ def create_customer(full_name,email,phone):
 
 def update_status(id, status):
     conn = get_connection()
+    updated_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     conn.execute(
         """
     UPDATE bookings
     SET
-        status = ?
+        status = ?,
+        updated_at = ?
     WHERE id = ?
-""", (status, id)
+""", (status, updated_at, id)
     )
     conn.commit()
     conn.close()
@@ -116,9 +121,10 @@ def update_status(id, status):
 
 def cancel_booking_with_reason(booking_id, reason):
     conn = get_connection()
+    updated_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     conn.execute(
-        "UPDATE bookings SET status = 'cancelled', cancellation_reason = ? WHERE id = ?",
-        (reason or None, booking_id)
+        "UPDATE bookings SET status = 'cancelled', cancellation_reason = ?, updated_at = ? WHERE id = ?",
+        (reason or None, updated_at, booking_id)
     )
     conn.commit()
     conn.close()
@@ -141,16 +147,17 @@ def verify_customer(customer_id):
 
 def update_new_code(id, code, expires_at):
     conn = get_connection()
+    last_sent_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     conn.execute(
         """
     UPDATE email_verifications
-    SET 
+    SET
         verification_code = ?,
         expired_at = ?,
-        last_sent_at = CURRENT_TIMESTAMP
+        last_sent_at = ?
     WHERE id = ?
         AND is_used = 0;
-""", (code, expires_at, id)
+""", (code, expires_at, last_sent_at, id)
     )
     conn.commit()
     conn.close()
@@ -294,14 +301,15 @@ def create_verification(verification_code, verification_type, expired_at):
 
 def get_verification_by_id(verification_id):
     conn = get_connection()
+    now_str = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     verification = conn.execute(
         """
     SELECT *
     FROM email_verifications
     WHERE id = ?
     AND is_used = 0
-    AND expired_at > CURRENT_TIMESTAMP
-""", (verification_id, )
+    AND expired_at > ?
+""", (verification_id, now_str)
     ).fetchone()
     conn.close()
 
@@ -310,15 +318,16 @@ def get_verification_by_id(verification_id):
 
 def update_verification(verification_id,reference_id, is_used):
     conn = get_connection()
+    verified_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     curr = conn.execute(
         """
     UPDATE email_verifications
     SET
         reference_id = ?,
-        verified_at = CURRENT_TIMESTAMP,
+        verified_at = ?,
         is_used = ?
     WHERE id = ?
-""", (reference_id, is_used, verification_id)
+""", (reference_id, verified_at, is_used, verification_id)
     )
     conn.commit()
     conn.close()
@@ -397,14 +406,16 @@ def get_customer_by_customer_id(customer_id):
 
 def update_booking_schedule(booking_id, booking_date, start_time, end_time):
     conn = get_connection()
+    updated_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     conn.execute(
         """
     UPDATE bookings
     SET booking_date = ?,
         start_time = ?,
-        end_time = ?
+        end_time = ?,
+        updated_at = ?
     WHERE id = ?
-""", (booking_date, start_time, end_time, booking_id)
+""", (booking_date, start_time, end_time, updated_at, booking_id)
     )
     conn.commit()
     conn.close()
@@ -773,10 +784,10 @@ def get_tier_by_name(name):
     return dict(row) if row else None
 
 def upgrade_membership(customer_id, tier_id, duration_days):
-    from datetime import datetime, timedelta
+    from datetime import timedelta
     conn = get_connection()
     try:
-        now = datetime.now()
+        now = now_helsinki()
         started_at = now.strftime("%Y-%m-%d %H:%M:%S")
         expires_at = (now + timedelta(days=duration_days)).strftime("%Y-%m-%d %H:%M:%S")
         existing = conn.execute(
@@ -804,16 +815,17 @@ def upgrade_membership(customer_id, tier_id, duration_days):
 
 def get_customer_active_tier(customer_id):
     conn = get_connection()
+    now_str = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     row = conn.execute("""
         SELECT mt.name, mt.point_multiplier, cm.expires_at
         FROM customer_memberships cm
         JOIN membership_tiers mt ON cm.tier_id = mt.id
         WHERE cm.customer_id = ?
           AND cm.is_active = 1
-          AND cm.expires_at > datetime('now')
+          AND cm.expires_at > ?
         ORDER BY mt.point_multiplier DESC
         LIMIT 1
-    """, (customer_id,)).fetchone()
+    """, (customer_id, now_str)).fetchone()
     conn.close()
     return dict(row) if row else None
 
@@ -872,10 +884,11 @@ def _generate_voucher_code():
 def redeem_reward(customer_id, reward_id, cost, reward_name=""):
     voucher_code = _generate_voucher_code()
     conn = get_connection()
+    redeemed_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     try:
         conn.execute(
-            "INSERT INTO reward_redemptions (customer_id, reward_id, points_spent, voucher_code) VALUES (?, ?, ?, ?)",
-            (customer_id, reward_id, cost, voucher_code)
+            "INSERT INTO reward_redemptions (customer_id, reward_id, points_spent, voucher_code, redeemed_at) VALUES (?, ?, ?, ?, ?)",
+            (customer_id, reward_id, cost, voucher_code, redeemed_at)
         )
         conn.execute(
             "UPDATE rewards SET stock = stock - 1 WHERE id = ? AND stock IS NOT NULL",
@@ -950,6 +963,142 @@ def get_invoice_detail_by_id(invoice_id):
     return dict(row) if row else None
 
 
+def get_staff_bookings_range(staff_id, date_from=None, date_to=None):
+    """Bookings của 1 staff cho trang 'Lịch của tôi'. LEFT JOIN invoices để lấy
+    trạng thái thanh toán (bookings không có cột payment_method/is_paid — model thật
+    nằm ở bảng invoices). date_from/date_to = None → không lọc ngày (preset 'all')."""
+    conn = get_connection()
+    sql = """
+        SELECT b.id, b.booking_date, b.start_time, b.end_time, b.status,
+               c.full_name AS customer_name, c.phone AS customer_phone,
+               sv.name AS service_name, sv.price AS total_price,
+               iv.payment_method AS invoice_method, iv.status AS invoice_status
+        FROM bookings b
+        JOIN customers c ON c.id = b.customer_id
+        JOIN services sv ON sv.id = b.service_id
+        LEFT JOIN invoices iv ON iv.booking_id = b.id
+        WHERE b.staff_id = ?
+          AND b.status != 'unverified'
+    """
+    params = [staff_id]
+    if date_from and date_to:
+        sql += " AND b.booking_date BETWEEN ? AND ?"
+        params.extend([date_from, date_to])
+    sql += " ORDER BY b.booking_date ASC, b.start_time ASC"
+    rows = conn.execute(sql, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_staff_history_months(staff_id):
+    """Danh sách 'YYYY-MM' có booking done/cancelled của staff, mới nhất trước."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT DISTINCT strftime('%Y-%m', booking_date) AS ym
+        FROM bookings
+        WHERE staff_id = ? AND status IN ('done', 'cancelled')
+        ORDER BY ym DESC
+    """, (staff_id,)).fetchall()
+    conn.close()
+    return [r["ym"] for r in rows]
+
+
+def get_staff_profile_stats(staff_id):
+    """Stats tháng này cho trang Hồ sơ — bookings hoàn thành + thu nhập (lương + hoa hồng)."""
+    conn = get_connection()
+    bookings_this_month = conn.execute("""
+        SELECT COUNT(*) FROM bookings
+        WHERE staff_id = ? AND status = 'done'
+          AND strftime('%Y-%m', booking_date) = strftime('%Y-%m', 'now')
+    """, (staff_id,)).fetchone()[0]
+    income_this_month = conn.execute("""
+        SELECT COALESCE(SUM(staff_total_earning), 0) FROM bookings
+        WHERE staff_id = ? AND status = 'done'
+          AND strftime('%Y-%m', booking_date) = strftime('%Y-%m', 'now')
+    """, (staff_id,)).fetchone()[0]
+    conn.close()
+    return {"bookings_this_month": bookings_this_month, "income_this_month": income_this_month}
+
+
+def get_staff_history_stats(staff_id, today_str):
+    """Stats trang Lịch sử — luôn tính trên toàn bộ record, không theo filter đang chọn.
+    incomplete = cancelled sau khi đã qua ngày hẹn (khác cancelled trước ngày hẹn)."""
+    conn = get_connection()
+    total = conn.execute(
+        "SELECT COUNT(*) FROM bookings WHERE staff_id = ? AND status IN ('done', 'cancelled')",
+        (staff_id,)
+    ).fetchone()[0]
+    done = conn.execute(
+        "SELECT COUNT(*) FROM bookings WHERE staff_id = ? AND status = 'done'",
+        (staff_id,)
+    ).fetchone()[0]
+    cancelled = conn.execute(
+        "SELECT COUNT(*) FROM bookings WHERE staff_id = ? AND status = 'cancelled'",
+        (staff_id,)
+    ).fetchone()[0]
+    incomplete = conn.execute(
+        "SELECT COUNT(*) FROM bookings WHERE staff_id = ? AND status = 'cancelled' AND booking_date < ?",
+        (staff_id, today_str)
+    ).fetchone()[0]
+    conn.close()
+    return {"total": total, "done": done, "cancelled": cancelled, "incomplete": incomplete}
+
+
+def get_staff_history(staff_id, month='', search='', status='all', today_str=None):
+    """Bookings done/cancelled của 1 staff cho trang 'Lịch sử'. LEFT JOIN invoices
+    giống get_staff_bookings_range (payment model thật nằm ở invoices, không ở bookings)."""
+    conn = get_connection()
+    where = "WHERE b.staff_id = ? AND b.status IN ('done', 'cancelled')"
+    params = [staff_id]
+    if month:
+        where += " AND strftime('%Y-%m', b.booking_date) = ?"
+        params.append(month)
+    if search:
+        where += " AND c.full_name LIKE ?"
+        params.append(f'%{search}%')
+    if status == 'done':
+        where += " AND b.status = 'done'"
+    elif status == 'cancelled':
+        where += " AND b.status = 'cancelled'"
+    elif status == 'incomplete':
+        where += " AND b.status = 'cancelled' AND b.booking_date < ?"
+        params.append(today_str)
+
+    rows = conn.execute(f"""
+        SELECT b.id, b.booking_date, b.start_time, b.end_time, b.status,
+               b.staff_commission, b.staff_hourly_earning, b.staff_total_earning,
+               c.full_name AS customer_name, c.phone AS customer_phone,
+               sv.name AS service_name, sv.price AS total_price,
+               iv.payment_method AS invoice_method, iv.status AS invoice_status
+        FROM bookings b
+        JOIN customers c ON c.id = b.customer_id
+        JOIN services sv ON sv.id = b.service_id
+        LEFT JOIN invoices iv ON iv.booking_id = b.id
+        {where}
+        ORDER BY b.booking_date DESC, b.start_time DESC
+    """, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_invoice_by_booking(booking_id):
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT * FROM invoices WHERE booking_id = ?", (booking_id,)
+    ).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def mark_invoice_paid(booking_id):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE invoices SET status = 'paid' WHERE booking_id = ?", (booking_id,)
+    )
+    conn.commit()
+    conn.close()
+
+
 def update_customer_profile(customer_id, full_name, email, phone, date_of_birth):
     conn = get_connection()
     conn.execute(
@@ -980,7 +1129,7 @@ def get_admin_kpis(date_str):
         (date_str,)
     ).fetchone()[0]
     bookings = conn.execute(
-        "SELECT COUNT(*) FROM bookings WHERE booking_date = ? AND status NOT IN ('unverified', 'cancelled')",
+        "SELECT COUNT(*) FROM bookings WHERE DATE(updated_at) = ? AND status NOT IN ('unverified', 'cancelled')",
         (date_str,)
     ).fetchone()[0]
     new_customers = conn.execute(
@@ -1009,12 +1158,35 @@ def get_admin_today_appointments(date_str):
         JOIN customers c ON c.id = b.customer_id
         JOIN services s ON s.id = b.service_id
         JOIN staff st ON st.id = b.staff_id
-        WHERE b.booking_date = ?
-          AND b.status NOT IN ('unverified', 'cancelled')
-        ORDER BY b.start_time ASC
+        WHERE DATE(b.updated_at) = ?
+          AND b.status != 'unverified'
+        ORDER BY b.updated_at DESC
     """, (date_str,)).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+def auto_expire_bookings():
+    """Flips 'confirmed'/'pending' bookings to 'no-show' once the current
+    Helsinki wall-clock time has passed their end_time today (or their
+    booking_date is in the past). Starting a booking ('in-progress') is now
+    a manual staff action (see mark_in_progress) — this function only handles
+    the no-show cutoff. Called on admin/staff page loads (see staff_dashboard/
+    admin_bookings/admin_dashboard) — there's no scheduler in this project,
+    so this is evaluated lazily on read."""
+    conn = get_connection()
+    now = now_helsinki()
+    date_str = now.strftime("%Y-%m-%d")
+    time_str = now.strftime("%H:%M")
+    conn.execute("""
+        UPDATE bookings
+        SET status = 'no-show',
+            updated_at = ?
+        WHERE status IN ('confirmed', 'pending')
+          AND (booking_date < ?
+               OR (booking_date = ? AND end_time <= ?))
+    """, (now.strftime("%Y-%m-%d %H:%M:%S"), date_str, date_str, time_str))
+    conn.commit()
+    conn.close()
 
 def get_admin_revenue_chart(date_str):
     from datetime import datetime as _dt, timedelta as _td
@@ -1055,16 +1227,67 @@ def get_admin_revenue_chart(date_str):
 def get_admin_recent_activity(limit=5):
     conn = get_connection()
     rows = conn.execute("""
-        SELECT b.id, b.status, b.created_at,
+        SELECT b.id, b.status, b.updated_at,
                c.full_name AS customer_name,
                s.name AS service_name
         FROM bookings b
         JOIN customers c ON c.id = b.customer_id
         JOIN services s ON s.id = b.service_id
         WHERE b.status != 'unverified'
-        ORDER BY b.created_at DESC
+        ORDER BY b.updated_at DESC
         LIMIT ?
     """, (limit,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def get_admin_top_services(date_from, date_to, limit=3):
+    """Ranked by booking count (not revenue) — unlike get_report_top_services,
+    this counts confirmed/done bookings (LEFT JOIN invoices), not just paid
+    ones, so it still shows data for a month with no paid invoices yet."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT sv.name AS name,
+               COUNT(b.id) AS booking_count,
+               COALESCE(SUM(i.amount), 0) AS revenue
+        FROM bookings b
+        JOIN services sv ON sv.id = b.service_id
+        LEFT JOIN invoices i ON i.booking_id = b.id AND i.status = 'paid'
+        WHERE b.booking_date BETWEEN ? AND ?
+          AND b.status IN ('confirmed', 'done')
+        GROUP BY sv.id
+        ORDER BY booking_count DESC
+        LIMIT ?
+    """, (date_from, date_to, limit)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def get_admin_top_loyalty(limit=5):
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT c.full_name,
+               COALESCE(mt.name, 'Silver') AS tier_name,
+               SUM(lpl.points) AS total_points
+        FROM loyalty_points_log lpl
+        JOIN customers c ON c.id = lpl.customer_id
+        LEFT JOIN customer_memberships cm ON cm.customer_id = c.id AND cm.is_active = 1
+        LEFT JOIN membership_tiers mt ON mt.id = cm.tier_id
+        GROUP BY lpl.customer_id
+        HAVING total_points > 0
+        ORDER BY total_points DESC
+        LIMIT ?
+    """, (limit,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def get_admin_new_members(month_str, limit=8):
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT full_name, email, created_at
+        FROM customers
+        WHERE strftime('%Y-%m', created_at) = ?
+        ORDER BY created_at DESC
+        LIMIT ?
+    """, (month_str, limit)).fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
@@ -1161,14 +1384,16 @@ def get_booking_status_counts(q='', staff_id='', service_id='', date=''):
         'in_progress': counts.get('in-progress', 0),
         'done':        counts.get('done', 0),
         'cancelled':   counts.get('cancelled', 0),
+        'no_show':     counts.get('no-show', 0),
     }
 
 
 def update_booking_details(booking_id, staff_id, booking_date, start_time, end_time, notes):
     conn = get_connection()
+    updated_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     conn.execute(
-        "UPDATE bookings SET staff_id=?, booking_date=?, start_time=?, end_time=?, notes=? WHERE id=?",
-        (staff_id, booking_date, start_time, end_time, notes, booking_id)
+        "UPDATE bookings SET staff_id=?, booking_date=?, start_time=?, end_time=?, notes=?, updated_at=? WHERE id=?",
+        (staff_id, booking_date, start_time, end_time, notes, updated_at, booking_id)
     )
     conn.commit()
     conn.close()
@@ -1258,6 +1483,16 @@ def update_staff(staff_id, full_name, email, phone, role, hourly_rate, commissio
         SET full_name = ?, email = ?, phone = ?, role = ?, hourly_rate = ?, commission_rate = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     """, (full_name, email, phone, role, hourly_rate, commission_rate, is_active, staff_id))
+    conn.commit()
+    conn.close()
+
+
+def update_staff_photo(staff_id, photo_filename):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE staff SET photo = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (photo_filename, staff_id)
+    )
     conn.commit()
     conn.close()
 
@@ -1435,6 +1670,200 @@ def update_customer_admin(customer_id, full_name, email, phone, date_of_birth, n
 
 
 # ─────────────────────────────────────────────────────────────
+#  ADMIN LOYALTY MANAGEMENT
+#  "Missions" are edits to the 5 real loyalty_config rows that
+#  already drive award_points() in the booking flow (see
+#  app/services/loyalty.py). Not a free-form CRUD namespace —
+#  the key set is fixed because these keys are hardcoded at the
+#  call sites in routes.py.
+# ─────────────────────────────────────────────────────────────
+
+MISSION_KEYS = [
+    "first_booking_bonus",
+    "streak_bonus",
+    "review_bonus",
+    "birthday_bonus",
+    "referral_bonus",
+]
+
+def get_admin_loyalty_customers():
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT c.id, c.full_name, c.email,
+               LOWER(COALESCE(mt.name, 'silver')) AS tier_name,
+               COALESCE(pts.total_points, 0) AS total_points,
+               COALESCE(vc.voucher_count, 0) AS voucher_count,
+               cm.expires_at AS membership_expires_at,
+               cm.tier_id AS membership_tier_id
+        FROM customers c
+        LEFT JOIN customer_memberships cm ON cm.customer_id = c.id AND cm.is_active = 1
+        LEFT JOIN membership_tiers mt ON mt.id = cm.tier_id
+        LEFT JOIN (
+            SELECT customer_id, SUM(points) AS total_points
+            FROM loyalty_points_log GROUP BY customer_id
+        ) pts ON pts.customer_id = c.id
+        LEFT JOIN (
+            SELECT customer_id, COUNT(*) AS voucher_count
+            FROM reward_redemptions WHERE is_used = 0 GROUP BY customer_id
+        ) vc ON vc.customer_id = c.id
+        WHERE c.user_id IS NOT NULL
+        ORDER BY c.full_name ASC
+    """).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_admin_loyalty_stats():
+    conn = get_connection()
+    total_customers_with_account = conn.execute(
+        "SELECT COUNT(*) FROM customers WHERE user_id IS NOT NULL"
+    ).fetchone()[0]
+    total_points_circulating = conn.execute(
+        "SELECT COALESCE(SUM(points), 0) FROM loyalty_points_log"
+    ).fetchone()[0]
+    active_vouchers = conn.execute(
+        "SELECT COUNT(*) FROM rewards WHERE is_active = 1"
+    ).fetchone()[0]
+    placeholders = ",".join("?" * len(MISSION_KEYS))
+    active_missions = conn.execute(
+        f"SELECT COUNT(*) FROM loyalty_config WHERE key IN ({placeholders}) AND CAST(value AS INTEGER) > 0",
+        MISSION_KEYS
+    ).fetchone()[0]
+    conn.close()
+    return {
+        "total_customers_with_account": total_customers_with_account,
+        "total_points_circulating": total_points_circulating,
+        "active_vouchers": active_vouchers,
+        "active_missions": active_missions,
+    }
+
+
+def get_rewards_admin():
+    conn = get_connection()
+    rows = conn.execute("SELECT * FROM rewards ORDER BY created_at DESC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_missions():
+    conn = get_connection()
+    placeholders = ",".join("?" * len(MISSION_KEYS))
+    rows = conn.execute(
+        f"SELECT key, value, description FROM loyalty_config WHERE key IN ({placeholders})",
+        MISSION_KEYS
+    ).fetchall()
+    conn.close()
+    by_key = {r["key"]: dict(r) for r in rows}
+    return [by_key[k] for k in MISSION_KEYS if k in by_key]
+
+
+def create_reward(name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image=None):
+    conn = get_connection()
+    cur = conn.execute("""
+        INSERT INTO rewards (name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+    """, (name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image))
+    conn.commit()
+    reward_id = cur.lastrowid
+    conn.close()
+    return reward_id
+
+
+def update_reward(reward_id, name, description, cost, stock, max_redeems_per_customer, cooldown_days, is_active, banner_image):
+    conn = get_connection()
+    conn.execute("""
+        UPDATE rewards
+        SET name = ?, description = ?, cost = ?, stock = ?,
+            max_redeems_per_customer = ?, cooldown_days = ?, is_active = ?, banner_image = ?
+        WHERE id = ?
+    """, (name, description, cost, stock, max_redeems_per_customer, cooldown_days, is_active, banner_image, reward_id))
+    conn.commit()
+    conn.close()
+
+
+def get_reward_by_id(reward_id):
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM rewards WHERE id = ?", (reward_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def get_reward_redemption_count(reward_id):
+    conn = get_connection()
+    count = conn.execute(
+        "SELECT COUNT(*) FROM reward_redemptions WHERE reward_id = ?", (reward_id,)
+    ).fetchone()[0]
+    conn.close()
+    return count
+
+
+def delete_reward(reward_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM rewards WHERE id = ?", (reward_id,))
+    conn.commit()
+    conn.close()
+
+
+def deactivate_reward(reward_id):
+    conn = get_connection()
+    conn.execute("UPDATE rewards SET is_active = 0 WHERE id = ?", (reward_id,))
+    conn.commit()
+    conn.close()
+
+
+def update_mission_config(key, description, points):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE loyalty_config SET value = ?, description = ?, updated_at = CURRENT_TIMESTAMP WHERE key = ?",
+        (str(points), description, key)
+    )
+    conn.commit()
+    conn.close()
+
+
+def toggle_mission_config(key, default_points):
+    conn = get_connection()
+    row = conn.execute("SELECT value FROM loyalty_config WHERE key = ?", (key,)).fetchone()
+    current = int(row["value"]) if row else 0
+    new_value = 0 if current > 0 else default_points
+    conn.execute(
+        "UPDATE loyalty_config SET value = ?, updated_at = CURRENT_TIMESTAMP WHERE key = ?",
+        (str(new_value), key)
+    )
+    conn.commit()
+    conn.close()
+    return new_value
+
+
+def get_active_membership_tiers():
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT * FROM membership_tiers WHERE is_active = 1 ORDER BY point_multiplier ASC"
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def adjust_membership_admin(customer_id, tier_id, started_at, expires_at):
+    conn = get_connection()
+    try:
+        conn.execute(
+            "UPDATE customer_memberships SET is_active = 0 WHERE customer_id = ? AND is_active = 1",
+            (customer_id,)
+        )
+        conn.execute(
+            "INSERT INTO customer_memberships (customer_id, tier_id, started_at, expires_at, is_active) VALUES (?, ?, ?, ?, 1)",
+            (customer_id, tier_id, started_at, expires_at)
+        )
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+# ─────────────────────────────────────────────────────────────
 #  ADMIN REPORTS & STATISTICS
 #  All revenue is attributed to bookings.booking_date (date of
 #  service), joined to paid invoices. All date filters are
@@ -1604,3 +2033,132 @@ def get_report_customer_growth(since_str):
     ).fetchall()
     conn.close()
     return {r["ym"]: r["cnt"] for r in rows}
+
+
+# ─────────────────────────────────────────────────────────────
+#  ADMIN CAROUSEL MANAGEMENT
+#  carousel_slides holds 3 unrelated content types, told apart by
+#  carousel_key: 'homepage' (full CRUD), 'dashboard_offers' (full
+#  CRUD, each slide just points at a reward_id), 'loyalty_missions'
+#  (fixed 3 rows keyed by slot_key, update-only — see MISSION_KEYS
+#  and admin_loyalty_update_mission for the analogous fixed-slot
+#  pattern already used for loyalty_config).
+# ─────────────────────────────────────────────────────────────
+
+MISSION_SLOT_KEYS = ["first_booking", "review", "referral"]
+
+def get_carousel_slides(carousel_key, active_only=False):
+    conn = get_connection()
+    query = "SELECT * FROM carousel_slides WHERE carousel_key = ?"
+    params = [carousel_key]
+    if active_only:
+        query += " AND is_active = 1"
+    query += " ORDER BY sort_order ASC, id ASC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_carousel_slide_by_id(slide_id):
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM carousel_slides WHERE id = ?", (slide_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def get_next_carousel_sort_order(carousel_key):
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT COALESCE(MAX(sort_order), 0) FROM carousel_slides WHERE carousel_key = ?",
+        (carousel_key,)
+    ).fetchone()
+    conn.close()
+    return row[0] + 1
+
+
+def create_homepage_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order):
+    conn = get_connection()
+    cur = conn.execute("""
+        INSERT INTO carousel_slides
+            (carousel_key, title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order, is_active)
+        VALUES ('homepage', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order))
+    conn.commit()
+    slide_id = cur.lastrowid
+    conn.close()
+    return slide_id
+
+
+def update_homepage_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, is_active):
+    conn = get_connection()
+    conn.execute("""
+        UPDATE carousel_slides
+        SET title = ?, subtitle = ?, badge = ?, image = ?, cta_label = ?, cta_url = ?, cta_style = ?,
+            cta2_label = ?, cta2_url = ?, cta2_style = ?, is_active = ?
+        WHERE id = ?
+    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, is_active, slide_id))
+    conn.commit()
+    conn.close()
+
+
+def create_offer_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order):
+    conn = get_connection()
+    cur = conn.execute("""
+        INSERT INTO carousel_slides
+            (carousel_key, title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order, is_active)
+        VALUES ('dashboard_offers', ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order))
+    conn.commit()
+    slide_id = cur.lastrowid
+    conn.close()
+    return slide_id
+
+
+def update_offer_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, is_active):
+    conn = get_connection()
+    conn.execute("""
+        UPDATE carousel_slides
+        SET title = ?, subtitle = ?, badge = ?, image = ?, cta_label = ?, cta_url = ?, cta_style = ?, is_active = ?
+        WHERE id = ?
+    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, is_active, slide_id))
+    conn.commit()
+    conn.close()
+
+
+def delete_carousel_slide(slide_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM carousel_slides WHERE id = ?", (slide_id,))
+    conn.commit()
+    conn.close()
+
+
+def get_mission_slides():
+    conn = get_connection()
+    placeholders = ",".join("?" * len(MISSION_SLOT_KEYS))
+    rows = conn.execute(
+        f"""SELECT * FROM carousel_slides
+            WHERE carousel_key = 'loyalty_missions' AND slot_key IN ({placeholders})
+            ORDER BY sort_order ASC""",
+        MISSION_SLOT_KEYS
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def update_mission_slide(slot_key, icon, title, pts_label, image):
+    conn = get_connection()
+    conn.execute("""
+        UPDATE carousel_slides
+        SET icon = ?, title = ?, pts_label = ?, image = ?
+        WHERE carousel_key = 'loyalty_missions' AND slot_key = ?
+    """, (icon, title, pts_label, image, slot_key))
+    conn.commit()
+    conn.close()
+
+
+def reorder_carousel_slides(order):
+    """order: list of (sort_order, id) tuples."""
+    conn = get_connection()
+    conn.executemany("UPDATE carousel_slides SET sort_order = ? WHERE id = ?", order)
+    conn.commit()
+    conn.close()

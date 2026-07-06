@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS carousel_slides;
 DROP TABLE IF EXISTS reward_redemptions;
 DROP TABLE IF EXISTS referrals;
 DROP TABLE IF EXISTS loyalty_points_log;
@@ -96,7 +97,10 @@ CREATE TABLE bookings (
     status TEXT NOT NULL DEFAULT 'unverified',
     notes TEXT,
     cancellation_reason TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    staff_commission REAL DEFAULT 0,
+    staff_hourly_earning REAL DEFAULT 0,
+    staff_total_earning REAL DEFAULT 0,
 
     FOREIGN KEY (customer_id) REFERENCES customers(id),
     FOREIGN KEY (staff_id) REFERENCES staff(id),
@@ -220,6 +224,30 @@ CREATE TABLE loyalty_config (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE carousel_slides (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    carousel_key TEXT NOT NULL,          -- 'homepage' | 'dashboard_offers' | 'loyalty_missions'
+    slot_key TEXT,                       -- loyalty_missions only: 'first_booking' | 'review' | 'referral' (fixed set)
+    reward_id INTEGER,                   -- dashboard_offers only
+    title TEXT,                          -- homepage
+    subtitle TEXT,                       -- homepage
+    badge TEXT,                          -- homepage
+    icon TEXT,                           -- loyalty_missions
+    pts_label TEXT,                      -- loyalty_missions
+    image TEXT,                          -- homepage + loyalty_missions (uploaded filename)
+    cta_label TEXT,
+    cta_url TEXT,
+    cta_style TEXT DEFAULT 'primary',
+    cta2_label TEXT,                     -- homepage secondary button
+    cta2_url TEXT,
+    cta2_style TEXT DEFAULT 'outline',
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (reward_id) REFERENCES rewards(id)
+);
+
 CREATE TABLE gallery_images (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     image_url TEXT NOT NULL,
@@ -241,3 +269,4 @@ CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_customers_email ON customers(email);
 CREATE INDEX idx_loyalty_log_customer_id ON loyalty_points_log(customer_id);
 CREATE INDEX idx_customer_memberships_customer_id ON customer_memberships(customer_id);
+CREATE INDEX idx_carousel_slides_key ON carousel_slides(carousel_key);
