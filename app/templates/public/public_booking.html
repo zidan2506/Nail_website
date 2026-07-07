@@ -85,7 +85,9 @@
                 {% if service['image'] %}
                 <img src="{{ url_for('static', filename='uploads/services/' + service['image']) }}" alt="{{ service['name'] }}">
                 {% else %}
-                <div class="bk-svc-thumb bk-svc-thumb--bg" style="background:var(--surface-2)"></div>
+                <div class="bk-svc-thumb bk-svc-thumb--fallback">
+                  <span class="material-symbols-outlined">spa</span>
+                </div>
                 {% endif %}
               </div>
               <div class="bk-svc-body">

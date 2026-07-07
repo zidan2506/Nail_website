@@ -85,6 +85,10 @@
                     src="{{ url_for('static', filename='uploads/services/' + service.image) }}"
                     alt="{{ service.name }}"
                 >
+                {% else %}
+                <div class="service-card__img-fallback">
+                    <span class="material-symbols-outlined">spa</span>
+                </div>
                 {% endif %}
             </div>
             <div class="service-card__row">

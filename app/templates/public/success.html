@@ -109,6 +109,10 @@
                 <div class="bkc-card__img-wrap">
                     {% if service_image %}
                     <img class="bkc-card__img" src="{{ service_image }}" alt="{{ service_name }}">
+                    {% else %}
+                    <div class="bkc-card__img-fallback">
+                        <span class="material-symbols-outlined">spa</span>
+                    </div>
                     {% endif %}
                 </div>
             </div>

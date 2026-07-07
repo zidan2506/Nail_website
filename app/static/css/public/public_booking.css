@@ -337,6 +337,19 @@
     background-position: center;
 }
 
+.bk-svc-thumb--fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bk-blossom);
+}
+
+.bk-svc-thumb--fallback .material-symbols-outlined {
+    font-size: 40px;
+    color: var(--bk-primary);
+    opacity: 0.35;
+}
+
 .bk-svc-body {
     flex-grow: 1;
 }

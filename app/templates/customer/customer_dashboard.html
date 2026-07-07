@@ -257,6 +257,12 @@
 }
 .upcoming-card:hover .upcoming-card__img { transform: rotate(2deg) scale(1.03); }
 
+.upcoming-card__img-placeholder .material-symbols-outlined {
+    font-size: 5rem;
+    color: #ab2261;
+    opacity: 0.5;
+}
+
 .upcoming-card__img-placeholder {
     width: 240px;
     height: 240px;
@@ -554,7 +560,7 @@
                 {% if upcoming_booking.service_img %}
                 <img class="upcoming-card__img" src="{{ upcoming_booking.service_img }}" alt="{{ upcoming_booking.service_name }}">
                 {% else %}
-                <div class="upcoming-card__img-placeholder">💅</div>
+                <div class="upcoming-card__img-placeholder"><span class="material-symbols-outlined">spa</span></div>
                 {% endif %}
             </div>
         {% else %}

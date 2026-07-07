@@ -9,6 +9,10 @@ class Config:
     if not SECRET_KEY:
         raise RuntimeError("SECRET_KEY is not set. Add it to your .env file.")
 
+    # Google OAuth
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 587
     MAIL_USE_TLS = True

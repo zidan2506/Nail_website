@@ -16,13 +16,15 @@ from app.database.db import (
 from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_active_tier, get_tier_by_name, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_user_email, update_user_password, cancel_booking_with_reason, get_gallery_images, get_active_staff, get_admin_kpis, get_admin_today_appointments, get_admin_recent_activity, get_admin_revenue_chart, get_all_customers, get_admin_bookings, get_booking_status_counts, update_booking_details, get_staff_stats, get_staff_list, get_staff_role_list, create_staff, update_staff, delete_staff, toggle_staff_active, get_all_categories, get_service_categories_with_services, get_service_stats, create_service, update_service, delete_service, toggle_service_active, create_category, update_category, delete_category, get_admin_customer_stats, get_admin_customers, create_customer_admin, update_customer_admin, delete_customer_admin, get_gallery_images_admin, get_gallery_image_by_id, get_gallery_stats, create_gallery_images, update_gallery_image, delete_gallery_image, bulk_delete_gallery_images, reorder_gallery_images, get_admin_loyalty_customers, get_admin_loyalty_stats, get_rewards_admin, get_missions, create_reward, update_reward, get_reward_by_id, get_reward_redemption_count, delete_reward, deactivate_reward, update_mission_config, toggle_mission_config, get_active_membership_tiers, adjust_membership_admin, MISSION_KEYS, get_carousel_slides, get_carousel_slide_by_id, get_next_carousel_sort_order, create_homepage_slide, update_homepage_slide, create_offer_slide, update_offer_slide, delete_carousel_slide, get_mission_slides, update_mission_slide, reorder_carousel_slides, MISSION_SLOT_KEYS, auto_expire_bookings, get_admin_top_loyalty, get_admin_new_members, get_admin_top_services, get_popular_services, get_staff_bookings_range, get_invoice_by_booking, mark_invoice_paid, create_invoice, get_staff_history, get_staff_history_months, get_staff_history_stats, get_staff_profile_stats, update_staff_photo
 from datetime import datetime, timedelta, date
 from app.services.email_system import send_verification_email, send_thank_you_email, generate_verification_code
-from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days
+from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days, complete_booking_txn, revert_booking_txn
 from app.services.loyalty import get_active_multiplier, get_config_value, already_awarded, award_points, check_streak
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
 from app.utils.helpers import split_customer_bookings, format_booking_date, format_booking_time, build_calendar_url, build_gg_map_url, build_services_by_category, mask_email, now_helsinki, today_helsinki
 from collections import Counter
+from app import oauth
+from app.database.db import create_oauth_user, set_user_oauth
 main = Blueprint("main",__name__)
 
 _failed_logins = {}       # {ip: {"count": int, "blocked_until": float}}
@@ -1663,84 +1665,10 @@ def _month_display_vi(ym):
     except (ValueError, AttributeError):
         return ym
 
-def _complete_booking_txn(booking_id):
-    """Set booking = 'done' + trao điểm loyalty (base/double/first/streak).
-    Dùng chung cho complete_booking (legacy) và mark_done (staff portal).
-    Trả về True nếu thành công."""
-    booking = get_booking_by_id(booking_id)
-    service = get_service_by_id(booking["service_id"]) if booking else None
-    staff = get_staff_by_id(booking["staff_id"]) if booking else None
-    if not booking or not service or not staff:
-        return False
-
-    customer_id = booking["customer_id"]
-    booking_date = booking["booking_date"]
-    multiplier = get_active_multiplier(customer_id)
-    base_points = int((service["points"] or 0) * multiplier)
-    double_points_day = get_config_value("double_points_day")
-    booking_day = datetime.strptime(booking_date, "%Y-%m-%d").isoweekday()
-    streak_ref = int(datetime.strptime(booking_date, "%Y-%m-%d").strftime("%Y%m"))
-
-    # Snapshot thu nhập tại thời điểm hoàn thành, không tính live theo rate hiện tại
-    # của staff — để lịch sử thu nhập không đổi nếu rate thay đổi sau này.
-    hourly_earning = (staff["hourly_rate"] or 0) * (service["duration_minutes"] or 0) / 60
-    commission = (service["price"] or 0) * (staff["commission_rate"] or 0) / 100
-    total_earning = hourly_earning + commission
-
-    conn = get_connection()
-    try:
-        conn.execute(
-            """UPDATE bookings
-               SET status = 'done', staff_hourly_earning = ?, staff_commission = ?, staff_total_earning = ?
-               WHERE id = ?""",
-            (hourly_earning, commission, total_earning, booking_id)
-        )
-
-        # Tạo invoice khi hoàn thành (nếu chưa có). Cash -> 'pending', staff xác
-        # nhận đã thu tiền qua nút "Đã thanh toán" thì mới tính vào doanh thu.
-        existing_invoice = conn.execute(
-            "SELECT 1 FROM invoices WHERE booking_id = ?", (booking_id,)
-        ).fetchone()
-        if not existing_invoice:
-            create_invoice(conn, booking_id, service["price"] or 0,
-                           booking["payment_method"], "pending")
-
-        # 1. Base points
-        if base_points > 0 and not already_awarded(customer_id, "booking", booking_id):
-            award_points(customer_id, base_points, "booking", booking_id,
-                         f"{service['name']} × {multiplier}", conn=conn)
-
-        # 2. Double points day bonus
-        if double_points_day and booking_day == double_points_day:
-            if not already_awarded(customer_id, "double_points", booking_id):
-                award_points(customer_id, base_points, "double_points", booking_id,
-                             "Double points day bonus", conn=conn)
-
-        # 3. First booking bonus — count AFTER the update (same conn sees uncommitted write)
-        row = conn.execute(
-            "SELECT COUNT(*) FROM bookings WHERE customer_id = ? AND status = 'done'",
-            (customer_id,)
-        ).fetchone()
-        if row[0] == 1:
-            first_bonus = get_config_value("first_booking_bonus")
-            if first_bonus and not already_awarded(customer_id, "first_booking", booking_id):
-                award_points(customer_id, first_bonus, "first_booking", booking_id,
-                             "First booking bonus", conn=conn)
-
-        # 4. Streak bonus — pass conn so check sees uncommitted UPDATE
-        if check_streak(customer_id, booking_date, conn=conn):
-            streak_bonus = get_config_value("streak_bonus")
-            if streak_bonus and not already_awarded(customer_id, "streak", streak_ref):
-                award_points(customer_id, streak_bonus, "streak", streak_ref,
-                             "3-month streak bonus", conn=conn)
-
-        conn.commit()
-        return True
-    except Exception:
-        conn.rollback()
-        return False
-    finally:
-        conn.close()
+# Logic hoàn tất booking đã chuyển sang app/services/booking_service.complete_booking_txn
+# (nguồn chân lý duy nhất, dùng chung cho staff portal / admin / dev_tools).
+# Giữ alias để các call-site legacy trong file này không phải đổi.
+_complete_booking_txn = complete_booking_txn
 
 @main.route("/staff")
 @staff_required
@@ -2244,8 +2172,25 @@ def admin_update_booking_status(booking_id):
     if new_status not in {"pending", "confirmed", "in-progress", "done", "cancelled", "no-show"}:
         flash("Trạng thái không hợp lệ.", "error")
         return redirect(url_for("main.admin_bookings"))
+
+    booking = get_booking_by_id(booking_id)
+    if not booking:
+        flash("Booking không tồn tại.", "error")
+        return redirect(request.referrer or url_for("main.admin_bookings"))
+    old_status = booking["status"]
+
+    # Rời khỏi 'done' → thu hồi side-effect (invoice + điểm + earnings) trước khi đổi status.
+    if old_status == "done" and new_status != "done":
+        revert_booking_txn(booking_id)
+
     if new_status == "cancelled":
         cancel_booking_with_reason(booking_id, None)
+    elif new_status == "done":
+        # 'done' phải đi qua transaction hoàn tất (invoice + earnings + loyalty),
+        # không được ghi status trần bằng update_status. Bỏ qua nếu đã 'done'.
+        if old_status != "done" and not complete_booking_txn(booking_id):
+            flash("Không thể hoàn tất booking (thiếu dữ liệu dịch vụ/nhân viên).", "error")
+            return redirect(request.referrer or url_for("main.admin_bookings"))
     else:
         update_status(booking_id, new_status)
     flash(f"Đã cập nhật trạng thái booking #{booking_id}.", "success")
@@ -3411,13 +3356,24 @@ def _build_revenue_chart(df, dt, active_preset):
 
     elif grouping == "daily":
         day_amount = {r["day"]: r["amount"] for r in get_report_revenue_by_day(df, dt)}
+        # step > 1 (preset 'month') gộp mỗi 'step' ngày liên tiếp thành 1 cột và CỘNG
+        # trọn cửa sổ — trước đây chỉ lấy doanh thu 1 ngày rồi nhảy qua ngày kế, làm
+        # mất doanh thu các ngày bị bỏ qua khiến tổng cột không khớp KPI.
         step = 2 if active_preset == "month" else 1
         d = d_from
         while d <= d_to:
-            amt = day_amount.get(d.strftime("%Y-%m-%d"), 0)
+            win_end = min(d + timedelta(days=step - 1), d_to)
+            amt, is_current, wd = 0.0, False, d
+            while wd <= win_end:
+                amt += day_amount.get(wd.strftime("%Y-%m-%d"), 0)
+                is_current = is_current or wd == today
+                wd += timedelta(days=1)
             label = _WEEKDAY_ABBR_EN[d.weekday()] if active_preset == "7days" else f"{d.day}/{d.month}"
-            tooltip = f"{_WEEKDAY_VI[d.weekday()]} {d.day:02d}/{d.month:02d} · {amt:.0f}€"
-            buckets.append((label, amt, tooltip, d == today))
+            if step > 1 and win_end > d:
+                tooltip = f"{d.day:02d}/{d.month:02d}–{win_end.day:02d}/{win_end.month:02d} · {amt:.0f}€"
+            else:
+                tooltip = f"{_WEEKDAY_VI[d.weekday()]} {d.day:02d}/{d.month:02d} · {amt:.0f}€"
+            buckets.append((label, amt, tooltip, is_current))
             d += timedelta(days=step)
 
     elif grouping == "biweekly":
@@ -3941,6 +3897,67 @@ def login():
 
         flash(f"Login successfully, welcome back {customer['full_name']}", "success")
         return redirect(url_for('main.customer_dashboard'))
+
+@main.route("/auth/google")
+@guest_only
+def google_login():
+    redirect_uri = url_for("main.google_callback", _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+@main.route("/auth/google/callback")
+def google_callback():
+    try:
+        token = oauth.google.authorize_access_token()
+    except Exception:
+        flash("Google sign-in failed. Please try again.", "error")
+        return redirect(url_for("main.login"))
+
+    userinfo = token.get("userinfo") or {}
+    email = (userinfo.get("email") or "").strip().lower()
+    if not email or not userinfo.get("email_verified"):
+        flash("Could not verify your Google email. Please try again.", "error")
+        return redirect(url_for("main.login"))
+
+    full_name = userinfo.get("name") or email.split("@")[0]
+    sub = userinfo.get("sub")
+
+    user = get_user_by_email(email)
+
+    # OAuth chỉ dành cho customer — nếu email này là staff/admin thì chuyển sang cổng nhân viên
+    if user and user["role"] != "customer":
+        flash("Please use the staff login portal.", "error")
+        return redirect(url_for("main.staff_login"))
+
+    if user:
+        user_id = user["id"]
+        # Link tài khoản email/password cũ với Google nếu chưa gắn
+        if not user["oauth_provider"]:
+            set_user_oauth(user_id, "google", sub)
+        customer = get_customer_by_user_id(user_id)
+        if not customer:
+            customer_id = create_customer(full_name, email, None)
+            verify_customer(customer_id)
+            link_customer_to_user(customer_id, user_id)
+            customer = get_customer_by_user_id(user_id)
+    else:
+        user_id = create_oauth_user(email, "google", sub)
+        customer = get_customer_by_email(email)
+        if customer:
+            link_customer_to_user(customer["id"], user_id)
+        else:
+            customer_id = create_customer(full_name, email, None)
+            verify_customer(customer_id)
+            link_customer_to_user(customer_id, user_id)
+        customer = get_customer_by_user_id(user_id)
+
+    session.clear()
+    session["user_id"] = user_id
+    session["role"] = "customer"
+    session["user_email"] = email
+    session["customer_id"] = customer["id"]
+
+    flash(f"Login successfully, welcome {customer['full_name']}!", "success")
+    return redirect(url_for("main.customer_dashboard"))
 
 @main.route('/login/forgot-password', methods=['GET', 'POST'])
 @guest_only

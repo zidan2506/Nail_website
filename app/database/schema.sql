@@ -51,6 +51,8 @@ CREATE TABLE users (
     email TEXT NOT NULL UNIQUE,
     role TEXT NOT NULL,
     is_active INTEGER NOT NULL DEFAULT 0,
+    oauth_provider TEXT DEFAULT NULL,
+    oauth_sub TEXT DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

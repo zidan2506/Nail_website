@@ -17,18 +17,16 @@ Examples:
 import argparse
 import sys
 from pathlib import Path
-from datetime import datetime
 
 # Allow importing app modules from project root
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from app.database.db import get_connection, get_booking_by_id, get_service_by_id
-from app.services.loyalty import (
-    get_active_multiplier, get_config_value,
-    already_awarded, award_points, check_streak,
-)
+from app.database.db import get_connection, get_booking_by_id, update_status
+from app.services.loyalty import award_points
+from app.services.booking_service import complete_booking_txn, revert_booking_txn
 
-VALID_STATUSES = {"unverified", "pending", "confirmed", "done", "cancelled"}
+VALID_STATUSES = {"unverified", "pending", "confirmed", "in-progress",
+                  "done", "cancelled", "no-show", "expired"}
 
 
 # ─────────────────────────────────────────────
@@ -43,87 +41,29 @@ def cmd_booking_set_status(booking_id: int, status: str):
 
     old_status = booking["status"]
 
-    if status != "completed":
-        conn = get_connection()
-        conn.execute("UPDATE bookings SET status = ? WHERE id = ?", (status, booking_id))
-        conn.commit()
-        conn.close()
-        print(f"Booking {booking_id}: {old_status} → {status}")
-        return
+    # Rời khỏi 'done' → thu hồi side-effect (invoice + điểm base/double/first + earnings).
+    if old_status == "done" and status != "done":
+        revert_booking_txn(booking_id)
+        print(f"  (đã thu hồi invoice + điểm + earnings của booking {booking_id})")
 
-    # completed → trigger loyalty flow in same transaction
-    service = get_service_by_id(booking["service_id"])
-    if not service:
-        conn = get_connection()
-        conn.execute("UPDATE bookings SET status = 'completed' WHERE id = ?", (booking_id,))
-        conn.commit()
-        conn.close()
-        print(f"Booking {booking_id}: {old_status} → completed")
-        print("Warning: service not found — no loyalty points awarded.")
-        return
-
-    customer_id   = booking["customer_id"]
-    booking_date  = booking["booking_date"]
-    multiplier    = get_active_multiplier(customer_id)
-    base_points   = int((service["points"] or 0) * multiplier)
-    double_day    = get_config_value("double_points_day")
-    booking_day   = datetime.strptime(booking_date, "%Y-%m-%d").isoweekday()
-    streak_ref    = int(datetime.strptime(booking_date, "%Y-%m-%d").strftime("%Y%m"))
-
-    awarded = []
-
-    conn = get_connection()
-    try:
-        conn.execute("UPDATE bookings SET status = 'completed' WHERE id = ?", (booking_id,))
-
-        # 1. Base points
-        if base_points > 0 and not already_awarded(customer_id, "booking", booking_id):
-            award_points(customer_id, base_points, "booking", booking_id,
-                         f"{service['name']} × {multiplier}", conn=conn)
-            awarded.append(f"  +{base_points:>5}  base points  ({service['name']} × {multiplier})")
-
-        # 2. Double points day bonus
-        if double_day and booking_day == double_day:
-            if not already_awarded(customer_id, "double_points", booking_id):
-                award_points(customer_id, base_points, "double_points", booking_id,
-                             "Double points day bonus", conn=conn)
-                awarded.append(f"  +{base_points:>5}  double points day bonus")
-
-        # 3. First booking bonus (count after UPDATE — same conn sees uncommitted write)
-        row = conn.execute(
-            "SELECT COUNT(*) FROM bookings WHERE customer_id = ? AND status = 'completed'",
-            (customer_id,)
-        ).fetchone()
-        if row[0] == 1:
-            first_bonus = get_config_value("first_booking_bonus")
-            if first_bonus and not already_awarded(customer_id, "first_booking", booking_id):
-                award_points(customer_id, first_bonus, "first_booking", booking_id,
-                             "First booking bonus", conn=conn)
-                awarded.append(f"  +{first_bonus:>5}  first booking bonus")
-
-        # 4. Streak bonus
-        if check_streak(customer_id, booking_date, conn=conn):
-            streak_bonus = get_config_value("streak_bonus")
-            if streak_bonus and not already_awarded(customer_id, "streak", streak_ref):
-                award_points(customer_id, streak_bonus, "streak", streak_ref,
-                             "3-month streak bonus", conn=conn)
-                awarded.append(f"  +{streak_bonus:>5}  3-month streak bonus")
-
-        conn.commit()
-        print(f"Booking {booking_id}: {old_status} → completed")
-        if awarded:
-            print("Loyalty points awarded:")
-            for line in awarded:
-                print(line)
+    # 'done' phải đi qua ĐÚNG transaction hoàn tất như staff/admin bấm hoàn thành:
+    # tạo invoice + snapshot thu nhập staff + trao điểm loyalty. Không ghi status trần.
+    if status == "done":
+        if old_status == "done":
+            print(f"Booking {booking_id}: đã ở trạng thái 'done', bỏ qua.")
+            return
+        if complete_booking_txn(booking_id):
+            print(f"Booking {booking_id}: {old_status} → done "
+                  f"(đã tạo invoice + snapshot earnings + trao điểm loyalty)")
         else:
-            print("No new loyalty points awarded (already awarded or service has 0 points).")
+            print(f"Error: không thể hoàn tất booking {booking_id} "
+                  f"(thiếu dữ liệu dịch vụ/nhân viên).")
+            sys.exit(1)
+        return
 
-    except Exception as e:
-        conn.rollback()
-        print(f"Error: transaction rolled back — {e}")
-        sys.exit(1)
-    finally:
-        conn.close()
+    # Các status khác không có side-effect: dùng update_status (có bump updated_at).
+    update_status(booking_id, status)
+    print(f"Booking {booking_id}: {old_status} → {status}")
 
 
 # ─────────────────────────────────────────────

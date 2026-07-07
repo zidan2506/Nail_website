@@ -90,6 +90,10 @@
                 <img class="svc-card__img"
                      src="{{ url_for('static', filename='uploads/services/' + service.image) }}"
                      alt="{{ service.name }}">
+                {% else %}
+                <div class="svc-card__img-fallback">
+                    <span class="material-symbols-outlined">spa</span>
+                </div>
                 {% endif %}
                 <div class="svc-card__badges">
                     <span class="svc-badge svc-badge--category">{{ service.category_name }}</span>

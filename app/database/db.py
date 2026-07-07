@@ -268,6 +268,38 @@ def create_user(email, password, role="customer"):
     print(f"Create new user successfully! User id: {user_id}")
     return user_id
 
+def create_oauth_user(email, oauth_provider, oauth_sub, role="customer"):
+    """Tạo user đăng nhập bằng OAuth (Google...). User loại này không có mật khẩu
+    thật — lưu 1 hash ngẫu nhiên vô dụng để thỏa ràng buộc NOT NULL của cột
+    password_hash và để không ai đăng nhập được bằng mật khẩu."""
+    conn = get_connection()
+    random_password = secrets.token_urlsafe(32)
+    password_hash = generate_password_hash(random_password)
+    user = conn.execute(
+        """
+    INSERT INTO users (password_hash, email, role, oauth_provider, oauth_sub)
+    VALUES (?, ?, ?, ?, ?)
+""", (password_hash, email, role, oauth_provider, oauth_sub)
+    )
+    conn.commit()
+    user_id = user.lastrowid
+    conn.close()
+    print(f"Create OAuth user successfully! User id: {user_id}")
+    return user_id
+
+def set_user_oauth(user_id, oauth_provider, oauth_sub):
+    """Gắn thông tin OAuth vào 1 user đã tồn tại (link tài khoản email/password
+    cũ với đăng nhập Google khi email trùng)."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE users SET oauth_provider = ?, oauth_sub = ? WHERE id = ?",
+        (oauth_provider, oauth_sub, user_id)
+    )
+    conn.commit()
+    conn.close()
+    print(f"Set OAuth for user id={user_id} successfully!")
+    return True
+
 def link_customer_to_user(customer_id, user_id):
     conn = get_connection()
     conn.execute(
@@ -1138,11 +1170,13 @@ def update_user_password(user_id, password_hash):
 def get_admin_kpis(date_str):
     conn = get_connection()
     revenue = conn.execute(
-        "SELECT COALESCE(SUM(amount), 0) FROM invoices WHERE DATE(issued_at) = ? AND status = 'paid'",
+        """SELECT COALESCE(SUM(i.amount), 0)
+           FROM invoices i JOIN bookings b ON b.id = i.booking_id
+           WHERE b.booking_date = ? AND i.status = 'paid'""",
         (date_str,)
     ).fetchone()[0]
     bookings = conn.execute(
-        "SELECT COUNT(*) FROM bookings WHERE DATE(updated_at) = ? AND status NOT IN ('unverified', 'cancelled')",
+        "SELECT COUNT(*) FROM bookings WHERE booking_date = ? AND status NOT IN ('unverified', 'cancelled')",
         (date_str,)
     ).fetchone()[0]
     new_customers = conn.execute(
@@ -1171,9 +1205,9 @@ def get_admin_today_appointments(date_str):
         JOIN customers c ON c.id = b.customer_id
         JOIN services s ON s.id = b.service_id
         JOIN staff st ON st.id = b.staff_id
-        WHERE DATE(b.updated_at) = ?
+        WHERE b.booking_date = ?
           AND b.status != 'unverified'
-        ORDER BY b.updated_at DESC
+        ORDER BY b.start_time ASC
     """, (date_str,)).fetchall()
     conn.close()
     return [dict(r) for r in rows]
@@ -1209,10 +1243,10 @@ def get_admin_revenue_chart(date_str):
     # Week: last 7 days, one point per day
     week_start = (today - _td(days=6)).strftime("%Y-%m-%d")
     week_rows = conn.execute("""
-        SELECT DATE(issued_at) AS day, COALESCE(SUM(amount), 0) AS revenue
-        FROM invoices
-        WHERE DATE(issued_at) >= ? AND DATE(issued_at) <= ? AND status = 'paid'
-        GROUP BY day ORDER BY day ASC
+        SELECT b.booking_date AS day, COALESCE(SUM(i.amount), 0) AS revenue
+        FROM invoices i JOIN bookings b ON b.id = i.booking_id
+        WHERE b.booking_date >= ? AND b.booking_date <= ? AND i.status = 'paid'
+        GROUP BY b.booking_date ORDER BY b.booking_date ASC
     """, (week_start, date_str)).fetchall()
     week_map = {r["day"]: r["revenue"] for r in week_rows}
     week_data = []
@@ -1223,9 +1257,9 @@ def get_admin_revenue_chart(date_str):
     # Month: last 4 weeks grouped by week
     month_start = (today - _td(days=27)).strftime("%Y-%m-%d")
     month_rows = conn.execute("""
-        SELECT strftime('%Y-W%W', issued_at) AS wk, COALESCE(SUM(amount), 0) AS revenue
-        FROM invoices
-        WHERE DATE(issued_at) >= ? AND DATE(issued_at) <= ? AND status = 'paid'
+        SELECT strftime('%Y-W%W', b.booking_date) AS wk, COALESCE(SUM(i.amount), 0) AS revenue
+        FROM invoices i JOIN bookings b ON b.id = i.booking_id
+        WHERE b.booking_date >= ? AND b.booking_date <= ? AND i.status = 'paid'
         GROUP BY wk ORDER BY wk ASC
     """, (month_start, date_str)).fetchall()
     month_map = {r["wk"]: r["revenue"] for r in month_rows}
@@ -1919,7 +1953,7 @@ def get_report_totals(date_from, date_to):
     bookings = conn.execute(
         """
         SELECT COUNT(*) FROM bookings
-        WHERE booking_date BETWEEN ? AND ? AND status != 'unverified'
+        WHERE booking_date BETWEEN ? AND ? AND status NOT IN ('unverified', 'cancelled')
         """, (date_from, date_to)
     ).fetchone()[0]
     new_customers = conn.execute(
