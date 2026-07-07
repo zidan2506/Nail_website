@@ -197,7 +197,7 @@
                     <td class="cell-bold cell-dim">$0.00</td>
                     <td><span class="badge badge-cancelled">Cancelled</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
-                        <a class="btn-rebook" href="{{ url_for('main.customer_booking') }}">Rebook</a>
+                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">Rebook</a>
                     </td>
                 </tr>
                     {% elif appt.display_type == 'reviewed' %}
@@ -219,7 +219,7 @@
                     <td><span class="badge badge-completed">Completed</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
                         <span class="reviewed-tag">✓ Reviewed</span>
-                        <a class="btn-rebook" href="{{ url_for('main.customer_booking') }}">Rebook</a>
+                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">Rebook</a>
                     </td>
                 </tr>
                     {% else %}
@@ -241,7 +241,7 @@
                     <td><span class="badge badge-completed">Completed</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
                         <button class="btn-review">Leave Review</button>
-                        <a class="btn-rebook" href="{{ url_for('main.customer_booking') }}">Rebook</a>
+                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">Rebook</a>
                     </td>
                 </tr>
                     {% endif %}

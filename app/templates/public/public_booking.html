@@ -78,7 +78,7 @@
                    data-name="{{ service['name'] }}"
                    data-duration="{{ service['duration_minutes'] }}"
                    data-price="{{ service['price'] }}"
-                   {% if ns.first_service %}checked{% endif %} required>
+                   {% if (preselect_id and service['id'] == preselect_id) or (not preselect_id and ns.first_service) %}checked{% endif %} required>
             {% set ns.first_service = false %}
             <div class="bk-svc-card">
               <div class="bk-svc-thumb">

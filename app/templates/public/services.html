@@ -111,7 +111,7 @@
                     <span class="material-symbols-outlined svc-card__icon">{{ service.icon }}</span>
                 </div>
             </div>
-            <a href="{{ url_for('main.public_booking') }}" class="svc-card__btn">Book now</a>
+            <a href="{{ url_for('main.public_booking', service_id=service.id) }}" class="svc-card__btn">Book now</a>
         </div>
         {% endfor %}
     </div>
