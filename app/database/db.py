@@ -1274,6 +1274,28 @@ def get_admin_top_services(date_from, date_to, limit=3):
     conn.close()
     return [dict(r) for r in rows]
 
+def get_popular_services(limit=4):
+    """Active services ranked by booking count for the public homepage.
+    Same ranking convention as get_admin_top_services (COUNT of bookings with
+    status confirmed/done), but LEFT JOIN so services with 0 bookings still show,
+    and returns full card fields (id, price, image, category slug)."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT s.id, s.name, s.description, s.price, s.image,
+               c.slug AS category_slug,
+               COUNT(CASE WHEN b.status IN ('confirmed', 'done') THEN b.id END) AS booking_count
+        FROM services s
+        JOIN service_categories c ON s.category_id = c.id
+        LEFT JOIN bookings b ON b.service_id = s.id
+        WHERE s.is_active = 1
+          AND c.is_active = 1
+        GROUP BY s.id
+        ORDER BY booking_count DESC, s.name ASC
+        LIMIT ?
+    """, (limit,)).fetchall()
+    conn.close()
+    return rows
+
 def get_admin_top_loyalty(limit=5):
     conn = get_connection()
     rows = conn.execute("""

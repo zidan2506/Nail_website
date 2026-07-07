@@ -311,6 +311,9 @@
 }
 
 .service-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
     background: #F8F9FA;
     border-radius: 20px;
     padding: 24px;

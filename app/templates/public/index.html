@@ -77,73 +77,25 @@
     <!-- Service cards grid -->
     <div class="services-grid">
 
-        <!-- Card: Manicure -->
-        <div class="service-card">
+        {% for service in services %}
+        <a class="service-card" href="{{ url_for('main.public_booking', service_id=service.id) }}">
             <div class="service-card__img-wrap">
+                {% if service.image %}
                 <img
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuByGE_bAn6zf3fRkHLzTjh4Sq-OVJzYgZhwW12EM2gUcBUdbwvohHmgsmG2WO1qN_hDp5KGa5-iLc4iIMnnaihmGuRvCnecK1Xb0qb2Za0jilmd2tbm2qTRIT19apVc1ouo-HOSUCntQZtxink9W8D5yp6efHrYW0vhcPtPoqYcwA6g0dezFuGu39OniJHtx5yfi9gL8Wlnm23oQNfm6ujgKAeH9qTadsG3PuvzISuqct59UCpObaxQOdQBpVg0aw3XLfYc4tbJZCa6"
-                    alt="Professional manicure service"
+                    src="{{ url_for('static', filename='uploads/services/' + service.image) }}"
+                    alt="{{ service.name }}"
                 >
+                {% endif %}
             </div>
             <div class="service-card__row">
-                <h3 class="service-card__name">Manicure</h3>
-                <span class="service-card__price">€25</span>
+                <h3 class="service-card__name">{{ service.name }}</h3>
+                <span class="service-card__price">€{{ service.price | int }}</span>
             </div>
             <p class="service-card__desc">
-                Essential hand and nail care including shaping, cuticle work, and perfect polish.
+                {{ service.description }}
             </p>
-        </div>
-
-        <!-- Card: Pedicure -->
-        <div class="service-card">
-            <div class="service-card__img-wrap">
-                <img
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpw_e_gCSl5nRQZfP1hQ9SO5KlpBMxbAA00Vc2n7oMGdeZ9KUg--E1AMuKXruQq0-1dp-J0WxjBZamle6GKvsitihK7AZhkSgJs7jcBqsZD4syi2nV5h4iQWt0KNLgJNkGQEu59WR9tz_Ahj6Vr1UExnUgELkdV0MbF_2q7mRDtZPD8yHqeVMHnKwlSbWYG-ajc3rGcgbyriQVKnqonxJhvIXa-ofm8Em4YOTjyLykKcLNQr5zxMGM4zV8SXhuCcMfR4D5aSGCtunG"
-                    alt="Pedicure station in luxury salon"
-                >
-            </div>
-            <div class="service-card__row">
-                <h3 class="service-card__name">Pedicure</h3>
-                <span class="service-card__price">€35</span>
-            </div>
-            <p class="service-card__desc">
-                Complete foot rejuvenation with exfoliation, massage, and meticulous nail finishing.
-            </p>
-        </div>
-
-        <!-- Card: Nail Art -->
-        <div class="service-card">
-            <div class="service-card__img-wrap">
-                <img
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYZUCDJw5dan-Izs6jHLXPPqDsU1ZKd1iWBMgnefeX-prUWtbraFCbLBb3v-3Fq8KINpynqJWubSBNHuGsq3BOzRbMaKdxSo_FSqd7HbpLqpUeuAtzZ4-MidJCXLLm5v9KcpGYRmVJrDoK4jVMHHlI2JQwTAce3gsh3dNvsCPdRfMXIcGUt2zMsGFOgh7gnVMw9l4IcSt6lU7qkVUHVAibdaeZY1hztmLwSuniQPrsivMbFS-FQCWvDthnCu9Z9j-aDa78_5LU7apO"
-                    alt="Intricate nail art being applied"
-                >
-            </div>
-            <div class="service-card__row">
-                <h3 class="service-card__name">Nail art</h3>
-                <span class="service-card__price">€15</span>
-            </div>
-            <p class="service-card__desc">
-                Custom designs, intricate details, and unique artistry tailored to your style.
-            </p>
-        </div>
-
-        <!-- Card: Gel Extension -->
-        <div class="service-card">
-            <div class="service-card__img-wrap">
-                <img
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQzwnoUCqaWexL2FtvpKp6gL7OvxNxhnnoz9d9rKJ5vqSvANF89mVmKqNXUhm_HCeBazE9itb1eBdQOdxU-4Ic4q9vYugJEuvxyHsEiM4Bw4ZSmQomrhT7pxuXbs4hZTPTectvwkfN6TTKf2TZWKg2czmG65hGC25p6PjdiMB4oERFl8ZMhyEXMt0eiBWk9tAcOuu8lxP4DW-ZRShLlg12o4malhPU0rNlzfLhSsNFIMsV0TIL_WbOougORZJ3v5wAXE-vc8DHy4hV"
-                    alt="Gel nail extension process"
-                >
-            </div>
-            <div class="service-card__row">
-                <h3 class="service-card__name">Gel extension</h3>
-                <span class="service-card__price">€40</span>
-            </div>
-            <p class="service-card__desc">
-                Durable, natural-looking extensions for added length and perfect shape.
-            </p>
-        </div>
+        </a>
+        {% endfor %}
 
     </div>
 
@@ -167,41 +119,14 @@
     <!-- Gallery grid — item 1 spans 2 rows on desktop -->
     <div class="gallery-grid">
 
-        <!-- Tall item: row-span 2 -->
-        <a href="{{ url_for('main.gallery') }}" class="gallery-item gallery-item--tall">
+        {% for image in gallery_images %}
+        <a href="{{ url_for('main.gallery') }}" class="gallery-item{% if loop.first %} gallery-item--tall{% endif %}">
             <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxhpPe2XY3YC__Wpe4FsPVE2lg4JNEUhtq7FR9o3YO2hRcPeoBHiaa2v8fbcRykEPzF7Ja4PN_2vllBOUFyY0XFuyO9Xpc9pzMvI5RtW2Xh76hraVnJ7Zo3zzVI_5wnR1Lj3faqgGUcJTCF6WuSEHsU5i4KAfGBRRV45F62IjMZDzvSKbCRf8aubLisudvEuUOpoS2rlEF38U-dLCd27nkwJXabjtx9bCVw84FqD3kAKZFuNPYzsven7gqAVm4lZp_ZoIwg9f9u8yM"
-                alt="Nail Art"
+                src="{{ image.image_url if image.image_url.startswith('http') else url_for('static', filename='uploads/gallery/' + image.image_url) }}"
+                alt="{{ image.alt_text }}"
             >
         </a>
-
-        <a href="{{ url_for('main.gallery') }}" class="gallery-item">
-            <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8DOz-CoeL0jyDpOi5Xv5V5gPJQHJhNVD6J_xSJ1wGx0gtUzb6o2xtWJxkc1h7slCdvUyiknWcdXQzyRURauaN8m-jnHm2SWCle8J38AxWBji3ib6Gu6U8SsZcnKSmABUS49O5G638-YaCch1r1aLLHITx8OM4GGdeNH-tOTTyAm6yeqkxtPoENlCvmGH0UCEAFnIJYd6aI8LIesG-E2SHW3Zir9lwKs0WOSsB-bSn9EWdsqMJouabRMewSOA3opft0PUgnppnT3VA"
-                alt="Nail Art"
-            >
-        </a>
-
-        <a href="{{ url_for('main.gallery') }}" class="gallery-item">
-            <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSzL5vRPFnu50tnE7YsZBS4X0LWXKyQChSTvkwSvRbcaIHDNxjJxHujtu__jYTIUOa9gbC619OTsMwgzxgFEg0GhoL4yoWD46QJE-Vg0yHo-x19GsMHWpMOK6HwJMLVt6F3JbG78VFvPMNaUtpTs3Y4gTyOzTouBVtTf0slyi5mv2yz9fEUJ4R-sB2Q9htsQHo4T5B4WKbD1gBN6_07zlFzjxsn2frbpzAfHHsDxob8nO757i9cX7VjXiihOHJ5d8vS5gF3jYMhf3k"
-                alt="Nail Art"
-            >
-        </a>
-
-        <a href="{{ url_for('main.gallery') }}" class="gallery-item">
-            <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAX3eTy2m7oYuZbmcZjlhLmvd7h818qLINbBBCwmi318AG6Rif9yvOKlp_1TGnzp3MyBzKAJmqzkE1_dvAn2iLL6dc5EkDmAYhBRr8tH6o-7JoNzuuIVu5USVvtG887UiK6Aias-8v-bQapjEIOiFjix-W07XiMjgnY9JLeqjMBpDxylDL3hrkIN0fCwHwKBDZXwc7dJNaCo6kQ8Iz_fcSB1mpTBmQZH_I7mgUBUciNj8SNK1wDXIpqHxlwl0wAUbL_mTkZ-8XoItMc"
-                alt="Nail Art"
-            >
-        </a>
-
-        <a href="{{ url_for('main.gallery') }}" class="gallery-item">
-            <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAK9OBSeoOApvPfkIIxgmG5F5NXcXCH_kbZgKPeCVcCFP73z7i4HwMu_G1Klve7h0hOVWFgZX8fW8IonOMH2pA2Z6D1W3UD7-1rwZ4tkrhJiAJIZ_7s_BwBx61A7UOkf7rl5mjSi2axrAjo4t1cuAf9dKSqG0zltJm4UNb5EJjuChdMYNmfKCn4cMA_l8uUztAF3Xg99WC2VLq3ThQHvX2MqCgFZClGKNzTkAuv0Gwa7hXc4ik58J1gGrSLU9puWGzMx_72BSM7stiF"
-                alt="Nail Art"
-            >
-        </a>
+        {% endfor %}
 
     </div>
 </section>
