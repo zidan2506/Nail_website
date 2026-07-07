@@ -28,7 +28,7 @@ from app.services.loyalty import (
     already_awarded, award_points, check_streak,
 )
 
-VALID_STATUSES = {"unverified", "pending", "confirmed", "completed", "cancelled"}
+VALID_STATUSES = {"unverified", "pending", "confirmed", "done", "cancelled"}
 
 
 # ─────────────────────────────────────────────

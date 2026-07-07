@@ -74,6 +74,10 @@ class GuestService:
         return customer
         
     
+# Map lựa chọn payment_method trên form -> công cụ thanh toán lưu ở booking/invoice.
+# Hiện chỉ có "pay_at_salon" (trả tiền mặt tại tiệm); online payment đang "coming soon".
+_PAYMENT_METHOD_MAP = {"pay_at_salon": "cash"}
+
 class BookingService:
     @staticmethod
     def parse_form(form):
@@ -83,6 +87,8 @@ class BookingService:
             "staff_id": int(form.get("staff_id", "").strip()),
             "booking_date": form.get("booking_date", "").strip(),
             "slot": form.get("start_time", "").strip(),
+            "payment_method": _PAYMENT_METHOD_MAP.get(
+                form.get("payment_method", "pay_at_salon").strip(), "cash"),
         }
     
     def parse_slot(booking_date, slot, duration_minutes):
@@ -113,8 +119,8 @@ class BookingService:
         picked = random.choice(availalble)
         return picked
     
-    def create(customer_id, staff_id, service_id, booking_date, start_time, end_time, note, email):
-        booking_id = create_booking(customer_id, staff_id, service_id, booking_date, start_time, end_time, "unverified", note)
+    def create(customer_id, staff_id, service_id, booking_date, start_time, end_time, note, email, payment_method):
+        booking_id = create_booking(customer_id, staff_id, service_id, booking_date, start_time, end_time, "unverified", note, payment_method)
         verification_id = VerificationService.create_booking_verification(email)
         return booking_id, verification_id
     

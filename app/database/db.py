@@ -65,7 +65,7 @@ def check_booking_conflict(staff_id, booking_date, start_at, end_at):
     conn.close()
     return conflict is not None
 
-def create_booking(customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes):
+def create_booking(customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes, payment_method):
     conn = get_connection()
     updated_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     cur = conn.execute("""
@@ -78,11 +78,12 @@ def create_booking(customer_id, staff_id, service_id, booking_date, start_time, 
         end_time,
         status,
         notes,
+        payment_method,
         updated_at
 
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes, updated_at))
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes, payment_method, updated_at))
     booking_id = cur.lastrowid
     conn.commit()
     conn.close()
@@ -1088,6 +1089,18 @@ def get_invoice_by_booking(booking_id):
     ).fetchone()
     conn.close()
     return dict(row) if row else None
+
+
+def create_invoice(conn, booking_id, amount, payment_method, status="pending"):
+    """Tạo invoice cho 1 booking. Dùng chung conn của caller để atomic
+    với lúc set booking = 'done'. invoice_number = INV-{year}-{booking_id}."""
+    year = now_helsinki().strftime("%Y")
+    invoice_number = f"INV-{year}-{booking_id:04d}"
+    conn.execute(
+        """INSERT INTO invoices (booking_id, invoice_number, amount, payment_method, status)
+           VALUES (?, ?, ?, ?, ?)""",
+        (booking_id, invoice_number, amount, payment_method, status)
+    )
 
 
 def mark_invoice_paid(booking_id):

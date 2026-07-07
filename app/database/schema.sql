@@ -96,6 +96,7 @@ CREATE TABLE bookings (
     end_time TIME NOT NULL,
     status TEXT NOT NULL DEFAULT 'unverified',
     notes TEXT,
+    payment_method TEXT DEFAULT 'cash',
     cancellation_reason TEXT,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     staff_commission REAL DEFAULT 0,

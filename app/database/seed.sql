@@ -124,49 +124,49 @@ VALUES
 -- BOOKINGS
 -- 22 done | 4 cancelled | 2 pending | 2 confirmed | 2 in-progress
 -- ============================================
-INSERT INTO bookings (customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes)
+INSERT INTO bookings (customer_id, staff_id, service_id, booking_date, start_time, end_time, status, notes, payment_method)
 VALUES
--- id 1-22: done
-(1, 1, 1, '2024-03-15', '10:00', '10:45', 'done', 'Visa paid'),
-(1, 2, 2, '2024-05-20', '14:00', '15:00', 'done', 'Mastercard paid'),
-(1, 3, 3, '2024-07-08', '09:00', '10:15', 'done', 'Mobile pay paid'),
-(1, 1, 2, '2024-09-12', '11:00', '12:00', 'done', 'Apple pay paid'),
-(1, 2, 1, '2024-11-25', '13:30', '14:15', 'done', 'Google pay refunded'),
-(1, 3, 3, '2025-01-18', '15:00', '16:15', 'done', 'Cash paid'),
-(1, 1, 1, '2025-02-14', '10:00', '10:45', 'done', 'Bank transfer paid'),
-(1, 2, 2, '2025-03-22', '14:30', '15:30', 'done', 'Visa pending'),
-(1, 3, 3, '2025-04-10', '09:00', '10:15', 'done', 'Mastercard paid'),
-(1, 1, 2, '2025-05-19', '11:00', '12:00', 'done', 'Mobile pay refunded'),
-(1, 2, 1, '2025-07-08', '13:00', '13:45', 'done', 'Apple pay paid'),
-(1, 3, 3, '2025-08-15', '15:00', '16:15', 'done', 'Google pay paid'),
-(1, 1, 1, '2025-09-20', '10:00', '10:45', 'done', 'Cash paid'),
-(1, 2, 2, '2025-10-12', '14:00', '15:00', 'done', 'Bank transfer refunded'),
-(1, 3, 3, '2025-11-25', '09:30', '10:45', 'done', 'Visa paid'),
-(1, 1, 2, '2025-12-18', '11:00', '12:00', 'done', 'Mastercard paid'),
-(1, 2, 1, '2026-02-22', '13:30', '14:15', 'done', 'Mobile pay paid'),
-(1, 3, 3, '2026-03-15', '15:00', '16:15', 'done', 'Apple pay paid'),
-(1, 1, 1, '2026-04-05', '10:00', '10:45', 'done', 'Google pay pending'),
-(1, 2, 2, '2026-04-20', '14:00', '15:00', 'done', 'Cash paid'),
-(1, 3, 2, '2026-05-08', '11:00', '12:00', 'done', 'Visa paid'),
-(1, 1, 3, '2026-05-22', '09:00', '10:15', 'done', 'Mastercard pending'),
+-- id 1-22: done (payment_method khớp với invoice tương ứng bên dưới)
+(1, 1, 1, '2024-03-15', '10:00', '10:45', 'done', 'Visa paid', 'visa'),
+(1, 2, 2, '2024-05-20', '14:00', '15:00', 'done', 'Mastercard paid', 'mastercard'),
+(1, 3, 3, '2024-07-08', '09:00', '10:15', 'done', 'Mobile pay paid', 'mobile_pay'),
+(1, 1, 2, '2024-09-12', '11:00', '12:00', 'done', 'Apple pay paid', 'apple_pay'),
+(1, 2, 1, '2024-11-25', '13:30', '14:15', 'done', 'Google pay refunded', 'google_pay'),
+(1, 3, 3, '2025-01-18', '15:00', '16:15', 'done', 'Cash paid', 'cash'),
+(1, 1, 1, '2025-02-14', '10:00', '10:45', 'done', 'Bank transfer paid', 'bank_transfer'),
+(1, 2, 2, '2025-03-22', '14:30', '15:30', 'done', 'Visa pending', 'visa'),
+(1, 3, 3, '2025-04-10', '09:00', '10:15', 'done', 'Mastercard paid', 'mastercard'),
+(1, 1, 2, '2025-05-19', '11:00', '12:00', 'done', 'Mobile pay refunded', 'mobile_pay'),
+(1, 2, 1, '2025-07-08', '13:00', '13:45', 'done', 'Apple pay paid', 'apple_pay'),
+(1, 3, 3, '2025-08-15', '15:00', '16:15', 'done', 'Google pay paid', 'google_pay'),
+(1, 1, 1, '2025-09-20', '10:00', '10:45', 'done', 'Cash paid', 'cash'),
+(1, 2, 2, '2025-10-12', '14:00', '15:00', 'done', 'Bank transfer refunded', 'bank_transfer'),
+(1, 3, 3, '2025-11-25', '09:30', '10:45', 'done', 'Visa paid', 'visa'),
+(1, 1, 2, '2025-12-18', '11:00', '12:00', 'done', 'Mastercard paid', 'mastercard'),
+(1, 2, 1, '2026-02-22', '13:30', '14:15', 'done', 'Mobile pay paid', 'mobile_pay'),
+(1, 3, 3, '2026-03-15', '15:00', '16:15', 'done', 'Apple pay paid', 'apple_pay'),
+(1, 1, 1, '2026-04-05', '10:00', '10:45', 'done', 'Google pay pending', 'google_pay'),
+(1, 2, 2, '2026-04-20', '14:00', '15:00', 'done', 'Cash paid', 'cash'),
+(1, 3, 2, '2026-05-08', '11:00', '12:00', 'done', 'Visa paid', 'visa'),
+(1, 1, 3, '2026-05-22', '09:00', '10:15', 'done', 'Mastercard pending', 'mastercard'),
 
 -- id 23-26: cancelled
-(1, 1, 1, '2024-08-15', '10:00', '10:45', 'cancelled', 'Customer cancelled - old'),
-(1, 2, 2, '2025-06-20', '14:00', '15:00', 'cancelled', 'Staff unavailable'),
-(1, 3, 3, '2026-01-12', '09:00', '10:15', 'cancelled', 'Customer cancelled'),
-(1, 1, 2, '2026-05-15', '11:00', '12:00', 'cancelled', 'Cancelled last minute'),
+(1, 1, 1, '2024-08-15', '10:00', '10:45', 'cancelled', 'Customer cancelled - old', 'cash'),
+(1, 2, 2, '2025-06-20', '14:00', '15:00', 'cancelled', 'Staff unavailable', 'cash'),
+(1, 3, 3, '2026-01-12', '09:00', '10:15', 'cancelled', 'Customer cancelled', 'cash'),
+(1, 1, 2, '2026-05-15', '11:00', '12:00', 'cancelled', 'Cancelled last minute', 'cash'),
 
 -- id 27-28: pending
-(1, 2, 1, '2026-06-20', '13:00', '13:45', 'pending', 'Awaiting confirmation'),
-(1, 3, 2, '2026-07-10', '10:00', '11:00', 'pending',  'New booking'),
+(1, 2, 1, '2026-06-20', '13:00', '13:45', 'pending', 'Awaiting confirmation', 'cash'),
+(1, 3, 2, '2026-07-10', '10:00', '11:00', 'pending',  'New booking', 'cash'),
 
 -- id 29-30: confirmed
-(1, 1, 3, '2026-06-25', '14:00', '15:15', 'confirmed', 'Upcoming visit'),
-(1, 2, 1, '2026-07-05', '11:00', '11:45', 'confirmed', 'Birthday treat'),
+(1, 1, 3, '2026-06-25', '14:00', '15:15', 'confirmed', 'Upcoming visit', 'cash'),
+(1, 2, 1, '2026-07-05', '11:00', '11:45', 'confirmed', 'Birthday treat', 'cash'),
 
 -- id 31-32: in-progress (today 2026-07-01, no conflicts with existing staff slots)
-(1, 1, 1, '2026-07-01', '09:00', '09:45', 'in-progress', 'Currently in session'),
-(1, 2, 3, '2026-07-01', '10:00', '11:15', 'in-progress', 'Session ongoing');
+(1, 1, 1, '2026-07-01', '09:00', '09:45', 'in-progress', 'Currently in session', 'cash'),
+(1, 2, 3, '2026-07-01', '10:00', '11:15', 'in-progress', 'Session ongoing', 'cash');
 
 -- ============================================
 -- INVOICES (giữ nguyên)
