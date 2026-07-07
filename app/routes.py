@@ -34,6 +34,14 @@ _ADMIN_IDLE_TIMEOUT = 30 * 60  # 30 phút
 
 _AVATAR_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "avatars")
 _ALLOWED_AVATAR_EXT = {"jpg", "jpeg", "png", "gif"}
+_MAX_AVATAR_SIZE = 800 * 1024  # 800KB
+
+# Bảng màu cho avatar initials (dùng khi khách chưa upload ảnh)
+_AVATAR_PALETTE = [
+    ("#e0e7ff", "#3730a3"), ("#fce7f3", "#9d174d"),
+    ("#fef3c7", "#92400e"), ("#f3e8ff", "#6b21a8"),
+    ("#dcfce7", "#166534"), ("#fee2e2", "#991b1b"),
+]
 
 _SERVICE_IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "services")
 _ALLOWED_SERVICE_IMG_EXT = {"jpg", "jpeg", "png", "webp"}
@@ -181,6 +189,63 @@ def _save_staff_image(file):
     filename = f"{uuid.uuid4().hex}.{ext}"
     file.save(os.path.join(_STAFF_IMG_DIR, filename))
     return filename
+
+def _name_initials(full_name):
+    """Returns up to 2 uppercase initials from a name, e.g. 'Ha Anh' -> 'HA'."""
+    parts = (full_name or "").split()
+    return "".join(p[0].upper() for p in parts[:2]) or "?"
+
+def _resolve_customer_avatar(user_id):
+    """Returns the customer's avatar URL with a cache-busting version tag, or None if not set.
+    Avatars are stored as {user_id}.{ext} in static/uploads/avatars/."""
+    for ext in _ALLOWED_AVATAR_EXT:
+        path = os.path.join(_AVATAR_DIR, f"{user_id}.{ext}")
+        if os.path.exists(path):
+            version = int(os.path.getmtime(path))
+            return url_for("static", filename=f"uploads/avatars/{user_id}.{ext}", v=version)
+    return None
+
+def _save_avatar_image(file, user_id):
+    """Validates and saves a customer avatar as {user_id}.{ext} (max 800KB, JPG/GIF/PNG).
+    Removes any previous avatar first. Raises ValueError on invalid input."""
+    if not file or not file.filename:
+        raise ValueError("No file selected.")
+    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+    if ext not in _ALLOWED_AVATAR_EXT:
+        raise ValueError("Invalid file type. JPG, GIF or PNG only.")
+
+    file.seek(0, 2)
+    size = file.tell()
+    file.seek(0)
+    if size > _MAX_AVATAR_SIZE:
+        raise ValueError("File is too large. Max size is 800KB.")
+
+    os.makedirs(_AVATAR_DIR, exist_ok=True)
+    for old_ext in _ALLOWED_AVATAR_EXT:
+        old_path = os.path.join(_AVATAR_DIR, f"{user_id}.{old_ext}")
+        if os.path.exists(old_path):
+            os.remove(old_path)
+
+    file.save(os.path.join(_AVATAR_DIR, f"{user_id}.{ext}"))
+
+@main.app_context_processor
+def inject_customer_sidebar():
+    """Exposes the logged-in customer's avatar + name to every customer template
+    (sidebar in customer_base.html). Returns {} for non-customer requests."""
+    if session.get("role") != "customer":
+        return {}
+    user_id = session.get("user_id")
+    customer = get_customer_by_user_id(user_id) if user_id else None
+    if not customer:
+        return {}
+    bg, fg = _AVATAR_PALETTE[user_id % len(_AVATAR_PALETTE)]
+    return {"sidebar_customer": {
+        "name": customer["full_name"],
+        "avatar_url": _resolve_customer_avatar(user_id),
+        "initials": _name_initials(customer["full_name"]),
+        "avatar_bg": bg,
+        "avatar_color": fg,
+    }}
 
 #Server config
 def customer_login_required(view_func):
@@ -767,12 +832,7 @@ def customer_setting():
     dob_raw = customer["date_of_birth"]
     dob = datetime.strptime(dob_raw, "%Y-%m-%d").date() if dob_raw else None
 
-    profile_picture = None
-    for ext in _ALLOWED_AVATAR_EXT:
-        candidate = os.path.join(_AVATAR_DIR, f"{user_id}.{ext}")
-        if os.path.exists(candidate):
-            profile_picture = url_for("static", filename=f"uploads/avatars/{user_id}.{ext}")
-            break
+    profile_picture = _resolve_customer_avatar(user_id)
 
     current_user = {
         "full_name": customer["full_name"],
@@ -812,30 +872,11 @@ def update_avatar():
     user_id = session.get("user_id")
     file = request.files.get("avatar")
 
-    if not file or not file.filename:
-        flash("No file selected.", "error")
+    try:
+        _save_avatar_image(file, user_id)
+    except ValueError as e:
+        flash(str(e), "error")
         return redirect(url_for("main.customer_setting"))
-
-    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
-    if ext not in _ALLOWED_AVATAR_EXT:
-        flash("Invalid file type. JPG, GIF or PNG only.", "error")
-        return redirect(url_for("main.customer_setting"))
-
-    file.seek(0, 2)
-    size = file.tell()
-    file.seek(0)
-    if size > 800 * 1024:
-        flash("File is too large. Max size is 800KB.", "error")
-        return redirect(url_for("main.customer_setting"))
-
-    os.makedirs(_AVATAR_DIR, exist_ok=True)
-    for old_ext in _ALLOWED_AVATAR_EXT:
-        old_path = os.path.join(_AVATAR_DIR, f"{user_id}.{old_ext}")
-        if os.path.exists(old_path):
-            os.remove(old_path)
-
-    save_path = os.path.join(_AVATAR_DIR, f"{user_id}.{ext}")
-    file.save(save_path)
 
     flash("Profile picture updated.", "success")
     return redirect(url_for("main.customer_setting"))
