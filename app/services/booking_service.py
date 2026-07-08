@@ -76,8 +76,8 @@ class GuestService:
         
     
 # Map lựa chọn payment_method trên form -> công cụ thanh toán lưu ở booking/invoice.
-# Hiện chỉ có "pay_at_salon" (trả tiền mặt tại tiệm); online payment đang "coming soon".
-_PAYMENT_METHOD_MAP = {"pay_at_salon": "cash"}
+# "pay_at_salon" -> trả tiền mặt tại tiệm; "online" -> thanh toán thẻ qua Stripe.
+_PAYMENT_METHOD_MAP = {"pay_at_salon": "cash", "online": "online"}
 
 class BookingService:
     @staticmethod

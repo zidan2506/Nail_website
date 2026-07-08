@@ -251,13 +251,19 @@
               </div>
             </label>
 
-            <div class="bk-payment-card bk-payment-card--disabled">
-              <span class="material-symbols-outlined bk-payment-icon">credit_card</span>
-              <div class="bk-payment-body">
-                <h4 class="bk-payment-title">Online Payment</h4>
-                <p class="bk-payment-desc">Coming soon</p>
+            <label class="bk-payment-label">
+              <input class="bk-sr-only" type="radio" name="payment_method" value="online">
+              <div class="bk-payment-card">
+                <span class="material-symbols-outlined bk-payment-icon">credit_card</span>
+                <div class="bk-payment-body">
+                  <h4 class="bk-payment-title">Online Payment</h4>
+                  <p class="bk-payment-desc">Pay now securely by card</p>
+                </div>
+                <div class="bk-payment-radio">
+                  <span class="material-symbols-outlined bk-payment-radio-check">check</span>
+                </div>
               </div>
-            </div>
+            </label>
 
             <div class="bk-info-note">
               <span class="material-symbols-outlined bk-info-note-icon">info</span>
@@ -314,7 +320,7 @@
             <span class="material-symbols-outlined">arrow_back</span> Back
           </button>
           <button type="submit" class="bk-btn-confirm" id="confirm-btn">
-            Confirm &amp; verify email <span class="material-symbols-outlined">arrow_forward</span>
+            Confirm &amp; continue <span class="material-symbols-outlined">arrow_forward</span>
           </button>
         </div>
       </section>

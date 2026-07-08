@@ -13,6 +13,11 @@ class Config:
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 
+    # Stripe
+    STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
+    STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
+    STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
+
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 587
     MAIL_USE_TLS = True

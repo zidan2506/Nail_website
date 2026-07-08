@@ -18,12 +18,13 @@ from datetime import datetime, timedelta, date
 from app.services.email_system import send_verification_email, send_thank_you_email, generate_verification_code
 from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days, complete_booking_txn, revert_booking_txn
 from app.services.loyalty import get_active_multiplier, get_config_value, already_awarded, award_points, check_streak
+from app.services.payment_service import create_booking_checkout_session, construct_event, handle_event, fulfill_from_session
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
 from app.utils.helpers import split_customer_bookings, format_booking_date, format_booking_time, build_calendar_url, build_gg_map_url, build_services_by_category, mask_email, now_helsinki, today_helsinki
 from collections import Counter
-from app import oauth
+from app import oauth, csrf
 from app.database.db import create_oauth_user, set_user_oauth
 main = Blueprint("main",__name__)
 
@@ -1127,6 +1128,24 @@ def invoice_detail(invoice_id):
 def download_invoice(invoice_id):
     return render_template("customer/coming_soon.html", feature_name="Download Invoice")
 
+def _redirect_to_stripe(booking_id, service_id, fallback_endpoint):
+    """Tạo Stripe Checkout session cho booking online và redirect khách sang Stripe.
+    Nếu lỗi -> flash + quay lại trang đặt lịch."""
+    booking = get_booking_by_id(booking_id)
+    service = get_service_by_id(service_id)
+    try:
+        checkout_url = create_booking_checkout_session(
+            booking, service,
+            success_url=url_for('main.payment_success', _external=True),
+            cancel_url=url_for('main.payment_cancel', _external=True),
+        )
+    except Exception as e:
+        print(f"[payment] create session failed: {e}")
+        flash("Không tạo được phiên thanh toán. Vui lòng thử lại.", "error")
+        return redirect(url_for(fallback_endpoint))
+    return redirect(checkout_url)
+
+
 @main.route("/customer/create-booking", methods=['POST'])
 @customer_login_required
 def create_customer_booking():
@@ -1182,6 +1201,15 @@ def create_customer_booking():
         flash(str(e), "error")
         return redirect(url_for('main.customer_booking'))
     staff_id = staff["id"]
+
+    # Online: tạo booking 'unverified' rồi chuyển sang Stripe (bỏ qua OTP; thanh
+    # toán thành công sẽ tự confirm qua webhook).
+    if data["payment_method"] == "online":
+        booking_id = create_booking(customer_id, staff_id, service_id,
+                                    booking_date, start_time, end_time,
+                                    "unverified", note, "online")
+        session["booking_id"] = booking_id  # để /success hiển thị chi tiết sau khi trả tiền
+        return _redirect_to_stripe(booking_id, service_id, 'main.customer_booking')
 
     booking_id, verification_id = BookingService.create(
         customer_id,
@@ -3770,6 +3798,14 @@ def create_public_booking():
         return redirect(url_for('main.public_booking'))
     staff_id = staff["id"]
 
+    # Online: tạo booking 'unverified' rồi chuyển sang Stripe (bỏ qua OTP).
+    if data["payment_method"] == "online":
+        booking_id = create_booking(customer_id, staff_id, service_id,
+                                    booking_date, start_time, end_time,
+                                    "unverified", note, "online")
+        session["booking_id"] = booking_id  # để /success hiển thị chi tiết sau khi trả tiền
+        return _redirect_to_stripe(booking_id, service_id, 'main.public_booking')
+
     booking_id, verification_id = BookingService.create(
         customer_id,
         staff_id,
@@ -3791,6 +3827,35 @@ def create_public_booking():
     }
 
     return redirect(url_for('main.email_verification'))
+
+@main.route("/payment/success")
+def payment_success():
+    # Fallback: xác nhận & fulfill ngay khi khách quay về (bù webhook trễ/thiếu).
+    session_id = request.args.get("session_id")
+    if session_id:
+        try:
+            fulfill_from_session(session_id)
+        except Exception as e:
+            print(f"[payment] success fallback failed: {e}")
+    return render_template("payment/success.html")
+
+@main.route("/payment/cancel")
+def payment_cancel():
+    return render_template("payment/cancel.html")
+
+@main.route("/payment/webhook", methods=["POST"])
+@csrf.exempt
+def payment_webhook():
+    payload = request.get_data()
+    sig_header = request.headers.get("Stripe-Signature", "")
+    try:
+        event = construct_event(payload, sig_header)
+    except Exception as e:
+        print(f"[payment] webhook verify failed: {e}")
+        return "", 400
+
+    handle_event(event)  # lỗi ở đây -> 500 để Stripe retry
+    return "", 200
 
 @main.route("/services")
 def services():
