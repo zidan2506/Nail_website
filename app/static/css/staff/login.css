@@ -1,0 +1,74 @@
+/* =============================================================================
+   STAFF LOGIN — page-scoped overrides cho auth_base.html
+   Chỉ load trên trang staff login (qua {% block extra_css %}).
+   Nhiệm vụ: biến panel trái (mặc định là ảnh) thành nền đặc #3E1F47
+   + 2 vòng tròn trang trí + badge pill. Form bên phải TÁI DÙNG class auth-*
+   của auth.css, không style lại ở đây.
+   KHÔNG sửa auth.css / base.css — mọi override nằm gọn trong file này và
+   chỉ có hiệu lực trên trang staff login vì file chỉ được include ở đó.
+   ============================================================================= */
+
+/* ─── PANEL TRÁI: thay ảnh nền bằng nền đặc deep-plum ────────────────────────*/
+.auth-panel__img,
+.auth-panel__overlay {
+    display: none;
+}
+
+.auth-panel {
+    background: #3E1F47;
+    overflow: hidden;
+}
+
+/* Text panel: căn giữa cả dọc lẫn ngang (thay vì neo đáy trái) cho hợp
+   nền phẳng + ăn khớp trục giữa với form căn giữa bên phải */
+.auth-panel__text {
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    padding: 0 48px;
+    text-align: center;
+}
+
+/* Hai vòng tròn trang trí — vẽ bằng pseudo-element, không cần markup thêm */
+.auth-panel::before,
+.auth-panel::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.auth-panel::before {
+    width: 420px;
+    height: 420px;
+    top: -120px;
+    right: -120px;
+    background: rgba(171, 34, 97, 0.18);
+}
+
+.auth-panel::after {
+    width: 320px;
+    height: 320px;
+    bottom: -80px;
+    left: -60px;
+    background: rgba(214, 70, 130, 0.12);
+}
+
+/* ─── BADGE PILL trong panel trái ──────────────────────────────────────────*/
+.sf-login-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    background: rgba(214, 70, 130, 0.2);
+    border: 1px solid rgba(214, 70, 130, 0.4);
+    color: #ffd9e2;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}

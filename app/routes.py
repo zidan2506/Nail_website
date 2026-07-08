@@ -1534,7 +1534,7 @@ def redeem_terms():
 @main.route('/staff/login', methods=['POST', 'GET'])
 def staff_login():
     if request.method == "GET":
-        return render_template("/staff/staff_login.html")
+        return render_template("staff/login.html")
     
     ip = request.remote_addr
     now = time.time()

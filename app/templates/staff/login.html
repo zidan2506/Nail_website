@@ -1,0 +1,70 @@
+{% extends "auth_base.html" %}
+
+{% block title %}Sign In — DahaCare Staff{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/staff/login.css') }}">
+{% endblock %}
+
+{# ── Panel trái: chỉ override text (title + subtitle) + badge.
+     Nền #3E1F47 + vòng tròn trang trí do css/staff/login.css lo. ── #}
+{% block auth_panel_text %}
+<span class="sf-login-badge">Staff &amp; admin portal</span>
+<h1 class="auth-panel__title">Staff &amp; Admin Portal</h1>
+<p class="auth-panel__subtitle">Sign in to manage bookings, staff, and salon operations.</p>
+{% endblock %}
+
+{% block auth_content %}
+{# Flash messages đã do auth_base.html xử lý — KHÔNG lặp lại ở đây. #}
+
+<div class="auth-heading">
+    <h1 class="auth-heading__title">Sign in</h1>
+    <p class="auth-heading__subtitle">Staff &amp; administrator access</p>
+</div>
+
+{# Route thật hiện có: main.staff_login (không có blueprint 'staff'). #}
+<form class="auth-form" method="POST" action="{{ url_for('main.staff_login') }}">
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div>
+        <label class="auth-field__label" for="email">Email Address</label>
+        <div class="auth-field__input-wrap">
+            <span class="material-symbols-outlined auth-field__icon">mail</span>
+            <input class="auth-field__input"
+                   id="email" name="email" type="email"
+                   placeholder="you@dahacare.com" required>
+        </div>
+    </div>
+
+    <div>
+        <label class="auth-field__label" for="password">Password</label>
+        <div class="auth-field__input-wrap">
+            <span class="material-symbols-outlined auth-field__icon">lock</span>
+            <input class="auth-field__input auth-field__input--with-toggle"
+                   id="password" name="password" type="password"
+                   placeholder="••••••••" required>
+            {# Nút toggle tái dùng logic .auth-toggle-pw đã wire sẵn trong auth_base.html #}
+            <button class="auth-toggle-pw" type="button" data-target="password" aria-label="Toggle password visibility">
+                <span class="material-symbols-outlined">visibility</span>
+            </button>
+        </div>
+    </div>
+
+    {# Chưa có route staff forgot-password → dùng '#', không tạo route ở bước này. #}
+    <div class="auth-forgot-row">
+        <a href="#" class="auth-forgot-link">Forgot password?</a>
+    </div>
+
+    <button class="auth-submit-btn" type="submit">
+        Sign in
+        <span class="material-symbols-outlined">arrow_forward</span>
+    </button>
+
+</form>
+
+<div class="auth-switch">
+    <p>Not a staff member? <a href="{{ url_for('main.home') }}">Back to homepage</a></p>
+</div>
+
+{% endblock %}
