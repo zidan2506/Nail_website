@@ -51,9 +51,8 @@
         </div>
     </div>
 
-    {# Chưa có route staff forgot-password → dùng '#', không tạo route ở bước này. #}
     <div class="auth-forgot-row">
-        <a href="#" class="auth-forgot-link">Forgot password?</a>
+        <a href="{{ url_for('main.staff_forgot_password') }}" class="auth-forgot-link">Forgot password?</a>
     </div>
 
     <button class="auth-submit-btn" type="submit">

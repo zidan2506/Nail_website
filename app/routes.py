@@ -4021,7 +4021,35 @@ def forgot_password():
             "type": "forgot_password",
             "email": email,
             "verification_id": verification_id,
-            "user_id": user["id"]
+            "user_id": user["id"],
+            "role": user["role"]
+        }
+
+    return redirect(url_for("main.email_verification"))
+
+@main.route('/staff/forgot-password', methods=['GET', 'POST'])
+@guest_only
+def staff_forgot_password():
+    if request.method == "GET":
+        return render_template('/Auth/staff_forgot_password.html')
+
+    email = request.form.get("email", "").strip().lower()
+    if not email:
+        flash("Please enter your email address.", "error")
+        return redirect(url_for("main.staff_forgot_password"))
+
+    user = get_user_by_email(email)
+    if user and user["role"] in ("staff", "admin"):
+        expires_at = (now_helsinki() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
+        code = generate_verification_code()
+        verification_id = create_verification(code, "forgot_password", expires_at)
+        send_verification_email(email, code, "forgot_password")
+        session["verify_context"] = {
+            "type": "forgot_password",
+            "email": email,
+            "verification_id": verification_id,
+            "user_id": user["id"],
+            "role": user["role"]
         }
 
     return redirect(url_for("main.email_verification"))
@@ -4034,8 +4062,10 @@ def set_new_password():
         flash("Session expired. Please try again.", "error")
         return redirect(url_for("main.forgot_password"))
 
+    login_endpoint = "main.staff_login" if session.get("reset_role") in ("staff", "admin") else "main.login"
+
     if request.method == "GET":
-        return render_template("/Auth/set_new_password.html")
+        return render_template("/Auth/set_new_password.html", login_endpoint=login_endpoint)
 
     new_password = request.form.get("new_password", "")
     confirm_password = request.form.get("confirm_password", "")
@@ -4050,8 +4080,9 @@ def set_new_password():
 
     update_user_password(user_id, generate_password_hash(new_password))
     session.pop("reset_user_id", None)
+    session.pop("reset_role", None)
     flash("Password reset successfully. Please log in.", "success")
-    return redirect(url_for("main.login"))
+    return redirect(url_for(login_endpoint))
 
 @main.route('/logout', methods=['POST'])
 def logout():
@@ -4402,6 +4433,7 @@ def verify_email():
             if user_code == verification_code:
                 update_verification(verification_id, user_id, 1)
                 session["reset_user_id"] = user_id
+                session["reset_role"] = verify_context.get("role", "customer")
                 session.pop("verify_context", None)
                 return jsonify({
                     "success": True,
