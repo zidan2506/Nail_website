@@ -69,14 +69,13 @@
     <span class="material-symbols-outlined pay-icon">check_circle</span>
     <h1 class="pay-heading">Payment Successful!</h1>
     <p class="pay-body">
-      Thank you — your payment went through and your booking is now
-      <strong>confirmed</strong>. A confirmation email is on its way.
+      Thank you — your payment went through. You're all set.
     </p>
     <p class="pay-countdown">
-      Redirecting to your booking details in <span id="pay-count">5</span>s…
+      Redirecting in <span id="pay-count">5</span>s…
     </p>
     <div class="pay-actions">
-      <a href="{{ url_for('main.success') }}" class="pay-btn pay-btn--primary">View booking now</a>
+      <a href="{{ next_url }}" class="pay-btn pay-btn--primary">{{ next_label }}</a>
       <a href="{{ url_for('main.home') }}" id="pay-home" class="pay-btn pay-btn--ghost">Back to Home</a>
     </div>
   </div>
@@ -84,7 +83,7 @@
 
 <script>
   (function () {
-    var target = "{{ url_for('main.success') }}";
+    var target = "{{ next_url }}";
     var seconds = 5;
     var countEl = document.getElementById('pay-count');
     var tick = setInterval(function () {

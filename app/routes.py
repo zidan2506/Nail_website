@@ -13,12 +13,12 @@ from app.database.db import (
     get_report_top_services, get_report_staff_performance, get_report_loyalty,
     get_report_customer_growth,
 )
-from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_active_tier, get_tier_by_name, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_user_email, update_user_password, cancel_booking_with_reason, get_gallery_images, get_active_staff, get_admin_kpis, get_admin_today_appointments, get_admin_recent_activity, get_admin_revenue_chart, get_all_customers, get_admin_bookings, get_booking_status_counts, update_booking_details, get_staff_stats, get_staff_list, get_staff_role_list, create_staff, update_staff, delete_staff, toggle_staff_active, get_all_categories, get_service_categories_with_services, get_service_stats, create_service, update_service, delete_service, toggle_service_active, create_category, update_category, delete_category, get_admin_customer_stats, get_admin_customers, create_customer_admin, update_customer_admin, delete_customer_admin, get_gallery_images_admin, get_gallery_image_by_id, get_gallery_stats, create_gallery_images, update_gallery_image, delete_gallery_image, bulk_delete_gallery_images, reorder_gallery_images, get_admin_loyalty_customers, get_admin_loyalty_stats, get_rewards_admin, get_missions, create_reward, update_reward, get_reward_by_id, get_reward_redemption_count, delete_reward, deactivate_reward, update_mission_config, toggle_mission_config, get_active_membership_tiers, adjust_membership_admin, MISSION_KEYS, get_carousel_slides, get_carousel_slide_by_id, get_next_carousel_sort_order, create_homepage_slide, update_homepage_slide, create_offer_slide, update_offer_slide, delete_carousel_slide, get_mission_slides, update_mission_slide, reorder_carousel_slides, MISSION_SLOT_KEYS, auto_expire_bookings, get_admin_top_loyalty, get_admin_new_members, get_admin_top_services, get_popular_services, get_staff_bookings_range, get_invoice_by_booking, mark_invoice_paid, create_invoice, get_staff_history, get_staff_history_months, get_staff_history_stats, get_staff_profile_stats, update_staff_photo
+from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_current_tier, get_tier_by_name, get_tier_by_id, get_customer_subscription_row, get_active_subscription_rows, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_user_email, update_user_password, cancel_booking_with_reason, get_gallery_images, get_active_staff, get_admin_kpis, get_admin_today_appointments, get_admin_recent_activity, get_admin_revenue_chart, get_all_customers, get_admin_bookings, get_booking_status_counts, update_booking_details, get_staff_stats, get_staff_list, get_staff_role_list, create_staff, update_staff, delete_staff, toggle_staff_active, get_all_categories, get_service_categories_with_services, get_service_stats, create_service, update_service, delete_service, toggle_service_active, create_category, update_category, delete_category, get_admin_customer_stats, get_admin_customers, create_customer_admin, update_customer_admin, delete_customer_admin, get_gallery_images_admin, get_gallery_image_by_id, get_gallery_stats, create_gallery_images, update_gallery_image, delete_gallery_image, bulk_delete_gallery_images, reorder_gallery_images, get_admin_loyalty_customers, get_admin_loyalty_stats, get_rewards_admin, get_missions, create_reward, update_reward, get_reward_by_id, get_reward_redemption_count, delete_reward, deactivate_reward, update_mission_config, toggle_mission_config, get_active_membership_tiers, adjust_membership_admin, MISSION_KEYS, get_carousel_slides, get_carousel_slide_by_id, get_next_carousel_sort_order, create_homepage_slide, update_homepage_slide, create_offer_slide, update_offer_slide, delete_carousel_slide, get_mission_slides, update_mission_slide, reorder_carousel_slides, MISSION_SLOT_KEYS, auto_expire_bookings, get_admin_top_loyalty, get_admin_new_members, get_admin_top_services, get_popular_services, get_staff_bookings_range, get_invoice_by_booking, mark_invoice_paid, create_invoice, get_staff_history, get_staff_history_months, get_staff_history_stats, get_staff_profile_stats, update_staff_photo
 from datetime import datetime, timedelta, date
 from app.services.email_system import send_verification_email, send_thank_you_email, generate_verification_code
 from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days, complete_booking_txn, revert_booking_txn
 from app.services.loyalty import get_active_multiplier, get_config_value, already_awarded, award_points, check_streak
-from app.services.payment_service import create_booking_checkout_session, construct_event, handle_event, fulfill_from_session
+from app.services.payment_service import create_booking_checkout_session, construct_event, handle_event, fulfill_from_session, create_subscription_checkout_session, cancel_subscription, create_billing_portal_session
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
@@ -1252,9 +1252,70 @@ def upgrade_plan():
         flash("Plan not found.", "error")
         return redirect(url_for("main.tier_benefits"))
 
-    #redir tới page checkout ở đây
-    upgrade_membership(customer["id"], tier["id"], tier["duration_days"])
-    flash(f"Successfully upgraded to {tier['name']} plan!", "success")
+    active_subs = get_active_subscription_rows(customer["id"])
+
+    # Tier miễn phí (price = 0, vd Silver) -> không qua Stripe. Đang có sub trả phí
+    # thì hẹn hủy TẤT CẢ (giữ quyền lợi tới hết kỳ, sau đó tự về Silver).
+    if not tier["price"]:
+        renewing = [s for s in active_subs if not s["cancel_at_period_end"]]
+        if renewing:
+            for s in renewing:
+                try:
+                    cancel_subscription(s["stripe_subscription_id"])
+                except Exception as e:
+                    print(f"[payment] cancel on downgrade failed: {e}")
+            flash("Your paid membership will stop renewing and revert to Silver at the period end.", "success")
+        else:
+            flash("You're on the Silver plan.", "success")
+        return redirect(url_for("main.tier_benefits"))
+
+    # Tier trả phí nhưng chưa cấu hình Stripe Price -> lỗi cấu hình, báo rõ (thay vì
+    # âm thầm coi như free). Thường do quên chạy setup_stripe_prices sau khi reset DB.
+    if not tier["stripe_price_id"]:
+        print(f"[payment] tier {tier['name']} thieu stripe_price_id -> chay: python -m app.database.setup_stripe_prices")
+        flash("This plan isn't available for online payment right now. Please try again later.", "error")
+        return redirect(url_for("main.tier_benefits"))
+
+    # Đang gia hạn đúng tier này rồi -> thôi (khỏi mua trùng).
+    if any(s["tier_id"] == tier["id"] and not s["cancel_at_period_end"] for s in active_subs):
+        flash(f"You're already subscribed to {tier['name']}.", "success")
+        return redirect(url_for("main.tier_benefits"))
+
+    # Đổi tier = MUA MỚI: luôn tạo Checkout cho gói mới (kể cả đang có sub khác).
+    # Gói cũ sẽ bị hủy gia hạn SAU KHI thanh toán mới thành công (trong fulfillment),
+    # không refund gói cũ (giữ tới hết kỳ).
+    try:
+        checkout_url = create_subscription_checkout_session(
+            customer, tier,
+            success_url=url_for('main.payment_success', _external=True),
+            cancel_url=url_for('main.payment_cancel', _external=True),
+        )
+    except Exception as e:
+        print(f"[payment] create subscription session failed: {e}")
+        flash("Could not start checkout. Please try again.", "error")
+        return redirect(url_for("main.tier_benefits"))
+    return redirect(checkout_url)
+
+
+@main.route("/membership/cancel", methods=["POST"])
+@customer_login_required
+def cancel_membership():
+    user_id = session.get("user_id")
+    customer = get_customer_by_user_id(user_id)
+    if not customer:
+        flash("Customer profile not found!", "error")
+        return redirect(url_for("main.login"))
+
+    sub_row = get_customer_subscription_row(customer["id"])
+    if not sub_row:
+        flash("No active subscription to cancel.", "error")
+        return redirect(url_for("main.tier_benefits"))
+    try:
+        cancel_subscription(sub_row["stripe_subscription_id"])
+        flash("Your membership will not renew. You keep your benefits until the current period ends.", "success")
+    except Exception as e:
+        print(f"[payment] cancel failed: {e}")
+        flash("Could not cancel your membership. Please try again.", "error")
     return redirect(url_for("main.tier_benefits"))
 
 @main.route("/customer/redeem-reward", methods=["POST"])
@@ -1343,21 +1404,56 @@ def tier_benefits():
         flash("Customer profile not found!", "error")
         return redirect(url_for("main.login"))
 
-    active_tier = get_customer_active_tier(customer["id"])
-    current_plan = active_tier["name"].lower() if active_tier else "silver"
+    # "Current plan" = tier hiện tại (gói active mới nhất) — thống nhất với loyalty
+    # page và hệ số điểm qua get_customer_current_tier.
+    current = get_customer_current_tier(customer["id"])
+    current_plan = current["name"].lower() if current else "silver"
 
-    expires_at = None
-    if active_tier and active_tier.get("expires_at"):
+    sub_row = get_customer_subscription_row(customer["id"])  # newest active sub (cho banner)
+    has_subscription = sub_row is not None
+    will_cancel = bool(sub_row and sub_row["cancel_at_period_end"])
+    is_past_due = bool(sub_row and sub_row["subscription_status"] == "past_due")
+    sub_plan = None
+    sub_expires = None
+    if sub_row:
+        sub_tier = get_tier_by_id(sub_row["tier_id"])
+        sub_plan = sub_tier["name"] if sub_tier else None
         try:
-            expires_at = datetime.strptime(active_tier["expires_at"], "%Y-%m-%d %H:%M:%S").strftime("%b %d, %Y")
-        except ValueError:
-            expires_at = active_tier["expires_at"]
+            sub_expires = datetime.strptime(sub_row["expires_at"], "%Y-%m-%d %H:%M:%S").strftime("%b %d, %Y")
+        except (ValueError, TypeError):
+            sub_expires = sub_row["expires_at"]
 
     return render_template(
         "customer/customer_membership.html",
         current_plan=current_plan,
-        expires_at=expires_at,
+        has_subscription=has_subscription,
+        will_cancel=will_cancel,
+        is_past_due=is_past_due,
+        sub_plan=sub_plan,
+        sub_expires=sub_expires,
     )
+
+
+@main.route("/membership/billing-portal", methods=["POST"])
+@customer_login_required
+def billing_portal():
+    customer = get_customer_by_user_id(session.get("user_id"))
+    if not customer:
+        flash("Customer profile not found!", "error")
+        return redirect(url_for("main.login"))
+    if not customer["stripe_customer_id"]:
+        flash("No billing account found.", "error")
+        return redirect(url_for("main.tier_benefits"))
+    try:
+        url = create_billing_portal_session(
+            customer["stripe_customer_id"],
+            return_url=url_for("main.tier_benefits", _external=True),
+        )
+    except Exception as e:
+        print(f"[payment] billing portal failed: {e}")
+        flash("Could not open the billing portal. Please try again later.", "error")
+        return redirect(url_for("main.tier_benefits"))
+    return redirect(url)
 
 @main.route("/customer/rewards")
 @customer_login_required
@@ -1393,7 +1489,7 @@ def customer_loyalty_points():
         "gold":    ("tier-gold",    "badge-gold",    "fill-gold"),
         "silver":  ("tier-silver",  "badge-silver",  ""),
     }
-    active_tier = get_customer_active_tier(customer_id)
+    active_tier = get_customer_current_tier(customer_id)
     if active_tier:
         tier_name = active_tier["name"]
         tier_class, badge_class, fill_class = _tier_css.get(tier_name.lower(), ("tier-silver", "badge-silver", ""))
@@ -3830,14 +3926,22 @@ def create_public_booking():
 
 @main.route("/payment/success")
 def payment_success():
-    # Fallback: xác nhận & fulfill ngay khi khách quay về (bù webhook trễ/thiếu).
+    # Fallback: xác nhận & fulfill ngay khi khách quay về (bù webhook trễ/thiếu),
+    # rồi điều hướng theo loại thanh toán.
+    next_url = url_for('main.home')
+    next_label = "Continue"
     session_id = request.args.get("session_id")
     if session_id:
         try:
-            fulfill_from_session(session_id)
+            ptype = fulfill_from_session(session_id)
         except Exception as e:
             print(f"[payment] success fallback failed: {e}")
-    return render_template("payment/success.html")
+            ptype = None
+        if ptype == "booking":
+            next_url, next_label = url_for('main.success'), "View booking now"
+        elif ptype == "membership":
+            next_url, next_label = url_for('main.tier_benefits'), "View my membership"
+    return render_template("payment/success.html", next_url=next_url, next_label=next_label)
 
 @main.route("/payment/cancel")
 def payment_cancel():

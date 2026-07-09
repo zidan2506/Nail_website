@@ -823,14 +823,16 @@ def upgrade_membership(customer_id, tier_id, duration_days):
         now = now_helsinki()
         started_at = now.strftime("%Y-%m-%d %H:%M:%S")
         expires_at = (now + timedelta(days=duration_days)).strftime("%Y-%m-%d %H:%M:%S")
+        # Cấp tay/free -> chỉ đụng row thủ công (stripe_subscription_id IS NULL),
+        # tuyệt đối không clobber row subscription của Stripe.
         existing = conn.execute(
-            "SELECT id FROM customer_memberships WHERE customer_id = ?",
+            "SELECT id FROM customer_memberships WHERE customer_id = ? AND stripe_subscription_id IS NULL",
             (customer_id,)
         ).fetchone()
         if existing:
             conn.execute(
-                "UPDATE customer_memberships SET tier_id = ?, started_at = ?, expires_at = ?, is_active = 1 WHERE customer_id = ?",
-                (tier_id, started_at, expires_at, customer_id)
+                "UPDATE customer_memberships SET tier_id = ?, started_at = ?, expires_at = ?, is_active = 1 WHERE id = ?",
+                (tier_id, started_at, expires_at, existing["id"])
             )
         else:
             conn.execute(
@@ -843,25 +845,6 @@ def upgrade_membership(customer_id, tier_id, duration_days):
         raise
     finally:
         conn.close()
-
-# Thêm vào app/database/db.py
-
-def get_customer_active_tier(customer_id):
-    conn = get_connection()
-    now_str = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
-    row = conn.execute("""
-        SELECT mt.name, mt.point_multiplier, cm.expires_at
-        FROM customer_memberships cm
-        JOIN membership_tiers mt ON cm.tier_id = mt.id
-        WHERE cm.customer_id = ?
-          AND cm.is_active = 1
-          AND cm.expires_at > ?
-        ORDER BY mt.point_multiplier DESC
-        LIMIT 1
-    """, (customer_id, now_str)).fetchone()
-    conn.close()
-    return dict(row) if row else None
-
 
 def get_loyalty_balance(customer_id):
     conn = get_connection()
@@ -1338,7 +1321,12 @@ def get_admin_top_loyalty(limit=5):
                SUM(lpl.points) AS total_points
         FROM loyalty_points_log lpl
         JOIN customers c ON c.id = lpl.customer_id
-        LEFT JOIN customer_memberships cm ON cm.customer_id = c.id AND cm.is_active = 1
+        LEFT JOIN customer_memberships cm ON cm.id = (
+            SELECT cm2.id FROM customer_memberships cm2
+            WHERE cm2.customer_id = c.id AND cm2.is_active = 1
+            ORDER BY (cm2.stripe_subscription_id IS NOT NULL) DESC, cm2.id DESC
+            LIMIT 1
+        )
         LEFT JOIN membership_tiers mt ON mt.id = cm.tier_id
         GROUP BY lpl.customer_id
         HAVING total_points > 0
@@ -1590,11 +1578,16 @@ def get_admin_customer_stats(month_start_str):
     new_this_month = conn.execute(
         "SELECT COUNT(*) FROM customers WHERE created_at >= ?", (month_start_str,)
     ).fetchone()[0]
+    # Đếm mỗi khách MỘT lần theo tier hiện tại (sub mới nhất thắng), tránh nhân
+    # bản khi khách có nhiều row membership active (Silver cấp tay + sub, hoặc chồng lấn).
     tier_rows = conn.execute("""
         SELECT LOWER(mt.name) AS tier, COUNT(*) AS cnt
-        FROM customer_memberships cm
-        JOIN membership_tiers mt ON cm.tier_id = mt.id
-        WHERE cm.is_active = 1
+        FROM customers c
+        JOIN membership_tiers mt ON mt.id = (
+            SELECT cm.tier_id FROM customer_memberships cm
+            WHERE cm.customer_id = c.id AND cm.is_active = 1
+            ORDER BY (cm.stripe_subscription_id IS NOT NULL) DESC, cm.id DESC LIMIT 1
+        )
         GROUP BY LOWER(mt.name)
     """).fetchall()
     conn.close()
@@ -1615,7 +1608,12 @@ def get_admin_customers(q='', sort='newest', tier='', page=1, per_page=15):
 
     joins = """
         FROM customers c
-        LEFT JOIN customer_memberships cm ON cm.customer_id = c.id AND cm.is_active = 1
+        LEFT JOIN customer_memberships cm ON cm.id = (
+            SELECT cm2.id FROM customer_memberships cm2
+            WHERE cm2.customer_id = c.id AND cm2.is_active = 1
+            ORDER BY (cm2.stripe_subscription_id IS NOT NULL) DESC, cm2.id DESC
+            LIMIT 1
+        )
         LEFT JOIN membership_tiers mt ON mt.id = cm.tier_id
         LEFT JOIN (
             SELECT customer_id, SUM(points) AS total_points
@@ -1765,7 +1763,12 @@ def get_admin_loyalty_customers():
                cm.expires_at AS membership_expires_at,
                cm.tier_id AS membership_tier_id
         FROM customers c
-        LEFT JOIN customer_memberships cm ON cm.customer_id = c.id AND cm.is_active = 1
+        LEFT JOIN customer_memberships cm ON cm.id = (
+            SELECT cm2.id FROM customer_memberships cm2
+            WHERE cm2.customer_id = c.id AND cm2.is_active = 1
+            ORDER BY (cm2.stripe_subscription_id IS NOT NULL) DESC, cm2.id DESC
+            LIMIT 1
+        )
         LEFT JOIN membership_tiers mt ON mt.id = cm.tier_id
         LEFT JOIN (
             SELECT customer_id, SUM(points) AS total_points
@@ -1916,8 +1919,9 @@ def get_active_membership_tiers():
 def adjust_membership_admin(customer_id, tier_id, started_at, expires_at):
     conn = get_connection()
     try:
+        # Admin cấp tay -> chỉ deactivate row thủ công cũ, không đụng row subscription.
         conn.execute(
-            "UPDATE customer_memberships SET is_active = 0 WHERE customer_id = ? AND is_active = 1",
+            "UPDATE customer_memberships SET is_active = 0 WHERE customer_id = ? AND is_active = 1 AND stripe_subscription_id IS NULL",
             (customer_id,)
         )
         conn.execute(
@@ -1930,6 +1934,137 @@ def adjust_membership_admin(customer_id, tier_id, started_at, expires_at):
         raise
     finally:
         conn.close()
+
+
+# ─────────────────────────────────────────────────────────────
+#  STRIPE MEMBERSHIP SUBSCRIPTION
+#  Nhiều dòng/khách: row subscription (stripe_subscription_id NOT NULL) do webhook
+#  quản; row cấp tay (NULL) do admin/free quản. get_customer_current_tier chọn tier
+#  hiện tại: sub active MỚI NHẤT thắng, không có sub -> grant cấp tay.
+# ─────────────────────────────────────────────────────────────
+
+def set_customer_stripe_id(customer_id, stripe_customer_id):
+    conn = get_connection()
+    conn.execute("UPDATE customers SET stripe_customer_id = ? WHERE id = ?",
+                 (stripe_customer_id, customer_id))
+    conn.commit()
+    conn.close()
+
+
+def get_customer_by_stripe_customer(stripe_customer_id):
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM customers WHERE stripe_customer_id = ?",
+                       (stripe_customer_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def get_tier_by_id(tier_id):
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM membership_tiers WHERE id = ?", (tier_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def get_tier_by_stripe_price(price_id):
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM membership_tiers WHERE stripe_price_id = ?",
+                       (price_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def get_customer_subscription_row(customer_id):
+    """Row subscription đang active MỚI NHẤT của khách (để cancel / hiển thị banner).
+    Lúc đổi tier có thể có nhiều row active chồng lấn -> lấy cái mới nhất (đang gia hạn)."""
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT * FROM customer_memberships WHERE customer_id = ? "
+        "AND stripe_subscription_id IS NOT NULL AND is_active = 1 "
+        "ORDER BY id DESC LIMIT 1",
+        (customer_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def get_active_subscription_rows(customer_id):
+    """Mọi row subscription đang active của khách (kể cả đã hẹn hủy). Dùng để hủy
+    các gói cũ khi mua gói mới, và guard 'đã đăng ký tier này'."""
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT * FROM customer_memberships WHERE customer_id = ? "
+        "AND stripe_subscription_id IS NOT NULL AND is_active = 1",
+        (customer_id,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_customer_current_tier(customer_id):
+    """Tier HIỆN TẠI của khách — nguồn chân lý DUY NHẤT cho cả hiển thị lẫn hệ số
+    điểm. Định nghĩa: gói SUBSCRIPTION active MỚI NHẤT (gói vừa chọn / đang gia hạn;
+    kể cả đã hẹn hủy thì vẫn giữ tới hết kỳ). Không có sub -> grant cấp tay active
+    cao nhất. Không có gì -> None (Silver). Không dùng 'tier cao nhất thắng' nữa:
+    đổi tier = tier mới thay thế ngay (gói cũ đã hủy không còn tính quyền lợi)."""
+    conn = get_connection()
+    now_str = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
+    row = conn.execute("""
+        SELECT mt.name, mt.point_multiplier, cm.expires_at
+        FROM customer_memberships cm
+        JOIN membership_tiers mt ON cm.tier_id = mt.id
+        WHERE cm.customer_id = ? AND cm.is_active = 1 AND cm.expires_at > ?
+          AND cm.stripe_subscription_id IS NOT NULL
+        ORDER BY cm.id DESC LIMIT 1
+    """, (customer_id, now_str)).fetchone()
+    if not row:
+        row = conn.execute("""
+            SELECT mt.name, mt.point_multiplier, cm.expires_at
+            FROM customer_memberships cm
+            JOIN membership_tiers mt ON cm.tier_id = mt.id
+            WHERE cm.customer_id = ? AND cm.is_active = 1 AND cm.expires_at > ?
+              AND cm.stripe_subscription_id IS NULL
+            ORDER BY mt.point_multiplier DESC LIMIT 1
+        """, (customer_id, now_str)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def upsert_subscription_membership(customer_id, tier_id, subscription_id, expires_at,
+                                   status, cancel_at_period_end):
+    """Upsert row subscription theo stripe_subscription_id. Dùng chung cho
+    checkout hoàn tất + gia hạn + đổi tier + đồng bộ trạng thái. is_active suy ra
+    từ status Stripe (past_due vẫn giữ tier, expiry gate sẽ chặn nếu quá hạn).
+    subscription_status lưu trạng thái Stripe gốc (để phân biệt active vs past_due)."""
+    is_active = 1 if status in ("active", "trialing", "past_due") else 0
+    started_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
+    conn = get_connection()
+    try:
+        # ON CONFLICT theo UNIQUE(stripe_subscription_id): nguyên tử trong 1 câu,
+        # chống race fallback+webhook tạo dòng trùng. started_at giữ nguyên khi update.
+        conn.execute(
+            "INSERT INTO customer_memberships (customer_id, tier_id, started_at, "
+            "expires_at, is_active, stripe_subscription_id, subscription_status, "
+            "cancel_at_period_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(stripe_subscription_id) DO UPDATE SET "
+            "tier_id=excluded.tier_id, expires_at=excluded.expires_at, "
+            "subscription_status=excluded.subscription_status, "
+            "cancel_at_period_end=excluded.cancel_at_period_end, is_active=excluded.is_active",
+            (customer_id, tier_id, started_at, expires_at, is_active,
+             subscription_id, status, cancel_at_period_end))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def deactivate_subscription(subscription_id):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE customer_memberships SET is_active = 0, subscription_status = 'canceled' "
+        "WHERE stripe_subscription_id = ?", (subscription_id,))
+    conn.commit()
+    conn.close()
 
 
 # ─────────────────────────────────────────────────────────────

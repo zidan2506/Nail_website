@@ -1,23 +1,12 @@
-from app.database.db import get_connection
+from app.database.db import get_connection, get_customer_current_tier
 from app.utils.helpers import now_helsinki
 from datetime import datetime
 
 
 def get_active_multiplier(customer_id: int) -> float:
-    conn = get_connection()
-    now_str = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
-    row = conn.execute("""
-        SELECT mt.point_multiplier
-        FROM customer_memberships cm
-        JOIN membership_tiers mt ON cm.tier_id = mt.id
-        WHERE cm.customer_id = ?
-          AND cm.is_active = 1
-          AND cm.expires_at > ?
-        ORDER BY mt.point_multiplier DESC
-        LIMIT 1
-    """, (customer_id, now_str)).fetchone()
-    conn.close()
-    return float(row["point_multiplier"]) if row else 1.0
+    # Hệ số điểm theo TIER HIỆN TẠI (gói đang gia hạn), thống nhất với hiển thị.
+    tier = get_customer_current_tier(customer_id)
+    return float(tier["point_multiplier"]) if tier else 1.0
 
 
 def get_config_value(key: str) -> int:

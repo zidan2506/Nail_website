@@ -271,6 +271,38 @@
   <h1 class="mp-page-h1">Choose your plan</h1>
   <p class="mp-page-sub">Unlock exclusive perks, rewards, and priority care tailored to your loyalty.</p>
 
+  {% if is_past_due %}
+  <div style="display:flex;align-items:center;gap:0.85rem;max-width:640px;margin:0 auto 1rem;padding:14px 20px;border-radius:16px;background:rgba(220,38,38,0.07);border:1px solid rgba(220,38,38,0.30);">
+    <span class="material-symbols-outlined" style="color:#dc2626;">error</span>
+    <div style="flex:1;font-size:0.9rem;color:#7f1d1d;line-height:1.5;">
+      Your last payment failed. <strong>Update your card</strong> to keep your membership active.
+    </div>
+    <form method="POST" action="{{ url_for('main.billing_portal') }}" style="flex-shrink:0;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" style="background:#dc2626;border:none;color:#fff;border-radius:12px;padding:9px 18px;font-size:0.82rem;font-weight:700;cursor:pointer;">Update payment method</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if has_subscription %}
+  <div style="display:flex;align-items:center;gap:0.85rem;max-width:640px;margin:0 auto 2rem;padding:14px 20px;border-radius:16px;background:rgba(214,70,130,0.06);border:1px solid rgba(214,70,130,0.18);">
+    <span class="material-symbols-outlined" style="color:#d64682;">card_membership</span>
+    <div style="flex:1;font-size:0.9rem;color:#5a4a52;line-height:1.5;">
+      {% if will_cancel %}
+        Your <strong>{{ sub_plan }}</strong> membership will not renew · active until <strong>{{ sub_expires }}</strong>.
+      {% else %}
+        Your <strong>{{ sub_plan }}</strong> membership renews on <strong>{{ sub_expires }}</strong>.
+      {% endif %}
+    </div>
+    {% if not will_cancel %}
+    <form method="POST" action="{{ url_for('main.cancel_membership') }}" style="flex-shrink:0;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" style="background:transparent;border:1px solid rgba(214,70,130,0.4);color:#d64682;border-radius:12px;padding:9px 18px;font-size:0.82rem;font-weight:700;cursor:pointer;">Cancel renewal</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endif %}
+
   <div class="mp-grid">
 
     <!-- SILVER -->
@@ -285,7 +317,6 @@
       <p class="mp-tagline">Start your loyalty journey</p>
       {% if current_plan == 'silver' %}
       <button class="mp-btn mp-btn-current" disabled>Current plan</button>
-      {% if expires_at %}<p class="mp-price-hint" style="margin-top:-1rem;">Renews {{ expires_at }}</p>{% endif %}
       {% else %}
       <form method="POST" action="{{ url_for('main.upgrade_plan') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -318,7 +349,6 @@
       <p class="mp-tagline">For our dedicated guests</p>
       {% if current_plan == 'gold' %}
       <button class="mp-btn mp-btn-current" disabled>Current plan</button>
-      {% if expires_at %}<p class="mp-price-hint" style="margin-top:-1rem;">Renews {{ expires_at }}</p>{% endif %}
       {% else %}
       <form method="POST" action="{{ url_for('main.upgrade_plan') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -348,7 +378,6 @@
       <p class="mp-tagline">For our most valued guests</p>
       {% if current_plan == 'diamond' %}
       <button class="mp-btn mp-btn-current" disabled>Current plan</button>
-      {% if expires_at %}<p class="mp-price-hint" style="margin-top:-1rem;">Renews {{ expires_at }}</p>{% endif %}
       {% else %}
       <form method="POST" action="{{ url_for('main.upgrade_plan') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

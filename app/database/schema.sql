@@ -82,6 +82,7 @@ CREATE TABLE customers (
     notes TEXT,
     date_of_birth DATE,
     is_verified INTEGER NOT NULL DEFAULT 0,
+    stripe_customer_id TEXT DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
@@ -154,6 +155,7 @@ CREATE TABLE membership_tiers (
     duration_days INTEGER NOT NULL,
     description TEXT,
     is_active INTEGER NOT NULL DEFAULT 1,
+    stripe_price_id TEXT DEFAULT NULL,     -- Stripe recurring Price (monthly); NULL cho tier miễn phí (Silver)
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -164,6 +166,9 @@ CREATE TABLE customer_memberships (
     started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expires_at DATETIME NOT NULL,
     is_active INTEGER NOT NULL DEFAULT 1,
+    stripe_subscription_id TEXT DEFAULT NULL,      -- NULL = cấp tay (admin/free); có giá trị = subscription Stripe
+    subscription_status TEXT DEFAULT NULL,         -- 'active' | 'past_due' | 'canceled' | NULL (cấp tay); dùng để cảnh báo khi past_due
+    cancel_at_period_end INTEGER NOT NULL DEFAULT 0,
 
     FOREIGN KEY (customer_id) REFERENCES customers(id),
     FOREIGN KEY (tier_id) REFERENCES membership_tiers(id)
@@ -272,4 +277,6 @@ CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_customers_email ON customers(email);
 CREATE INDEX idx_loyalty_log_customer_id ON loyalty_points_log(customer_id);
 CREATE INDEX idx_customer_memberships_customer_id ON customer_memberships(customer_id);
+-- Mỗi Stripe subscription chỉ 1 dòng (NULL vẫn cho nhiều dòng cấp tay). Chống race fallback+webhook.
+CREATE UNIQUE INDEX idx_cm_stripe_sub ON customer_memberships(stripe_subscription_id);
 CREATE INDEX idx_carousel_slides_key ON carousel_slides(carousel_key);
