@@ -1,0 +1,2636 @@
+# Vietnamese translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-07-11 00:09+0700\n"
+"PO-Revision-Date: 2026-07-10 19:40+0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: vi\n"
+"Language-Team: vi <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/routes.py:35
+msgid "Chờ xác nhận"
+msgstr ""
+
+#: app/routes.py:35 app/templates/staff/staff_bookings.html:276
+msgid "Đã xác nhận"
+msgstr ""
+
+#: app/routes.py:35 app/templates/staff/staff_bookings.html:277
+#: app/templates/staff/staff_bookings.html:303
+msgid "Đang thực hiện"
+msgstr ""
+
+#: app/routes.py:36 app/templates/staff/staff_bookings.html:277
+#: app/templates/staff/staff_bookings.html:307
+#: app/templates/staff/staff_bookings.html:374
+#: app/templates/staff/staff_bookings.html:452
+#: app/templates/staff/staff_history.html:232
+#: app/templates/staff/staff_history.html:252
+#: app/templates/staff/staff_history.html:397
+msgid "Hoàn thành"
+msgstr ""
+
+#: app/routes.py:36 app/templates/staff/staff_history.html:233
+#: app/templates/staff/staff_history.html:256
+#: app/templates/staff/staff_history.html:312
+#: app/templates/staff/staff_history.html:398
+msgid "Đã hủy"
+msgstr ""
+
+#: app/routes.py:36
+msgid "Không đến"
+msgstr ""
+
+#: app/routes.py:37
+msgid "hôm nay"
+msgstr ""
+
+#: app/routes.py:37
+msgid "trong tuần này"
+msgstr ""
+
+#: app/routes.py:37
+msgid "trong tháng này"
+msgstr ""
+
+#: app/routes.py:38
+msgid "trong tháng trước"
+msgstr ""
+
+#: app/routes.py:39 app/routes.py:1625
+msgid "✓ Claimed"
+msgstr "✓ Đã nhận"
+
+#: app/routes.py:39 app/routes.py:1627
+msgid "✓ All Reviewed"
+msgstr "✓ Đã đánh giá hết"
+
+#: app/routes.py:39
+msgid "Start"
+msgstr "Bắt đầu"
+
+#: app/routes.py:39
+msgid "Claim"
+msgstr "Nhận"
+
+#: app/routes.py:1915
+msgid "vào ngày %(date)s"
+msgstr ""
+
+#: app/routes.py:1916
+msgid "từ %(start)s đến %(end)s"
+msgstr ""
+
+#: app/template_filters.py:115
+msgid "Visa"
+msgstr ""
+
+#: app/template_filters.py:116
+msgid "Mastercard"
+msgstr ""
+
+#: app/template_filters.py:117
+msgid "Mobile Pay"
+msgstr ""
+
+#: app/template_filters.py:118
+msgid "Apple Pay"
+msgstr ""
+
+#: app/template_filters.py:119
+msgid "Google Pay"
+msgstr ""
+
+#: app/template_filters.py:120 app/templates/customer/customer_history.html:139
+msgid "Cash"
+msgstr "Tiền mặt"
+
+#: app/template_filters.py:121 app/templates/customer/customer_history.html:140
+msgid "Bank Transfer"
+msgstr "Chuyển khoản"
+
+#: app/templates/base.html:44 app/templates/base.html:83
+#: app/templates/base.html:226 app/templates/public/services.html:3
+msgid "Services"
+msgstr "Dịch vụ"
+
+#: app/templates/base.html:45 app/templates/base.html:84
+#: app/templates/base.html:227 app/templates/public/gallery.html:3
+msgid "Gallery"
+msgstr "Thư viện ảnh"
+
+#: app/templates/base.html:46 app/templates/base.html:86
+msgid "About"
+msgstr "Giới thiệu"
+
+#: app/templates/base.html:47 app/templates/base.html:87
+#: app/templates/base.html:236
+msgid "Contact"
+msgstr "Liên hệ"
+
+#: app/templates/base.html:58 app/templates/base.html:95
+msgid "Register"
+msgstr "Đăng ký"
+
+#: app/templates/base.html:59 app/templates/base.html:69
+#: app/templates/base.html:96 app/templates/base.html:105
+#: app/templates/customer_base.html:109
+msgid "Book Now"
+msgstr "Đặt lịch"
+
+#: app/templates/base.html:63 app/templates/base.html:99
+msgid "My Dashboard"
+msgstr "Bảng điều khiển"
+
+#: app/templates/base.html:65 app/templates/base.html:101
+msgid "My Schedule"
+msgstr "Lịch của tôi"
+
+#: app/templates/base.html:67 app/templates/base.html:103
+msgid "Management"
+msgstr "Quản trị"
+
+#: app/templates/base.html:74
+msgid "Open menu"
+msgstr "Mở menu"
+
+#: app/templates/base.html:85
+#: app/templates/customer/customer_membership.html:270
+msgid "Membership"
+msgstr "Thành viên"
+
+#: app/templates/base.html:219
+msgid "Business ID:"
+msgstr "Mã số doanh nghiệp:"
+
+#: app/templates/base.html:224
+msgid "Explore"
+msgstr "Khám phá"
+
+#: app/templates/base.html:233
+msgid "Support"
+msgstr "Hỗ trợ"
+
+#: app/templates/base.html:235 app/templates/public/about.html:3
+msgid "About Us"
+msgstr "Về chúng tôi"
+
+#: app/templates/base.html:237
+msgid "FAQs"
+msgstr "Câu hỏi thường gặp"
+
+#: app/templates/base.html:244
+msgid "All rights reserved."
+msgstr "Bảo lưu mọi quyền."
+
+#: app/templates/base.html:246
+msgid "Privacy Policy"
+msgstr "Chính sách bảo mật"
+
+#: app/templates/base.html:247
+msgid "Terms of Service"
+msgstr "Điều khoản dịch vụ"
+
+#: app/templates/customer_base.html:6
+msgid "Customer Portal"
+msgstr "Cổng khách hàng"
+
+#: app/templates/customer/customer_dashboard.html:2
+#: app/templates/customer_base.html:54
+msgid "Dashboard"
+msgstr "Bảng điều khiển"
+
+#: app/templates/customer/my_bookings.html:3
+#: app/templates/customer_base.html:63
+msgid "My bookings"
+msgstr "Lịch đặt của tôi"
+
+#: app/templates/customer_base.html:71
+msgid "Book appointment"
+msgstr "Đặt lịch hẹn"
+
+#: app/templates/customer/customer_history.html:3
+#: app/templates/customer/customer_history.html:16
+#: app/templates/customer_base.html:80
+msgid "History"
+msgstr "Lịch sử"
+
+#: app/templates/customer/customer_dashboard.html:584
+#: app/templates/customer/loyalty_points.html:1066
+#: app/templates/customer_base.html:89
+msgid "Loyalty Points"
+msgstr "Điểm thưởng"
+
+#: app/templates/customer_base.html:98
+msgid "Setting"
+msgstr "Cài đặt"
+
+#: app/templates/customer_base.html:115
+msgid "Logout"
+msgstr "Đăng xuất"
+
+#: app/templates/customer/coming_soon.html:3
+#: app/templates/customer/coming_soon.html:129
+msgid "Coming Soon"
+msgstr "Sắp ra mắt"
+
+#: app/templates/customer/coming_soon.html:133
+msgid "This feature is on its way"
+msgstr "Tính năng này sắp có mặt"
+
+#: app/templates/customer/coming_soon.html:135
+msgid "Currently in development"
+msgstr "Đang trong quá trình phát triển"
+
+#: app/templates/customer/coming_soon.html:138
+msgid "Coming soon"
+msgstr "Sắp có"
+
+#: app/templates/customer/coming_soon.html:142
+msgid "We're working hard to bring this to you."
+msgstr "Chúng tôi đang nỗ lực để mang điều này đến cho bạn."
+
+#: app/templates/customer/coming_soon.html:143
+msgid "It'll be available here once it's ready."
+msgstr "Nó sẽ có mặt ở đây ngay khi sẵn sàng."
+
+#: app/templates/customer/coming_soon.html:150
+msgid "Back to dashboard"
+msgstr "Về bảng điều khiển"
+
+#: app/templates/customer/customer_booking.html:3
+#: app/templates/public/public_booking.html:3
+msgid "Book an Appointment"
+msgstr "Đặt lịch hẹn"
+
+#: app/templates/customer/customer_booking.html:28
+#: app/templates/customer/customer_booking.html:279
+#: app/templates/public/public_booking.html:25
+#: app/templates/public/public_booking.html:329
+msgid "Service"
+msgstr "Dịch vụ"
+
+#: app/templates/customer/customer_booking.html:32
+#: app/templates/customer/customer_booking.html:287
+#: app/templates/customer/customer_history.html:173
+#: app/templates/customer/my_bookings.html:385
+#: app/templates/public/public_booking.html:29
+#: app/templates/public/public_booking.html:337
+msgid "Stylist"
+msgstr "Thợ làm"
+
+#: app/templates/customer/customer_booking.html:36
+#: app/templates/customer/invoice_detail.html:100
+#: app/templates/customer/reschedule.html:203
+#: app/templates/customer/reschedule.html:219
+#: app/templates/public/public_booking.html:33
+msgid "Date"
+msgstr "Ngày"
+
+#: app/templates/customer/customer_booking.html:40
+#: app/templates/public/public_booking.html:41
+msgid "Checkout"
+msgstr "Thanh toán"
+
+#: app/templates/customer/customer_booking.html:59
+#: app/templates/public/public_booking.html:60
+msgid "Select a Service"
+msgstr "Chọn dịch vụ"
+
+#: app/templates/customer/customer_booking.html:60
+#: app/templates/public/public_booking.html:61
+msgid "Choose from our curated selection of luxury treatments."
+msgstr "Lựa chọn từ bộ sưu tập liệu trình cao cấp của chúng tôi."
+
+#: app/templates/customer/customer_booking.html:64
+#: app/templates/public/public_booking.html:65
+msgid "All Services"
+msgstr "Tất cả dịch vụ"
+
+#: app/templates/customer/customer_booking.html:101
+#: app/templates/customer/customer_booking.html:409
+#: app/templates/customer/invoice_detail.html:83
+#: app/templates/public/public_booking.html:101
+#: app/templates/public/public_booking.html:460
+msgid "min"
+msgstr "phút"
+
+#: app/templates/customer/customer_booking.html:115
+#: app/templates/customer/customer_booking.html:169
+#: app/templates/customer/customer_booking.html:220
+#: app/templates/public/public_booking.html:115
+#: app/templates/public/public_booking.html:169
+#: app/templates/public/public_booking.html:220
+msgid "Continue"
+msgstr "Tiếp tục"
+
+#: app/templates/customer/customer_booking.html:126
+#: app/templates/public/public_booking.html:126
+msgid "Choose a Professional"
+msgstr "Chọn chuyên viên"
+
+#: app/templates/customer/customer_booking.html:127
+#: app/templates/public/public_booking.html:127
+msgid "Select your preferred stylist or let us match you."
+msgstr "Chọn thợ bạn thích hoặc để chúng tôi ghép cho bạn."
+
+#: app/templates/customer/customer_booking.html:138
+#: app/templates/customer/customer_booking.html:288
+#: app/templates/customer/customer_booking.html:417
+#: app/templates/public/public_booking.html:138
+#: app/templates/public/public_booking.html:338
+#: app/templates/public/public_booking.html:465
+msgid "No Preference"
+msgstr "Không yêu cầu cụ thể"
+
+#: app/templates/customer/customer_booking.html:139
+#: app/templates/public/public_booking.html:139
+msgid "Any available specialist"
+msgstr "Bất kỳ chuyên viên nào có sẵn"
+
+#: app/templates/customer/customer_booking.html:157
+#: app/templates/public/public_booking.html:157
+msgid "Nail Technician"
+msgstr "Kỹ thuật viên móng"
+
+#: app/templates/customer/customer_booking.html:166
+#: app/templates/customer/customer_booking.html:217
+#: app/templates/customer/customer_booking.html:319
+#: app/templates/public/public_booking.html:166
+#: app/templates/public/public_booking.html:217
+#: app/templates/public/public_booking.html:267
+#: app/templates/public/public_booking.html:369
+msgid "Back"
+msgstr "Quay lại"
+
+#: app/templates/customer/customer_booking.html:182
+#: app/templates/public/public_booking.html:182
+msgid "Select Date & Time"
+msgstr "Chọn ngày & giờ"
+
+#: app/templates/customer/customer_booking.html:183
+#: app/templates/public/public_booking.html:183
+msgid "Pick a date, then choose an available slot."
+msgstr "Chọn ngày, sau đó chọn khung giờ trống."
+
+#: app/templates/customer/customer_booking.html:190
+#: app/templates/public/public_booking.html:190
+msgid "Previous month"
+msgstr "Tháng trước"
+
+#: app/templates/customer/customer_booking.html:194
+#: app/templates/public/public_booking.html:194
+msgid "Next month"
+msgstr "Tháng sau"
+
+#: app/templates/customer/customer_booking.html:199
+#: app/templates/customer/reschedule.html:111
+#: app/templates/public/public_booking.html:199
+msgid "MO"
+msgstr "T2"
+
+#: app/templates/customer/customer_booking.html:199
+#: app/templates/customer/reschedule.html:112
+#: app/templates/public/public_booking.html:199
+msgid "TU"
+msgstr "T3"
+
+#: app/templates/customer/customer_booking.html:199
+#: app/templates/customer/reschedule.html:113
+#: app/templates/public/public_booking.html:199
+msgid "WE"
+msgstr "T4"
+
+#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/reschedule.html:114
+#: app/templates/public/public_booking.html:200
+msgid "TH"
+msgstr "T5"
+
+#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/reschedule.html:115
+#: app/templates/public/public_booking.html:200
+msgid "FR"
+msgstr "T6"
+
+#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/reschedule.html:116
+#: app/templates/public/public_booking.html:200
+msgid "SA"
+msgstr "T7"
+
+#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/reschedule.html:117
+#: app/templates/public/public_booking.html:200
+msgid "SU"
+msgstr "CN"
+
+#: app/templates/customer/customer_booking.html:206
+#: app/templates/customer/reschedule.html:153
+#: app/templates/public/public_booking.html:206
+msgid "Available Times"
+msgstr "Giờ trống"
+
+#: app/templates/customer/customer_booking.html:207
+#: app/templates/public/public_booking.html:207
+msgid "Select a date to see available times"
+msgstr "Chọn ngày để xem giờ trống"
+
+#: app/templates/customer/customer_booking.html:209
+#: app/templates/public/public_booking.html:209
+msgid "Please select a date first"
+msgstr "Vui lòng chọn ngày trước"
+
+#: app/templates/customer/customer_booking.html:232
+#: app/templates/public/public_booking.html:282
+msgid "Confirm & Pay"
+msgstr "Xác nhận & thanh toán"
+
+#: app/templates/customer/customer_booking.html:238
+#: app/templates/customer/invoice_detail.html:48
+#: app/templates/public/public_booking.html:288
+msgid "Payment Method"
+msgstr "Phương thức thanh toán"
+
+#: app/templates/customer/customer_booking.html:245
+#: app/templates/public/public_booking.html:295
+msgid "Pay at Salon"
+msgstr "Thanh toán tại salon"
+
+#: app/templates/customer/customer_booking.html:246
+#: app/templates/public/public_booking.html:296
+msgid "Pay after your service is completed"
+msgstr "Thanh toán sau khi hoàn tất dịch vụ"
+
+#: app/templates/customer/customer_booking.html:259
+#: app/templates/public/public_booking.html:309
+msgid "Online Payment"
+msgstr "Thanh toán trực tuyến"
+
+#: app/templates/customer/customer_booking.html:260
+#: app/templates/public/public_booking.html:310
+msgid "Pay now securely by card"
+msgstr "Thanh toán ngay an toàn bằng thẻ"
+
+#: app/templates/customer/customer_booking.html:270
+#: app/templates/public/public_booking.html:320
+msgid "You'll receive a verification email after confirming. Your booking will be"
+msgstr "Bạn sẽ nhận email xác minh sau khi xác nhận. Lịch đặt của bạn sẽ ở trạng thái"
+
+#: app/templates/customer/customer_booking.html:270
+#: app/templates/public/public_booking.html:320
+msgid "pending"
+msgstr "chờ duyệt"
+
+#: app/templates/customer/customer_booking.html:270
+#: app/templates/public/public_booking.html:320
+msgid "until the salon confirms your appointment."
+msgstr "cho đến khi salon xác nhận lịch hẹn của bạn."
+
+#: app/templates/customer/customer_booking.html:276
+#: app/templates/public/public_booking.html:326
+msgid "Booking Summary"
+msgstr "Tóm tắt đặt lịch"
+
+#: app/templates/customer/customer_booking.html:283
+#: app/templates/customer/invoice_detail.html:82
+#: app/templates/public/public_booking.html:333
+msgid "Duration"
+msgstr "Thời lượng"
+
+#: app/templates/customer/customer_booking.html:291
+#: app/templates/public/public_booking.html:341
+msgid "Date & Time"
+msgstr "Ngày & giờ"
+
+#: app/templates/customer/customer_booking.html:297
+#: app/templates/public/public_booking.html:347
+msgid "Subtotal"
+msgstr "Tạm tính"
+
+#: app/templates/customer/customer_booking.html:300
+#: app/templates/public/public_booking.html:350
+msgid "VAT (25.5%%)"
+msgstr "VAT (25.5%%)"
+
+#: app/templates/customer/customer_booking.html:303
+#: app/templates/public/public_booking.html:353
+msgid "Total"
+msgstr "Tổng cộng"
+
+#: app/templates/customer/customer_booking.html:309
+msgid "You'll earn"
+msgstr "Bạn sẽ nhận được"
+
+#: app/templates/customer/customer_booking.html:309
+msgid "loyalty points with this booking."
+msgstr "điểm thưởng cho lần đặt này."
+
+#: app/templates/customer/customer_booking.html:311
+#: app/templates/public/public_booking.html:361
+msgid "By confirming, you agree to our 24h cancellation policy."
+msgstr "Bằng việc xác nhận, bạn đồng ý với chính sách hủy trong 24 giờ."
+
+#: app/templates/customer/customer_booking.html:322
+#: app/templates/public/public_booking.html:372
+msgid "Confirm & continue"
+msgstr "Xác nhận & tiếp tục"
+
+#: app/templates/customer/customer_booking.html:415
+#: app/templates/customer/loyalty_points.html:1091
+#: app/templates/customer/loyalty_points.html:1112
+#: app/templates/customer/loyalty_points.html:1221
+#: app/templates/customer/loyalty_points.html:1381
+#: app/templates/customer/my_bookings.html:84
+#: app/templates/customer/my_bookings.html:95
+#: app/templates/customer/redeem_confirm_modal.html:112
+#: app/templates/customer/redeem_confirm_modal.html:131
+msgid "pts"
+msgstr "điểm"
+
+#: app/templates/customer/customer_booking.html:425
+#: app/templates/public/public_booking.html:473
+msgid "Processing…"
+msgstr "Đang xử lý…"
+
+#: app/templates/customer/customer_booking.html:516
+#: app/templates/public/public_booking.html:550
+msgid "Please select a service first."
+msgstr "Vui lòng chọn dịch vụ trước."
+
+#: app/templates/customer/customer_booking.html:520
+#: app/templates/customer/reschedule.html:157
+#: app/templates/public/public_booking.html:554
+msgid "Please select a date first."
+msgstr "Vui lòng chọn ngày trước."
+
+#: app/templates/customer/customer_booking.html:527
+#: app/templates/public/public_booking.html:561
+msgid "Loading..."
+msgstr "Đang tải..."
+
+#: app/templates/customer/customer_booking.html:534
+#: app/templates/public/public_booking.html:568
+msgid "Could not load available times."
+msgstr "Không thể tải giờ trống."
+
+#: app/templates/customer/customer_booking.html:541
+#: app/templates/public/public_booking.html:575
+msgid "No available slots for this date."
+msgstr "Không có giờ trống cho ngày này."
+
+#: app/templates/customer/customer_dashboard.html:498
+msgid "Customer Dashboard"
+msgstr "Bảng điều khiển khách hàng"
+
+#: app/templates/customer/customer_dashboard.html:499
+msgid "Good morning, %(name)s!"
+msgstr "Chào buổi sáng, %(name)s!"
+
+#: app/templates/customer/customer_dashboard.html:500
+msgid "Ready for your next glow up?"
+msgstr "Sẵn sàng cho lần tỏa sáng tiếp theo?"
+
+#: app/templates/customer/customer_dashboard.html:502
+msgid "Book Appointment"
+msgstr "Đặt lịch hẹn"
+
+#: app/templates/customer/customer_dashboard.html:517
+msgid "✦ Loyalty Reward"
+msgstr "✦ Phần thưởng thân thiết"
+
+#: app/templates/customer/customer_dashboard.html:546
+#: app/templates/customer/customer_dashboard.html:568
+msgid "Upcoming Appointment"
+msgstr "Lịch hẹn sắp tới"
+
+#: app/templates/customer/customer_dashboard.html:552
+msgid "%(date)s • %(time)s with %(staff)s."
+msgstr "%(date)s • %(time)s với %(staff)s."
+
+#: app/templates/customer/customer_dashboard.html:555
+#: app/templates/customer/my_bookings.html:42
+#: app/templates/customer/view_booking_details.html:26
+#: app/templates/public/success.html:103
+msgid "Add to Calendar"
+msgstr "Thêm vào lịch"
+
+#: app/templates/customer/customer_dashboard.html:556
+#: app/templates/customer/my_bookings.html:43
+#: app/templates/customer/my_bookings.html:189
+#: app/templates/customer/my_bookings.html:246
+#: app/templates/customer/my_bookings.html:293
+msgid "View Details"
+msgstr "Xem chi tiết"
+
+#: app/templates/customer/customer_dashboard.html:569
+#: app/templates/customer/my_bookings.html:55
+msgid "No upcoming visits scheduled"
+msgstr "Chưa có lịch hẹn sắp tới"
+
+#: app/templates/customer/customer_dashboard.html:570
+#: app/templates/customer/my_bookings.html:58
+msgid "Ready for a new look? Book your next treatment today."
+msgstr "Sẵn sàng cho diện mạo mới? Đặt liệu trình tiếp theo ngay hôm nay."
+
+#: app/templates/customer/customer_dashboard.html:572
+#: app/templates/customer/my_bookings.html:62
+msgid "Book new appointment"
+msgstr "Đặt lịch hẹn mới"
+
+#: app/templates/customer/customer_dashboard.html:589
+msgid "Keep blooming —"
+msgstr "Tiếp tục tỏa sáng —"
+
+#: app/templates/customer/customer_dashboard.html:589
+msgid "your next treat is almost here!"
+msgstr "phần thưởng tiếp theo sắp đến rồi!"
+
+#: app/templates/customer/customer_dashboard.html:595
+#: app/templates/customer/my_bookings.html:85
+#: app/templates/customer/my_bookings.html:96
+msgid "Complete"
+msgstr "Hoàn thành"
+
+#: app/templates/customer/customer_dashboard.html:600
+#: app/templates/customer/my_bookings.html:77
+msgid "%(points)s points to %(reward)s"
+msgstr "%(points)s điểm để đạt %(reward)s"
+
+#: app/templates/customer/customer_dashboard.html:604
+msgid "You've unlocked all rewards! 🎉"
+msgstr "Bạn đã mở khóa tất cả phần thưởng! 🎉"
+
+#: app/templates/customer/customer_dashboard.html:608
+msgid "View All Rewards"
+msgstr "Xem tất cả phần thưởng"
+
+#: app/templates/customer/customer_history.html:15
+msgid "Your records"
+msgstr "Hồ sơ của bạn"
+
+#: app/templates/customer/customer_history.html:17
+msgid "Review your past visits and invoices."
+msgstr "Xem lại các lần ghé thăm và hóa đơn của bạn."
+
+#: app/templates/customer/customer_history.html:24
+msgid "Total Visits"
+msgstr "Tổng số lần ghé"
+
+#: app/templates/customer/customer_history.html:33
+msgid "Total Spent"
+msgstr "Tổng chi tiêu"
+
+#: app/templates/customer/customer_history.html:42
+msgid "Favorite Stylist"
+msgstr "Thợ yêu thích"
+
+#: app/templates/customer/customer_history.html:46
+msgid "visits"
+msgstr "lần ghé"
+
+#: app/templates/customer/customer_history.html:51
+msgid "Top Service"
+msgstr "Dịch vụ hàng đầu"
+
+#: app/templates/customer/customer_history.html:55
+msgid "times"
+msgstr "lần"
+
+#: app/templates/customer/customer_history.html:61
+#: app/templates/customer/my_bookings.html:17
+msgid "Appointments"
+msgstr "Lịch hẹn"
+
+#: app/templates/customer/customer_history.html:62
+msgid "Invoices"
+msgstr "Hóa đơn"
+
+#: app/templates/customer/customer_history.html:72
+msgid "All times"
+msgstr "Mọi thời điểm"
+
+#: app/templates/customer/customer_history.html:76
+#: app/templates/customer/customer_history.html:87
+#: app/templates/customer/customer_history.html:99
+#: app/templates/customer/customer_history.html:103
+#: app/templates/customer/customer_history.html:114
+#: app/templates/customer/customer_history.html:118
+#: app/templates/customer/customer_history.html:129
+#: app/templates/customer/customer_history.html:133
+#: app/templates/customer/customer_history.html:579
+#: app/templates/customer/customer_history.html:584
+#: app/templates/public/services.html:47
+msgid "All"
+msgstr "Tất cả"
+
+#: app/templates/customer/customer_history.html:77
+msgid "Last 30 days"
+msgstr "30 ngày qua"
+
+#: app/templates/customer/customer_history.html:78
+msgid "Last 3 months"
+msgstr "3 tháng qua"
+
+#: app/templates/customer/customer_history.html:79
+msgid "Last year"
+msgstr "Năm qua"
+
+#: app/templates/customer/customer_history.html:86
+#: app/templates/customer/my_bookings.html:240
+msgid "Status:"
+msgstr "Trạng thái:"
+
+#: app/templates/customer/customer_history.html:98
+#: app/templates/customer/my_bookings.html:178
+#: app/templates/customer/my_bookings.html:235
+msgid "Stylist:"
+msgstr "Thợ làm:"
+
+#: app/templates/customer/customer_history.html:113
+msgid "Service:"
+msgstr "Dịch vụ:"
+
+#: app/templates/customer/customer_history.html:128
+msgid "Payment:"
+msgstr "Thanh toán:"
+
+#: app/templates/customer/customer_history.html:150
+#: app/templates/customer/customer_history.html:155
+msgid "Newest first"
+msgstr "Mới nhất trước"
+
+#: app/templates/customer/customer_history.html:156
+msgid "Oldest first"
+msgstr "Cũ nhất trước"
+
+#: app/templates/customer/customer_history.html:157
+msgid "Amount: High to Low"
+msgstr "Số tiền: Cao đến Thấp"
+
+#: app/templates/customer/customer_history.html:158
+msgid "Amount: Low to High"
+msgstr "Số tiền: Thấp đến Cao"
+
+#: app/templates/customer/customer_history.html:163
+msgid "Clear all"
+msgstr "Xóa tất cả"
+
+#: app/templates/customer/customer_history.html:172
+msgid "Service & Date"
+msgstr "Dịch vụ & Ngày"
+
+#: app/templates/customer/customer_history.html:174
+msgid "Price"
+msgstr "Giá"
+
+#: app/templates/customer/customer_history.html:175
+#: app/templates/customer/customer_history.html:269
+#: app/templates/customer/invoice_detail.html:55
+#: app/templates/customer/loyalty_points.html:1338
+msgid "Status"
+msgstr "Trạng thái"
+
+#: app/templates/customer/customer_history.html:176
+#: app/templates/customer/customer_history.html:270
+msgid "Action"
+msgstr "Thao tác"
+
+#: app/templates/customer/customer_history.html:198
+#: app/templates/customer/customer_history.html:581
+#: app/templates/customer/my_bookings.html:137
+#: app/templates/customer/my_bookings.html:275
+msgid "Cancelled"
+msgstr "Đã hủy"
+
+#: app/templates/customer/customer_history.html:200
+#: app/templates/customer/customer_history.html:222
+#: app/templates/customer/customer_history.html:244
+#: app/templates/customer/my_bookings.html:294
+#: app/templates/customer/my_bookings.html:395
+msgid "Rebook"
+msgstr "Đặt lại"
+
+#: app/templates/customer/customer_history.html:219
+#: app/templates/customer/customer_history.html:241
+#: app/templates/customer/customer_history.html:580
+msgid "Completed"
+msgstr "Hoàn thành"
+
+#: app/templates/customer/customer_history.html:221
+msgid "Reviewed"
+msgstr "Đã đánh giá"
+
+#: app/templates/customer/customer_history.html:243
+msgid "Leave Review"
+msgstr "Để lại đánh giá"
+
+#: app/templates/customer/customer_history.html:266
+msgid "Invoice & Service"
+msgstr "Hóa đơn & Dịch vụ"
+
+#: app/templates/customer/customer_history.html:267
+msgid "Payment"
+msgstr "Thanh toán"
+
+#: app/templates/customer/customer_history.html:268
+#: app/templates/customer/my_bookings.html:390
+msgid "Amount"
+msgstr "Số tiền"
+
+#: app/templates/customer/customer_history.html:301
+msgid "Download PDF"
+msgstr "Tải PDF"
+
+#: app/templates/customer/customer_history.html:441
+msgid "No result"
+msgstr "Không có kết quả"
+
+#: app/templates/customer/customer_history.html:442
+msgid "Showing"
+msgstr "Đang hiển thị"
+
+#: app/templates/customer/customer_history.html:442
+msgid "of"
+msgstr "trên"
+
+#: app/templates/customer/customer_history.html:585
+msgid "Paid"
+msgstr "Đã thanh toán"
+
+#: app/templates/customer/customer_history.html:586
+msgid "Refunded"
+msgstr "Đã hoàn tiền"
+
+#: app/templates/customer/customer_history.html:587
+#: app/templates/customer/my_bookings.html:129
+#: app/templates/customer/my_bookings.html:219
+msgid "Pending"
+msgstr "Chờ duyệt"
+
+#: app/templates/customer/customer_membership.html:3
+msgid "Membership Plans"
+msgstr "Gói thành viên"
+
+#: app/templates/customer/customer_membership.html:271
+msgid "Choose your plan"
+msgstr "Chọn gói của bạn"
+
+#: app/templates/customer/customer_membership.html:272
+msgid "Unlock exclusive perks, rewards, and priority care tailored to your loyalty."
+msgstr "Mở khóa đặc quyền, phần thưởng và ưu tiên chăm sóc riêng cho sự gắn bó của bạn."
+
+#: app/templates/customer/customer_membership.html:278
+msgid "Your last payment failed."
+msgstr "Lần thanh toán gần nhất thất bại."
+
+#: app/templates/customer/customer_membership.html:278
+msgid "Update your card"
+msgstr "Cập nhật thẻ của bạn"
+
+#: app/templates/customer/customer_membership.html:278
+msgid "to keep your membership active."
+msgstr "để giữ thành viên của bạn hoạt động."
+
+#: app/templates/customer/customer_membership.html:282
+msgid "Update payment method"
+msgstr "Cập nhật phương thức thanh toán"
+
+#: app/templates/customer/customer_membership.html:292
+msgid "Your %(plan)s membership will not renew · active until %(date)s."
+msgstr "Thành viên %(plan)s của bạn sẽ không gia hạn · còn hiệu lực đến %(date)s."
+
+#: app/templates/customer/customer_membership.html:294
+msgid "Your %(plan)s membership renews on %(date)s."
+msgstr "Thành viên %(plan)s của bạn gia hạn vào %(date)s."
+
+#: app/templates/customer/customer_membership.html:300
+msgid "Cancel renewal"
+msgstr "Hủy gia hạn"
+
+#: app/templates/customer/customer_membership.html:312
+#: app/templates/customer/customer_membership.html:341
+#: app/templates/customer/customer_membership.html:373
+msgid "Your current plan"
+msgstr "Gói hiện tại của bạn"
+
+#: app/templates/customer/customer_membership.html:316
+msgid "Entry level"
+msgstr "Cấp cơ bản"
+
+#: app/templates/customer/customer_membership.html:317
+msgid "Start your loyalty journey"
+msgstr "Bắt đầu hành trình thân thiết"
+
+#: app/templates/customer/customer_membership.html:319
+#: app/templates/customer/customer_membership.html:351
+#: app/templates/customer/customer_membership.html:380
+msgid "Current plan"
+msgstr "Gói hiện tại"
+
+#: app/templates/customer/customer_membership.html:324
+msgid "Upgrade to Silver"
+msgstr "Nâng lên Silver"
+
+#: app/templates/customer/customer_membership.html:329
+msgid "Earn base loyalty points on every visit"
+msgstr "Nhận điểm thưởng cơ bản mỗi lần ghé"
+
+#: app/templates/customer/customer_membership.html:330
+msgid "Birthday bonus points"
+msgstr "Điểm thưởng sinh nhật"
+
+#: app/templates/customer/customer_membership.html:331
+msgid "Access to member-only promotions"
+msgstr "Truy cập ưu đãi dành riêng cho thành viên"
+
+#: app/templates/customer/customer_membership.html:332
+msgid "Monthly reward voucher"
+msgstr "Voucher thưởng hàng tháng"
+
+#: app/templates/customer/customer_membership.html:333
+msgid "Priority booking (standard)"
+msgstr "Đặt lịch ưu tiên (tiêu chuẩn)"
+
+#: app/templates/customer/customer_membership.html:348
+msgid "Most chosen"
+msgstr "Được chọn nhiều nhất"
+
+#: app/templates/customer/customer_membership.html:349
+msgid "For our dedicated guests"
+msgstr "Dành cho khách hàng gắn bó"
+
+#: app/templates/customer/customer_membership.html:356
+msgid "Upgrade to Gold"
+msgstr "Nâng lên Gold"
+
+#: app/templates/customer/customer_membership.html:361
+msgid "Everything in Silver"
+msgstr "Mọi thứ trong Silver"
+
+#: app/templates/customer/customer_membership.html:362
+msgid "1.5× point multiplier on all services"
+msgstr "Nhân 1.5× điểm cho mọi dịch vụ"
+
+#: app/templates/customer/customer_membership.html:363
+msgid "Early access to new services & seasonal offers"
+msgstr "Truy cập sớm dịch vụ mới & ưu đãi theo mùa"
+
+#: app/templates/customer/customer_membership.html:364
+msgid "Complimentary nail care kit (quarterly)"
+msgstr "Bộ chăm sóc móng miễn phí (hàng quý)"
+
+#: app/templates/customer/customer_membership.html:365
+msgid "Dedicated booking slot on weekends"
+msgstr "Khung giờ đặt riêng cuối tuần"
+
+#: app/templates/customer/customer_membership.html:377
+msgid "Ultimate luxury"
+msgstr "Sang trọng tối thượng"
+
+#: app/templates/customer/customer_membership.html:378
+msgid "For our most valued guests"
+msgstr "Dành cho khách hàng quý giá nhất"
+
+#: app/templates/customer/customer_membership.html:385
+msgid "Upgrade to Diamond"
+msgstr "Nâng lên Diamond"
+
+#: app/templates/customer/customer_membership.html:390
+msgid "Everything in Gold"
+msgstr "Mọi thứ trong Gold"
+
+#: app/templates/customer/customer_membership.html:391
+msgid "2× point multiplier on all services"
+msgstr "Nhân 2× điểm cho mọi dịch vụ"
+
+#: app/templates/customer/customer_membership.html:392
+msgid "Free add-on service every visit"
+msgstr "Dịch vụ bổ sung miễn phí mỗi lần ghé"
+
+#: app/templates/customer/customer_membership.html:393
+msgid "Personal nail stylist assignment"
+msgstr "Chỉ định thợ móng riêng"
+
+#: app/templates/customer/customer_membership.html:394
+msgid "VIP lounge access & complimentary drinks"
+msgstr "Vào phòng chờ VIP & đồ uống miễn phí"
+
+#: app/templates/customer/customer_setting.html:51
+#: app/templates/customer/customer_setting.html:610
+msgid "Account Settings"
+msgstr "Cài đặt tài khoản"
+
+#: app/templates/customer/customer_setting.html:609
+msgid "My Account"
+msgstr "Tài khoản của tôi"
+
+#: app/templates/customer/customer_setting.html:611
+msgid "Manage your personal information and security preferences."
+msgstr "Quản lý thông tin cá nhân và tùy chọn bảo mật của bạn."
+
+#: app/templates/customer/customer_setting.html:667
+msgid "Profile picture of %(name)s"
+msgstr "Ảnh đại diện của %(name)s"
+
+#: app/templates/customer/customer_setting.html:679
+msgid "Profile Picture"
+msgstr "Ảnh đại diện"
+
+#: app/templates/customer/customer_setting.html:680
+msgid "JPG, GIF or PNG. Max size of 800K"
+msgstr "JPG, GIF hoặc PNG. Tối đa 800K"
+
+#: app/templates/customer/customer_setting.html:718
+msgid "Personal Information"
+msgstr "Thông tin cá nhân"
+
+#: app/templates/customer/customer_setting.html:734
+#: app/templates/public/public_booking.html:245
+msgid "Full Name"
+msgstr "Họ và tên"
+
+#: app/templates/customer/customer_setting.html:743
+msgid "Enter full name"
+msgstr "Nhập họ và tên"
+
+#: app/templates/customer/customer_setting.html:746
+#: app/templates/customer/customer_setting.html:755
+#: app/templates/customer/customer_setting.html:771
+#: app/templates/customer/customer_setting.html:796
+#: app/templates/customer/customer_setting.html:1140
+msgid "Change"
+msgstr "Thay đổi"
+
+#: app/templates/customer/customer_setting.html:752
+#: app/templates/public/public_booking.html:254
+#: app/templates/staff/login.html:31
+msgid "Email Address"
+msgstr "Địa chỉ email"
+
+#: app/templates/customer/customer_setting.html:761
+#: app/templates/public/public_booking.html:249
+msgid "Phone Number"
+msgstr "Số điện thoại"
+
+#: app/templates/customer/customer_setting.html:768
+msgid "Enter phone number"
+msgstr "Nhập số điện thoại"
+
+#: app/templates/customer/customer_setting.html:781
+msgid "Date of Birth"
+msgstr "Ngày sinh"
+
+#: app/templates/customer/customer_setting.html:786
+msgid "Not set"
+msgstr "Chưa đặt"
+
+#: app/templates/customer/customer_setting.html:803
+msgid "Save Changes"
+msgstr "Lưu thay đổi"
+
+#: app/templates/customer/customer_setting.html:840
+msgid "Security"
+msgstr "Bảo mật"
+
+#: app/templates/customer/customer_setting.html:846
+#: app/templates/staff/login.html:41
+msgid "Password"
+msgstr "Mật khẩu"
+
+#: app/templates/customer/customer_setting.html:851
+msgid "Change Password"
+msgstr "Đổi mật khẩu"
+
+#: app/templates/customer/customer_setting.html:858
+msgid "Last changed %(time)s"
+msgstr "Đổi lần cuối %(time)s"
+
+#: app/templates/customer/customer_setting.html:876
+#: app/templates/staff/staff_profile.html:303
+msgid "Language"
+msgstr "Ngôn ngữ"
+
+#: app/templates/customer/customer_setting.html:879
+msgid "Choose your preferred display language."
+msgstr "Chọn ngôn ngữ hiển thị bạn muốn."
+
+#: app/templates/customer/customer_setting.html:908
+msgid "Change Email Address"
+msgstr "Đổi địa chỉ email"
+
+#: app/templates/customer/customer_setting.html:909
+#: app/templates/customer/customer_setting.html:978
+#: app/templates/customer/my_bookings.html:314
+#: app/templates/public/gallery.html:97
+msgid "Close"
+msgstr "Đóng"
+
+#: app/templates/customer/customer_setting.html:917
+msgid "To verify your identity, we'll send a verification code to your current email address."
+msgstr "Để xác minh danh tính, chúng tôi sẽ gửi mã xác minh đến email hiện tại của bạn."
+
+#: app/templates/customer/customer_setting.html:923
+#: app/templates/customer/customer_setting.html:944
+#: app/templates/customer/customer_setting.html:992
+#: app/templates/customer/customer_setting.html:1017
+#: app/templates/customer/customer_setting.html:1149
+#: app/templates/customer/my_bookings.html:193
+#: app/templates/customer/my_bookings.html:249
+#: app/templates/customer/redeem_confirm_modal.html:170
+#: app/templates/customer/reschedule.html:250
+#: app/templates/customer/view_booking_details.html:86
+#: app/templates/customer/view_booking_details.html:91
+msgid "Cancel"
+msgstr "Hủy"
+
+#: app/templates/customer/customer_setting.html:924
+#: app/templates/customer/customer_setting.html:993
+#: app/templates/customer/customer_setting.html:1062
+#: app/templates/customer/customer_setting.html:1107
+#: app/templates/customer/customer_setting.html:1113
+#: app/templates/customer/customer_setting.html:1196
+#: app/templates/customer/customer_setting.html:1239
+#: app/templates/customer/customer_setting.html:1245
+msgid "Send Code"
+msgstr "Gửi mã"
+
+#: app/templates/customer/customer_setting.html:931
+#: app/templates/customer/customer_setting.html:1000
+msgid "Enter the verification code sent to"
+msgstr "Nhập mã xác minh đã gửi đến"
+
+#: app/templates/customer/customer_setting.html:931
+msgid "and your new email address."
+msgstr "và địa chỉ email mới của bạn."
+
+#: app/templates/customer/customer_setting.html:936
+#: app/templates/customer/customer_setting.html:1005
+msgid "Verification Code"
+msgstr "Mã xác minh"
+
+#: app/templates/customer/customer_setting.html:937
+#: app/templates/customer/customer_setting.html:1006
+msgid "Enter 6-digit code"
+msgstr "Nhập mã 6 chữ số"
+
+#: app/templates/customer/customer_setting.html:940
+msgid "New Email Address"
+msgstr "Địa chỉ email mới"
+
+#: app/templates/customer/customer_setting.html:941
+msgid "Enter new email address"
+msgstr "Nhập địa chỉ email mới"
+
+#: app/templates/customer/customer_setting.html:945
+msgid "Update Email"
+msgstr "Cập nhật email"
+
+#: app/templates/customer/customer_setting.html:977
+#: app/templates/customer/customer_setting.html:1018
+msgid "Update Password"
+msgstr "Cập nhật mật khẩu"
+
+#: app/templates/customer/customer_setting.html:986
+msgid "To verify your identity, we'll send a verification code to your email address."
+msgstr "Để xác minh danh tính, chúng tôi sẽ gửi mã xác minh đến email của bạn."
+
+#: app/templates/customer/customer_setting.html:1000
+msgid "and your new password."
+msgstr "và mật khẩu mới của bạn."
+
+#: app/templates/customer/customer_setting.html:1009
+msgid "New Password"
+msgstr "Mật khẩu mới"
+
+#: app/templates/customer/customer_setting.html:1010
+msgid "Create new password"
+msgstr "Tạo mật khẩu mới"
+
+#: app/templates/customer/customer_setting.html:1013
+msgid "Confirm New Password"
+msgstr "Xác nhận mật khẩu mới"
+
+#: app/templates/customer/customer_setting.html:1014
+msgid "Confirm new password"
+msgstr "Xác nhận mật khẩu mới"
+
+#: app/templates/customer/customer_setting.html:1085
+#: app/templates/customer/customer_setting.html:1217
+msgid "Sending..."
+msgstr "Đang gửi..."
+
+#: app/templates/customer/customer_setting.html:1104
+#: app/templates/customer/customer_setting.html:1236
+#: app/templates/customer/redeem_confirm_modal.html:556
+msgid "Something went wrong. Please try again."
+msgstr "Đã có lỗi xảy ra. Vui lòng thử lại."
+
+#: app/templates/customer/customer_setting.html:1110
+#: app/templates/customer/customer_setting.html:1242
+msgid "Network error. Please try again."
+msgstr "Lỗi mạng. Vui lòng thử lại."
+
+#: app/templates/customer/customer_setting.html:1164
+msgid "You have unsaved changes. Do you want to leave without saving?"
+msgstr "Bạn có thay đổi chưa lưu. Bạn có muốn rời đi mà không lưu?"
+
+#: app/templates/customer/invoice_detail.html:3
+msgid "Invoice Detail"
+msgstr "Chi tiết hóa đơn"
+
+#: app/templates/customer/invoice_detail.html:16
+msgid "Back to Invoices"
+msgstr "Về danh sách hóa đơn"
+
+#: app/templates/customer/invoice_detail.html:34
+msgid "Invoice Date"
+msgstr "Ngày hóa đơn"
+
+#: app/templates/customer/invoice_detail.html:41
+msgid "Total Amount"
+msgstr "Tổng số tiền"
+
+#: app/templates/customer/invoice_detail.html:70
+msgid "Service Details"
+msgstr "Chi tiết dịch vụ"
+
+#: app/templates/customer/invoice_detail.html:74
+msgid "Service Name"
+msgstr "Tên dịch vụ"
+
+#: app/templates/customer/invoice_detail.html:78
+msgid "Category"
+msgstr "Danh mục"
+
+#: app/templates/customer/invoice_detail.html:86
+msgid "Base Price"
+msgstr "Giá gốc"
+
+#: app/templates/customer/invoice_detail.html:96
+msgid "Appointment Details"
+msgstr "Chi tiết lịch hẹn"
+
+#: app/templates/customer/invoice_detail.html:104
+msgid "Time Window"
+msgstr "Khung giờ"
+
+#: app/templates/customer/invoice_detail.html:108
+msgid "Assigned Stylist"
+msgstr "Thợ được phân công"
+
+#: app/templates/customer/invoice_detail.html:121
+msgid "Payment Summary"
+msgstr "Tóm tắt thanh toán"
+
+#: app/templates/customer/invoice_detail.html:131
+msgid "Total Paid Amount"
+msgstr "Tổng số tiền đã trả"
+
+#: app/templates/customer/invoice_detail.html:139
+msgid "FULLY PAID"
+msgstr "ĐÃ THANH TOÁN ĐỦ"
+
+#: app/templates/customer/invoice_detail.html:140
+msgid "REFUNDED"
+msgstr "ĐÃ HOÀN TIỀN"
+
+#: app/templates/customer/invoice_detail.html:150
+msgid "Download PDF Invoice"
+msgstr "Tải hóa đơn PDF"
+
+#: app/templates/customer/loyalty_points.html:1065
+msgid "Rewards Club"
+msgstr "Câu lạc bộ thưởng"
+
+#: app/templates/customer/loyalty_points.html:1067
+msgid "Your journey to effortless beauty, rewarded."
+msgstr "Hành trình làm đẹp nhẹ nhàng của bạn, được tưởng thưởng."
+
+#: app/templates/customer/loyalty_points.html:1089
+msgid "Current Balance"
+msgstr "Số dư hiện tại"
+
+#: app/templates/customer/loyalty_points.html:1100
+msgid "Tier"
+msgstr "Hạng"
+
+#: app/templates/customer/loyalty_points.html:1103
+msgid "%(pts)s pts to unlock %(reward)s"
+msgstr "%(pts)s điểm để mở khóa %(reward)s"
+
+#: app/templates/customer/loyalty_points.html:1112
+msgid "Next reward:"
+msgstr "Phần thưởng tiếp theo:"
+
+#: app/templates/customer/loyalty_points.html:1114
+msgid "View Tier Benefits"
+msgstr "Xem quyền lợi hạng"
+
+#: app/templates/customer/loyalty_points.html:1152
+msgid "Earn Points"
+msgstr "Tích điểm"
+
+#: app/templates/customer/loyalty_points.html:1153
+msgid "Previous"
+msgstr "Trước"
+
+#: app/templates/customer/loyalty_points.html:1154
+msgid "Next"
+msgstr "Tiếp"
+
+#: app/templates/customer/loyalty_points.html:1170
+msgid "Available Vouchers"
+msgstr "Voucher khả dụng"
+
+#: app/templates/customer/loyalty_points.html:1172
+msgid "See All"
+msgstr "Xem tất cả"
+
+#: app/templates/customer/loyalty_points.html:1203
+msgid "Available"
+msgstr "Có sẵn"
+
+#: app/templates/customer/loyalty_points.html:1205
+msgid "left"
+msgstr "còn lại"
+
+#: app/templates/customer/loyalty_points.html:1213
+msgid "redeems left"
+msgstr "lượt đổi còn lại"
+
+#: app/templates/customer/loyalty_points.html:1216
+msgid "in stock"
+msgstr "trong kho"
+
+#: app/templates/customer/loyalty_points.html:1224
+msgid "Not enough pts"
+msgstr "Không đủ điểm"
+
+#: app/templates/customer/loyalty_points.html:1226
+msgid "Out of stock"
+msgstr "Hết hàng"
+
+#: app/templates/customer/loyalty_points.html:1228
+#: app/templates/customer/loyalty_points.html:1231
+msgid "Limit reached"
+msgstr "Đã đạt giới hạn"
+
+#: app/templates/customer/loyalty_points.html:1232
+msgid "renew in"
+msgstr "làm mới sau"
+
+#: app/templates/customer/loyalty_points.html:1232
+msgid "days"
+msgstr "ngày"
+
+#: app/templates/customer/loyalty_points.html:1237
+msgid "Redeem"
+msgstr "Đổi thưởng"
+
+#: app/templates/customer/loyalty_points.html:1251
+msgid "Points History"
+msgstr "Lịch sử điểm"
+
+#: app/templates/customer/loyalty_points.html:1252
+msgid "My Vouchers"
+msgstr "Voucher của tôi"
+
+#: app/templates/customer/loyalty_points.html:1280
+msgid "Load More History"
+msgstr "Tải thêm lịch sử"
+
+#: app/templates/customer/loyalty_points.html:1307
+#: app/templates/customer/loyalty_points.html:1375
+msgid "Active"
+msgstr "Đang hoạt động"
+
+#: app/templates/customer/loyalty_points.html:1308
+#: app/templates/customer/loyalty_points.html:1375
+msgid "Used"
+msgstr "Đã dùng"
+
+#: app/templates/customer/loyalty_points.html:1309
+#: app/templates/customer/loyalty_points.html:1375
+msgid "Expired"
+msgstr "Đã hết hạn"
+
+#: app/templates/customer/loyalty_points.html:1318
+msgid "You haven't redeemed any rewards yet."
+msgstr "Bạn chưa đổi phần thưởng nào."
+
+#: app/templates/customer/loyalty_points.html:1319
+msgid "Start earning points to unlock vouchers!"
+msgstr "Bắt đầu tích điểm để mở khóa voucher!"
+
+#: app/templates/customer/loyalty_points.html:1339
+msgid "Points spent"
+msgstr "Điểm đã dùng"
+
+#: app/templates/customer/loyalty_points.html:1340
+msgid "Redeemed on"
+msgstr "Đã đổi ngày"
+
+#: app/templates/customer/loyalty_points.html:1341
+msgid "Expires"
+msgstr "Hết hạn"
+
+#: app/templates/customer/loyalty_points.html:1345
+msgid "Voucher Code"
+msgstr "Mã voucher"
+
+#: app/templates/customer/loyalty_points.html:1346
+#: app/templates/customer/loyalty_points.html:1402
+#: app/templates/customer/loyalty_points.html:1425
+msgid "Copy"
+msgstr "Sao chép"
+
+#: app/templates/customer/loyalty_points.html:1372
+msgid "Show this code to our staff when you visit."
+msgstr "Xuất trình mã này cho nhân viên khi bạn đến."
+
+#: app/templates/customer/loyalty_points.html:1393
+msgid "Show this code to our staff at your next visit to redeem."
+msgstr "Xuất trình mã này cho nhân viên trong lần ghé tiếp theo để đổi."
+
+#: app/templates/customer/loyalty_points.html:1395
+msgid "This voucher has already been used."
+msgstr "Voucher này đã được sử dụng."
+
+#: app/templates/customer/loyalty_points.html:1397
+msgid "This voucher has expired and is no longer valid."
+msgstr "Voucher này đã hết hạn và không còn hiệu lực."
+
+#: app/templates/customer/loyalty_points.html:1422
+msgid "Copied"
+msgstr "Đã sao chép"
+
+#: app/templates/customer/my_bookings.html:18
+msgid "Manage your upcoming visits and booking history."
+msgstr "Quản lý lịch hẹn sắp tới và lịch sử đặt của bạn."
+
+#: app/templates/customer/my_bookings.html:29
+#: app/templates/customer/my_bookings.html:53
+msgid "Next Visit"
+msgstr "Lần ghé tiếp theo"
+
+#: app/templates/customer/my_bookings.html:38
+msgid "%(date)s • %(start)s with %(staff)s."
+msgstr "%(date)s • %(start)s với %(staff)s."
+
+#: app/templates/customer/my_bookings.html:73
+msgid "Loyalty Reward"
+msgstr "Phần thưởng thân thiết"
+
+#: app/templates/customer/my_bookings.html:89
+msgid "You've unlocked all rewards!"
+msgstr "Bạn đã mở khóa tất cả phần thưởng!"
+
+#: app/templates/customer/my_bookings.html:107
+msgid "Manage Appointments"
+msgstr "Quản lý lịch hẹn"
+
+#: app/templates/customer/my_bookings.html:108
+msgid "View your confirmed, pending, and cancelled bookings."
+msgstr "Xem các lịch đã xác nhận, chờ duyệt và đã hủy của bạn."
+
+#: app/templates/customer/my_bookings.html:111
+msgid "Book New Appointment"
+msgstr "Đặt lịch hẹn mới"
+
+#: app/templates/customer/my_bookings.html:121
+msgid "Upcoming"
+msgstr "Sắp tới"
+
+#: app/templates/customer/my_bookings.html:165
+msgid "Confirmed"
+msgstr "Đã xác nhận"
+
+#: app/templates/customer/my_bookings.html:173
+#: app/templates/customer/my_bookings.html:230
+#: app/templates/customer/my_bookings.html:282
+msgid "Date:"
+msgstr "Ngày:"
+
+#: app/templates/customer/my_bookings.html:183
+msgid "Duration:"
+msgstr "Thời lượng:"
+
+#: app/templates/customer/my_bookings.html:190
+#: app/templates/customer/reschedule.html:3
+#: app/templates/customer/reschedule.html:21
+#: app/templates/customer/view_booking_details.html:83
+msgid "Reschedule"
+msgstr "Đổi lịch"
+
+#: app/templates/customer/my_bookings.html:241
+msgid "Awaiting confirmation"
+msgstr "Đang chờ xác nhận"
+
+#: app/templates/customer/my_bookings.html:287
+msgid "Cancelled on:"
+msgstr "Hủy vào:"
+
+#: app/templates/customer/my_bookings.html:312
+msgid "Cancel appointment?"
+msgstr "Hủy lịch hẹn?"
+
+#: app/templates/customer/my_bookings.html:318
+msgid "Appointment details"
+msgstr "Chi tiết lịch hẹn"
+
+#: app/templates/customer/my_bookings.html:332
+msgid "Cancellation Policy"
+msgstr "Chính sách hủy"
+
+#: app/templates/customer/my_bookings.html:337
+msgid "Reason for cancellation"
+msgstr "Lý do hủy"
+
+#: app/templates/customer/my_bookings.html:337
+msgid "(optional)"
+msgstr "(tùy chọn)"
+
+#: app/templates/customer/my_bookings.html:340
+msgid "Select a reason..."
+msgstr "Chọn lý do..."
+
+#: app/templates/customer/my_bookings.html:341
+msgid "Change of plans"
+msgstr "Thay đổi kế hoạch"
+
+#: app/templates/customer/my_bookings.html:342
+msgid "Feeling unwell"
+msgstr "Cảm thấy không khỏe"
+
+#: app/templates/customer/my_bookings.html:343
+msgid "Want to reschedule instead"
+msgstr "Muốn đổi lịch thay vì hủy"
+
+#: app/templates/customer/my_bookings.html:344
+msgid "Other"
+msgstr "Khác"
+
+#: app/templates/customer/my_bookings.html:349
+msgid "Keep appointment"
+msgstr "Giữ lịch hẹn"
+
+#: app/templates/customer/my_bookings.html:350
+msgid "Yes, cancel"
+msgstr "Có, hủy"
+
+#: app/templates/customer/my_bookings.html:360
+msgid "Recent History"
+msgstr "Lịch sử gần đây"
+
+#: app/templates/customer/my_bookings.html:361
+msgid "Your completed appointments."
+msgstr "Các lịch hẹn đã hoàn thành của bạn."
+
+#: app/templates/customer/my_bookings.html:364
+msgid "View All History"
+msgstr "Xem toàn bộ lịch sử"
+
+#: app/templates/customer/my_bookings.html:380
+msgid "%(status)s on %(date)s"
+msgstr "%(status)s ngày %(date)s"
+
+#: app/templates/customer/my_bookings.html:397
+msgid "Invoice"
+msgstr "Hóa đơn"
+
+#: app/templates/customer/my_bookings.html:403
+msgid "No history yet."
+msgstr "Chưa có lịch sử."
+
+#: app/templates/customer/redeem_confirm_modal.html:84
+msgid "CONFIRM REDEEM"
+msgstr "XÁC NHẬN ĐỔI"
+
+#: app/templates/customer/redeem_confirm_modal.html:108
+msgid "Points cost"
+msgstr "Chi phí điểm"
+
+#: app/templates/customer/redeem_confirm_modal.html:123
+msgid "Your balance"
+msgstr "Số dư của bạn"
+
+#: app/templates/customer/redeem_confirm_modal.html:141
+msgid "Voucher valid until"
+msgstr "Voucher có hiệu lực đến"
+
+#: app/templates/customer/redeem_confirm_modal.html:155
+#: app/templates/customer/redeem_confirm_modal.html:499
+msgid "Once redeemed, points cannot be refunded."
+msgstr "Sau khi đổi, điểm không thể hoàn lại."
+
+#: app/templates/customer/redeem_confirm_modal.html:156
+#: app/templates/customer/redeem_confirm_modal.html:499
+msgid "Terms apply."
+msgstr "Áp dụng điều khoản."
+
+#: app/templates/customer/redeem_confirm_modal.html:180
+#: app/templates/customer/redeem_confirm_modal.html:504
+#: app/templates/customer/redeem_confirm_modal.html:559
+#: app/templates/customer/redeem_confirm_modal.html:566
+msgid "Confirm Redeem"
+msgstr "Xác nhận đổi"
+
+#: app/templates/customer/redeem_confirm_modal.html:492
+msgid "Upon use"
+msgstr "Khi sử dụng"
+
+#: app/templates/customer/redeem_confirm_modal.html:538
+msgid "Processing..."
+msgstr "Đang xử lý..."
+
+#: app/templates/customer/redeem_confirm_modal.html:564
+msgid "Connection error. Please try again."
+msgstr "Lỗi kết nối. Vui lòng thử lại."
+
+#: app/templates/customer/reschedule.html:19
+msgid "APPOINTMENT MANAGEMENT"
+msgstr "QUẢN LÝ LỊCH HẸN"
+
+#: app/templates/customer/reschedule.html:23
+msgid "Modify your session with ease. Please note our 24-hour rescheduling window to ensure we can accommodate all guests."
+msgstr "Đổi buổi hẹn của bạn dễ dàng. Vui lòng lưu ý khung 24 giờ để đổi lịch nhằm đảm bảo phục vụ mọi khách hàng."
+
+#: app/templates/customer/reschedule.html:43
+#: app/templates/customer/reschedule.html:49
+msgid "Service image"
+msgstr "Ảnh dịch vụ"
+
+#: app/templates/customer/reschedule.html:55
+msgid "CURRENT SESSION"
+msgstr "BUỔI HẸN HIỆN TẠI"
+
+#: app/templates/customer/reschedule.html:57
+msgid "Technician:"
+msgstr "Kỹ thuật viên:"
+
+#: app/templates/customer/reschedule.html:63
+msgid "DATE"
+msgstr "NGÀY"
+
+#: app/templates/customer/reschedule.html:68
+msgid "TIME"
+msgstr "GIỜ"
+
+#: app/templates/customer/reschedule.html:91
+msgid "Select New Date"
+msgstr "Chọn ngày mới"
+
+#: app/templates/customer/reschedule.html:162
+msgid "Session duration:"
+msgstr "Thời lượng buổi hẹn:"
+
+#: app/templates/customer/reschedule.html:162
+#: app/templates/customer/view_booking_details.html:45
+#: app/templates/public/services.html:110
+msgid "mins"
+msgstr "phút"
+
+#: app/templates/customer/reschedule.html:179
+msgid "Policy Notice"
+msgstr "Thông báo chính sách"
+
+#: app/templates/customer/reschedule.html:180
+msgid "Bookings can only be rescheduled at least 24 hours in advance and can only be changed once. Further changes may require a new deposit."
+msgstr "Lịch chỉ có thể đổi trước ít nhất 24 giờ và chỉ đổi được một lần. Thay đổi thêm có thể cần đặt cọc mới."
+
+#: app/templates/customer/reschedule.html:196
+msgid "Comparison"
+msgstr "So sánh"
+
+#: app/templates/customer/reschedule.html:200
+msgid "FROM"
+msgstr "TỪ"
+
+#: app/templates/customer/reschedule.html:208
+#: app/templates/customer/reschedule.html:224
+msgid "Time"
+msgstr "Giờ"
+
+#: app/templates/customer/reschedule.html:216
+msgid "TO (NEW)"
+msgstr "ĐẾN (MỚI)"
+
+#: app/templates/customer/reschedule.html:220
+msgid "Please select a date"
+msgstr "Vui lòng chọn ngày"
+
+#: app/templates/customer/reschedule.html:225
+msgid "Please select a time"
+msgstr "Vui lòng chọn giờ"
+
+#: app/templates/customer/reschedule.html:254
+msgid "Confirm Reschedule"
+msgstr "Xác nhận đổi lịch"
+
+#: app/templates/customer/view_booking_details.html:3
+msgid "Book Details"
+msgstr "Chi tiết đặt lịch"
+
+#: app/templates/customer/view_booking_details.html:17
+msgid "Back to Appointments"
+msgstr "Về danh sách lịch hẹn"
+
+#: app/templates/customer/view_booking_details.html:19
+msgid "Booking Details"
+msgstr "Chi tiết đặt lịch"
+
+#: app/templates/customer/view_booking_details.html:62
+msgid "Service Description"
+msgstr "Mô tả dịch vụ"
+
+#: app/templates/customer/view_booking_details.html:70
+msgid "Technician avatar"
+msgstr "Ảnh kỹ thuật viên"
+
+#: app/templates/customer/view_booking_details.html:74
+msgid "Artist"
+msgstr "Nghệ nhân"
+
+#: app/templates/customer/view_booking_details.html:77
+msgid "Senior Artist"
+msgstr "Nghệ nhân cao cấp"
+
+#: app/templates/customer/view_booking_details.html:101
+msgid "Appointment Notes"
+msgstr "Ghi chú lịch hẹn"
+
+#: app/templates/customer/view_booking_details.html:105
+msgid "Please arrive 5 minutes early to select your polish color. Soak-off for previous gel application is included in your service time. Refreshments are available at the lounge area."
+msgstr "Vui lòng đến sớm 5 phút để chọn màu sơn. Việc tháo lớp gel cũ đã bao gồm trong thời gian dịch vụ. Có sẵn đồ uống nhẹ tại khu vực lounge."
+
+#: app/templates/customer/view_booking_details.html:114
+msgid "Salon location map"
+msgstr "Bản đồ vị trí salon"
+
+#: app/templates/customer/view_booking_details.html:126
+#: app/templates/public/index.html:285
+msgid "Address"
+msgstr "Địa chỉ"
+
+#: app/templates/customer/view_booking_details.html:135
+msgid "Get Directions"
+msgstr "Chỉ đường"
+
+#: app/templates/customer/view_booking_details.html:141
+msgid "Salon Contact"
+msgstr "Liên hệ salon"
+
+#: app/templates/public/about.html:19
+msgid "The Retreat"
+msgstr "Ốc đảo thư giãn"
+
+#: app/templates/public/about.html:20
+msgid "Our Story"
+msgstr "Câu chuyện của chúng tôi"
+
+#: app/templates/public/about.html:21
+msgid "Redefining luxury wellness with precise, artisanal care in a sanctuary of soft mood and quiet elegance."
+msgstr "Định nghĩa lại sự chăm sóc sang trọng bằng liệu trình tỉ mỉ, thủ công trong một không gian nhẹ nhàng và thanh lịch."
+
+#: app/templates/public/about.html:37
+msgid "Crafted with intention"
+msgstr "Chăm chút trong từng chi tiết"
+
+#: app/templates/public/about.html:39
+msgid "At DahaCare, we believe that true luxury lies in the details. Founded on the principle of bringing atelier-level precision to daily wellness, our space was designed as a retreat from the noise of the city."
+msgstr "Tại DahaCare, chúng tôi tin rằng sự sang trọng thực sự nằm ở từng chi tiết. Được xây dựng trên nguyên tắc mang sự tỉ mỉ đẳng cấp atelier vào việc chăm sóc hằng ngày, không gian của chúng tôi được thiết kế như một chốn nghỉ ngơi khỏi sự ồn ào của phố thị."
+
+#: app/templates/public/about.html:40
+msgid "Every treatment is a careful composition of quality products, rigorous hygiene standards, and the trained hands of our artists. We don't just provide a service; we curate an experience that honors your time and elevates your personal care ritual."
+msgstr "Mỗi liệu trình là sự kết hợp cẩn thận giữa sản phẩm chất lượng, tiêu chuẩn vệ sinh nghiêm ngặt và đôi tay lành nghề của các nghệ nhân. Chúng tôi không chỉ cung cấp dịch vụ; chúng tôi tạo nên trải nghiệm tôn trọng thời gian của bạn và nâng tầm nghi thức chăm sóc bản thân."
+
+#: app/templates/public/about.html:68
+msgid "Years of Excellence"
+msgstr "Năm kinh nghiệm đỉnh cao"
+
+#: app/templates/public/about.html:72
+msgid "Clients Served"
+msgstr "Khách hàng đã phục vụ"
+
+#: app/templates/public/about.html:76
+msgid "Master Artists"
+msgstr "Nghệ nhân bậc thầy"
+
+#: app/templates/public/about.html:80 app/templates/public/services.html:132
+msgid "Average Rating"
+msgstr "Đánh giá trung bình"
+
+#: app/templates/public/about.html:118
+msgid "Meet the team"
+msgstr "Gặp gỡ đội ngũ"
+
+#: app/templates/public/about.html:147
+msgid "What we stand for"
+msgstr "Giá trị của chúng tôi"
+
+#: app/templates/public/about.html:158
+msgid "Hygiene first"
+msgstr "Vệ sinh hàng đầu"
+
+#: app/templates/public/about.html:159
+msgid "Medical-grade sterilization processes for every tool, ensuring your safety is never compromised."
+msgstr "Quy trình tiệt trùng đạt chuẩn y tế cho mọi dụng cụ, đảm bảo an toàn của bạn không bao giờ bị đánh đổi."
+
+#: app/templates/public/about.html:168
+msgid "Trained artists"
+msgstr "Nghệ nhân được đào tạo"
+
+#: app/templates/public/about.html:169
+msgid "Continuous education and mastery of techniques mean you receive the pinnacle of modern care."
+msgstr "Việc học hỏi liên tục và tinh thông kỹ thuật đảm bảo bạn nhận được sự chăm sóc hiện đại đỉnh cao."
+
+#: app/templates/public/about.html:178
+msgid "Quality products"
+msgstr "Sản phẩm chất lượng"
+
+#: app/templates/public/about.html:179
+msgid "We source only premium, non-toxic, and sustainable materials for long-lasting, brilliant results."
+msgstr "Chúng tôi chỉ chọn vật liệu cao cấp, không độc hại và bền vững để mang lại kết quả rực rỡ, lâu dài."
+
+#: app/templates/public/about.html:188
+msgid "Client-first care"
+msgstr "Khách hàng là trên hết"
+
+#: app/templates/public/about.html:189
+msgid "Your comfort is our priority. Enjoy a serene environment designed entirely around your relaxation."
+msgstr "Sự thoải mái của bạn là ưu tiên của chúng tôi. Hãy tận hưởng không gian yên tĩnh được thiết kế hoàn toàn cho sự thư giãn của bạn."
+
+#: app/templates/public/about.html:203
+msgid "Come meet the team"
+msgstr "Đến gặp gỡ đội ngũ"
+
+#: app/templates/public/about.html:204
+msgid "Experience the DahaCare difference in person."
+msgstr "Trải nghiệm sự khác biệt DahaCare trực tiếp."
+
+#: app/templates/public/about.html:206
+msgid "Book your visit"
+msgstr "Đặt lịch hẹn"
+
+#: app/templates/public/gallery.html:20
+msgid "Our Work"
+msgstr "Tác phẩm của chúng tôi"
+
+#: app/templates/public/gallery.html:21
+msgid "A glimpse into the artistry and precision behind every visit."
+msgstr "Thoáng nhìn nghệ thuật và sự tỉ mỉ trong mỗi lần ghé thăm."
+
+#: app/templates/public/gallery.html:75
+msgid "Like what you see?"
+msgstr "Thích những gì bạn thấy?"
+
+#: app/templates/public/gallery.html:77
+msgid "Book your session"
+msgstr "Đặt lịch ngay"
+
+#: app/templates/public/gallery.html:104
+msgid "Previous image"
+msgstr "Ảnh trước"
+
+#: app/templates/public/gallery.html:108
+msgid "Enlarged gallery image"
+msgstr "Ảnh phóng to"
+
+#: app/templates/public/gallery.html:110
+msgid "Next image"
+msgstr "Ảnh tiếp theo"
+
+#: app/templates/public/index.html:3
+msgid "Premium Nail Care & Art"
+msgstr "Chăm sóc & nghệ thuật móng cao cấp"
+
+#: app/templates/public/index.html:27
+msgid "Salon interior"
+msgstr "Không gian salon"
+
+#: app/templates/public/index.html:74
+msgid "Popular Service"
+msgstr "Dịch vụ phổ biến"
+
+#: app/templates/public/index.html:107
+msgid "View All Service"
+msgstr "Xem tất cả dịch vụ"
+
+#: app/templates/public/index.html:119
+msgid "Our work"
+msgstr "Tác phẩm của chúng tôi"
+
+#: app/templates/public/index.html:120
+msgid "A glimpse of what we create every day"
+msgstr "Thoáng nhìn những gì chúng tôi tạo ra mỗi ngày"
+
+#: app/templates/public/index.html:146
+msgid "Why DahaCare?"
+msgstr "Tại sao chọn DahaCare?"
+
+#: app/templates/public/index.html:152
+msgid "Happy clients"
+msgstr "Khách hàng hài lòng"
+
+#: app/templates/public/index.html:153
+msgid "Trusted by thousands of satisfied customers who love our work."
+msgstr "Được hàng nghìn khách hàng hài lòng yêu thích tin tưởng."
+
+#: app/templates/public/index.html:157
+msgid "Safe products"
+msgstr "Sản phẩm an toàn"
+
+#: app/templates/public/index.html:158
+msgid "We use only premium, non-toxic products for your health and safety."
+msgstr "Chúng tôi chỉ dùng sản phẩm cao cấp, không độc hại vì sức khỏe và an toàn của bạn."
+
+#: app/templates/public/index.html:162
+msgid "Expert artists"
+msgstr "Nghệ nhân chuyên nghiệp"
+
+#: app/templates/public/index.html:163
+msgid "Our highly trained professionals bring your vision to life."
+msgstr "Đội ngũ chuyên gia lành nghề biến ý tưởng của bạn thành hiện thực."
+
+#: app/templates/public/index.html:176
+msgid "What clients say"
+msgstr "Khách hàng nói gì"
+
+#: app/templates/public/index.html:190
+msgid "\"Absolutely wonderful experience! The attention to detail is unmatched, and my nails have never looked better. Highly recommend the gel extensions.\""
+msgstr "\"Trải nghiệm tuyệt vời! Sự tỉ mỉ đến từng chi tiết không đâu sánh bằng, và móng của tôi chưa bao giờ đẹp đến thế. Rất khuyến khích dịch vụ nối móng gel.\""
+
+#: app/templates/public/index.html:195
+msgid "Gold member"
+msgstr "Thành viên Vàng"
+
+#: app/templates/public/index.html:209
+msgid "\"The ambiance is so relaxing, and the staff is incredibly professional. I love the creative nail art options they offer. A true luxury experience.\""
+msgstr "\"Không gian thật thư giãn, và nhân viên vô cùng chuyên nghiệp. Tôi thích những lựa chọn nghệ thuật móng sáng tạo của họ. Một trải nghiệm sang trọng đích thực.\""
+
+#: app/templates/public/index.html:214
+msgid "First-time client"
+msgstr "Khách hàng lần đầu"
+
+#: app/templates/public/index.html:235
+msgid "New member offer"
+msgstr "Ưu đãi thành viên mới"
+
+#: app/templates/public/index.html:236
+msgid "Create an account & get 15%% off your first visit"
+msgstr "Tạo tài khoản & giảm 15%% cho lần ghé thăm đầu tiên"
+
+#: app/templates/public/index.html:237
+msgid "Join our community today and start enjoying the perks of premium nail care right away."
+msgstr "Tham gia cộng đồng của chúng tôi hôm nay và bắt đầu tận hưởng ưu đãi chăm sóc móng cao cấp ngay lập tức."
+
+#: app/templates/public/index.html:241
+msgid "Exclusive member updates"
+msgstr "Cập nhật độc quyền cho thành viên"
+
+#: app/templates/public/index.html:245
+msgid "Easy online booking"
+msgstr "Đặt lịch trực tuyến dễ dàng"
+
+#: app/templates/public/index.html:249
+msgid "Earn rewards points"
+msgstr "Tích điểm thưởng"
+
+#: app/templates/public/index.html:254
+msgid "Create account"
+msgstr "Tạo tài khoản"
+
+#: app/templates/public/index.html:255
+msgid "Already have one? Log in"
+msgstr "Đã có tài khoản? Đăng nhập"
+
+#: app/templates/public/index.html:262
+msgid "welcome discount"
+msgstr "giảm giá chào mừng"
+
+#: app/templates/public/index.html:279
+msgid "Find us"
+msgstr "Tìm chúng tôi"
+
+#: app/templates/public/index.html:293
+msgid "Hours"
+msgstr "Giờ mở cửa"
+
+#: app/templates/public/index.html:301
+msgid "Phone"
+msgstr "Điện thoại"
+
+#: app/templates/public/index.html:309
+#: app/templates/staff/staff_profile.html:259
+msgid "Email"
+msgstr "Email"
+
+#: app/templates/public/index.html:321
+msgid "Map Integration Placeholder"
+msgstr "Vị trí bản đồ"
+
+#: app/templates/public/public_booking.html:37
+msgid "Info"
+msgstr "Thông tin"
+
+#: app/templates/public/public_booking.html:232
+msgid "Your Details"
+msgstr "Thông tin của bạn"
+
+#: app/templates/public/public_booking.html:233
+msgid "Please provide your contact information to secure the booking."
+msgstr "Vui lòng cung cấp thông tin liên hệ để xác nhận đặt lịch."
+
+#: app/templates/public/public_booking.html:239
+msgid "Already have an account?"
+msgstr "Đã có tài khoản?"
+
+#: app/templates/public/public_booking.html:240
+msgid "Log in"
+msgstr "Đăng nhập"
+
+#: app/templates/public/public_booking.html:246
+msgid "Jane Doe"
+msgstr "Nguyễn Văn A"
+
+#: app/templates/public/public_booking.html:258
+msgid "Booking Notes"
+msgstr "Ghi chú đặt lịch"
+
+#: app/templates/public/public_booking.html:258
+msgid "(Optional)"
+msgstr "(Tùy chọn)"
+
+#: app/templates/public/public_booking.html:260
+msgid "Any special requests or allergies..."
+msgstr "Yêu cầu đặc biệt hoặc dị ứng..."
+
+#: app/templates/public/public_booking.html:270
+msgid "Continue to Checkout"
+msgstr "Tiếp tục đến thanh toán"
+
+#: app/templates/public/public_booking.html:359
+msgid "Sign in to earn loyalty points with this booking."
+msgstr "Đăng nhập để tích điểm thưởng cho lần đặt này."
+
+#: app/templates/public/services.html:19
+msgid "Our Services"
+msgstr "Dịch vụ của chúng tôi"
+
+#: app/templates/public/services.html:20
+msgid "Discover a curated collection of premium nail care and aesthetic treatments designed for the modern individual. Precision meets tranquility in every session."
+msgstr "Khám phá bộ sưu tập chọn lọc các liệu trình chăm sóc móng và làm đẹp cao cấp dành cho người hiện đại. Sự tỉ mỉ hòa quyện cùng sự thư thái trong mỗi buổi hẹn."
+
+#: app/templates/public/services.html:98
+msgid "Popular"
+msgstr "Phổ biến"
+
+#: app/templates/public/services.html:100
+msgid "New"
+msgstr "Mới"
+
+#: app/templates/public/services.html:115
+msgid "Book now"
+msgstr "Đặt ngay"
+
+#: app/templates/public/services.html:136
+msgid "Satisfied Clients"
+msgstr "Khách hàng hài lòng"
+
+#: app/templates/public/services.html:140
+msgid "Quality Assurance"
+msgstr "Đảm bảo chất lượng"
+
+#: app/templates/public/services.html:153
+msgid "Ready to define your signature look?"
+msgstr "Sẵn sàng tạo phong cách riêng của bạn?"
+
+#: app/templates/public/services.html:155
+msgid "Book a consultation"
+msgstr "Đặt lịch tư vấn"
+
+#: app/templates/public/success.html:3
+msgid "Booking Confirmed"
+msgstr "Đã xác nhận đặt lịch"
+
+#: app/templates/public/success.html:71
+msgid "Booking Confirmed!"
+msgstr "Đã xác nhận đặt lịch!"
+
+#: app/templates/public/success.html:72
+msgid "We've reserved your spot. Get ready for some well-deserved pampering."
+msgstr "Chúng tôi đã giữ chỗ cho bạn. Hãy sẵn sàng cho giây phút chăm sóc xứng đáng."
+
+#: app/templates/public/success.html:81
+msgid "Appointment Summary"
+msgstr "Tóm tắt lịch hẹn"
+
+#: app/templates/public/success.html:123
+msgid "What's Next?"
+msgstr "Tiếp theo là gì?"
+
+#: app/templates/public/success.html:128
+msgid "Check your inbox"
+msgstr "Kiểm tra hộp thư"
+
+#: app/templates/public/success.html:129
+msgid "We sent a detailed confirmation email with our location and contact info."
+msgstr "Chúng tôi đã gửi email xác nhận chi tiết kèm địa chỉ và thông tin liên hệ."
+
+#: app/templates/public/success.html:135
+msgid "Arrive on time"
+msgstr "Đến đúng giờ"
+
+#: app/templates/public/success.html:136
+msgid "Please arrive 5-10 minutes early to choose your perfect shade and settle in."
+msgstr "Vui lòng đến sớm 5-10 phút để chọn màu ưng ý và ổn định chỗ ngồi."
+
+#: app/templates/public/success.html:148
+msgid "Manage bookings easily"
+msgstr "Quản lý lịch đặt dễ dàng"
+
+#: app/templates/public/success.html:149
+msgid "Create an account to track your loyalty points, reschedule appointments, and save your favorite colors."
+msgstr "Tạo tài khoản để theo dõi điểm thưởng, đổi lịch hẹn và lưu những màu yêu thích của bạn."
+
+#: app/templates/public/success.html:150
+msgid "Create Account"
+msgstr "Tạo tài khoản"
+
+#: app/templates/public/success.html:157
+msgid "Book Another Service"
+msgstr "Đặt dịch vụ khác"
+
+#: app/templates/public/success.html:158
+msgid "Back to Home"
+msgstr "Về trang chủ"
+
+#: app/templates/public/success.html:165
+msgid "Find us at:"
+msgstr "Tìm chúng tôi tại:"
+
+#: app/templates/public/success.html:171
+msgid "Map location"
+msgstr "Vị trí trên bản đồ"
+
+#: app/templates/staff/login.html:3
+msgid "Sign In"
+msgstr "Đăng nhập"
+
+#: app/templates/staff/login.html:12
+msgid "Staff & admin portal"
+msgstr "Cổng nhân viên & quản trị"
+
+#: app/templates/staff/login.html:13
+msgid "Staff & Admin Portal"
+msgstr "Cổng nhân viên & quản trị"
+
+#: app/templates/staff/login.html:14
+msgid "Sign in to manage bookings, staff, and salon operations."
+msgstr "Đăng nhập để quản lý đặt lịch, nhân viên và hoạt động salon."
+
+#: app/templates/staff/login.html:21 app/templates/staff/login.html:59
+msgid "Sign in"
+msgstr "Đăng nhập"
+
+#: app/templates/staff/login.html:22
+msgid "Staff & administrator access"
+msgstr "Truy cập nhân viên & quản trị"
+
+#: app/templates/staff/login.html:55
+msgid "Forgot password?"
+msgstr "Quên mật khẩu?"
+
+#: app/templates/staff/login.html:66
+msgid "Not a staff member?"
+msgstr "Không phải nhân viên?"
+
+#: app/templates/staff/login.html:66
+msgid "Back to homepage"
+msgstr "Về trang chủ"
+
+#: app/templates/staff/staff_base.html:38
+#: app/templates/staff/staff_base.html:288
+#: app/templates/staff/staff_base.html:316
+msgid "Staff"
+msgstr ""
+
+#: app/templates/staff/staff_base.html:296
+#: app/templates/staff/staff_bookings.html:43
+msgid "Lịch của tôi"
+msgstr ""
+
+#: app/templates/staff/staff_base.html:300
+#: app/templates/staff/staff_history.html:41
+msgid "Lịch sử"
+msgstr ""
+
+#: app/templates/staff/staff_base.html:304
+#: app/templates/staff/staff_profile.html:25
+msgid "Hồ sơ"
+msgstr ""
+
+#: app/templates/staff/staff_base.html:322
+msgid "Đăng xuất"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:242
+msgid "Lịch của"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:252
+msgid "Lọc theo ngày"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:254
+#: app/templates/staff/staff_bookings.html:333
+msgid "Hôm nay"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:254
+msgid "Tuần này"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:254
+msgid "Tháng này"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:255
+msgid "Tháng trước"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:255
+msgid "Tùy chọn"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:255
+#: app/templates/staff/staff_bookings.html:276
+#: app/templates/staff/staff_history.html:212
+#: app/templates/staff/staff_history.html:232
+msgid "Tất cả"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:274
+#: app/templates/staff/staff_history.html:231
+msgid "Lọc theo trạng thái"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:283
+#: app/templates/staff/staff_history.html:239
+msgid "Xóa bộ lọc"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:293
+msgid "Tổng lịch hẹn"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:297
+msgid "Tới lịch hẹn sắp tới gần nhất"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:299
+msgid "Lịch hẹn sắp tới"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:311
+msgid "Chờ thanh toán"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:320
+msgid "Không có lịch hẹn nào"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:321
+#: app/templates/staff/staff_history.html:270
+msgid "Xem tất cả"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:330
+#: app/templates/staff/staff_history.html:279
+msgid "lịch hẹn"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:380
+#: app/templates/staff/staff_bookings.html:388
+#: app/templates/staff/staff_bookings.html:454
+msgid "Đã thu tiền"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:391
+#: app/templates/staff/staff_history.html:310
+msgid "Đã xong"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:397
+#: app/templates/staff/staff_bookings.html:401
+#: app/templates/staff/staff_bookings.html:450
+msgid "Bắt đầu làm"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:407
+msgid "Không có lịch hẹn"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:418
+#: app/templates/staff/staff_history.html:325
+msgid "Chi tiết lịch hẹn"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:423
+#: app/templates/staff/staff_history.html:330
+msgid "Mã booking"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:427
+#: app/templates/staff/staff_history.html:334
+msgid "Khách hàng"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:428
+#: app/templates/staff/staff_history.html:335
+msgid "Họ tên"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:429
+#: app/templates/staff/staff_history.html:336
+#: app/templates/staff/staff_profile.html:255
+msgid "Số điện thoại"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:432
+#: app/templates/staff/staff_history.html:339
+msgid "Dịch vụ"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:433
+#: app/templates/staff/staff_history.html:340
+msgid "Tên dịch vụ"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:434
+#: app/templates/staff/staff_history.html:341
+msgid "Ngày hẹn"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:435
+#: app/templates/staff/staff_history.html:342
+msgid "Thời gian"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:438
+#: app/templates/staff/staff_history.html:345
+msgid "Thanh toán"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:439
+msgid "Tổng tiền"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:440
+#: app/templates/staff/staff_history.html:347
+msgid "Phương thức"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:443
+#: app/templates/staff/staff_history.html:350
+msgid "Trạng thái"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:448
+#: app/templates/staff/staff_history.html:374
+msgid "Đóng"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:495
+msgid "Tiền mặt - đã thanh toán"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:496
+msgid "Tiền mặt - chưa thanh toán"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:498
+#: app/templates/staff/staff_history.html:391
+msgid "Online"
+msgstr ""
+
+#: app/templates/staff/staff_bookings.html:499
+msgid "Chưa có hóa đơn"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:201
+msgid "Lịch sử của"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:210
+msgid "Lọc theo tháng"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:221
+msgid "Tìm kiếm"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:224
+msgid "Tên khách hàng..."
+msgstr ""
+
+#: app/templates/staff/staff_history.html:233
+#: app/templates/staff/staff_history.html:260
+msgid "Chưa hoàn thành"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:248
+msgid "Tổng lịch sử"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:269
+msgid "Không có lịch sử nào trong khoảng thời gian này."
+msgstr ""
+
+#: app/templates/staff/staff_history.html:346
+msgid "Tổng tiền dịch vụ"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:354
+msgid "Thu nhập"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:357
+#: app/templates/staff/staff_profile.html:271
+msgid "Lương theo giờ"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:361
+msgid "Hoa hồng booking"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:366
+msgid "Thu nhập sau booking"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:388
+msgid "Tiền mặt – đã thanh toán"
+msgstr ""
+
+#: app/templates/staff/staff_history.html:389
+msgid "Tiền mặt – chưa thanh toán"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:180
+msgid "Hồ sơ của"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:202
+#: app/templates/staff/staff_profile.html:264
+msgid "Nhân viên"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:205
+msgid "Tham gia từ"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:207
+msgid "Nhấn vào ảnh để thay đổi"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:207
+msgid "JPG, PNG tối đa 2MB"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:220
+msgid "Booking tháng này"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:226
+msgid "lịch hẹn hoàn thành"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:230
+msgid "Thu nhập tháng này"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:236
+msgid "lương + hoa hồng"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:245
+msgid "Thông tin cá nhân"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:247
+msgid "Chỉ xem"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:251
+msgid "Họ và tên"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:263
+msgid "Vai trò"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:267
+msgid "Ngày vào làm"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:272
+msgid "giờ"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:275
+msgid "Hoa hồng"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:276
+msgid "booking"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:286
+msgid "Bảo mật"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:291
+msgid "Mật khẩu"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:294
+#: app/templates/staff/staff_profile.html:325
+msgid "Đổi mật khẩu"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:333
+msgid "Để xác nhận danh tính, chúng tôi sẽ gửi mã xác thực đến email của bạn."
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:336
+#: app/templates/staff/staff_profile.html:359
+msgid "Hủy"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:337
+#: app/templates/staff/staff_profile.html:383
+#: app/templates/staff/staff_profile.html:420
+#: app/templates/staff/staff_profile.html:426
+msgid "Gửi mã"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:343
+msgid "Nhập mã xác thực đã gửi đến"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:343
+msgid "và mật khẩu mới."
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:347
+msgid "Mã xác thực"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:348
+msgid "Nhập mã gồm 6 chữ số"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:351
+msgid "Mật khẩu mới"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:352
+msgid "Tối thiểu 8 ký tự"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:355
+msgid "Xác nhận mật khẩu mới"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:356
+msgid "Nhập lại mật khẩu mới"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:360
+msgid "Cập nhật mật khẩu"
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:403
+msgid "Đang gửi..."
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:417
+msgid "Có lỗi xảy ra. Vui lòng thử lại."
+msgstr ""
+
+#: app/templates/staff/staff_profile.html:423
+msgid "Lỗi mạng. Vui lòng thử lại."
+msgstr ""
+

@@ -20,6 +20,8 @@ DROP TABLE IF EXISTS gallery_images;
 CREATE TABLE service_categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    name_fi TEXT,
+    name_vi TEXT,
     slug TEXT NOT NULL UNIQUE,
     is_active INTEGER NOT NULL DEFAULT 1,
     sort_order INTEGER NOT NULL DEFAULT 0,
@@ -31,7 +33,11 @@ CREATE TABLE services (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     category_id INTEGER NOT NULL,
     name TEXT NOT NULL,
+    name_fi TEXT,
+    name_vi TEXT,
     description TEXT,
+    description_fi TEXT,
+    description_vi TEXT,
     duration_minutes INTEGER NOT NULL,
     price REAL NOT NULL,
     points INTEGER NOT NULL DEFAULT 0,
@@ -177,8 +183,12 @@ CREATE TABLE customer_memberships (
 CREATE TABLE rewards (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    name_fi TEXT,
+    name_vi TEXT,
     cost INTEGER NOT NULL,
     description TEXT,
+    description_fi TEXT,
+    description_vi TEXT,
     banner_image TEXT DEFAULT NULL,
     is_active INTEGER NOT NULL DEFAULT 1,
     max_redeems_per_customer INTEGER DEFAULT NULL,
@@ -238,15 +248,25 @@ CREATE TABLE carousel_slides (
     slot_key TEXT,                       -- loyalty_missions only: 'first_booking' | 'review' | 'referral' (fixed set)
     reward_id INTEGER,                   -- dashboard_offers only
     title TEXT,                          -- homepage
+    title_fi TEXT,
+    title_vi TEXT,
     subtitle TEXT,                       -- homepage
+    subtitle_fi TEXT,
+    subtitle_vi TEXT,
     badge TEXT,                          -- homepage
+    badge_fi TEXT,
+    badge_vi TEXT,
     icon TEXT,                           -- loyalty_missions
     pts_label TEXT,                      -- loyalty_missions
     image TEXT,                          -- homepage + loyalty_missions (uploaded filename)
     cta_label TEXT,
+    cta_label_fi TEXT,
+    cta_label_vi TEXT,
     cta_url TEXT,
     cta_style TEXT DEFAULT 'primary',
     cta2_label TEXT,                     -- homepage secondary button
+    cta2_label_fi TEXT,
+    cta2_label_vi TEXT,
     cta2_url TEXT,
     cta2_style TEXT DEFAULT 'outline',
     sort_order INTEGER NOT NULL DEFAULT 0,
@@ -260,6 +280,8 @@ CREATE TABLE gallery_images (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     image_url TEXT NOT NULL,
     alt_text TEXT,
+    alt_text_fi TEXT,
+    alt_text_vi TEXT,
     sort_order INTEGER NOT NULL DEFAULT 0,
     is_active INTEGER NOT NULL DEFAULT 1,
     uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP

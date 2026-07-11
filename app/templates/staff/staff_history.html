@@ -38,7 +38,7 @@
 #}
 {% extends "staff/staff_base.html" %}
 
-{% block title %}Lịch sử — DahaCare{% endblock %}
+{% block title %}{{ _('Lịch sử') }} — DahaCare{% endblock %}
 
 {% block page_styles %}
 <style>
@@ -198,7 +198,7 @@
   {# ── Header + filter ── #}
   <div class="sf-hdr">
     <div class="sf-hdr-top">
-      <div class="sf-title">Lịch sử của <em>{{ current_staff.name }}</em></div>
+      <div class="sf-title">{{ _('Lịch sử của') }} <em>{{ current_staff.name }}</em></div>
       <div class="sf-hdr-date">{{ now.strftime('%d/%m/%Y') }}</div>
     </div>
 
@@ -207,9 +207,9 @@
 
       {# Row 1: tháng #}
       <div class="sf-frow">
-        <span class="sf-flabel">Lọc theo tháng</span>
+        <span class="sf-flabel">{{ _('Lọc theo tháng') }}</span>
         <select class="sf-msel" name="month" onchange="document.getElementById('sfFilterForm').submit()">
-          <option value="" {% if active_month == '' %}selected{% endif %}>Tất cả</option>
+          <option value="" {% if active_month == '' %}selected{% endif %}>{{ _('Tất cả') }}</option>
           {% for ym in month_options %}
           <option value="{{ ym }}" {% if active_month == ym %}selected{% endif %}>{{ month_display[ym] }}</option>
           {% endfor %}
@@ -218,25 +218,25 @@
 
       {# Row 2: tìm kiếm #}
       <div class="sf-frow">
-        <span class="sf-flabel">Tìm kiếm</span>
+        <span class="sf-flabel">{{ _('Tìm kiếm') }}</span>
         <label class="sf-search">
           <i class="ti ti-search"></i>
-          <input type="text" name="search" value="{{ active_search }}" placeholder="Tên khách hàng..."
+          <input type="text" name="search" value="{{ active_search }}" placeholder="{{ _('Tên khách hàng...') }}"
                  onkeydown="if(event.key==='Enter'){document.getElementById('sfFilterForm').submit();}">
         </label>
       </div>
 
       {# Row 3: trạng thái #}
       <div class="sf-frow">
-        <span class="sf-flabel">Lọc theo trạng thái</span>
-        {% set chips = [('all','Tất cả','all-chip'),('done','Hoàn thành','done-chip'),
-                        ('cancelled','Đã hủy','cancelled-chip'),('incomplete','Chưa hoàn thành','incomplete-chip')] %}
+        <span class="sf-flabel">{{ _('Lọc theo trạng thái') }}</span>
+        {% set chips = [('all', _('Tất cả'),'all-chip'),('done', _('Hoàn thành'),'done-chip'),
+                        ('cancelled', _('Đã hủy'),'cancelled-chip'),('incomplete', _('Chưa hoàn thành'),'incomplete-chip')] %}
         {% for val, label, extra_class in chips %}
         <button type="button"
                 class="sf-ch {{ extra_class }} {% if active_status == val %}sf-ch--active{% endif %}"
                 onclick="document.getElementById('sfStatus').value='{{ val }}'; document.getElementById('sfFilterForm').submit();">{{ label }}</button>
         {% endfor %}
-        <a href="{{ url_for('main.staff_history') }}" class="sf-clear">Xóa bộ lọc</a>
+        <a href="{{ url_for('main.staff_history') }}" class="sf-clear">{{ _('Xóa bộ lọc') }}</a>
       </div>
     </form>
   </div>
@@ -245,19 +245,19 @@
   <div class="sf-stats">
     <div class="sf-sc">
       <div class="sf-sn">{{ stats.total }}</div>
-      <div class="sf-sl"><span class="sf-dot" style="background:#60A5FA"></span>Tổng lịch sử</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#60A5FA"></span>{{ _('Tổng lịch sử') }}</div>
     </div>
     <div class="sf-sc">
       <div class="sf-sn" style="color:#16A34A">{{ stats.done }}</div>
-      <div class="sf-sl"><span class="sf-dot" style="background:#4ADE80"></span>Hoàn thành</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#4ADE80"></span>{{ _('Hoàn thành') }}</div>
     </div>
     <div class="sf-sc">
       <div class="sf-sn" style="color:#8C7B75">{{ stats.cancelled }}</div>
-      <div class="sf-sl"><span class="sf-dot" style="background:#D4BAB0"></span>Đã hủy</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#D4BAB0"></span>{{ _('Đã hủy') }}</div>
     </div>
     <div class="sf-sc">
       <div class="sf-sn" style="color:#B45309">{{ stats.incomplete }}</div>
-      <div class="sf-sl"><span class="sf-dot" style="background:#FDE68A"></span>Chưa hoàn thành</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#FDE68A"></span>{{ _('Chưa hoàn thành') }}</div>
     </div>
   </div>
 
@@ -266,8 +266,8 @@
     {% if not month_keys %}
       <div class="sf-empty">
         <i class="ti ti-clock-off"></i>
-        <div class="sf-empty-text">Không có lịch sử nào trong khoảng thời gian này.</div>
-        <a href="{{ url_for('main.staff_history') }}">Xem tất cả</a>
+        <div class="sf-empty-text">{{ _('Không có lịch sử nào trong khoảng thời gian này.') }}</div>
+        <a href="{{ url_for('main.staff_history') }}">{{ _('Xem tất cả') }}</a>
       </div>
     {% else %}
       {% for ym in month_keys %}
@@ -276,7 +276,7 @@
           <div class="sf-month-label">
             <span class="sf-month-name">{{ month_display[ym] }}</span>
             <span class="sf-month-dot"></span>
-            <span class="sf-month-count">{{ grouped_bookings[ym] | length }} lịch hẹn</span>
+            <span class="sf-month-count">{{ grouped_bookings[ym] | length }} {{ _('lịch hẹn') }}</span>
           </div>
           <div class="sf-month-line"></div>
         </div>
@@ -307,9 +307,9 @@
           </div>
 
           {% if b.status == 'done' %}
-          <div class="sf-hist-label done"><i class="ti ti-circle-check"></i>Đã xong</div>
+          <div class="sf-hist-label done"><i class="ti ti-circle-check"></i>{{ _('Đã xong') }}</div>
           {% else %}
-          <div class="sf-hist-label cancelled"><i class="ti ti-ban"></i>Đã hủy</div>
+          <div class="sf-hist-label cancelled"><i class="ti ti-ban"></i>{{ _('Đã hủy') }}</div>
           {% endif %}
         </div>
         {% endfor %}
@@ -322,48 +322,48 @@
   <div class="sf-overlay" id="sfOverlay" onclick="if(event.target===this) sfCloseModal()">
     <div class="sf-modal">
       <div class="sf-mhdr">
-        <span class="sf-mtitle">Chi tiết lịch hẹn</span>
+        <span class="sf-mtitle">{{ _('Chi tiết lịch hẹn') }}</span>
         <button type="button" class="sf-mclose" onclick="sfCloseModal()"><i class="ti ti-x"></i></button>
       </div>
       <div class="sf-mbody">
         <div class="sf-msec">
-          <span class="sf-mlabel">Mã booking</span>
+          <span class="sf-mlabel">{{ _('Mã booking') }}</span>
           <div class="sf-mid" id="m-id"></div>
         </div>
         <div class="sf-msec">
-          <span class="sf-mlabel">Khách hàng</span>
-          <div class="sf-mrow"><span class="sf-mk">Họ tên</span><span class="sf-mv" id="m-name"></span></div>
-          <div class="sf-mrow"><span class="sf-mk">Số điện thoại</span><span class="sf-mv" id="m-phone"></span></div>
+          <span class="sf-mlabel">{{ _('Khách hàng') }}</span>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Họ tên') }}</span><span class="sf-mv" id="m-name"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Số điện thoại') }}</span><span class="sf-mv" id="m-phone"></span></div>
         </div>
         <div class="sf-msec">
-          <span class="sf-mlabel">Dịch vụ</span>
-          <div class="sf-mrow"><span class="sf-mk">Tên dịch vụ</span><span class="sf-mv" id="m-svc"></span></div>
-          <div class="sf-mrow"><span class="sf-mk">Ngày hẹn</span><span class="sf-mv" id="m-date"></span></div>
-          <div class="sf-mrow"><span class="sf-mk">Thời gian</span><span class="sf-mv" id="m-time"></span></div>
+          <span class="sf-mlabel">{{ _('Dịch vụ') }}</span>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Tên dịch vụ') }}</span><span class="sf-mv" id="m-svc"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Ngày hẹn') }}</span><span class="sf-mv" id="m-date"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Thời gian') }}</span><span class="sf-mv" id="m-time"></span></div>
         </div>
         <div class="sf-msec">
-          <span class="sf-mlabel">Thanh toán</span>
-          <div class="sf-mrow"><span class="sf-mk">Tổng tiền dịch vụ</span><span class="sf-mv" id="m-price"></span></div>
-          <div class="sf-mrow"><span class="sf-mk">Phương thức</span><span class="sf-mv" id="m-pay"></span></div>
+          <span class="sf-mlabel">{{ _('Thanh toán') }}</span>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Tổng tiền dịch vụ') }}</span><span class="sf-mv" id="m-price"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Phương thức') }}</span><span class="sf-mv" id="m-pay"></span></div>
         </div>
         <div class="sf-msec">
-          <span class="sf-mlabel">Trạng thái</span>
+          <span class="sf-mlabel">{{ _('Trạng thái') }}</span>
           <div><span id="m-status-badge"></span></div>
         </div>
         <div class="sf-msec" id="m-income-section" style="display:none">
-          <span class="sf-mlabel">Thu nhập</span>
+          <span class="sf-mlabel">{{ _('Thu nhập') }}</span>
           <div class="sf-income-box">
             <div class="sf-income-row">
-              <span class="sf-income-k">Lương theo giờ</span>
+              <span class="sf-income-k">{{ _('Lương theo giờ') }}</span>
               <span class="sf-income-v" id="m-hourly"></span>
             </div>
             <div class="sf-income-row">
-              <span class="sf-income-k">Hoa hồng booking</span>
+              <span class="sf-income-k">{{ _('Hoa hồng booking') }}</span>
               <span class="sf-income-v" id="m-commission"></span>
             </div>
             <div class="sf-income-divider">
               <div class="sf-income-total-row">
-                <span class="sf-income-total-k">Thu nhập sau booking</span>
+                <span class="sf-income-total-k">{{ _('Thu nhập sau booking') }}</span>
                 <span class="sf-income-total-v" id="m-total-income"></span>
               </div>
             </div>
@@ -371,7 +371,7 @@
         </div>
       </div>
       <div class="sf-mftr">
-        <button type="button" class="sf-mbtn" onclick="sfCloseModal()">Đóng</button>
+        <button type="button" class="sf-mbtn" onclick="sfCloseModal()">{{ _('Đóng') }}</button>
       </div>
     </div>
   </div>
@@ -385,17 +385,17 @@ function sfPayTag(status, method, isPaid) {
   if (status === 'cancelled') return '<span class="sf-ptag pt-na">—</span>';
   if (method === 'cash') {
     return isPaid === '1'
-      ? '<span class="sf-ptag pt-paid">Tiền mặt – đã thanh toán</span>'
-      : '<span class="sf-ptag pt-unpaid">Tiền mặt – chưa thanh toán</span>';
+      ? '<span class="sf-ptag pt-paid">{{ _("Tiền mặt – đã thanh toán") }}</span>'
+      : '<span class="sf-ptag pt-unpaid">{{ _("Tiền mặt – chưa thanh toán") }}</span>';
   }
-  if (method === 'online') return '<span class="sf-ptag pt-online">Online</span>';
+  if (method === 'online') return '<span class="sf-ptag pt-online">{{ _("Online") }}</span>';
   return '<span class="sf-ptag pt-na">—</span>';
 }
 
 function sfBadge(status) {
   return status === 'done'
-    ? '<span class="sf-badge b-done">Hoàn thành</span>'
-    : '<span class="sf-badge b-cancelled">Đã hủy</span>';
+    ? '<span class="sf-badge b-done">{{ _("Hoàn thành") }}</span>'
+    : '<span class="sf-badge b-cancelled">{{ _("Đã hủy") }}</span>';
 }
 
 function sfOpenModal(card) {

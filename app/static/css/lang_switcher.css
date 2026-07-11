@@ -1,0 +1,97 @@
+/* ═══════════════════════════════════════════════════════════════
+   LANGUAGE SWITCHER — dropdown [cờ + mã] → menu chọn ngôn ngữ
+   File dùng chung cho public / customer / staff. Tự chứa (hardcode màu)
+   để không phụ thuộc CSS variables của từng base.
+════════════════════════════════════════════════════════════════════ */
+.lang-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.lang-flag {
+    width: 20px;
+    height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    display: block;
+    box-shadow: 0 0 0 1px rgba(239, 57, 118, 0.15);
+}
+
+.lang-dropdown__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px 6px 10px;
+    border: 1.5px solid #574147;
+    border-radius: 9999px;
+    background: transparent;
+    color: #22191d;
+    font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.lang-dropdown__trigger:hover {
+    border-color: #ab2261;
+    color: #ab2261;
+}
+
+.lang-dropdown__caret {
+    font-size: 18px;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.lang-dropdown--open .lang-dropdown__caret {
+    transform: rotate(180deg);
+}
+
+.lang-dropdown__menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 160px;
+    padding: 6px;
+    margin: 0;
+    list-style: none;
+    background: #ffffff;
+    border: 1px solid rgba(239, 57, 118, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(239, 57, 118, 0.18);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+    z-index: 200;
+}
+
+.lang-dropdown--open .lang-dropdown__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.lang-dropdown__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    color: #22191d;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
+
+.lang-dropdown__item:hover {
+    background: #fff0f5;
+}
+
+.lang-dropdown__item--active {
+    color: #ab2261;
+    background: #ffd9e2;
+}

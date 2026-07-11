@@ -1,6 +1,6 @@
 {% extends "customer_base.html" %}
 
-{% block title %}History - Daha Care{% endblock %}
+{% block title %}{{ _('History') }} - Daha Care{% endblock %}
 
 {% block nav_history %}active{% endblock %}
 
@@ -12,16 +12,16 @@
 <div class="ch-wrapper">
 <!-- Page header -->
 <div class="dashboard-header">
-    <p class="dashboard-label">Your records</p>
-    <h1>History</h1>
-    <p class="dashboard-subtitle">Review your past visits and invoices.</p>
+    <p class="dashboard-label">{{ _('Your records') }}</p>
+    <h1>{{ _('History') }}</h1>
+    <p class="dashboard-subtitle">{{ _('Review your past visits and invoices.') }}</p>
 </div>
 
 <!-- Stats Summary -->
 <div class="history-stats">
     <div class="stat-card">
         <div class="stat-card-top">
-            <span class="stat-label">Total Visits</span>
+            <span class="stat-label">{{ _('Total Visits') }}</span>
             <div class="stat-icon stat-icon-pink">📅</div>
         </div>
         <h3 class="stat-value">{{ total_visits }}</h3>
@@ -30,7 +30,7 @@
 
     <div class="stat-card">
         <div class="stat-card-top">
-            <span class="stat-label">Total Spent</span>
+            <span class="stat-label">{{ _('Total Spent') }}</span>
             <div class="stat-icon stat-icon-pink">$</div>
         </div>
         <h3 class="stat-value">${{ total_spent }}</h3>
@@ -39,27 +39,27 @@
 
     <div class="stat-card">
         <div class="stat-card-top">
-            <span class="stat-label">Favorite Stylist</span>
+            <span class="stat-label">{{ _('Favorite Stylist') }}</span>
             <div class="stat-icon stat-icon-avatar"></div>
         </div>
         <h3 class="stat-value stat-value-md">{{ fav_stylist['name'] }}</h3>
-        <p class="stat-sublabel">{{fav_stylist['count']}} visits</p>
+        <p class="stat-sublabel">{{fav_stylist['count']}} {{ _('visits') }}</p>
     </div>
 
     <div class="stat-card">
         <div class="stat-card-top">
-            <span class="stat-label">Top Service</span>
+            <span class="stat-label">{{ _('Top Service') }}</span>
             <div class="stat-icon stat-icon-pink">✦</div>
         </div>
         <h3 class="stat-value stat-value-md">{{ top_service['name'] }}</h3>
-        <p class="stat-sublabel">{{ top_service['count'] }} times</p>
+        <p class="stat-sublabel">{{ top_service['count'] }} {{ _('times') }}</p>
     </div>
 </div>
 
 <!-- Tab Switcher -->
 <div class="history-tabs">
-    <button class="history-tab active" data-tab="appointments">Appointments</button>
-    <button class="history-tab" data-tab="invoices">Invoices</button>
+    <button class="history-tab active" data-tab="appointments">{{ _('Appointments') }}</button>
+    <button class="history-tab" data-tab="invoices">{{ _('Invoices') }}</button>
 </div>
 
 <!-- Filters Bar -->
@@ -69,22 +69,22 @@
     <div class="filter-dropdown" data-filter="date">
         <button class="filter-chip">
             <span class="filter-icon">📅</span>
-            <span class="filter-value">All times</span>
+            <span class="filter-value">{{ _('All times') }}</span>
             <span class="filter-caret">▾</span>
         </button>
         <div class="filter-panel" hidden>
-            <div class="filter-option" data-value="">All</div>
-            <div class="filter-option" data-value="30_days">Last 30 days</div>
-            <div class="filter-option" data-value="3_months">Last 3 months</div>
-            <div class="filter-option" data-value="year">Last year</div>
+            <div class="filter-option" data-value="">{{ _('All') }}</div>
+            <div class="filter-option" data-value="30_days">{{ _('Last 30 days') }}</div>
+            <div class="filter-option" data-value="3_months">{{ _('Last 3 months') }}</div>
+            <div class="filter-option" data-value="year">{{ _('Last year') }}</div>
         </div>
     </div>
 
     <!-- status - half_shared -->
     <div class="filter-dropdown" data-filter="status">
         <button class="filter-chip">
-            <span class="filter-label">Status:</span>
-            <span class="filter-value">All</span>
+            <span class="filter-label">{{ _('Status:') }}</span>
+            <span class="filter-value">{{ _('All') }}</span>
             <span class="filter-caret">▾</span>
         </button>
         <div class="filter-panel" hidden>
@@ -95,12 +95,12 @@
     <!-- stylist - only appointments -->
     <div class="filter-dropdown" data-filter="stylist">
         <button class="filter-chip filter-chip-appointments">
-            <span class="filter-label">Stylist:</span>
-            <span class="filter-value">All</span>
+            <span class="filter-label">{{ _('Stylist:') }}</span>
+            <span class="filter-value">{{ _('All') }}</span>
             <span class="filter-caret">▾</span>
         </button>
         <div class="filter-panel" hidden>
-        <div class="filter-option" data-value="">All</div>
+        <div class="filter-option" data-value="">{{ _('All') }}</div>
         {% for stylist in stylists %}
             <div class="filter-option" data-value="{{ stylist.id }}">{{ stylist.full_name }}</div>
         {% endfor %}
@@ -110,12 +110,12 @@
     <!-- service  - only appointments -->
     <div class="filter-dropdown" data-filter="service">
         <button class="filter-chip filter-chip-appointments">
-            <span class="filter-label">Service:</span>
-            <span class="filter-value">All</span>
+            <span class="filter-label">{{ _('Service:') }}</span>
+            <span class="filter-value">{{ _('All') }}</span>
             <span class="filter-caret">▾</span>
         </button>
         <div class="filter-panel" hidden>
-            <div class="filter-option" data-value="">All</div>
+            <div class="filter-option" data-value="">{{ _('All') }}</div>
             {% for service in services %}
             <div class="filter-option" data-value="{{ service.id }}">{{ service.name }}</div>
             {% endfor %}
@@ -125,19 +125,19 @@
     <!-- payment method - only invoices  -->
     <div class="filter-dropdown" data-filter="payment_method">
         <button class="filter-chip filter-chip-invoices" style="display:none;">
-            <span class="filter-label">Payment:</span>
-            <span class="filter-value">All</span>
+            <span class="filter-label">{{ _('Payment:') }}</span>
+            <span class="filter-value">{{ _('All') }}</span>
             <span class="filter-caret">▾</span>
         </button>
         <div class="filter-panel" hidden>
-            <div class="filter-option" data-value="">All</div>
+            <div class="filter-option" data-value="">{{ _('All') }}</div>
             <div class="filter-option" data-value="visa">Visa</div>
             <div class="filter-option" data-value="mastercard">Mastercard</div>
             <div class="filter-option" data-value="mobile_pay">Mobile Pay</div>
             <div class="filter-option" data-value="apple_pay">Apple Pay</div>
             <div class="filter-option" data-value="google_pay">Google Pay</div>
-            <div class="filter-option" data-value="cash">Cash</div>
-            <div class="filter-option" data-value="bank_transfer">Bank Transfer</div>
+            <div class="filter-option" data-value="cash">{{ _('Cash') }}</div>
+            <div class="filter-option" data-value="bank_transfer">{{ _('Bank Transfer') }}</div>
         </div>
     </div>
 
@@ -147,20 +147,20 @@
     <div class="filter-dropdown filter-sort-dropdown" data-filter="sort">
         <button class="filter-chip filter-sort">
             <span class="filter-label">⇅</span>
-            <span class="filter-value">Newest first</span>
+            <span class="filter-value">{{ _('Newest first') }}</span>
             <span class="filter-caret">▾</span>
         </button>
 
         <div class="filter-panel" hidden>
-            <div class="filter-option" data-value="date_desc">Newest first</div>
-            <div class="filter-option" data-value="date_asc">Oldest first</div>
-            <div class="filter-option" data-value="amount_desc">Amount: High to Low</div>
-            <div class="filter-option" data-value="amount_asc">Amount: Low to High</div>
+            <div class="filter-option" data-value="date_desc">{{ _('Newest first') }}</div>
+            <div class="filter-option" data-value="date_asc">{{ _('Oldest first') }}</div>
+            <div class="filter-option" data-value="amount_desc">{{ _('Amount: High to Low') }}</div>
+            <div class="filter-option" data-value="amount_asc">{{ _('Amount: Low to High') }}</div>
         </div>
     </div>
         
         <!-- clear - shared -->
-        <button class="filter-clear">Clear all</button>
+        <button class="filter-clear">{{ _('Clear all') }}</button>
 </div>
 
 <!-- ===== Appointments Tab Content ===== -->
@@ -169,11 +169,11 @@
         <table class="history-table">
             <thead>
                 <tr>
-                    <th>Service &amp; Date</th>
-                    <th>Stylist</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th class="th-right">Action</th>
+                    <th>{{ _('Service & Date') }}</th>
+                    <th>{{ _('Stylist') }}</th>
+                    <th>{{ _('Price') }}</th>
+                    <th>{{ _('Status') }}</th>
+                    <th class="th-right">{{ _('Action') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -195,9 +195,9 @@
                     </td>
                     <td class="cell-medium cell-dim">N/A</td>
                     <td class="cell-bold cell-dim">$0.00</td>
-                    <td><span class="badge badge-cancelled">Cancelled</span></td>
+                    <td><span class="badge badge-cancelled">{{ _('Cancelled') }}</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
-                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">Rebook</a>
+                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>
                     </td>
                 </tr>
                     {% elif appt.display_type == 'reviewed' %}
@@ -216,10 +216,10 @@
                     </td>
                     <td class="cell-medium">{{ appt.stylist_name | short_name }}</td>
                     <td class="cell-bold">{{ appt.service_price | format_currency }}</td>
-                    <td><span class="badge badge-completed">Completed</span></td>
+                    <td><span class="badge badge-completed">{{ _('Completed') }}</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
-                        <span class="reviewed-tag">✓ Reviewed</span>
-                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">Rebook</a>
+                        <span class="reviewed-tag">✓ {{ _('Reviewed') }}</span>
+                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>
                     </td>
                 </tr>
                     {% else %}
@@ -238,10 +238,10 @@
                     </td>
                     <td class="cell-medium">{{ appt.stylist_name | short_name }}</td>
                     <td class="cell-bold">{{ appt.service_price | format_currency }}</td>
-                    <td><span class="badge badge-completed">Completed</span></td>
+                    <td><span class="badge badge-completed">{{ _('Completed') }}</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
-                        <button class="btn-review">Leave Review</button>
-                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">Rebook</a>
+                        <button class="btn-review">{{ _('Leave Review') }}</button>
+                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>
                     </td>
                 </tr>
                     {% endif %}
@@ -263,11 +263,11 @@
         <table class="history-table">
             <thead>
                 <tr>
-                    <th>Invoice &amp; Service</th>
-                    <th>Payment</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th class="th-right">Action</th>
+                    <th>{{ _('Invoice & Service') }}</th>
+                    <th>{{ _('Payment') }}</th>
+                    <th>{{ _('Amount') }}</th>
+                    <th>{{ _('Status') }}</th>
+                    <th class="th-right">{{ _('Action') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -298,7 +298,7 @@
                     <td class="cell-bold">{{ invoice.amount | format_currency }}</td>
                     <td><span class="badge badge-{{ invoice.invoice_status }}">{{ invoice.invoice_status}}</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
-                        <a class="btn-download" href="{{ url_for('main.download_invoice', invoice_id=invoice.invoice_id) }}">⤓ Download PDF</a>
+                        <a class="btn-download" href="{{ url_for('main.download_invoice', invoice_id=invoice.invoice_id) }}">⤓ {{ _('Download PDF') }}</a>
                         <button class="btn-more">⋮</button>
                     </td>
                 </tr>
@@ -438,8 +438,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const endIdx = Math.min(currentPage* ROW_PER_PAGE, totalRows);
 
         info.textContent = totalRows === 0
-            ? 'No result'
-            : `Showing ${startIdx}-${endIdx} of ${totalRows}`;
+            ? '{{ _("No result") }}'
+            : `{{ _('Showing') }} ${startIdx}-${endIdx} {{ _('of') }} ${totalRows}`;
         
         controls.innerHTML = buildPageButtons(currentPage, totalPages)
     }
@@ -576,15 +576,15 @@ function getPageNumbers(current, total) {
 
     const statusOptionByTab = {
         appointments: [
-            {value: '', label: 'All'},
-            {value: 'completed', label: 'Completed'},
-            {value: 'cancelled', label: 'Cancelled'},
+            {value: '', label: '{{ _("All") }}'},
+            {value: 'completed', label: '{{ _("Completed") }}'},
+            {value: 'cancelled', label: '{{ _("Cancelled") }}'},
         ],
         invoices: [
-            {value: '', label: 'All'},
-            {value: 'paid', label: 'Paid'},
-            {value: 'refunded', label: 'Refunded'},
-            {value: 'pending', label: 'Pending'},
+            {value: '', label: '{{ _("All") }}'},
+            {value: 'paid', label: '{{ _("Paid") }}'},
+            {value: 'refunded', label: '{{ _("Refunded") }}'},
+            {value: 'pending', label: '{{ _("Pending") }}'},
         ]
     };
 

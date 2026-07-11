@@ -1007,6 +1007,7 @@
                 </button>
                 <button type="button" class="sv-icon-btn" title="Chỉnh sửa danh mục"
                         data-id="{{ cat.id }}" data-name="{{ cat.name }}"
+                        data-name-fi="{{ cat.name_fi or '' }}" data-name-vi="{{ cat.name_vi or '' }}"
                         data-slug="{{ cat.slug }}" data-active="{{ cat.is_active }}"
                         onclick="openEditCategory(this)">
                     <span class="material-symbols-outlined">edit</span>
@@ -1063,7 +1064,11 @@
                                 <button type="button" class="sv-action-btn" title="Chỉnh sửa"
                                         data-id="{{ s.id }}"
                                         data-name="{{ s.name }}"
+                                        data-name-fi="{{ s.name_fi or '' }}"
+                                        data-name-vi="{{ s.name_vi or '' }}"
                                         data-description="{{ s.description or '' }}"
+                                        data-description-fi="{{ s.description_fi or '' }}"
+                                        data-description-vi="{{ s.description_vi or '' }}"
                                         data-category-id="{{ s.category_id }}"
                                         data-icon="{{ s.icon }}"
                                         data-image="{{ s.image or '' }}"
@@ -1127,13 +1132,33 @@
                 <div class="sv-section-title">Thông tin cơ bản</div>
 
                 <div class="sv-form-group">
-                    <label class="sv-form-label" for="sv_add_name">Tên dịch vụ *</label>
+                    <label class="sv-form-label" for="sv_add_name">Tên dịch vụ (English) *</label>
                     <input type="text" name="name" id="sv_add_name" class="sv-form-input" required>
                 </div>
 
                 <div class="sv-form-group">
-                    <label class="sv-form-label" for="sv_add_description">Mô tả</label>
+                    <label class="sv-form-label" for="sv_add_name_fi">Tên dịch vụ (Suomi)</label>
+                    <input type="text" name="name_fi" id="sv_add_name_fi" class="sv-form-input">
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_add_name_vi">Tên dịch vụ (Tiếng Việt)</label>
+                    <input type="text" name="name_vi" id="sv_add_name_vi" class="sv-form-input">
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_add_description">Mô tả (English)</label>
                     <textarea name="description" id="sv_add_description" class="sv-form-textarea"></textarea>
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_add_description_fi">Mô tả (Suomi)</label>
+                    <textarea name="description_fi" id="sv_add_description_fi" class="sv-form-textarea"></textarea>
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_add_description_vi">Mô tả (Tiếng Việt)</label>
+                    <textarea name="description_vi" id="sv_add_description_vi" class="sv-form-textarea"></textarea>
                 </div>
 
                 <div class="sv-form-row">
@@ -1257,13 +1282,33 @@
                 <div class="sv-section-title">Thông tin cơ bản</div>
 
                 <div class="sv-form-group">
-                    <label class="sv-form-label" for="sv_edit_name">Tên dịch vụ *</label>
+                    <label class="sv-form-label" for="sv_edit_name">Tên dịch vụ (English) *</label>
                     <input type="text" name="name" id="sv_edit_name" class="sv-form-input" required>
                 </div>
 
                 <div class="sv-form-group">
-                    <label class="sv-form-label" for="sv_edit_description">Mô tả</label>
+                    <label class="sv-form-label" for="sv_edit_name_fi">Tên dịch vụ (Suomi)</label>
+                    <input type="text" name="name_fi" id="sv_edit_name_fi" class="sv-form-input">
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_edit_name_vi">Tên dịch vụ (Tiếng Việt)</label>
+                    <input type="text" name="name_vi" id="sv_edit_name_vi" class="sv-form-input">
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_edit_description">Mô tả (English)</label>
                     <textarea name="description" id="sv_edit_description" class="sv-form-textarea"></textarea>
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_edit_description_fi">Mô tả (Suomi)</label>
+                    <textarea name="description_fi" id="sv_edit_description_fi" class="sv-form-textarea"></textarea>
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_edit_description_vi">Mô tả (Tiếng Việt)</label>
+                    <textarea name="description_vi" id="sv_edit_description_vi" class="sv-form-textarea"></textarea>
                 </div>
 
                 <div class="sv-form-row">
@@ -1392,8 +1437,18 @@
             <div class="sv-modal__body">
 
                 <div class="sv-form-group">
-                    <label class="sv-form-label" for="sv_category_name">Tên danh mục *</label>
+                    <label class="sv-form-label" for="sv_category_name">Tên danh mục (English) *</label>
                     <input type="text" name="name" id="sv_category_name" class="sv-form-input" required>
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_category_name_fi">Tên danh mục (Suomi)</label>
+                    <input type="text" name="name_fi" id="sv_category_name_fi" class="sv-form-input">
+                </div>
+
+                <div class="sv-form-group">
+                    <label class="sv-form-label" for="sv_category_name_vi">Tên danh mục (Tiếng Việt)</label>
+                    <input type="text" name="name_vi" id="sv_category_name_vi" class="sv-form-input">
                 </div>
 
                 <div class="sv-form-group">
@@ -1636,7 +1691,11 @@ function openEditService(el) {
     form.action = svBuildUrl(SV_ROUTES.updateService, d.id);
 
     document.getElementById('sv_edit_name').value = d.name;
+    document.getElementById('sv_edit_name_fi').value = d.nameFi || '';
+    document.getElementById('sv_edit_name_vi').value = d.nameVi || '';
     document.getElementById('sv_edit_description').value = d.description || '';
+    document.getElementById('sv_edit_description_fi').value = d.descriptionFi || '';
+    document.getElementById('sv_edit_description_vi').value = d.descriptionVi || '';
     document.getElementById('sv_edit_category_id').value = d.categoryId;
 
     const iconSelect = document.getElementById('sv_edit_icon');
@@ -1699,6 +1758,8 @@ function openEditCategory(el) {
     document.getElementById('sv_category_modal_title').textContent = 'Chỉnh sửa danh mục';
     document.getElementById('sv_category_submit_btn').textContent = 'Lưu';
     document.getElementById('sv_category_name').value = d.name;
+    document.getElementById('sv_category_name_fi').value = d.nameFi || '';
+    document.getElementById('sv_category_name_vi').value = d.nameVi || '';
     document.getElementById('sv_category_slug').value = d.slug || '';
     document.getElementById('sv_category_active').checked = d.active === '1';
     document.getElementById('sv_category_delete_btn').style.display = 'inline-flex';

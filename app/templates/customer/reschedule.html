@@ -1,6 +1,6 @@
 {% extends "customer_base.html" %}
 
-{% block title %} Reschedule {% endblock %}
+{% block title %} {{ _('Reschedule') }} {% endblock %}
 
 {% block nav_bookings %}active{% endblock %}
 
@@ -16,14 +16,11 @@
          HERO / PAGE TITLE
          ========================= -->
     <section class="reschedule-hero">
-      <span class="reschedule-badge">APPOINTMENT MANAGEMENT</span>
+      <span class="reschedule-badge">{{ _('APPOINTMENT MANAGEMENT') }}</span>
 
-      <h1 class="reschedule-title">Reschedule</h1>
+      <h1 class="reschedule-title">{{ _('Reschedule') }}</h1>
 
-      <p class="reschedule-subtitle">
-        Modify your session with ease. Please note our 24-hour rescheduling
-        window to ensure we can accommodate all guests.
-      </p>
+      <p class="reschedule-subtitle">{{ _('Modify your session with ease. Please note our 24-hour rescheduling window to ensure we can accommodate all guests.') }}</p>
     </section>
 
     <!-- =========================
@@ -43,32 +40,32 @@
         <div class="current-session-image-wrap">
           <!--
             Nếu có ảnh:
-            <img src="{ss{ booking.image_url }ss}" alt="Service image" class="current-session-image">
+            <img src="{ss{ booking.image_url }ss}" alt="{{ _('Service image') }}" class="current-session-image">
 
             Nếu chưa có ảnh thật thì giữ placeholder này.
           -->
           <img
             src="https://via.placeholder.com/84x84"
-            alt="Service image"
+            alt="{{ _('Service image') }}"
             class="current-session-image"
           />
         </div>
 
         <div class="current-session-info">
-          <p class="current-session-label">CURRENT SESSION</p>
+          <p class="current-session-label">{{ _('CURRENT SESSION') }}</p>
           <h2 class="current-session-service">{{ service['name'] }}</h2>
-          <p class="current-session-staff">Technician: {{ staff['full_name'] }}</p>
+          <p class="current-session-staff">{{ _('Technician:') }} {{ staff['full_name'] }}</p>
         </div>
       </div>
 
       <div class="current-session-meta">
         <div class="session-meta-box">
-          <span class="session-meta-label">DATE</span>
+          <span class="session-meta-label">{{ _('DATE') }}</span>
           <span class="session-meta-value">{{ booking_date }}</span>
         </div>
 
         <div class="session-meta-box">
-          <span class="session-meta-label">TIME</span>
+          <span class="session-meta-label">{{ _('TIME') }}</span>
           <span class="session-meta-value"> {{ booking_time }}</span>
         </div>
       </div>
@@ -91,7 +88,7 @@
       -->
       <div class="panel-card calendar-card">
         <div class="panel-card-header">
-          <h3 class="panel-card-title">Select New Date</h3>
+          <h3 class="panel-card-title">{{ _('Select New Date') }}</h3>
 
           <div class="calendar-nav">
             <button type="button" class="calendar-nav-btn" id="prevCalendarBtn" aria-label="Previous month">
@@ -111,13 +108,13 @@
         -->
 
         <div class="calendar-weekdays">
-          <span>MO</span>
-          <span>TU</span>
-          <span>WE</span>
-          <span>TH</span>
-          <span>FR</span>
-          <span>SA</span>
-          <span>SU</span>
+          <span>{{ _('MO') }}</span>
+          <span>{{ _('TU') }}</span>
+          <span>{{ _('WE') }}</span>
+          <span>{{ _('TH') }}</span>
+          <span>{{ _('FR') }}</span>
+          <span>{{ _('SA') }}</span>
+          <span>{{ _('SU') }}</span>
         </div>
 
         <!--
@@ -153,16 +150,16 @@
       -->
       <div class="panel-card time-card">
         <div class="panel-card-header">
-          <h3 class="panel-card-title">Available Times</h3>
+          <h3 class="panel-card-title">{{ _('Available Times') }}</h3>
         </div>
 
         <div id="timeSlotGrid" class="time-slot-grid">
-          <p class="empty-text">Please select a date first.</p>
+          <p class="empty-text">{{ _('Please select a date first.') }}</p>
         </div>
 
         <p class="session-duration-note">
           <span class="duration-icon"></span>
-          Session duration: {{ duration }} mins
+          {{ _('Session duration:') }} {{ duration }} {{ _('mins') }}
         </p>
       </div>
     </section>
@@ -179,11 +176,8 @@
       </div>
 
       <div class="policy-content">
-        <h3 class="policy-title">Policy Notice</h3>
-        <p class="policy-text">
-          Bookings can only be rescheduled at least 24 hours in advance and can
-          only be changed once. Further changes may require a new deposit.
-        </p>
+        <h3 class="policy-title">{{ _('Policy Notice') }}</h3>
+        <p class="policy-text">{{ _('Bookings can only be rescheduled at least 24 hours in advance and can only be changed once. Further changes may require a new deposit.') }}</p>
       </div>
     </section>
 
@@ -199,19 +193,19 @@
          - update giá trị mới bằng JS khi user chọn date/time
     -->
     <section class="comparison-section">
-      <h3 class="comparison-title">Comparison</h3>
+      <h3 class="comparison-title">{{ _('Comparison') }}</h3>
 
       <div class="comparison-card">
         <div class="comparison-column comparison-column-old">
-          <p class="comparison-label">FROM</p>
+          <p class="comparison-label">{{ _('FROM') }}</p>
 
           <div class="comparison-row">
-            <span class="comparison-key">Date</span>
+            <span class="comparison-key">{{ _('Date') }}</span>
             <span class="comparison-value">{{ cp_booking_date }}</span>
           </div>
 
           <div class="comparison-row">
-            <span class="comparison-key">Time</span>
+            <span class="comparison-key">{{ _('Time') }}</span>
             <span class="comparison-value">{{ booking_time }}</span>
           </div>
         </div>
@@ -219,16 +213,16 @@
         <div class="comparison-divider"></div>
 
         <div class="comparison-column comparison-column-new">
-          <p class="comparison-label comparison-label-new">TO (NEW)</p>
+          <p class="comparison-label comparison-label-new">{{ _('TO (NEW)') }}</p>
 
           <div class="comparison-row">
-            <span class="comparison-key">Date</span>
-            <span class="comparison-value comparison-value-new" id="newDatePreview">Please select a date</span>
+            <span class="comparison-key">{{ _('Date') }}</span>
+            <span class="comparison-value comparison-value-new" id="newDatePreview">{{ _('Please select a date') }}</span>
           </div>
 
           <div class="comparison-row">
-            <span class="comparison-key">Time</span>
-            <span class="comparison-value comparison-value-new" id="newTimePreview">Please select a time</span>
+            <span class="comparison-key">{{ _('Time') }}</span>
+            <span class="comparison-value comparison-value-new" id="newTimePreview">{{ _('Please select a time') }}</span>
           </div>
         </div>
       </div>
@@ -253,11 +247,11 @@
       <section class="reschedule-actions">
         <a href="{{ url_for('main.view_booking_details', booking_id=booking['id']) }}"
            class="btn btn-cancel">
-          Cancel
+          {{ _('Cancel') }}
           </a>
 
           <button type="submit" class="btn btn-confirm">
-            Confirm Reschedule
+            {{ _('Confirm Reschedule') }}
           </button>
       </section>
     </form>

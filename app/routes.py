@@ -24,7 +24,19 @@ from werkzeug.utils import secure_filename
 from functools import wraps
 from app.utils.helpers import split_customer_bookings, format_booking_date, format_booking_time, build_calendar_url, build_gg_map_url, build_services_by_category, mask_email, now_helsinki, today_helsinki
 from collections import Counter
-from app import oauth, csrf
+from app import oauth, csrf, LANGUAGES
+from app.template_filters import translate_field as tr
+from flask_babel import gettext, format_date
+
+
+def _staff_status_i18n_markers():
+    # Extraction-only: badge_label/empty_scope/mission build động nên gettext(var)
+    # không được pybabel trích. Các literal này giữ chúng trong catalog.
+    return (gettext("Chờ xác nhận"), gettext("Đã xác nhận"), gettext("Đang thực hiện"),
+            gettext("Hoàn thành"), gettext("Đã hủy"), gettext("Không đến"),
+            gettext("hôm nay"), gettext("trong tuần này"), gettext("trong tháng này"),
+            gettext("trong tháng trước"),
+            gettext("✓ Claimed"), gettext("✓ All Reviewed"), gettext("Start"), gettext("Claim"))
 from app.database.db import create_oauth_user, set_user_oauth
 main = Blueprint("main",__name__)
 
@@ -229,6 +241,23 @@ def _save_avatar_image(file, user_id):
 
     file.save(os.path.join(_AVATAR_DIR, f"{user_id}.{ext}"))
 
+@main.route("/set-language/<lang>")
+def set_language(lang):
+    """Đổi ngôn ngữ giao diện, lưu vào session rồi quay lại trang trước."""
+    if lang in LANGUAGES:
+        session["lang"] = lang
+    return redirect(request.referrer or url_for("main.home"))
+
+
+@main.app_context_processor
+def inject_language():
+    """Expose ngôn ngữ hiện tại + danh sách ngôn ngữ cho mọi template (switcher UI)."""
+    return {
+        "current_lang": session.get("lang") if session.get("lang") in LANGUAGES else "fi",
+        "languages": LANGUAGES,
+    }
+
+
 @main.app_context_processor
 def inject_customer_sidebar():
     """Exposes the logged-in customer's avatar + name to every customer template
@@ -362,11 +391,11 @@ def customer_dashboard():
     carousel_rewards = []
     for s in get_carousel_slides("dashboard_offers", active_only=True):
         carousel_rewards.append({
-            "title":     s["title"],
-            "subtitle":  s["subtitle"],
-            "badge":     s["badge"],
+            "title":     tr(s, "title"),
+            "subtitle":  tr(s, "subtitle"),
+            "badge":     tr(s, "badge"),
             "image":     _resolve_carousel_image(s["image"]),
-            "cta_label": s["cta_label"],
+            "cta_label": tr(s, "cta_label"),
             "cta_url":   s["cta_url"],
         })
 
@@ -1545,8 +1574,8 @@ def customer_loyalty_points():
 
         rewards.append({
             "id":                r["id"],
-            "name":              r["name"],
-            "desc":              r["description"] or "",
+            "name":              tr(r, "name"),
+            "desc":              tr(r, "description") or "",
             "pts":               r["cost"],
             "locked":            not redeemable,
             "img":               url_for("static", filename=f"uploads/rewards/{r['banner_image']}") if r["banner_image"] else "",
@@ -1593,17 +1622,17 @@ def customer_loyalty_points():
         slot = m["slot_key"]
         claimed, claimed_label = False, None
         if slot == "first_booking" and first_booking_claimed:
-            claimed, claimed_label = True, "✓ Claimed"
+            claimed, claimed_label = True, gettext("✓ Claimed")
         elif slot == "review" and not pending_review:
-            claimed, claimed_label = True, "✓ All Reviewed"
+            claimed, claimed_label = True, gettext("✓ All Reviewed")
         missions.append({
             "icon":          m["icon"],
-            "name":          m["title"],
+            "name":          tr(m, "title"),
             "pts":           m["pts_label"],
             "img":           _resolve_carousel_image(m["image"]),
             "bg":            _MISSION_SLOT_BG.get(slot),
             "url":           _MISSION_SLOT_URLS[slot](),
-            "cta":           _MISSION_SLOT_CTA.get(slot, "Start"),
+            "cta":           gettext(_MISSION_SLOT_CTA.get(slot, "Start")),
             "claimed":       claimed,
             "claimed_label": claimed_label,
         })
@@ -1727,9 +1756,6 @@ def staff_login():
     flash("something went wrong :(", "error")
     return redirect(url_for("main.staff_login"))
 
-_DOW_VI = {0: "Thứ hai", 1: "Thứ ba", 2: "Thứ tư", 3: "Thứ năm",
-           4: "Thứ sáu", 5: "Thứ bảy", 6: "Chủ nhật"}
-
 _STATUS_BORDER = {
     "in-progress": "#C084A0", "confirmed": "#60A5FA",
     "done": "#4ADE80", "pending": "#F59E0B", "cancelled": "#D4BAB0",
@@ -1752,8 +1778,9 @@ _EMPTY_SCOPE = {
 }
 
 def _dow_vi(date_str):
+    # Tên thứ theo locale hiện tại (Babel): fi/en/vi tự động.
     try:
-        return _DOW_VI[datetime.strptime(date_str, "%Y-%m-%d").weekday()]
+        return format_date(datetime.strptime(date_str, "%Y-%m-%d"), "EEEE")
     except (ValueError, TypeError):
         return ""
 
@@ -1780,9 +1807,9 @@ def _enrich_staff_booking(r):
         "pay_method": pay_method,
         "is_paid": is_paid,
         "pay_tag_class": pay_tag[0] if pay_tag else "",
-        "pay_tag_label": pay_tag[1] if pay_tag else "",
+        "pay_tag_label": gettext(pay_tag[1]) if pay_tag else "",
         "badge_class": badge_class,
-        "badge_label": badge_label,
+        "badge_label": gettext(badge_label),
         "border": _STATUS_BORDER.get(r["status"], "#D4BAB0"),
         "faded": r["status"] == "done",
         "code": "BK-" + (r["booking_date"] or "").replace("-", "") + "-" + f'{r["id"]:03d}',
@@ -1811,9 +1838,9 @@ def _enrich_history_booking(r):
         "pay_method": method or "",
         "is_paid": is_paid,
         "pay_tag_class": pay_tag_class,
-        "pay_tag_label": pay_tag_label,
+        "pay_tag_label": gettext(pay_tag_label) if pay_tag_label != "—" else "—",
         "badge_class": badge_class,
-        "badge_label": badge_label,
+        "badge_label": gettext(badge_label),
         "code": "BK-" + (r["booking_date"] or "").replace("-", "") + "-" + f'{r["id"]:03d}',
         "start": (r["start_time"] or "")[:5],
         "end": (r["end_time"] or "")[:5],
@@ -1824,9 +1851,10 @@ def _enrich_history_booking(r):
     }
 
 def _month_display_vi(ym):
+    # Tên tháng + năm theo locale hiện tại (Babel): fi/en/vi tự động.
     try:
         y, m = ym.split("-")
-        return f"Tháng {int(m)}/{y}"
+        return format_date(date(int(y), int(m), 1), "LLLL y")
     except (ValueError, AttributeError):
         return ym
 
@@ -1884,10 +1912,11 @@ def staff_dashboard():
 
     # scope hiển thị cho empty-state theo date range đang chọn
     if preset == "custom":
-        empty_scope = (f"vào ngày {_fmt_ddmmyyyy(df)}" if df == dt
-                       else f"từ {_fmt_ddmmyyyy(df)} đến {_fmt_ddmmyyyy(dt)}")
+        empty_scope = (gettext("vào ngày %(date)s", date=_fmt_ddmmyyyy(df)) if df == dt
+                       else gettext("từ %(start)s đến %(end)s", start=_fmt_ddmmyyyy(df), end=_fmt_ddmmyyyy(dt)))
     else:
-        empty_scope = _EMPTY_SCOPE.get(preset, "")
+        _scope_raw = _EMPTY_SCOPE.get(preset, "")
+        empty_scope = gettext(_scope_raw) if _scope_raw else ""
 
     all_bookings = [_enrich_staff_booking(r)
                     for r in get_staff_bookings_range(current_staff["id"], df, dt)]
@@ -2525,6 +2554,10 @@ def admin_services():
 def admin_create_service():
     name = request.form.get("name", "").strip()
     description = request.form.get("description", "").strip() or None
+    name_fi = request.form.get("name_fi", "").strip() or None
+    name_vi = request.form.get("name_vi", "").strip() or None
+    description_fi = request.form.get("description_fi", "").strip() or None
+    description_vi = request.form.get("description_vi", "").strip() or None
     category_id = request.form.get("category_id", type=int)
     icon = request.form.get("icon", "").strip() or "spa"
     price = request.form.get("price", type=float)
@@ -2543,7 +2576,8 @@ def admin_create_service():
         flash(str(e), "error")
         return redirect(url_for("main.admin_services"))
 
-    create_service(category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon)
+    create_service(category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
+                   name_fi=name_fi, name_vi=name_vi, description_fi=description_fi, description_vi=description_vi)
     flash(f"Đã thêm dịch vụ {name}.", "success")
     return redirect(url_for("main.admin_services"))
 
@@ -2558,6 +2592,10 @@ def admin_update_service(service_id):
 
     name = request.form.get("name", "").strip()
     description = request.form.get("description", "").strip() or None
+    name_fi = request.form.get("name_fi", "").strip() or None
+    name_vi = request.form.get("name_vi", "").strip() or None
+    description_fi = request.form.get("description_fi", "").strip() or None
+    description_vi = request.form.get("description_vi", "").strip() or None
     category_id = request.form.get("category_id", type=int)
     icon = request.form.get("icon", "").strip() or "spa"
     price = request.form.get("price", type=float)
@@ -2589,7 +2627,8 @@ def admin_update_service(service_id):
     else:
         image = service["image"]
 
-    update_service(service_id, category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon)
+    update_service(service_id, category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
+                   name_fi=name_fi, name_vi=name_vi, description_fi=description_fi, description_vi=description_vi)
     flash(f"Đã cập nhật dịch vụ {name}.", "success")
     return redirect(url_for("main.admin_services"))
 
@@ -2617,6 +2656,8 @@ def admin_toggle_service_active(service_id):
 @admin_required
 def admin_create_category():
     name = request.form.get("name", "").strip()
+    name_fi = request.form.get("name_fi", "").strip() or None
+    name_vi = request.form.get("name_vi", "").strip() or None
     slug = request.form.get("slug", "").strip() or _slugify(name)
     is_active = 1 if request.form.get("is_active") == "1" else 0
 
@@ -2625,7 +2666,7 @@ def admin_create_category():
         return redirect(url_for("main.admin_services"))
 
     try:
-        create_category(name, slug, is_active)
+        create_category(name, slug, is_active, name_fi=name_fi, name_vi=name_vi)
         flash(f"Đã thêm danh mục {name}.", "success")
     except sqlite3.IntegrityError:
         flash("Slug này đã tồn tại. Vui lòng chọn slug khác.", "error")
@@ -2636,6 +2677,8 @@ def admin_create_category():
 @admin_required
 def admin_update_category(category_id):
     name = request.form.get("name", "").strip()
+    name_fi = request.form.get("name_fi", "").strip() or None
+    name_vi = request.form.get("name_vi", "").strip() or None
     slug = request.form.get("slug", "").strip() or _slugify(name)
     is_active = 1 if request.form.get("is_active") == "1" else 0
 
@@ -2644,7 +2687,7 @@ def admin_update_category(category_id):
         return redirect(url_for("main.admin_services"))
 
     try:
-        update_category(category_id, name, slug, is_active)
+        update_category(category_id, name, slug, is_active, name_fi=name_fi, name_vi=name_vi)
         flash(f"Đã cập nhật danh mục {name}.", "success")
     except sqlite3.IntegrityError:
         flash("Slug này đã tồn tại. Vui lòng chọn slug khác.", "error")
@@ -2719,6 +2762,8 @@ def admin_gallery_update(image_id):
         return redirect(url_for("main.admin_gallery"))
 
     alt_text = request.form.get("alt_text", "").strip()
+    alt_text_fi = request.form.get("alt_text_fi", "").strip() or None
+    alt_text_vi = request.form.get("alt_text_vi", "").strip() or None
     sort_order = request.form.get("sort_order", type=int) or 0
     is_active = 1 if request.form.get("is_active") == "1" else 0
 
@@ -2732,9 +2777,11 @@ def admin_gallery_update(image_id):
         old_path = os.path.join(_GALLERY_IMG_DIR, image["image_url"])
         if os.path.exists(old_path):
             os.remove(old_path)
-        update_gallery_image(image_id, alt_text, sort_order, is_active, image_url=new_image)
+        update_gallery_image(image_id, alt_text, sort_order, is_active, image_url=new_image,
+                             alt_text_fi=alt_text_fi, alt_text_vi=alt_text_vi)
     else:
-        update_gallery_image(image_id, alt_text, sort_order, is_active)
+        update_gallery_image(image_id, alt_text, sort_order, is_active,
+                             alt_text_fi=alt_text_fi, alt_text_vi=alt_text_vi)
 
     flash("Đã cập nhật ảnh.", "success")
     return redirect(url_for("main.admin_gallery"))
@@ -3012,6 +3059,10 @@ def admin_loyalty_adjust_membership():
 def admin_loyalty_create_voucher():
     name = request.form.get("name", "").strip()
     description = request.form.get("description", "").strip()
+    name_fi = request.form.get("name_fi", "").strip() or None
+    name_vi = request.form.get("name_vi", "").strip() or None
+    description_fi = request.form.get("description_fi", "").strip() or None
+    description_vi = request.form.get("description_vi", "").strip() or None
     cost = request.form.get("cost", type=int)
     stock = request.form.get("stock", type=int)
     max_redeems_per_customer = request.form.get("max_redeems_per_customer", type=int)
@@ -3027,7 +3078,8 @@ def admin_loyalty_create_voucher():
         flash(str(e), "error")
         return redirect(url_for("main.admin_loyalty"))
 
-    create_reward(name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image)
+    create_reward(name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image,
+                  name_fi=name_fi, name_vi=name_vi, description_fi=description_fi, description_vi=description_vi)
     flash("Đã tạo voucher mới.", "success")
     return redirect(url_for("main.admin_loyalty"))
 
@@ -3042,6 +3094,10 @@ def admin_loyalty_update_voucher(reward_id):
 
     name = request.form.get("name", "").strip()
     description = request.form.get("description", "").strip()
+    name_fi = request.form.get("name_fi", "").strip() or None
+    name_vi = request.form.get("name_vi", "").strip() or None
+    description_fi = request.form.get("description_fi", "").strip() or None
+    description_vi = request.form.get("description_vi", "").strip() or None
     cost = request.form.get("cost", type=int)
     stock = request.form.get("stock", type=int)
     max_redeems_per_customer = request.form.get("max_redeems_per_customer", type=int)
@@ -3071,7 +3127,8 @@ def admin_loyalty_update_voucher(reward_id):
     else:
         banner_image = reward["banner_image"]
 
-    update_reward(reward_id, name, description, cost, stock, max_redeems_per_customer, cooldown_days, is_active, banner_image)
+    update_reward(reward_id, name, description, cost, stock, max_redeems_per_customer, cooldown_days, is_active, banner_image,
+                  name_fi=name_fi, name_vi=name_vi, description_fi=description_fi, description_vi=description_vi)
     flash("Đã cập nhật voucher.", "success")
     return redirect(url_for("main.admin_loyalty"))
 
@@ -3172,6 +3229,16 @@ def admin_carousel_homepage_create():
     cta2_label = request.form.get("cta2_label", "").strip()
     cta2_url = request.form.get("cta2_url", "").strip()
     cta2_style = request.form.get("cta2_style", "outline").strip() or "outline"
+    title_fi = request.form.get("title_fi", "").strip() or None
+    title_vi = request.form.get("title_vi", "").strip() or None
+    subtitle_fi = request.form.get("subtitle_fi", "").strip() or None
+    subtitle_vi = request.form.get("subtitle_vi", "").strip() or None
+    badge_fi = request.form.get("badge_fi", "").strip() or None
+    badge_vi = request.form.get("badge_vi", "").strip() or None
+    cta_label_fi = request.form.get("cta_label_fi", "").strip() or None
+    cta_label_vi = request.form.get("cta_label_vi", "").strip() or None
+    cta2_label_fi = request.form.get("cta2_label_fi", "").strip() or None
+    cta2_label_vi = request.form.get("cta2_label_vi", "").strip() or None
 
     if not title:
         flash("Vui lòng nhập tiêu đề slide.", "error")
@@ -3188,7 +3255,10 @@ def admin_carousel_homepage_create():
         return redirect(url_for("main.admin_carousels"))
 
     sort_order = get_next_carousel_sort_order("homepage")
-    create_homepage_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order)
+    create_homepage_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order,
+                          title_fi=title_fi, title_vi=title_vi, subtitle_fi=subtitle_fi, subtitle_vi=subtitle_vi,
+                          badge_fi=badge_fi, badge_vi=badge_vi, cta_label_fi=cta_label_fi, cta_label_vi=cta_label_vi,
+                          cta2_label_fi=cta2_label_fi, cta2_label_vi=cta2_label_vi)
     flash("Đã tạo slide trang chủ mới.", "success")
     return redirect(url_for("main.admin_carousels"))
 
@@ -3210,6 +3280,16 @@ def admin_carousel_homepage_update(slide_id):
     cta2_label = request.form.get("cta2_label", "").strip()
     cta2_url = request.form.get("cta2_url", "").strip()
     cta2_style = request.form.get("cta2_style", "outline").strip() or "outline"
+    title_fi = request.form.get("title_fi", "").strip() or None
+    title_vi = request.form.get("title_vi", "").strip() or None
+    subtitle_fi = request.form.get("subtitle_fi", "").strip() or None
+    subtitle_vi = request.form.get("subtitle_vi", "").strip() or None
+    badge_fi = request.form.get("badge_fi", "").strip() or None
+    badge_vi = request.form.get("badge_vi", "").strip() or None
+    cta_label_fi = request.form.get("cta_label_fi", "").strip() or None
+    cta_label_vi = request.form.get("cta_label_vi", "").strip() or None
+    cta2_label_fi = request.form.get("cta2_label_fi", "").strip() or None
+    cta2_label_vi = request.form.get("cta2_label_vi", "").strip() or None
     is_active = 1 if request.form.get("is_active") else 0
     remove_image = request.form.get("remove_image") == "1"
 
@@ -3239,7 +3319,10 @@ def admin_carousel_homepage_update(slide_id):
         flash("Slide cần có ảnh.", "error")
         return redirect(url_for("main.admin_carousels"))
 
-    update_homepage_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, is_active)
+    update_homepage_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, is_active,
+                          title_fi=title_fi, title_vi=title_vi, subtitle_fi=subtitle_fi, subtitle_vi=subtitle_vi,
+                          badge_fi=badge_fi, badge_vi=badge_vi, cta_label_fi=cta_label_fi, cta_label_vi=cta_label_vi,
+                          cta2_label_fi=cta2_label_fi, cta2_label_vi=cta2_label_vi)
     flash("Đã cập nhật slide.", "success")
     return redirect(url_for("main.admin_carousels"))
 
@@ -3253,6 +3336,14 @@ def admin_carousel_offer_create():
     cta_label = request.form.get("cta_label", "").strip()
     cta_url = request.form.get("cta_url", "").strip()
     cta_style = request.form.get("cta_style", "primary").strip() or "primary"
+    title_fi = request.form.get("title_fi", "").strip() or None
+    title_vi = request.form.get("title_vi", "").strip() or None
+    subtitle_fi = request.form.get("subtitle_fi", "").strip() or None
+    subtitle_vi = request.form.get("subtitle_vi", "").strip() or None
+    badge_fi = request.form.get("badge_fi", "").strip() or None
+    badge_vi = request.form.get("badge_vi", "").strip() or None
+    cta_label_fi = request.form.get("cta_label_fi", "").strip() or None
+    cta_label_vi = request.form.get("cta_label_vi", "").strip() or None
 
     if not title:
         flash("Vui lòng nhập tiêu đề slide.", "error")
@@ -3265,7 +3356,9 @@ def admin_carousel_offer_create():
         return redirect(url_for("main.admin_carousels"))
 
     sort_order = get_next_carousel_sort_order("dashboard_offers")
-    create_offer_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order)
+    create_offer_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order,
+                       title_fi=title_fi, title_vi=title_vi, subtitle_fi=subtitle_fi, subtitle_vi=subtitle_vi,
+                       badge_fi=badge_fi, badge_vi=badge_vi, cta_label_fi=cta_label_fi, cta_label_vi=cta_label_vi)
     flash("Đã thêm slide ưu đãi.", "success")
     return redirect(url_for("main.admin_carousels"))
 
@@ -3284,6 +3377,14 @@ def admin_carousel_offer_update(slide_id):
     cta_label = request.form.get("cta_label", "").strip()
     cta_url = request.form.get("cta_url", "").strip()
     cta_style = request.form.get("cta_style", "primary").strip() or "primary"
+    title_fi = request.form.get("title_fi", "").strip() or None
+    title_vi = request.form.get("title_vi", "").strip() or None
+    subtitle_fi = request.form.get("subtitle_fi", "").strip() or None
+    subtitle_vi = request.form.get("subtitle_vi", "").strip() or None
+    badge_fi = request.form.get("badge_fi", "").strip() or None
+    badge_vi = request.form.get("badge_vi", "").strip() or None
+    cta_label_fi = request.form.get("cta_label_fi", "").strip() or None
+    cta_label_vi = request.form.get("cta_label_vi", "").strip() or None
     is_active = 1 if request.form.get("is_active") else 0
     remove_image = request.form.get("remove_image") == "1"
 
@@ -3309,7 +3410,9 @@ def admin_carousel_offer_update(slide_id):
     else:
         image = slide["image"]
 
-    update_offer_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, is_active)
+    update_offer_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, is_active,
+                       title_fi=title_fi, title_vi=title_vi, subtitle_fi=subtitle_fi, subtitle_vi=subtitle_vi,
+                       badge_fi=badge_fi, badge_vi=badge_vi, cta_label_fi=cta_label_fi, cta_label_vi=cta_label_vi)
     flash("Đã cập nhật slide ưu đãi.", "success")
     return redirect(url_for("main.admin_carousels"))
 
@@ -3346,6 +3449,8 @@ def admin_carousel_mission_update(slot_key):
 
     icon = request.form.get("icon", "").strip()
     title = request.form.get("title", "").strip()
+    title_fi = request.form.get("title_fi", "").strip() or None
+    title_vi = request.form.get("title_vi", "").strip() or None
     pts_label = request.form.get("pts_label", "").strip()
     remove_image = request.form.get("remove_image") == "1"
 
@@ -3371,7 +3476,7 @@ def admin_carousel_mission_update(slot_key):
     else:
         image = slide["image"] if slide else None
 
-    update_mission_slide(slot_key, icon, title, pts_label, image)
+    update_mission_slide(slot_key, icon, title, pts_label, image, title_fi=title_fi, title_vi=title_vi)
     flash("Đã cập nhật mission.", "success")
     return redirect(url_for("main.admin_carousels"))
 
@@ -3791,14 +3896,14 @@ def home():
     for s in raw_slides:
         cta = []
         if s["cta_label"] and s["cta_url"]:
-            cta.append({"label": s["cta_label"], "url": s["cta_url"], "style": s["cta_style"] or "primary"})
+            cta.append({"label": tr(s, "cta_label"), "url": s["cta_url"], "style": s["cta_style"] or "primary"})
         if s["cta2_label"] and s["cta2_url"]:
-            cta.append({"label": s["cta2_label"], "url": s["cta2_url"], "style": s["cta2_style"] or "outline"})
+            cta.append({"label": tr(s, "cta2_label"), "url": s["cta2_url"], "style": s["cta2_style"] or "outline"})
         slides.append({
             "image":    _resolve_carousel_image(s["image"]),
-            "badge":    s["badge"],
-            "title":    s["title"],
-            "subtitle": s["subtitle"],
+            "badge":    tr(s, "badge"),
+            "title":    tr(s, "title"),
+            "subtitle": tr(s, "subtitle"),
             "cta":      cta,
         })
     popular_services = get_popular_services(limit=4)

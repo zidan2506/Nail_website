@@ -1,0 +1,2642 @@
+# English translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-07-11 00:09+0700\n"
+"PO-Revision-Date: 2026-07-10 19:40+0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: app/routes.py:35
+msgid "Chờ xác nhận"
+msgstr "Awaiting confirmation"
+
+#: app/routes.py:35 app/templates/staff/staff_bookings.html:276
+msgid "Đã xác nhận"
+msgstr "Confirmed"
+
+#: app/routes.py:35 app/templates/staff/staff_bookings.html:277
+#: app/templates/staff/staff_bookings.html:303
+msgid "Đang thực hiện"
+msgstr "In progress"
+
+#: app/routes.py:36 app/templates/staff/staff_bookings.html:277
+#: app/templates/staff/staff_bookings.html:307
+#: app/templates/staff/staff_bookings.html:374
+#: app/templates/staff/staff_bookings.html:452
+#: app/templates/staff/staff_history.html:232
+#: app/templates/staff/staff_history.html:252
+#: app/templates/staff/staff_history.html:397
+msgid "Hoàn thành"
+msgstr "Completed"
+
+#: app/routes.py:36 app/templates/staff/staff_history.html:233
+#: app/templates/staff/staff_history.html:256
+#: app/templates/staff/staff_history.html:312
+#: app/templates/staff/staff_history.html:398
+msgid "Đã hủy"
+msgstr "Cancelled"
+
+#: app/routes.py:36
+msgid "Không đến"
+msgstr "No-show"
+
+#: app/routes.py:37
+msgid "hôm nay"
+msgstr "today"
+
+#: app/routes.py:37
+msgid "trong tuần này"
+msgstr "this week"
+
+#: app/routes.py:37
+msgid "trong tháng này"
+msgstr "this month"
+
+#: app/routes.py:38
+msgid "trong tháng trước"
+msgstr "last month"
+
+#: app/routes.py:39 app/routes.py:1625
+msgid "✓ Claimed"
+msgstr ""
+
+#: app/routes.py:39 app/routes.py:1627
+msgid "✓ All Reviewed"
+msgstr ""
+
+#: app/routes.py:39
+msgid "Start"
+msgstr ""
+
+#: app/routes.py:39
+msgid "Claim"
+msgstr ""
+
+#: app/routes.py:1915
+msgid "vào ngày %(date)s"
+msgstr "on %(date)s"
+
+#: app/routes.py:1916
+msgid "từ %(start)s đến %(end)s"
+msgstr "from %(start)s to %(end)s"
+
+#: app/template_filters.py:115
+msgid "Visa"
+msgstr ""
+
+#: app/template_filters.py:116
+msgid "Mastercard"
+msgstr ""
+
+#: app/template_filters.py:117
+msgid "Mobile Pay"
+msgstr ""
+
+#: app/template_filters.py:118
+msgid "Apple Pay"
+msgstr ""
+
+#: app/template_filters.py:119
+msgid "Google Pay"
+msgstr ""
+
+#: app/template_filters.py:120 app/templates/customer/customer_history.html:139
+msgid "Cash"
+msgstr ""
+
+#: app/template_filters.py:121 app/templates/customer/customer_history.html:140
+msgid "Bank Transfer"
+msgstr ""
+
+#: app/templates/base.html:44 app/templates/base.html:83
+#: app/templates/base.html:226 app/templates/public/services.html:3
+msgid "Services"
+msgstr ""
+
+#: app/templates/base.html:45 app/templates/base.html:84
+#: app/templates/base.html:227 app/templates/public/gallery.html:3
+msgid "Gallery"
+msgstr ""
+
+#: app/templates/base.html:46 app/templates/base.html:86
+msgid "About"
+msgstr ""
+
+#: app/templates/base.html:47 app/templates/base.html:87
+#: app/templates/base.html:236
+msgid "Contact"
+msgstr ""
+
+#: app/templates/base.html:58 app/templates/base.html:95
+msgid "Register"
+msgstr ""
+
+#: app/templates/base.html:59 app/templates/base.html:69
+#: app/templates/base.html:96 app/templates/base.html:105
+#: app/templates/customer_base.html:109
+msgid "Book Now"
+msgstr ""
+
+#: app/templates/base.html:63 app/templates/base.html:99
+msgid "My Dashboard"
+msgstr ""
+
+#: app/templates/base.html:65 app/templates/base.html:101
+msgid "My Schedule"
+msgstr ""
+
+#: app/templates/base.html:67 app/templates/base.html:103
+msgid "Management"
+msgstr ""
+
+#: app/templates/base.html:74
+msgid "Open menu"
+msgstr ""
+
+#: app/templates/base.html:85
+#: app/templates/customer/customer_membership.html:270
+msgid "Membership"
+msgstr ""
+
+#: app/templates/base.html:219
+msgid "Business ID:"
+msgstr ""
+
+#: app/templates/base.html:224
+msgid "Explore"
+msgstr ""
+
+#: app/templates/base.html:233
+msgid "Support"
+msgstr ""
+
+#: app/templates/base.html:235 app/templates/public/about.html:3
+msgid "About Us"
+msgstr ""
+
+#: app/templates/base.html:237
+msgid "FAQs"
+msgstr ""
+
+#: app/templates/base.html:244
+msgid "All rights reserved."
+msgstr ""
+
+#: app/templates/base.html:246
+msgid "Privacy Policy"
+msgstr ""
+
+#: app/templates/base.html:247
+msgid "Terms of Service"
+msgstr ""
+
+#: app/templates/customer_base.html:6
+msgid "Customer Portal"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:2
+#: app/templates/customer_base.html:54
+msgid "Dashboard"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:3
+#: app/templates/customer_base.html:63
+msgid "My bookings"
+msgstr ""
+
+#: app/templates/customer_base.html:71
+msgid "Book appointment"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:3
+#: app/templates/customer/customer_history.html:16
+#: app/templates/customer_base.html:80
+msgid "History"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:584
+#: app/templates/customer/loyalty_points.html:1066
+#: app/templates/customer_base.html:89
+msgid "Loyalty Points"
+msgstr ""
+
+#: app/templates/customer_base.html:98
+msgid "Setting"
+msgstr ""
+
+#: app/templates/customer_base.html:115
+msgid "Logout"
+msgstr ""
+
+#: app/templates/customer/coming_soon.html:3
+#: app/templates/customer/coming_soon.html:129
+msgid "Coming Soon"
+msgstr ""
+
+#: app/templates/customer/coming_soon.html:133
+msgid "This feature is on its way"
+msgstr ""
+
+#: app/templates/customer/coming_soon.html:135
+msgid "Currently in development"
+msgstr ""
+
+#: app/templates/customer/coming_soon.html:138
+msgid "Coming soon"
+msgstr ""
+
+#: app/templates/customer/coming_soon.html:142
+msgid "We're working hard to bring this to you."
+msgstr ""
+
+#: app/templates/customer/coming_soon.html:143
+msgid "It'll be available here once it's ready."
+msgstr ""
+
+#: app/templates/customer/coming_soon.html:150
+msgid "Back to dashboard"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:3
+#: app/templates/public/public_booking.html:3
+msgid "Book an Appointment"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:28
+#: app/templates/customer/customer_booking.html:279
+#: app/templates/public/public_booking.html:25
+#: app/templates/public/public_booking.html:329
+msgid "Service"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:32
+#: app/templates/customer/customer_booking.html:287
+#: app/templates/customer/customer_history.html:173
+#: app/templates/customer/my_bookings.html:385
+#: app/templates/public/public_booking.html:29
+#: app/templates/public/public_booking.html:337
+msgid "Stylist"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:36
+#: app/templates/customer/invoice_detail.html:100
+#: app/templates/customer/reschedule.html:203
+#: app/templates/customer/reschedule.html:219
+#: app/templates/public/public_booking.html:33
+msgid "Date"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:40
+#: app/templates/public/public_booking.html:41
+msgid "Checkout"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:59
+#: app/templates/public/public_booking.html:60
+msgid "Select a Service"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:60
+#: app/templates/public/public_booking.html:61
+msgid "Choose from our curated selection of luxury treatments."
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:64
+#: app/templates/public/public_booking.html:65
+msgid "All Services"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:101
+#: app/templates/customer/customer_booking.html:409
+#: app/templates/customer/invoice_detail.html:83
+#: app/templates/public/public_booking.html:101
+#: app/templates/public/public_booking.html:460
+msgid "min"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:115
+#: app/templates/customer/customer_booking.html:169
+#: app/templates/customer/customer_booking.html:220
+#: app/templates/public/public_booking.html:115
+#: app/templates/public/public_booking.html:169
+#: app/templates/public/public_booking.html:220
+msgid "Continue"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:126
+#: app/templates/public/public_booking.html:126
+msgid "Choose a Professional"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:127
+#: app/templates/public/public_booking.html:127
+msgid "Select your preferred stylist or let us match you."
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:138
+#: app/templates/customer/customer_booking.html:288
+#: app/templates/customer/customer_booking.html:417
+#: app/templates/public/public_booking.html:138
+#: app/templates/public/public_booking.html:338
+#: app/templates/public/public_booking.html:465
+msgid "No Preference"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:139
+#: app/templates/public/public_booking.html:139
+msgid "Any available specialist"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:157
+#: app/templates/public/public_booking.html:157
+msgid "Nail Technician"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:166
+#: app/templates/customer/customer_booking.html:217
+#: app/templates/customer/customer_booking.html:319
+#: app/templates/public/public_booking.html:166
+#: app/templates/public/public_booking.html:217
+#: app/templates/public/public_booking.html:267
+#: app/templates/public/public_booking.html:369
+msgid "Back"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:182
+#: app/templates/public/public_booking.html:182
+msgid "Select Date & Time"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:183
+#: app/templates/public/public_booking.html:183
+msgid "Pick a date, then choose an available slot."
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:190
+#: app/templates/public/public_booking.html:190
+msgid "Previous month"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:194
+#: app/templates/public/public_booking.html:194
+msgid "Next month"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:199
+#: app/templates/customer/reschedule.html:111
+#: app/templates/public/public_booking.html:199
+msgid "MO"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:199
+#: app/templates/customer/reschedule.html:112
+#: app/templates/public/public_booking.html:199
+msgid "TU"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:199
+#: app/templates/customer/reschedule.html:113
+#: app/templates/public/public_booking.html:199
+msgid "WE"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/reschedule.html:114
+#: app/templates/public/public_booking.html:200
+msgid "TH"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/reschedule.html:115
+#: app/templates/public/public_booking.html:200
+msgid "FR"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/reschedule.html:116
+#: app/templates/public/public_booking.html:200
+msgid "SA"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/reschedule.html:117
+#: app/templates/public/public_booking.html:200
+msgid "SU"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:206
+#: app/templates/customer/reschedule.html:153
+#: app/templates/public/public_booking.html:206
+msgid "Available Times"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:207
+#: app/templates/public/public_booking.html:207
+msgid "Select a date to see available times"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:209
+#: app/templates/public/public_booking.html:209
+msgid "Please select a date first"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:232
+#: app/templates/public/public_booking.html:282
+msgid "Confirm & Pay"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:238
+#: app/templates/customer/invoice_detail.html:48
+#: app/templates/public/public_booking.html:288
+msgid "Payment Method"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:245
+#: app/templates/public/public_booking.html:295
+msgid "Pay at Salon"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:246
+#: app/templates/public/public_booking.html:296
+msgid "Pay after your service is completed"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:259
+#: app/templates/public/public_booking.html:309
+msgid "Online Payment"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:260
+#: app/templates/public/public_booking.html:310
+msgid "Pay now securely by card"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:270
+#: app/templates/public/public_booking.html:320
+msgid "You'll receive a verification email after confirming. Your booking will be"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:270
+#: app/templates/public/public_booking.html:320
+msgid "pending"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:270
+#: app/templates/public/public_booking.html:320
+msgid "until the salon confirms your appointment."
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:276
+#: app/templates/public/public_booking.html:326
+msgid "Booking Summary"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:283
+#: app/templates/customer/invoice_detail.html:82
+#: app/templates/public/public_booking.html:333
+msgid "Duration"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:291
+#: app/templates/public/public_booking.html:341
+msgid "Date & Time"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:297
+#: app/templates/public/public_booking.html:347
+msgid "Subtotal"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:300
+#: app/templates/public/public_booking.html:350
+msgid "VAT (25.5%%)"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:303
+#: app/templates/public/public_booking.html:353
+msgid "Total"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:309
+msgid "You'll earn"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:309
+msgid "loyalty points with this booking."
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:311
+#: app/templates/public/public_booking.html:361
+msgid "By confirming, you agree to our 24h cancellation policy."
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:322
+#: app/templates/public/public_booking.html:372
+msgid "Confirm & continue"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:415
+#: app/templates/customer/loyalty_points.html:1091
+#: app/templates/customer/loyalty_points.html:1112
+#: app/templates/customer/loyalty_points.html:1221
+#: app/templates/customer/loyalty_points.html:1381
+#: app/templates/customer/my_bookings.html:84
+#: app/templates/customer/my_bookings.html:95
+#: app/templates/customer/redeem_confirm_modal.html:112
+#: app/templates/customer/redeem_confirm_modal.html:131
+msgid "pts"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:425
+#: app/templates/public/public_booking.html:473
+msgid "Processing…"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:516
+#: app/templates/public/public_booking.html:550
+msgid "Please select a service first."
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:520
+#: app/templates/customer/reschedule.html:157
+#: app/templates/public/public_booking.html:554
+msgid "Please select a date first."
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:527
+#: app/templates/public/public_booking.html:561
+msgid "Loading..."
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:534
+#: app/templates/public/public_booking.html:568
+msgid "Could not load available times."
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:541
+#: app/templates/public/public_booking.html:575
+msgid "No available slots for this date."
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:498
+msgid "Customer Dashboard"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:499
+msgid "Good morning, %(name)s!"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:500
+msgid "Ready for your next glow up?"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:502
+msgid "Book Appointment"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:517
+msgid "✦ Loyalty Reward"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:546
+#: app/templates/customer/customer_dashboard.html:568
+msgid "Upcoming Appointment"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:552
+msgid "%(date)s • %(time)s with %(staff)s."
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:555
+#: app/templates/customer/my_bookings.html:42
+#: app/templates/customer/view_booking_details.html:26
+#: app/templates/public/success.html:103
+msgid "Add to Calendar"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:556
+#: app/templates/customer/my_bookings.html:43
+#: app/templates/customer/my_bookings.html:189
+#: app/templates/customer/my_bookings.html:246
+#: app/templates/customer/my_bookings.html:293
+msgid "View Details"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:569
+#: app/templates/customer/my_bookings.html:55
+msgid "No upcoming visits scheduled"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:570
+#: app/templates/customer/my_bookings.html:58
+msgid "Ready for a new look? Book your next treatment today."
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:572
+#: app/templates/customer/my_bookings.html:62
+msgid "Book new appointment"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:589
+msgid "Keep blooming —"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:589
+msgid "your next treat is almost here!"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:595
+#: app/templates/customer/my_bookings.html:85
+#: app/templates/customer/my_bookings.html:96
+msgid "Complete"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:600
+#: app/templates/customer/my_bookings.html:77
+msgid "%(points)s points to %(reward)s"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:604
+msgid "You've unlocked all rewards! 🎉"
+msgstr ""
+
+#: app/templates/customer/customer_dashboard.html:608
+msgid "View All Rewards"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:15
+msgid "Your records"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:17
+msgid "Review your past visits and invoices."
+msgstr ""
+
+#: app/templates/customer/customer_history.html:24
+msgid "Total Visits"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:33
+msgid "Total Spent"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:42
+msgid "Favorite Stylist"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:46
+msgid "visits"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:51
+msgid "Top Service"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:55
+msgid "times"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:61
+#: app/templates/customer/my_bookings.html:17
+msgid "Appointments"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:62
+msgid "Invoices"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:72
+msgid "All times"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:76
+#: app/templates/customer/customer_history.html:87
+#: app/templates/customer/customer_history.html:99
+#: app/templates/customer/customer_history.html:103
+#: app/templates/customer/customer_history.html:114
+#: app/templates/customer/customer_history.html:118
+#: app/templates/customer/customer_history.html:129
+#: app/templates/customer/customer_history.html:133
+#: app/templates/customer/customer_history.html:579
+#: app/templates/customer/customer_history.html:584
+#: app/templates/public/services.html:47
+msgid "All"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:77
+msgid "Last 30 days"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:78
+msgid "Last 3 months"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:79
+msgid "Last year"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:86
+#: app/templates/customer/my_bookings.html:240
+msgid "Status:"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:98
+#: app/templates/customer/my_bookings.html:178
+#: app/templates/customer/my_bookings.html:235
+msgid "Stylist:"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:113
+msgid "Service:"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:128
+msgid "Payment:"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:150
+#: app/templates/customer/customer_history.html:155
+msgid "Newest first"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:156
+msgid "Oldest first"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:157
+msgid "Amount: High to Low"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:158
+msgid "Amount: Low to High"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:163
+msgid "Clear all"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:172
+msgid "Service & Date"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:174
+msgid "Price"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:175
+#: app/templates/customer/customer_history.html:269
+#: app/templates/customer/invoice_detail.html:55
+#: app/templates/customer/loyalty_points.html:1338
+msgid "Status"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:176
+#: app/templates/customer/customer_history.html:270
+msgid "Action"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:198
+#: app/templates/customer/customer_history.html:581
+#: app/templates/customer/my_bookings.html:137
+#: app/templates/customer/my_bookings.html:275
+msgid "Cancelled"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:200
+#: app/templates/customer/customer_history.html:222
+#: app/templates/customer/customer_history.html:244
+#: app/templates/customer/my_bookings.html:294
+#: app/templates/customer/my_bookings.html:395
+msgid "Rebook"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:219
+#: app/templates/customer/customer_history.html:241
+#: app/templates/customer/customer_history.html:580
+msgid "Completed"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:221
+msgid "Reviewed"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:243
+msgid "Leave Review"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:266
+msgid "Invoice & Service"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:267
+msgid "Payment"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:268
+#: app/templates/customer/my_bookings.html:390
+msgid "Amount"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:301
+msgid "Download PDF"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:441
+msgid "No result"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:442
+msgid "Showing"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:442
+msgid "of"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:585
+msgid "Paid"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:586
+msgid "Refunded"
+msgstr ""
+
+#: app/templates/customer/customer_history.html:587
+#: app/templates/customer/my_bookings.html:129
+#: app/templates/customer/my_bookings.html:219
+msgid "Pending"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:3
+msgid "Membership Plans"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:271
+msgid "Choose your plan"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:272
+msgid "Unlock exclusive perks, rewards, and priority care tailored to your loyalty."
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:278
+msgid "Your last payment failed."
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:278
+msgid "Update your card"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:278
+msgid "to keep your membership active."
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:282
+msgid "Update payment method"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:292
+msgid "Your %(plan)s membership will not renew · active until %(date)s."
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:294
+msgid "Your %(plan)s membership renews on %(date)s."
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:300
+msgid "Cancel renewal"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:312
+#: app/templates/customer/customer_membership.html:341
+#: app/templates/customer/customer_membership.html:373
+msgid "Your current plan"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:316
+msgid "Entry level"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:317
+msgid "Start your loyalty journey"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:319
+#: app/templates/customer/customer_membership.html:351
+#: app/templates/customer/customer_membership.html:380
+msgid "Current plan"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:324
+msgid "Upgrade to Silver"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:329
+msgid "Earn base loyalty points on every visit"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:330
+msgid "Birthday bonus points"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:331
+msgid "Access to member-only promotions"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:332
+msgid "Monthly reward voucher"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:333
+msgid "Priority booking (standard)"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:348
+msgid "Most chosen"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:349
+msgid "For our dedicated guests"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:356
+msgid "Upgrade to Gold"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:361
+msgid "Everything in Silver"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:362
+msgid "1.5× point multiplier on all services"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:363
+msgid "Early access to new services & seasonal offers"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:364
+msgid "Complimentary nail care kit (quarterly)"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:365
+msgid "Dedicated booking slot on weekends"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:377
+msgid "Ultimate luxury"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:378
+msgid "For our most valued guests"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:385
+msgid "Upgrade to Diamond"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:390
+msgid "Everything in Gold"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:391
+msgid "2× point multiplier on all services"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:392
+msgid "Free add-on service every visit"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:393
+msgid "Personal nail stylist assignment"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html:394
+msgid "VIP lounge access & complimentary drinks"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:51
+#: app/templates/customer/customer_setting.html:610
+msgid "Account Settings"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:609
+msgid "My Account"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:611
+msgid "Manage your personal information and security preferences."
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:667
+msgid "Profile picture of %(name)s"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:679
+msgid "Profile Picture"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:680
+msgid "JPG, GIF or PNG. Max size of 800K"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:718
+msgid "Personal Information"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:734
+#: app/templates/public/public_booking.html:245
+msgid "Full Name"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:743
+msgid "Enter full name"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:746
+#: app/templates/customer/customer_setting.html:755
+#: app/templates/customer/customer_setting.html:771
+#: app/templates/customer/customer_setting.html:796
+#: app/templates/customer/customer_setting.html:1140
+msgid "Change"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:752
+#: app/templates/public/public_booking.html:254
+#: app/templates/staff/login.html:31
+msgid "Email Address"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:761
+#: app/templates/public/public_booking.html:249
+msgid "Phone Number"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:768
+msgid "Enter phone number"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:781
+msgid "Date of Birth"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:786
+msgid "Not set"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:803
+msgid "Save Changes"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:840
+msgid "Security"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:846
+#: app/templates/staff/login.html:41
+msgid "Password"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:851
+msgid "Change Password"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:858
+msgid "Last changed %(time)s"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:876
+#: app/templates/staff/staff_profile.html:303
+msgid "Language"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:879
+msgid "Choose your preferred display language."
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:908
+msgid "Change Email Address"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:909
+#: app/templates/customer/customer_setting.html:978
+#: app/templates/customer/my_bookings.html:314
+#: app/templates/public/gallery.html:97
+msgid "Close"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:917
+msgid "To verify your identity, we'll send a verification code to your current email address."
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:923
+#: app/templates/customer/customer_setting.html:944
+#: app/templates/customer/customer_setting.html:992
+#: app/templates/customer/customer_setting.html:1017
+#: app/templates/customer/customer_setting.html:1149
+#: app/templates/customer/my_bookings.html:193
+#: app/templates/customer/my_bookings.html:249
+#: app/templates/customer/redeem_confirm_modal.html:170
+#: app/templates/customer/reschedule.html:250
+#: app/templates/customer/view_booking_details.html:86
+#: app/templates/customer/view_booking_details.html:91
+msgid "Cancel"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:924
+#: app/templates/customer/customer_setting.html:993
+#: app/templates/customer/customer_setting.html:1062
+#: app/templates/customer/customer_setting.html:1107
+#: app/templates/customer/customer_setting.html:1113
+#: app/templates/customer/customer_setting.html:1196
+#: app/templates/customer/customer_setting.html:1239
+#: app/templates/customer/customer_setting.html:1245
+msgid "Send Code"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:931
+#: app/templates/customer/customer_setting.html:1000
+msgid "Enter the verification code sent to"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:931
+msgid "and your new email address."
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:936
+#: app/templates/customer/customer_setting.html:1005
+msgid "Verification Code"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:937
+#: app/templates/customer/customer_setting.html:1006
+msgid "Enter 6-digit code"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:940
+msgid "New Email Address"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:941
+msgid "Enter new email address"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:945
+msgid "Update Email"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:977
+#: app/templates/customer/customer_setting.html:1018
+msgid "Update Password"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:986
+msgid "To verify your identity, we'll send a verification code to your email address."
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:1000
+msgid "and your new password."
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:1009
+msgid "New Password"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:1010
+msgid "Create new password"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:1013
+msgid "Confirm New Password"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:1014
+msgid "Confirm new password"
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:1085
+#: app/templates/customer/customer_setting.html:1217
+msgid "Sending..."
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:1104
+#: app/templates/customer/customer_setting.html:1236
+#: app/templates/customer/redeem_confirm_modal.html:556
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:1110
+#: app/templates/customer/customer_setting.html:1242
+msgid "Network error. Please try again."
+msgstr ""
+
+#: app/templates/customer/customer_setting.html:1164
+msgid "You have unsaved changes. Do you want to leave without saving?"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:3
+msgid "Invoice Detail"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:16
+msgid "Back to Invoices"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:34
+msgid "Invoice Date"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:41
+msgid "Total Amount"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:70
+msgid "Service Details"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:74
+msgid "Service Name"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:78
+msgid "Category"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:86
+msgid "Base Price"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:96
+msgid "Appointment Details"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:104
+msgid "Time Window"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:108
+msgid "Assigned Stylist"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:121
+msgid "Payment Summary"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:131
+msgid "Total Paid Amount"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:139
+msgid "FULLY PAID"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:140
+msgid "REFUNDED"
+msgstr ""
+
+#: app/templates/customer/invoice_detail.html:150
+msgid "Download PDF Invoice"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1065
+msgid "Rewards Club"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1067
+msgid "Your journey to effortless beauty, rewarded."
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1089
+msgid "Current Balance"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1100
+msgid "Tier"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1103
+msgid "%(pts)s pts to unlock %(reward)s"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1112
+msgid "Next reward:"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1114
+msgid "View Tier Benefits"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1152
+msgid "Earn Points"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1153
+msgid "Previous"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1154
+msgid "Next"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1170
+msgid "Available Vouchers"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1172
+msgid "See All"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1203
+msgid "Available"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1205
+msgid "left"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1213
+msgid "redeems left"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1216
+msgid "in stock"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1224
+msgid "Not enough pts"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1226
+msgid "Out of stock"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1228
+#: app/templates/customer/loyalty_points.html:1231
+msgid "Limit reached"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1232
+msgid "renew in"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1232
+msgid "days"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1237
+msgid "Redeem"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1251
+msgid "Points History"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1252
+msgid "My Vouchers"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1280
+msgid "Load More History"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1307
+#: app/templates/customer/loyalty_points.html:1375
+msgid "Active"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1308
+#: app/templates/customer/loyalty_points.html:1375
+msgid "Used"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1309
+#: app/templates/customer/loyalty_points.html:1375
+msgid "Expired"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1318
+msgid "You haven't redeemed any rewards yet."
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1319
+msgid "Start earning points to unlock vouchers!"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1339
+msgid "Points spent"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1340
+msgid "Redeemed on"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1341
+msgid "Expires"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1345
+msgid "Voucher Code"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1346
+#: app/templates/customer/loyalty_points.html:1402
+#: app/templates/customer/loyalty_points.html:1425
+msgid "Copy"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1372
+msgid "Show this code to our staff when you visit."
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1393
+msgid "Show this code to our staff at your next visit to redeem."
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1395
+msgid "This voucher has already been used."
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1397
+msgid "This voucher has expired and is no longer valid."
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html:1422
+msgid "Copied"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:18
+msgid "Manage your upcoming visits and booking history."
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:29
+#: app/templates/customer/my_bookings.html:53
+msgid "Next Visit"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:38
+msgid "%(date)s • %(start)s with %(staff)s."
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:73
+msgid "Loyalty Reward"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:89
+msgid "You've unlocked all rewards!"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:107
+msgid "Manage Appointments"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:108
+msgid "View your confirmed, pending, and cancelled bookings."
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:111
+msgid "Book New Appointment"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:121
+msgid "Upcoming"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:165
+msgid "Confirmed"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:173
+#: app/templates/customer/my_bookings.html:230
+#: app/templates/customer/my_bookings.html:282
+msgid "Date:"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:183
+msgid "Duration:"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:190
+#: app/templates/customer/reschedule.html:3
+#: app/templates/customer/reschedule.html:21
+#: app/templates/customer/view_booking_details.html:83
+msgid "Reschedule"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:241
+msgid "Awaiting confirmation"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:287
+msgid "Cancelled on:"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:312
+msgid "Cancel appointment?"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:318
+msgid "Appointment details"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:332
+msgid "Cancellation Policy"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:337
+msgid "Reason for cancellation"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:337
+msgid "(optional)"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:340
+msgid "Select a reason..."
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:341
+msgid "Change of plans"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:342
+msgid "Feeling unwell"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:343
+msgid "Want to reschedule instead"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:344
+msgid "Other"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:349
+msgid "Keep appointment"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:350
+msgid "Yes, cancel"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:360
+msgid "Recent History"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:361
+msgid "Your completed appointments."
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:364
+msgid "View All History"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:380
+msgid "%(status)s on %(date)s"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:397
+msgid "Invoice"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:403
+msgid "No history yet."
+msgstr ""
+
+#: app/templates/customer/redeem_confirm_modal.html:84
+msgid "CONFIRM REDEEM"
+msgstr ""
+
+#: app/templates/customer/redeem_confirm_modal.html:108
+msgid "Points cost"
+msgstr ""
+
+#: app/templates/customer/redeem_confirm_modal.html:123
+msgid "Your balance"
+msgstr ""
+
+#: app/templates/customer/redeem_confirm_modal.html:141
+msgid "Voucher valid until"
+msgstr ""
+
+#: app/templates/customer/redeem_confirm_modal.html:155
+#: app/templates/customer/redeem_confirm_modal.html:499
+msgid "Once redeemed, points cannot be refunded."
+msgstr ""
+
+#: app/templates/customer/redeem_confirm_modal.html:156
+#: app/templates/customer/redeem_confirm_modal.html:499
+msgid "Terms apply."
+msgstr ""
+
+#: app/templates/customer/redeem_confirm_modal.html:180
+#: app/templates/customer/redeem_confirm_modal.html:504
+#: app/templates/customer/redeem_confirm_modal.html:559
+#: app/templates/customer/redeem_confirm_modal.html:566
+msgid "Confirm Redeem"
+msgstr ""
+
+#: app/templates/customer/redeem_confirm_modal.html:492
+msgid "Upon use"
+msgstr ""
+
+#: app/templates/customer/redeem_confirm_modal.html:538
+msgid "Processing..."
+msgstr ""
+
+#: app/templates/customer/redeem_confirm_modal.html:564
+msgid "Connection error. Please try again."
+msgstr ""
+
+#: app/templates/customer/reschedule.html:19
+msgid "APPOINTMENT MANAGEMENT"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:23
+msgid "Modify your session with ease. Please note our 24-hour rescheduling window to ensure we can accommodate all guests."
+msgstr ""
+
+#: app/templates/customer/reschedule.html:43
+#: app/templates/customer/reschedule.html:49
+msgid "Service image"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:55
+msgid "CURRENT SESSION"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:57
+msgid "Technician:"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:63
+msgid "DATE"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:68
+msgid "TIME"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:91
+msgid "Select New Date"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:162
+msgid "Session duration:"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:162
+#: app/templates/customer/view_booking_details.html:45
+#: app/templates/public/services.html:110
+msgid "mins"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:179
+msgid "Policy Notice"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:180
+msgid "Bookings can only be rescheduled at least 24 hours in advance and can only be changed once. Further changes may require a new deposit."
+msgstr ""
+
+#: app/templates/customer/reschedule.html:196
+msgid "Comparison"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:200
+msgid "FROM"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:208
+#: app/templates/customer/reschedule.html:224
+msgid "Time"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:216
+msgid "TO (NEW)"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:220
+msgid "Please select a date"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:225
+msgid "Please select a time"
+msgstr ""
+
+#: app/templates/customer/reschedule.html:254
+msgid "Confirm Reschedule"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:3
+msgid "Book Details"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:17
+msgid "Back to Appointments"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:19
+msgid "Booking Details"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:62
+msgid "Service Description"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:70
+msgid "Technician avatar"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:74
+msgid "Artist"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:77
+msgid "Senior Artist"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:101
+msgid "Appointment Notes"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:105
+msgid "Please arrive 5 minutes early to select your polish color. Soak-off for previous gel application is included in your service time. Refreshments are available at the lounge area."
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:114
+msgid "Salon location map"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:126
+#: app/templates/public/index.html:285
+msgid "Address"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:135
+msgid "Get Directions"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:141
+msgid "Salon Contact"
+msgstr ""
+
+#: app/templates/public/about.html:19
+msgid "The Retreat"
+msgstr ""
+
+#: app/templates/public/about.html:20
+msgid "Our Story"
+msgstr ""
+
+#: app/templates/public/about.html:21
+msgid "Redefining luxury wellness with precise, artisanal care in a sanctuary of soft mood and quiet elegance."
+msgstr ""
+
+#: app/templates/public/about.html:37
+msgid "Crafted with intention"
+msgstr ""
+
+#: app/templates/public/about.html:39
+msgid "At DahaCare, we believe that true luxury lies in the details. Founded on the principle of bringing atelier-level precision to daily wellness, our space was designed as a retreat from the noise of the city."
+msgstr ""
+
+#: app/templates/public/about.html:40
+msgid "Every treatment is a careful composition of quality products, rigorous hygiene standards, and the trained hands of our artists. We don't just provide a service; we curate an experience that honors your time and elevates your personal care ritual."
+msgstr ""
+
+#: app/templates/public/about.html:68
+msgid "Years of Excellence"
+msgstr ""
+
+#: app/templates/public/about.html:72
+msgid "Clients Served"
+msgstr ""
+
+#: app/templates/public/about.html:76
+msgid "Master Artists"
+msgstr ""
+
+#: app/templates/public/about.html:80 app/templates/public/services.html:132
+msgid "Average Rating"
+msgstr ""
+
+#: app/templates/public/about.html:118
+msgid "Meet the team"
+msgstr ""
+
+#: app/templates/public/about.html:147
+msgid "What we stand for"
+msgstr ""
+
+#: app/templates/public/about.html:158
+msgid "Hygiene first"
+msgstr ""
+
+#: app/templates/public/about.html:159
+msgid "Medical-grade sterilization processes for every tool, ensuring your safety is never compromised."
+msgstr ""
+
+#: app/templates/public/about.html:168
+msgid "Trained artists"
+msgstr ""
+
+#: app/templates/public/about.html:169
+msgid "Continuous education and mastery of techniques mean you receive the pinnacle of modern care."
+msgstr ""
+
+#: app/templates/public/about.html:178
+msgid "Quality products"
+msgstr ""
+
+#: app/templates/public/about.html:179
+msgid "We source only premium, non-toxic, and sustainable materials for long-lasting, brilliant results."
+msgstr ""
+
+#: app/templates/public/about.html:188
+msgid "Client-first care"
+msgstr ""
+
+#: app/templates/public/about.html:189
+msgid "Your comfort is our priority. Enjoy a serene environment designed entirely around your relaxation."
+msgstr ""
+
+#: app/templates/public/about.html:203
+msgid "Come meet the team"
+msgstr ""
+
+#: app/templates/public/about.html:204
+msgid "Experience the DahaCare difference in person."
+msgstr ""
+
+#: app/templates/public/about.html:206
+msgid "Book your visit"
+msgstr ""
+
+#: app/templates/public/gallery.html:20
+msgid "Our Work"
+msgstr ""
+
+#: app/templates/public/gallery.html:21
+msgid "A glimpse into the artistry and precision behind every visit."
+msgstr ""
+
+#: app/templates/public/gallery.html:75
+msgid "Like what you see?"
+msgstr ""
+
+#: app/templates/public/gallery.html:77
+msgid "Book your session"
+msgstr ""
+
+#: app/templates/public/gallery.html:104
+msgid "Previous image"
+msgstr ""
+
+#: app/templates/public/gallery.html:108
+msgid "Enlarged gallery image"
+msgstr ""
+
+#: app/templates/public/gallery.html:110
+msgid "Next image"
+msgstr ""
+
+#: app/templates/public/index.html:3
+msgid "Premium Nail Care & Art"
+msgstr ""
+
+#: app/templates/public/index.html:27
+msgid "Salon interior"
+msgstr ""
+
+#: app/templates/public/index.html:74
+msgid "Popular Service"
+msgstr ""
+
+#: app/templates/public/index.html:107
+msgid "View All Service"
+msgstr ""
+
+#: app/templates/public/index.html:119
+msgid "Our work"
+msgstr ""
+
+#: app/templates/public/index.html:120
+msgid "A glimpse of what we create every day"
+msgstr ""
+
+#: app/templates/public/index.html:146
+msgid "Why DahaCare?"
+msgstr ""
+
+#: app/templates/public/index.html:152
+msgid "Happy clients"
+msgstr ""
+
+#: app/templates/public/index.html:153
+msgid "Trusted by thousands of satisfied customers who love our work."
+msgstr ""
+
+#: app/templates/public/index.html:157
+msgid "Safe products"
+msgstr ""
+
+#: app/templates/public/index.html:158
+msgid "We use only premium, non-toxic products for your health and safety."
+msgstr ""
+
+#: app/templates/public/index.html:162
+msgid "Expert artists"
+msgstr ""
+
+#: app/templates/public/index.html:163
+msgid "Our highly trained professionals bring your vision to life."
+msgstr ""
+
+#: app/templates/public/index.html:176
+msgid "What clients say"
+msgstr ""
+
+#: app/templates/public/index.html:190
+msgid "\"Absolutely wonderful experience! The attention to detail is unmatched, and my nails have never looked better. Highly recommend the gel extensions.\""
+msgstr ""
+
+#: app/templates/public/index.html:195
+msgid "Gold member"
+msgstr ""
+
+#: app/templates/public/index.html:209
+msgid "\"The ambiance is so relaxing, and the staff is incredibly professional. I love the creative nail art options they offer. A true luxury experience.\""
+msgstr ""
+
+#: app/templates/public/index.html:214
+msgid "First-time client"
+msgstr ""
+
+#: app/templates/public/index.html:235
+msgid "New member offer"
+msgstr ""
+
+#: app/templates/public/index.html:236
+msgid "Create an account & get 15%% off your first visit"
+msgstr ""
+
+#: app/templates/public/index.html:237
+msgid "Join our community today and start enjoying the perks of premium nail care right away."
+msgstr ""
+
+#: app/templates/public/index.html:241
+msgid "Exclusive member updates"
+msgstr ""
+
+#: app/templates/public/index.html:245
+msgid "Easy online booking"
+msgstr ""
+
+#: app/templates/public/index.html:249
+msgid "Earn rewards points"
+msgstr ""
+
+#: app/templates/public/index.html:254
+msgid "Create account"
+msgstr ""
+
+#: app/templates/public/index.html:255
+msgid "Already have one? Log in"
+msgstr ""
+
+#: app/templates/public/index.html:262
+msgid "welcome discount"
+msgstr ""
+
+#: app/templates/public/index.html:279
+msgid "Find us"
+msgstr ""
+
+#: app/templates/public/index.html:293
+msgid "Hours"
+msgstr ""
+
+#: app/templates/public/index.html:301
+msgid "Phone"
+msgstr ""
+
+#: app/templates/public/index.html:309
+#: app/templates/staff/staff_profile.html:259
+msgid "Email"
+msgstr ""
+
+#: app/templates/public/index.html:321
+msgid "Map Integration Placeholder"
+msgstr ""
+
+#: app/templates/public/public_booking.html:37
+msgid "Info"
+msgstr ""
+
+#: app/templates/public/public_booking.html:232
+msgid "Your Details"
+msgstr ""
+
+#: app/templates/public/public_booking.html:233
+msgid "Please provide your contact information to secure the booking."
+msgstr ""
+
+#: app/templates/public/public_booking.html:239
+msgid "Already have an account?"
+msgstr ""
+
+#: app/templates/public/public_booking.html:240
+msgid "Log in"
+msgstr ""
+
+#: app/templates/public/public_booking.html:246
+msgid "Jane Doe"
+msgstr ""
+
+#: app/templates/public/public_booking.html:258
+msgid "Booking Notes"
+msgstr ""
+
+#: app/templates/public/public_booking.html:258
+msgid "(Optional)"
+msgstr ""
+
+#: app/templates/public/public_booking.html:260
+msgid "Any special requests or allergies..."
+msgstr ""
+
+#: app/templates/public/public_booking.html:270
+msgid "Continue to Checkout"
+msgstr ""
+
+#: app/templates/public/public_booking.html:359
+msgid "Sign in to earn loyalty points with this booking."
+msgstr ""
+
+#: app/templates/public/services.html:19
+msgid "Our Services"
+msgstr ""
+
+#: app/templates/public/services.html:20
+msgid "Discover a curated collection of premium nail care and aesthetic treatments designed for the modern individual. Precision meets tranquility in every session."
+msgstr ""
+
+#: app/templates/public/services.html:98
+msgid "Popular"
+msgstr ""
+
+#: app/templates/public/services.html:100
+msgid "New"
+msgstr ""
+
+#: app/templates/public/services.html:115
+msgid "Book now"
+msgstr ""
+
+#: app/templates/public/services.html:136
+msgid "Satisfied Clients"
+msgstr ""
+
+#: app/templates/public/services.html:140
+msgid "Quality Assurance"
+msgstr ""
+
+#: app/templates/public/services.html:153
+msgid "Ready to define your signature look?"
+msgstr ""
+
+#: app/templates/public/services.html:155
+msgid "Book a consultation"
+msgstr ""
+
+#: app/templates/public/success.html:3
+msgid "Booking Confirmed"
+msgstr ""
+
+#: app/templates/public/success.html:71
+msgid "Booking Confirmed!"
+msgstr ""
+
+#: app/templates/public/success.html:72
+msgid "We've reserved your spot. Get ready for some well-deserved pampering."
+msgstr ""
+
+#: app/templates/public/success.html:81
+msgid "Appointment Summary"
+msgstr ""
+
+#: app/templates/public/success.html:123
+msgid "What's Next?"
+msgstr ""
+
+#: app/templates/public/success.html:128
+msgid "Check your inbox"
+msgstr ""
+
+#: app/templates/public/success.html:129
+msgid "We sent a detailed confirmation email with our location and contact info."
+msgstr ""
+
+#: app/templates/public/success.html:135
+msgid "Arrive on time"
+msgstr ""
+
+#: app/templates/public/success.html:136
+msgid "Please arrive 5-10 minutes early to choose your perfect shade and settle in."
+msgstr ""
+
+#: app/templates/public/success.html:148
+msgid "Manage bookings easily"
+msgstr ""
+
+#: app/templates/public/success.html:149
+msgid "Create an account to track your loyalty points, reschedule appointments, and save your favorite colors."
+msgstr ""
+
+#: app/templates/public/success.html:150
+msgid "Create Account"
+msgstr ""
+
+#: app/templates/public/success.html:157
+msgid "Book Another Service"
+msgstr ""
+
+#: app/templates/public/success.html:158
+msgid "Back to Home"
+msgstr ""
+
+#: app/templates/public/success.html:165
+msgid "Find us at:"
+msgstr ""
+
+#: app/templates/public/success.html:171
+msgid "Map location"
+msgstr ""
+
+#: app/templates/staff/login.html:3
+msgid "Sign In"
+msgstr ""
+
+#: app/templates/staff/login.html:12
+msgid "Staff & admin portal"
+msgstr ""
+
+#: app/templates/staff/login.html:13
+msgid "Staff & Admin Portal"
+msgstr ""
+
+#: app/templates/staff/login.html:14
+msgid "Sign in to manage bookings, staff, and salon operations."
+msgstr ""
+
+#: app/templates/staff/login.html:21 app/templates/staff/login.html:59
+msgid "Sign in"
+msgstr ""
+
+#: app/templates/staff/login.html:22
+msgid "Staff & administrator access"
+msgstr ""
+
+#: app/templates/staff/login.html:55
+msgid "Forgot password?"
+msgstr ""
+
+#: app/templates/staff/login.html:66
+msgid "Not a staff member?"
+msgstr ""
+
+#: app/templates/staff/login.html:66
+msgid "Back to homepage"
+msgstr ""
+
+#: app/templates/staff/staff_base.html:38
+#: app/templates/staff/staff_base.html:288
+#: app/templates/staff/staff_base.html:316
+msgid "Staff"
+msgstr "Staff"
+
+#: app/templates/staff/staff_base.html:296
+#: app/templates/staff/staff_bookings.html:43
+msgid "Lịch của tôi"
+msgstr "My schedule"
+
+#: app/templates/staff/staff_base.html:300
+#: app/templates/staff/staff_history.html:41
+msgid "Lịch sử"
+msgstr "History"
+
+#: app/templates/staff/staff_base.html:304
+#: app/templates/staff/staff_profile.html:25
+msgid "Hồ sơ"
+msgstr "Profile"
+
+#: app/templates/staff/staff_base.html:322
+msgid "Đăng xuất"
+msgstr "Log out"
+
+#: app/templates/staff/staff_bookings.html:242
+msgid "Lịch của"
+msgstr "Schedule of"
+
+#: app/templates/staff/staff_bookings.html:252
+msgid "Lọc theo ngày"
+msgstr "Filter by date"
+
+#: app/templates/staff/staff_bookings.html:254
+#: app/templates/staff/staff_bookings.html:333
+msgid "Hôm nay"
+msgstr "Today"
+
+#: app/templates/staff/staff_bookings.html:254
+msgid "Tuần này"
+msgstr "This week"
+
+#: app/templates/staff/staff_bookings.html:254
+msgid "Tháng này"
+msgstr "This month"
+
+#: app/templates/staff/staff_bookings.html:255
+msgid "Tháng trước"
+msgstr "Last month"
+
+#: app/templates/staff/staff_bookings.html:255
+msgid "Tùy chọn"
+msgstr "Custom"
+
+#: app/templates/staff/staff_bookings.html:255
+#: app/templates/staff/staff_bookings.html:276
+#: app/templates/staff/staff_history.html:212
+#: app/templates/staff/staff_history.html:232
+msgid "Tất cả"
+msgstr "All"
+
+#: app/templates/staff/staff_bookings.html:274
+#: app/templates/staff/staff_history.html:231
+msgid "Lọc theo trạng thái"
+msgstr "Filter by status"
+
+#: app/templates/staff/staff_bookings.html:283
+#: app/templates/staff/staff_history.html:239
+msgid "Xóa bộ lọc"
+msgstr "Clear filters"
+
+#: app/templates/staff/staff_bookings.html:293
+msgid "Tổng lịch hẹn"
+msgstr "Total bookings"
+
+#: app/templates/staff/staff_bookings.html:297
+msgid "Tới lịch hẹn sắp tới gần nhất"
+msgstr "Go to next upcoming booking"
+
+#: app/templates/staff/staff_bookings.html:299
+msgid "Lịch hẹn sắp tới"
+msgstr "Upcoming bookings"
+
+#: app/templates/staff/staff_bookings.html:311
+msgid "Chờ thanh toán"
+msgstr "Awaiting payment"
+
+#: app/templates/staff/staff_bookings.html:320
+msgid "Không có lịch hẹn nào"
+msgstr "No bookings"
+
+#: app/templates/staff/staff_bookings.html:321
+#: app/templates/staff/staff_history.html:270
+msgid "Xem tất cả"
+msgstr "View all"
+
+#: app/templates/staff/staff_bookings.html:330
+#: app/templates/staff/staff_history.html:279
+msgid "lịch hẹn"
+msgstr "bookings"
+
+#: app/templates/staff/staff_bookings.html:380
+#: app/templates/staff/staff_bookings.html:388
+#: app/templates/staff/staff_bookings.html:454
+msgid "Đã thu tiền"
+msgstr "Payment received"
+
+#: app/templates/staff/staff_bookings.html:391
+#: app/templates/staff/staff_history.html:310
+msgid "Đã xong"
+msgstr "Done"
+
+#: app/templates/staff/staff_bookings.html:397
+#: app/templates/staff/staff_bookings.html:401
+#: app/templates/staff/staff_bookings.html:450
+msgid "Bắt đầu làm"
+msgstr "Start"
+
+#: app/templates/staff/staff_bookings.html:407
+msgid "Không có lịch hẹn"
+msgstr "No bookings"
+
+#: app/templates/staff/staff_bookings.html:418
+#: app/templates/staff/staff_history.html:325
+msgid "Chi tiết lịch hẹn"
+msgstr "Booking details"
+
+#: app/templates/staff/staff_bookings.html:423
+#: app/templates/staff/staff_history.html:330
+msgid "Mã booking"
+msgstr "Booking code"
+
+#: app/templates/staff/staff_bookings.html:427
+#: app/templates/staff/staff_history.html:334
+msgid "Khách hàng"
+msgstr "Customer"
+
+#: app/templates/staff/staff_bookings.html:428
+#: app/templates/staff/staff_history.html:335
+msgid "Họ tên"
+msgstr "Full name"
+
+#: app/templates/staff/staff_bookings.html:429
+#: app/templates/staff/staff_history.html:336
+#: app/templates/staff/staff_profile.html:255
+msgid "Số điện thoại"
+msgstr "Phone number"
+
+#: app/templates/staff/staff_bookings.html:432
+#: app/templates/staff/staff_history.html:339
+msgid "Dịch vụ"
+msgstr "Service"
+
+#: app/templates/staff/staff_bookings.html:433
+#: app/templates/staff/staff_history.html:340
+msgid "Tên dịch vụ"
+msgstr "Service name"
+
+#: app/templates/staff/staff_bookings.html:434
+#: app/templates/staff/staff_history.html:341
+msgid "Ngày hẹn"
+msgstr "Appointment date"
+
+#: app/templates/staff/staff_bookings.html:435
+#: app/templates/staff/staff_history.html:342
+msgid "Thời gian"
+msgstr "Time"
+
+#: app/templates/staff/staff_bookings.html:438
+#: app/templates/staff/staff_history.html:345
+msgid "Thanh toán"
+msgstr "Payment"
+
+#: app/templates/staff/staff_bookings.html:439
+msgid "Tổng tiền"
+msgstr "Total"
+
+#: app/templates/staff/staff_bookings.html:440
+#: app/templates/staff/staff_history.html:347
+msgid "Phương thức"
+msgstr "Method"
+
+#: app/templates/staff/staff_bookings.html:443
+#: app/templates/staff/staff_history.html:350
+msgid "Trạng thái"
+msgstr "Status"
+
+#: app/templates/staff/staff_bookings.html:448
+#: app/templates/staff/staff_history.html:374
+msgid "Đóng"
+msgstr "Close"
+
+#: app/templates/staff/staff_bookings.html:495
+msgid "Tiền mặt - đã thanh toán"
+msgstr "Cash - paid"
+
+#: app/templates/staff/staff_bookings.html:496
+msgid "Tiền mặt - chưa thanh toán"
+msgstr "Cash - unpaid"
+
+#: app/templates/staff/staff_bookings.html:498
+#: app/templates/staff/staff_history.html:391
+msgid "Online"
+msgstr "Online"
+
+#: app/templates/staff/staff_bookings.html:499
+msgid "Chưa có hóa đơn"
+msgstr "No invoice"
+
+#: app/templates/staff/staff_history.html:201
+msgid "Lịch sử của"
+msgstr "History of"
+
+#: app/templates/staff/staff_history.html:210
+msgid "Lọc theo tháng"
+msgstr "Filter by month"
+
+#: app/templates/staff/staff_history.html:221
+msgid "Tìm kiếm"
+msgstr "Search"
+
+#: app/templates/staff/staff_history.html:224
+msgid "Tên khách hàng..."
+msgstr "Customer name..."
+
+#: app/templates/staff/staff_history.html:233
+#: app/templates/staff/staff_history.html:260
+msgid "Chưa hoàn thành"
+msgstr "Incomplete"
+
+#: app/templates/staff/staff_history.html:248
+msgid "Tổng lịch sử"
+msgstr "Total history"
+
+#: app/templates/staff/staff_history.html:269
+msgid "Không có lịch sử nào trong khoảng thời gian này."
+msgstr "No history in this period."
+
+#: app/templates/staff/staff_history.html:346
+msgid "Tổng tiền dịch vụ"
+msgstr "Service total"
+
+#: app/templates/staff/staff_history.html:354
+msgid "Thu nhập"
+msgstr "Income"
+
+#: app/templates/staff/staff_history.html:357
+#: app/templates/staff/staff_profile.html:271
+msgid "Lương theo giờ"
+msgstr "Hourly wage"
+
+#: app/templates/staff/staff_history.html:361
+msgid "Hoa hồng booking"
+msgstr "Booking commission"
+
+#: app/templates/staff/staff_history.html:366
+msgid "Thu nhập sau booking"
+msgstr "Income after booking"
+
+#: app/templates/staff/staff_history.html:388
+msgid "Tiền mặt – đã thanh toán"
+msgstr "Cash – paid"
+
+#: app/templates/staff/staff_history.html:389
+msgid "Tiền mặt – chưa thanh toán"
+msgstr "Cash – unpaid"
+
+#: app/templates/staff/staff_profile.html:180
+msgid "Hồ sơ của"
+msgstr "Profile of"
+
+#: app/templates/staff/staff_profile.html:202
+#: app/templates/staff/staff_profile.html:264
+msgid "Nhân viên"
+msgstr "Staff"
+
+#: app/templates/staff/staff_profile.html:205
+msgid "Tham gia từ"
+msgstr "Joined"
+
+#: app/templates/staff/staff_profile.html:207
+msgid "Nhấn vào ảnh để thay đổi"
+msgstr "Click the image to change"
+
+#: app/templates/staff/staff_profile.html:207
+msgid "JPG, PNG tối đa 2MB"
+msgstr "JPG, PNG max 2MB"
+
+#: app/templates/staff/staff_profile.html:220
+msgid "Booking tháng này"
+msgstr "Bookings this month"
+
+#: app/templates/staff/staff_profile.html:226
+msgid "lịch hẹn hoàn thành"
+msgstr "completed bookings"
+
+#: app/templates/staff/staff_profile.html:230
+msgid "Thu nhập tháng này"
+msgstr "Income this month"
+
+#: app/templates/staff/staff_profile.html:236
+msgid "lương + hoa hồng"
+msgstr "wage + commission"
+
+#: app/templates/staff/staff_profile.html:245
+msgid "Thông tin cá nhân"
+msgstr "Personal information"
+
+#: app/templates/staff/staff_profile.html:247
+msgid "Chỉ xem"
+msgstr "Read only"
+
+#: app/templates/staff/staff_profile.html:251
+msgid "Họ và tên"
+msgstr "Full name"
+
+#: app/templates/staff/staff_profile.html:263
+msgid "Vai trò"
+msgstr "Role"
+
+#: app/templates/staff/staff_profile.html:267
+msgid "Ngày vào làm"
+msgstr "Start date"
+
+#: app/templates/staff/staff_profile.html:272
+msgid "giờ"
+msgstr "hour"
+
+#: app/templates/staff/staff_profile.html:275
+msgid "Hoa hồng"
+msgstr "Commission"
+
+#: app/templates/staff/staff_profile.html:276
+msgid "booking"
+msgstr "booking"
+
+#: app/templates/staff/staff_profile.html:286
+msgid "Bảo mật"
+msgstr "Security"
+
+#: app/templates/staff/staff_profile.html:291
+msgid "Mật khẩu"
+msgstr "Password"
+
+#: app/templates/staff/staff_profile.html:294
+#: app/templates/staff/staff_profile.html:325
+msgid "Đổi mật khẩu"
+msgstr "Change password"
+
+#: app/templates/staff/staff_profile.html:333
+msgid "Để xác nhận danh tính, chúng tôi sẽ gửi mã xác thực đến email của bạn."
+msgstr "To verify your identity, we'll send a verification code to your email."
+
+#: app/templates/staff/staff_profile.html:336
+#: app/templates/staff/staff_profile.html:359
+msgid "Hủy"
+msgstr "Cancel"
+
+#: app/templates/staff/staff_profile.html:337
+#: app/templates/staff/staff_profile.html:383
+#: app/templates/staff/staff_profile.html:420
+#: app/templates/staff/staff_profile.html:426
+msgid "Gửi mã"
+msgstr "Send code"
+
+#: app/templates/staff/staff_profile.html:343
+msgid "Nhập mã xác thực đã gửi đến"
+msgstr "Enter the verification code sent to"
+
+#: app/templates/staff/staff_profile.html:343
+msgid "và mật khẩu mới."
+msgstr "and your new password."
+
+#: app/templates/staff/staff_profile.html:347
+msgid "Mã xác thực"
+msgstr "Verification code"
+
+#: app/templates/staff/staff_profile.html:348
+msgid "Nhập mã gồm 6 chữ số"
+msgstr "Enter 6-digit code"
+
+#: app/templates/staff/staff_profile.html:351
+msgid "Mật khẩu mới"
+msgstr "New password"
+
+#: app/templates/staff/staff_profile.html:352
+msgid "Tối thiểu 8 ký tự"
+msgstr "At least 8 characters"
+
+#: app/templates/staff/staff_profile.html:355
+msgid "Xác nhận mật khẩu mới"
+msgstr "Confirm new password"
+
+#: app/templates/staff/staff_profile.html:356
+msgid "Nhập lại mật khẩu mới"
+msgstr "Re-enter new password"
+
+#: app/templates/staff/staff_profile.html:360
+msgid "Cập nhật mật khẩu"
+msgstr "Update password"
+
+#: app/templates/staff/staff_profile.html:403
+msgid "Đang gửi..."
+msgstr "Sending..."
+
+#: app/templates/staff/staff_profile.html:417
+msgid "Có lỗi xảy ra. Vui lòng thử lại."
+msgstr "Something went wrong. Please try again."
+
+#: app/templates/staff/staff_profile.html:423
+msgid "Lỗi mạng. Vui lòng thử lại."
+msgstr "Network error. Please try again."
+
+#~ msgid "Create an account & get 15% off your first visit"
+#~ msgstr ""
+
+#~ msgid "VAT (25.5%)"
+#~ msgstr ""
+

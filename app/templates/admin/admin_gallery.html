@@ -1007,7 +1007,7 @@
             </span>
             <div class="gl-card__actions">
                 <button type="button" class="gl-action-btn" title="Chỉnh sửa"
-                        onclick="openEditModal({{ img.id }}, '{{ img.image_url }}', '{{ (img.alt_text or '') | e }}', {{ img.sort_order }}, {{ img.is_active }})">
+                        onclick="openEditModal({{ img.id }}, '{{ img.image_url }}', '{{ (img.alt_text or '') | e }}', {{ img.sort_order }}, {{ img.is_active }}, '{{ (img.alt_text_fi or '') | e }}', '{{ (img.alt_text_vi or '') | e }}')">
                     <span class="material-symbols-outlined">edit</span>
                 </button>
                 <form method="post" action="{{ url_for('main.admin_gallery_delete', image_id=img.id) }}" onsubmit="return confirm('Xóa ảnh này?');">
@@ -1110,8 +1110,18 @@
                 <input type="file" name="image" id="glEditImageInput" accept=".jpg,.jpeg,.png,.webp" style="display:none" onchange="glPreviewEditImage(this)">
 
                 <div class="gl-form-group">
-                    <label class="gl-form-label">Chú thích</label>
+                    <label class="gl-form-label">Chú thích (English)</label>
                     <input type="text" name="alt_text" id="glEditAltText" class="gl-form-input">
+                </div>
+
+                <div class="gl-form-group">
+                    <label class="gl-form-label">Chú thích (Suomi)</label>
+                    <input type="text" name="alt_text_fi" id="glEditAltTextFi" class="gl-form-input">
+                </div>
+
+                <div class="gl-form-group">
+                    <label class="gl-form-label">Chú thích (Tiếng Việt)</label>
+                    <input type="text" name="alt_text_vi" id="glEditAltTextVi" class="gl-form-input">
                 </div>
 
                 <div class="gl-form-group">
@@ -1350,11 +1360,13 @@ var GL_UPDATE_URL_TEMPLATE = "{{ url_for('main.admin_gallery_update', image_id=0
 var GL_DELETE_URL_TEMPLATE = "{{ url_for('main.admin_gallery_delete', image_id=0) }}";
 var GL_IMG_BASE = "{{ url_for('static', filename='uploads/gallery/') }}";
 
-function openEditModal(id, imageUrl, altText, sortOrder, isActive) {
+function openEditModal(id, imageUrl, altText, sortOrder, isActive, altTextFi, altTextVi) {
     glCurrentEditId = id;
     document.getElementById('glEditForm').action = glBuildUrl(GL_UPDATE_URL_TEMPLATE, id);
     document.getElementById('glEditPreviewImg').src = imageUrl ? GL_IMG_BASE + imageUrl : '';
     document.getElementById('glEditAltText').value = altText;
+    document.getElementById('glEditAltTextFi').value = altTextFi || '';
+    document.getElementById('glEditAltTextVi').value = altTextVi || '';
     document.getElementById('glEditSortOrder').value = sortOrder;
     document.getElementById('glEditImageInput').value = '';
 

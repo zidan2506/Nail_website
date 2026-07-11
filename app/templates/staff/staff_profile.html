@@ -20,8 +20,9 @@
   không cần current_password vì mã OTP gửi qua email đã xác thực danh tính.
 #}
 {% extends "staff/staff_base.html" %}
+{% import "_lang_switcher.html" as ls with context %}
 
-{% block title %}Hồ sơ — DahaCare{% endblock %}
+{% block title %}{{ _('Hồ sơ') }} — DahaCare{% endblock %}
 
 {% block page_styles %}
 <style>
@@ -160,6 +161,14 @@
 }
 .sf-msubmit:hover { opacity: .9; }
 .sf-msubmit:disabled { opacity: .5; cursor: not-allowed; }
+
+.sf-lang-options { display:flex; flex-direction:column; padding: 8px 20px 20px; gap:10px; }
+.sf-lang-option { display:flex; align-items:center; gap:12px; padding:12px 16px; border:1.5px solid var(--sf-border); border-radius:10px; text-decoration:none; color:var(--sf-text); transition: border-color .15s ease, background .15s ease; }
+.sf-lang-option:hover { border-color: var(--sf-accent); }
+.sf-lang-option--active { border-color: var(--sf-accent); background: var(--sf-accent-bg); }
+.sf-lang-name { flex:1; font-size:14px; font-weight:600; }
+.sf-lang-check { color: var(--sf-accent); font-size:18px; }
+.sf-lang-option .lang-flag { width:26px; height:18px; border-radius:3px; box-shadow:0 0 0 1px rgba(0,0,0,0.08); flex-shrink:0; display:block; }
 </style>
 {% endblock %}
 
@@ -168,7 +177,7 @@
 
     {# ── Header ── #}
     <div class="sf-hdr">
-        <div class="sf-title">Hồ sơ của <em>{{ current_staff.name }}</em></div>
+        <div class="sf-title">{{ _('Hồ sơ của') }} <em>{{ current_staff.name }}</em></div>
         <div class="sf-hdr-date">{{ now.strftime('%d/%m/%Y') }}</div>
     </div>
 
@@ -190,12 +199,12 @@
             </div>
             <div>
                 <div class="sf-hero-name">{{ current_staff.name }}</div>
-                <div class="sf-hero-role">{{ current_staff.role or 'Nhân viên' }}</div>
+                <div class="sf-hero-role">{{ current_staff.role or _('Nhân viên') }}</div>
                 <div class="sf-hero-since">
                     <i class="ti ti-calendar-plus"></i>
-                    Tham gia từ {{ current_staff.created_at | format_date('%d/%m/%Y') }}
+                    {{ _('Tham gia từ') }} {{ current_staff.created_at | format_date('%d/%m/%Y') }}
                 </div>
-                <div class="sf-avatar-hint">Nhấn vào ảnh để thay đổi &middot; JPG, PNG tối đa 2MB</div>
+                <div class="sf-avatar-hint">{{ _('Nhấn vào ảnh để thay đổi') }} &middot; {{ _('JPG, PNG tối đa 2MB') }}</div>
             </div>
         </div>
 
@@ -208,23 +217,23 @@
         <div class="sf-mini-stats">
             <div class="sf-mstat">
                 <div class="sf-mstat-top">
-                    <span class="sf-mstat-label">Booking tháng này</span>
+                    <span class="sf-mstat-label">{{ _('Booking tháng này') }}</span>
                     <div class="sf-mstat-icon" style="background:#EFF6FF;">
                         <i class="ti ti-calendar-check" style="color:#3B82F6; font-size:16px;"></i>
                     </div>
                 </div>
                 <div class="sf-mstat-val">{{ stats.bookings_this_month }}</div>
-                <div class="sf-mstat-sub">lịch hẹn hoàn thành</div>
+                <div class="sf-mstat-sub">{{ _('lịch hẹn hoàn thành') }}</div>
             </div>
             <div class="sf-mstat">
                 <div class="sf-mstat-top">
-                    <span class="sf-mstat-label">Thu nhập tháng này</span>
+                    <span class="sf-mstat-label">{{ _('Thu nhập tháng này') }}</span>
                     <div class="sf-mstat-icon" style="background:var(--sf-accent-bg);">
                         <i class="ti ti-wallet" style="color:var(--sf-accent); font-size:16px;"></i>
                     </div>
                 </div>
                 <div class="sf-mstat-val">{{ stats.income_this_month | format_currency('€') }}</div>
-                <div class="sf-mstat-sub">lương + hoa hồng</div>
+                <div class="sf-mstat-sub">{{ _('lương + hoa hồng') }}</div>
             </div>
         </div>
 
@@ -233,38 +242,38 @@
             <div class="sf-card-block-hdr">
                 <div class="sf-card-block-title">
                     <i class="ti ti-id-badge" style="color:var(--sf-accent); font-size:16px;"></i>
-                    Thông tin cá nhân
+                    {{ _('Thông tin cá nhân') }}
                 </div>
-                <span class="sf-readonly-badge">Chỉ xem</span>
+                <span class="sf-readonly-badge">{{ _('Chỉ xem') }}</span>
             </div>
             <div class="sf-info-rows">
                 <div class="sf-info-row">
-                    <span class="sf-info-k">Họ và tên</span>
+                    <span class="sf-info-k">{{ _('Họ và tên') }}</span>
                     <span class="sf-info-v">{{ current_staff.name }}</span>
                 </div>
                 <div class="sf-info-row">
-                    <span class="sf-info-k">Số điện thoại</span>
+                    <span class="sf-info-k">{{ _('Số điện thoại') }}</span>
                     <span class="sf-info-v">{{ current_staff.phone }}</span>
                 </div>
                 <div class="sf-info-row">
-                    <span class="sf-info-k">Email</span>
+                    <span class="sf-info-k">{{ _('Email') }}</span>
                     <span class="sf-info-v">{{ current_staff.email }}</span>
                 </div>
                 <div class="sf-info-row">
-                    <span class="sf-info-k">Vai trò</span>
-                    <span class="sf-info-v">{{ current_staff.role or 'Nhân viên' }}</span>
+                    <span class="sf-info-k">{{ _('Vai trò') }}</span>
+                    <span class="sf-info-v">{{ current_staff.role or _('Nhân viên') }}</span>
                 </div>
                 <div class="sf-info-row">
-                    <span class="sf-info-k">Ngày vào làm</span>
+                    <span class="sf-info-k">{{ _('Ngày vào làm') }}</span>
                     <span class="sf-info-v">{{ current_staff.created_at | format_date('%d/%m/%Y') }}</span>
                 </div>
                 <div class="sf-info-row">
-                    <span class="sf-info-k">Lương theo giờ</span>
-                    <span class="sf-info-v">{{ current_staff.hourly_rate | format_currency('€') }} / giờ</span>
+                    <span class="sf-info-k">{{ _('Lương theo giờ') }}</span>
+                    <span class="sf-info-v">{{ current_staff.hourly_rate | format_currency('€') }} / {{ _('giờ') }}</span>
                 </div>
                 <div class="sf-info-row">
-                    <span class="sf-info-k">Hoa hồng</span>
-                    <span class="sf-info-v"><span class="sf-commission-tag">{{ current_staff.commission_rate }}% / booking</span></span>
+                    <span class="sf-info-k">{{ _('Hoa hồng') }}</span>
+                    <span class="sf-info-v"><span class="sf-commission-tag">{{ current_staff.commission_rate }}% / {{ _('booking') }}</span></span>
                 </div>
             </div>
         </div>
@@ -274,15 +283,36 @@
             <div class="sf-card-block-hdr">
                 <div class="sf-card-block-title">
                     <i class="ti ti-lock" style="color:var(--sf-accent); font-size:16px;"></i>
-                    Bảo mật
+                    {{ _('Bảo mật') }}
                 </div>
             </div>
             <div class="sf-pw-row">
                 <div>
-                    <div class="sf-pw-label">Mật khẩu</div>
+                    <div class="sf-pw-label">{{ _('Mật khẩu') }}</div>
                     <div class="sf-pw-dots">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
                 </div>
-                <button type="button" class="sf-pw-btn" onclick="openPwModal()">Đổi mật khẩu</button>
+                <button type="button" class="sf-pw-btn" onclick="openPwModal()">{{ _('Đổi mật khẩu') }}</button>
+            </div>
+        </div>
+
+        {# ── Block 5: Ngôn ngữ ── #}
+        <div class="sf-card-block">
+            <div class="sf-card-block-hdr">
+                <div class="sf-card-block-title">
+                    <i class="ti ti-language" style="color:var(--sf-accent); font-size:16px;"></i>
+                    {{ _('Language') }}
+                </div>
+            </div>
+            {% set lang_names = {'fi': 'Suomi', 'en': 'English', 'vi': 'Tiếng Việt'} %}
+            <div class="sf-lang-options">
+                {% for code in languages %}
+                <a href="{{ url_for('main.set_language', lang=code) }}"
+                   class="sf-lang-option{% if code == current_lang %} sf-lang-option--active{% endif %}">
+                    {{ ls.lang_flag(code) }}
+                    <span class="sf-lang-name">{{ lang_names[code] }}</span>
+                    {% if code == current_lang %}<i class="ti ti-check sf-lang-check"></i>{% endif %}
+                </a>
+                {% endfor %}
             </div>
         </div>
 
@@ -292,7 +322,7 @@
     <div class="sf-overlay" id="sf-pw-overlay">
         <div class="sf-modal">
             <div class="sf-mhdr">
-                <h3>Đổi mật khẩu</h3>
+                <h3>{{ _('Đổi mật khẩu') }}</h3>
                 <button type="button" class="sf-mclose" onclick="closePwModal()">&#10005;</button>
             </div>
 
@@ -300,34 +330,34 @@
 
             {# Bước 1: xác nhận gửi mã #}
             <div id="sf-pw-step-1">
-                <p class="sf-mdesc">Để xác nhận danh tính, chúng tôi sẽ gửi mã xác thực đến email của bạn.</p>
+                <p class="sf-mdesc">{{ _('Để xác nhận danh tính, chúng tôi sẽ gửi mã xác thực đến email của bạn.') }}</p>
                 <div class="sf-memail">{{ current_staff.email | mask_email }}</div>
                 <div class="sf-mactions">
-                    <button type="button" class="sf-mcancel" onclick="closePwModal()">Hủy</button>
-                    <button type="button" class="sf-msubmit" id="sf-pw-send-btn" onclick="sendPwCode()">Gửi mã</button>
+                    <button type="button" class="sf-mcancel" onclick="closePwModal()">{{ _('Hủy') }}</button>
+                    <button type="button" class="sf-msubmit" id="sf-pw-send-btn" onclick="sendPwCode()">{{ _('Gửi mã') }}</button>
                 </div>
             </div>
 
             {# Bước 2: nhập mã + mật khẩu mới #}
             <div id="sf-pw-step-2" style="display:none">
-                <p class="sf-mdesc">Nhập mã xác thực đã gửi đến <strong>{{ current_staff.email | mask_email }}</strong> và mật khẩu mới.</p>
+                <p class="sf-mdesc">{{ _('Nhập mã xác thực đã gửi đến') }} <strong>{{ current_staff.email | mask_email }}</strong> {{ _('và mật khẩu mới.') }}</p>
                 <form method="POST" action="{{ url_for('main.staff_change_password') }}" id="sf-pw-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="sf-mfield">
-                        <label for="sf-pw-code">Mã xác thực</label>
-                        <input id="sf-pw-code" type="text" name="verification_code" placeholder="Nhập mã gồm 6 chữ số" required autocomplete="off">
+                        <label for="sf-pw-code">{{ _('Mã xác thực') }}</label>
+                        <input id="sf-pw-code" type="text" name="verification_code" placeholder="{{ _('Nhập mã gồm 6 chữ số') }}" required autocomplete="off">
                     </div>
                     <div class="sf-mfield">
-                        <label for="sf-pw-new">Mật khẩu mới</label>
-                        <input id="sf-pw-new" type="password" name="new_password" placeholder="Tối thiểu 8 ký tự" required autocomplete="new-password">
+                        <label for="sf-pw-new">{{ _('Mật khẩu mới') }}</label>
+                        <input id="sf-pw-new" type="password" name="new_password" placeholder="{{ _('Tối thiểu 8 ký tự') }}" required autocomplete="new-password">
                     </div>
                     <div class="sf-mfield">
-                        <label for="sf-pw-confirm">Xác nhận mật khẩu mới</label>
-                        <input id="sf-pw-confirm" type="password" name="confirm_password" placeholder="Nhập lại mật khẩu mới" required autocomplete="new-password">
+                        <label for="sf-pw-confirm">{{ _('Xác nhận mật khẩu mới') }}</label>
+                        <input id="sf-pw-confirm" type="password" name="confirm_password" placeholder="{{ _('Nhập lại mật khẩu mới') }}" required autocomplete="new-password">
                     </div>
                     <div class="sf-mactions">
-                        <button type="button" class="sf-mcancel" onclick="closePwModal()">Hủy</button>
-                        <button type="submit" class="sf-msubmit">Cập nhật mật khẩu</button>
+                        <button type="button" class="sf-mcancel" onclick="closePwModal()">{{ _('Hủy') }}</button>
+                        <button type="submit" class="sf-msubmit">{{ _('Cập nhật mật khẩu') }}</button>
                     </div>
                 </form>
             </div>
@@ -350,7 +380,7 @@ function openPwModal() {
     errorDiv.textContent = '';
     const sendBtn = document.getElementById('sf-pw-send-btn');
     sendBtn.disabled = false;
-    sendBtn.textContent = 'Gửi mã';
+    sendBtn.textContent = '{{ _("Gửi mã") }}';
 }
 
 function closePwModal() {
@@ -370,7 +400,7 @@ async function sendPwCode() {
     const sendBtn = document.getElementById('sf-pw-send-btn');
     const errorDiv = document.getElementById('sf-pw-error');
     sendBtn.disabled = true;
-    sendBtn.textContent = 'Đang gửi...';
+    sendBtn.textContent = '{{ _("Đang gửi...") }}';
     errorDiv.style.display = 'none';
 
     try {
@@ -384,16 +414,16 @@ async function sendPwCode() {
             document.getElementById('sf-pw-step-2').style.display = 'block';
             document.getElementById('sf-pw-code').focus();
         } else {
-            errorDiv.textContent = data.error || 'Có lỗi xảy ra. Vui lòng thử lại.';
+            errorDiv.textContent = data.error || '{{ _("Có lỗi xảy ra. Vui lòng thử lại.") }}';
             errorDiv.style.display = 'block';
             sendBtn.disabled = false;
-            sendBtn.textContent = 'Gửi mã';
+            sendBtn.textContent = '{{ _("Gửi mã") }}';
         }
     } catch {
-        errorDiv.textContent = 'Lỗi mạng. Vui lòng thử lại.';
+        errorDiv.textContent = '{{ _("Lỗi mạng. Vui lòng thử lại.") }}';
         errorDiv.style.display = 'block';
         sendBtn.disabled = false;
-        sendBtn.textContent = 'Gửi mã';
+        sendBtn.textContent = '{{ _("Gửi mã") }}';
     }
 }
 

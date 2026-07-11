@@ -81,7 +81,7 @@
 
       <!-- Eyebrow: chữ nhỏ uppercase màu primary mờ -->
       <!-- Tương đương Stitch: text-xs font-bold tracking-[0.15em] text-primary/70 uppercase -->
-      <span class="rdm-eyebrow">CONFIRM REDEEM</span>
+      <span class="rdm-eyebrow">{{ _('CONFIRM REDEEM') }}</span>
 
       <!-- Reward name: tiêu đề chính của modal — được JS điền vào -->
       <!-- Tương đương Stitch: text-2xl font-black tracking-tight text-secondary -->
@@ -105,11 +105,11 @@
         <div class="rdm-info-label">
           <!-- Icon toll = biểu tượng coin/toll -->
           <span class="material-symbols-outlined rdm-row-icon" aria-hidden="true">toll</span>
-          Points cost
+          {{ _('Points cost') }}
         </div>
         <!-- Giá trị được JS điền: "− 500 pts" -->
         <span class="rdm-info-value rdm-value-pink">
-          − <span id="rdm-points-cost">0</span> pts
+          − <span id="rdm-points-cost">0</span> {{ _('pts') }}
         </span>
       </div>
 
@@ -120,7 +120,7 @@
       <div class="rdm-info-row">
         <div class="rdm-info-label">
           <span class="material-symbols-outlined rdm-row-icon" aria-hidden="true">account_balance_wallet</span>
-          Your balance
+          {{ _('Your balance') }}
         </div>
         <div class="rdm-balance-value">
           <!-- Số cũ gạch ngang — JS điền currentBalance -->
@@ -128,7 +128,7 @@
           <!-- Mũi tên → dùng Material Symbol thay vì ký tự để đồng bộ với Stitch -->
           <span class="material-symbols-outlined rdm-arrow-icon" aria-hidden="true">arrow_forward</span>
           <!-- Số mới sau khi trừ — JS tính và điền -->
-          <span id="rdm-balance-after">0</span> pts
+          <span id="rdm-balance-after">0</span> {{ _('pts') }}
         </div>
       </div>
 
@@ -138,7 +138,7 @@
       <div class="rdm-info-row">
         <div class="rdm-info-label">
           <span class="material-symbols-outlined rdm-row-icon" aria-hidden="true">event</span>
-          Voucher valid until
+          {{ _('Voucher valid until') }}
         </div>
         <span class="rdm-info-value" id="rdm-voucher-expiry">—</span>
       </div>
@@ -152,8 +152,8 @@
          Tương đương Stitch: text-xs text-center text-on-surface-variant/70
          ============================================================ -->
     <p class="rdm-disclaimer" id="rdm-disclaimer-text">
-      Once redeemed, points cannot be refunded.
-      <a href="#" class="rdm-terms-link">Terms apply.</a>
+      {{ _('Once redeemed, points cannot be refunded.') }}
+      <a href="#" class="rdm-terms-link">{{ _('Terms apply.') }}</a>
     </p>
 
 
@@ -167,7 +167,7 @@
       <button type="button"
               class="rdm-btn-cancel"
               onclick="closeRedeemModal()">
-        Cancel
+        {{ _('Cancel') }}
       </button>
 
       <!-- Confirm: POST redeem lên backend
@@ -177,7 +177,7 @@
               id="rdm-confirm-btn"
               data-reward-id=""
               onclick="submitRedeem()">
-        Confirm Redeem
+        {{ _('Confirm Redeem') }}
       </button>
 
     </div>
@@ -489,19 +489,19 @@
     document.getElementById('rdm-balance-after').textContent  = (currentBalance - pointsCost).toLocaleString();
 
     // Điền ngày hết hạn voucher (fallback nếu không có)
-    document.getElementById('rdm-voucher-expiry').textContent = expiryDate || 'Upon use';
+    document.getElementById('rdm-voucher-expiry').textContent = expiryDate || '{{ _("Upon use") }}';
 
     // Set reward ID lên confirm button để submitRedeem() lấy
     document.getElementById('rdm-confirm-btn').dataset.rewardId = rewardId;
 
     // Reset disclaimer về text mặc định (phòng trường hợp lần trước bị lỗi)
     document.getElementById('rdm-disclaimer-text').innerHTML =
-      'Once redeemed, points cannot be refunded. <a href="{{ url_for("""main.redeem_terms""") }}" class="rdm-terms-link">Terms apply.</a>';
+      '{{ _("Once redeemed, points cannot be refunded.") }} <a href="{{ url_for("""main.redeem_terms""") }}" class="rdm-terms-link">{{ _("Terms apply.") }}</a>';
 
     // Reset confirm button về trạng thái bình thường
     const confirmBtn = document.getElementById('rdm-confirm-btn');
     confirmBtn.disabled    = false;
-    confirmBtn.textContent = 'Confirm Redeem';
+    confirmBtn.textContent = '{{ _("Confirm Redeem") }}';
 
     // Hiện backdrop
     document.getElementById('rdm-backdrop').style.display = 'flex';
@@ -535,7 +535,7 @@
 
     // Disable button, đổi text thành loading state
     confirmBtn.disabled    = true;
-    confirmBtn.textContent = 'Processing...';
+    confirmBtn.textContent = '{{ _("Processing...") }}';
 
     fetch("{{ url_for('main.redeem_reward_route') }}", {
       method: 'POST',
@@ -553,17 +553,17 @@
       } else {
         // Hiện error message thay thế disclaimer text
         document.getElementById('rdm-disclaimer-text').textContent =
-          data.message || 'Something went wrong. Please try again.';
+          data.message || '{{ _("Something went wrong. Please try again.") }}';
         // Cho phép thử lại
         confirmBtn.disabled    = false;
-        confirmBtn.textContent = 'Confirm Redeem';
+        confirmBtn.textContent = '{{ _("Confirm Redeem") }}';
       }
     })
     .catch(() => {
       document.getElementById('rdm-disclaimer-text').textContent =
-        'Connection error. Please try again.';
+        '{{ _("Connection error. Please try again.") }}';
       confirmBtn.disabled    = false;
-      confirmBtn.textContent = 'Confirm Redeem';
+      confirmBtn.textContent = '{{ _("Confirm Redeem") }}';
     });
   }
 

@@ -1,5 +1,24 @@
 from datetime import datetime, timezone
+from flask import session
 from app.utils.helpers import now_helsinki, mask_email
+
+
+def translate_field(obj, field):
+    """Chọn giá trị đã dịch của `field` theo ngôn ngữ session (i18n nội dung DB).
+    Trả `field_<lang>` nếu có & không rỗng, ngược lại fallback về cột gốc (English).
+    Hỗ trợ cả sqlite3.Row lẫn dict."""
+    lang = session.get("lang")
+    if lang in ("fi", "vi"):
+        try:
+            val = obj[f"{field}_{lang}"]
+        except (KeyError, IndexError):
+            val = None
+        if val:
+            return val
+    try:
+        return obj[field]
+    except (KeyError, IndexError):
+        return ""
 
 PAYMENT_METHOD_LABELS = {
     'visa': 'Visa',
@@ -88,10 +107,20 @@ def short_name(value):
     return f'{parts[0]} {parts[-1][0]}.'
 
 def payment_label(value):
-    """'mobile_pay' → 'Mobile Pay'"""
+    """'mobile_pay' → 'Mobile Pay' (đã i18n; brand tự fallback về tên gốc)."""
+    from flask_babel import gettext
     if not value:
         return ''
-    return PAYMENT_METHOD_LABELS.get(value, value.replace('_', ' ').title())
+    labels = {
+        'visa': gettext('Visa'),
+        'mastercard': gettext('Mastercard'),
+        'mobile_pay': gettext('Mobile Pay'),
+        'apple_pay': gettext('Apple Pay'),
+        'google_pay': gettext('Google Pay'),
+        'cash': gettext('Cash'),
+        'bank_transfer': gettext('Bank Transfer'),
+    }
+    return labels.get(value, value.replace('_', ' ').title())
 
 
 def payment_icon(value):
@@ -152,3 +181,5 @@ def register_filters(app):
     app.template_filter('time_ago')(time_ago)
     app.template_filter('mask_email')(mask_email)
     app.template_filter('initials')(initials)
+    # i18n nội dung DB: {{ tr(service, 'name') }}
+    app.jinja_env.globals['tr'] = translate_field

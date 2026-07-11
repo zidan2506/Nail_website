@@ -101,6 +101,12 @@ header {
     z-index: 100;
 }
 
+/* Navbar phải nổi trên nội dung trang (vd hero carousel cũng là <header>)
+   để dropdown ngôn ngữ không bị đè */
+.site-header {
+    z-index: 1000;
+}
+
 .navbar {
     display: flex;
     justify-content: space-between;

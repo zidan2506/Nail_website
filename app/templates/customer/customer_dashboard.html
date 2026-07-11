@@ -1,5 +1,5 @@
 {% extends "customer_base.html" %}
-{% block title %}Dashboard | Daha Care{% endblock %}
+{% block title %}{{ _('Dashboard') }} | Daha Care{% endblock %}
 {% block nav_dashboard %}active{% endblock %}
 
 {% block extra_css %}
@@ -495,11 +495,11 @@
 <!-- Header -->
 <div class="db-header-row">
     <div>
-        <p class="db-label">Customer Dashboard</p>
-        <h1 class="db-heading">Good morning, {{ current_user.name }}!</h1>
-        <p class="db-subtitle">Ready for your next glow up?</p>
+        <p class="db-label">{{ _('Customer Dashboard') }}</p>
+        <h1 class="db-heading">{{ _('Good morning, %(name)s!', name=current_user.name) }}</h1>
+        <p class="db-subtitle">{{ _('Ready for your next glow up?') }}</p>
     </div>
-    <a href="{{ url_for('main.customer_booking') }}" class="book-btn">Book Appointment</a>
+    <a href="{{ url_for('main.customer_booking') }}" class="book-btn">{{ _('Book Appointment') }}</a>
 </div>
 
 <!-- Carousel: Offers & Deals -->
@@ -514,7 +514,7 @@
                  {% endif %}
             ></div>
             <div class="slide-content">
-                <div class="slide-badge">{{ slide.badge or '✦ Loyalty Reward' }}</div>
+                <div class="slide-badge">{{ slide.badge or _('✦ Loyalty Reward') }}</div>
                 <h2 class="slide-title">{{ slide.title }}</h2>
                 <p class="slide-desc">{{ slide.subtitle }}</p>
                 <a href="{{ slide.cta_url }}" class="slide-cta">{{ slide.cta_label }}</a>
@@ -543,17 +543,17 @@
     <div class="upcoming-card">
         {% if upcoming_booking %}
             <div class="upcoming-card__content">
-                <p class="upcoming-section-label">Upcoming Appointment</p>
+                <p class="upcoming-section-label">{{ _('Upcoming Appointment') }}</p>
                 <div class="appointment-status-badge appointment-status-badge--{{ upcoming_booking.status }}">
                     {{ upcoming_booking.status }}
                 </div>
                 <h2 class="upcoming-card__title">{{ upcoming_booking.service_name }}</h2>
                 <p class="upcoming-card__meta">
-                    {{ upcoming_booking.date }} • {{ upcoming_booking.time }} with {{ upcoming_booking.staff_name }}.
+                    {{ _('%(date)s • %(time)s with %(staff)s.', date=upcoming_booking.date, time=upcoming_booking.time, staff=upcoming_booking.staff_name) }}
                 </p>
                 <div class="upcoming-card__actions">
-                    <a href="{{ upcoming_booking.calendar_url }}" class="btn btn-primary" target="{{ upcoming_booking.url_target }}">Add to Calendar</a>
-                    <a href="{{ url_for('main.view_booking_details', booking_id=upcoming_booking.id) }}" class="btn btn-secondary">View Details</a>
+                    <a href="{{ upcoming_booking.calendar_url }}" class="btn btn-primary" target="{{ upcoming_booking.url_target }}">{{ _('Add to Calendar') }}</a>
+                    <a href="{{ url_for('main.view_booking_details', booking_id=upcoming_booking.id) }}" class="btn btn-secondary">{{ _('View Details') }}</a>
                 </div>
             </div>
             <div class="upcoming-card__icon">
@@ -565,11 +565,11 @@
             </div>
         {% else %}
             <div class="upcoming-card__content">
-                <p class="upcoming-section-label">Upcoming Appointment</p>
-                <h2 class="upcoming-card__title">No upcoming visits scheduled</h2>
-                <p class="upcoming-card__meta">Ready for a new look? Book your next treatment today.</p>
+                <p class="upcoming-section-label">{{ _('Upcoming Appointment') }}</p>
+                <h2 class="upcoming-card__title">{{ _('No upcoming visits scheduled') }}</h2>
+                <p class="upcoming-card__meta">{{ _('Ready for a new look? Book your next treatment today.') }}</p>
                 <div class="upcoming-card__actions">
-                    <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">Book new appointment</a>
+                    <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">{{ _('Book new appointment') }}</a>
                 </div>
             </div>
             <div class="upcoming-card__icon">
@@ -581,31 +581,31 @@
     <!-- Loyalty Points -->
     <div class="loyalty-card">
         <div class="loyalty-header">
-            <span class="loyalty-title">Loyalty Points</span>
+            <span class="loyalty-title">{{ _('Loyalty Points') }}</span>
             <span class="loyalty-icon">✦</span>
         </div>
 
         <div class="loyalty-points-num">{{ loyalty_points or 0 }}</div>
-        <p class="loyalty-tagline">Keep blooming —<br>your next treat is almost here!</p>
+        <p class="loyalty-tagline">{{ _('Keep blooming —') }}<br>{{ _('your next treat is almost here!') }}</p>
 
         {% if next_reward %}
         <div class="loyalty-progress-section">
             <div class="progress-meta">
                 <span class="progress-reward-name">{{ next_reward.name }}</span>
-                <span class="progress-pct">{{ progress_pct }}% Complete</span>
+                <span class="progress-pct">{{ progress_pct }}% {{ _('Complete') }}</span>
             </div>
             <div class="progress-bar-track">
                 <div class="progress-bar-fill" style="width: {{ progress_pct }}%"></div>
             </div>
-            <p class="progress-hint">{{ points_needed }} points to {{ next_reward.name }}</p>
+            <p class="progress-hint">{{ _('%(points)s points to %(reward)s', points=points_needed, reward=next_reward.name) }}</p>
         </div>
         {% else %}
         <div class="loyalty-progress-section">
-            <p style="color:rgba(255,255,255,0.45);font-size:0.85rem;">You've unlocked all rewards! 🎉</p>
+            <p style="color:rgba(255,255,255,0.45);font-size:0.85rem;">{{ _("You've unlocked all rewards! 🎉") }}</p>
         </div>
         {% endif %}
 
-        <a href="{{ url_for('main.customer_loyalty_points') }}" class="loyalty-view-btn">View All Rewards</a>
+        <a href="{{ url_for('main.customer_loyalty_points') }}" class="loyalty-view-btn">{{ _('View All Rewards') }}</a>
     </div>
 
 </div>

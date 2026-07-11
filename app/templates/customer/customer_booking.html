@@ -1,6 +1,6 @@
 {% extends "customer_base.html" %}
 
-{% block title %}Book an Appointment | DahaCare
+{% block title %}{{ _('Book an Appointment') }} | DahaCare
 {% endblock %}
 
 {% block extra_css %}
@@ -25,19 +25,19 @@
       </div>
       <div class="bk-step-dot-wrap" data-step="1">
         <div class="bk-step-dot bk-step-dot--active" id="step-circle-1">1</div>
-        <span class="bk-step-label bk-step-label--active">Service</span>
+        <span class="bk-step-label bk-step-label--active">{{ _('Service') }}</span>
       </div>
       <div class="bk-step-dot-wrap" data-step="2">
         <div class="bk-step-dot" id="step-circle-2">2</div>
-        <span class="bk-step-label">Stylist</span>
+        <span class="bk-step-label">{{ _('Stylist') }}</span>
       </div>
       <div class="bk-step-dot-wrap" data-step="3">
         <div class="bk-step-dot" id="step-circle-3">3</div>
-        <span class="bk-step-label">Date</span>
+        <span class="bk-step-label">{{ _('Date') }}</span>
       </div>
       <div class="bk-step-dot-wrap" data-step="4">
         <div class="bk-step-dot" id="step-circle-4">4</div>
-        <span class="bk-step-label">Checkout</span>
+        <span class="bk-step-label">{{ _('Checkout') }}</span>
       </div>
     </div>
   </div>
@@ -56,14 +56,14 @@
          data-name, data-duration, data-price → JS update summary ở step 5 #}
       <section class="bk-step bk-step--active" id="step-1">
         <div class="bk-step-head">
-          <h1 class="bk-step-title">Select a Service</h1>
-          <p class="bk-step-sub">Choose from our curated selection of luxury treatments.</p>
+          <h1 class="bk-step-title">{{ _('Select a Service') }}</h1>
+          <p class="bk-step-sub">{{ _('Choose from our curated selection of luxury treatments.') }}</p>
         </div>
 
         <div class="bk-chips">
-          <button type="button" class="bk-chip bk-chip--active" data-category="all">All Services</button>
+          <button type="button" class="bk-chip bk-chip--active" data-category="all">{{ _('All Services') }}</button>
           {% for category in categories %}
-          <button type="button" class="bk-chip" data-category="{{ category['slug'] }}">{{ category['name'] }}</button>
+          <button type="button" class="bk-chip" data-category="{{ category['slug'] }}">{{ tr(category, 'name') }}</button>
           {% endfor %}
         </div>
 
@@ -74,7 +74,7 @@
           <label class="bk-svc-label service-item" data-category="{{ category['slug'] }}">
             <input class="bk-sr-only service-radio" type="radio" name="service_id"
                    value="{{ service['id'] }}"
-                   data-name="{{ service['name'] }}"
+                   data-name="{{ tr(service, 'name') }}"
                    data-duration="{{ service['duration_minutes'] }}"
                    data-price="{{ service['price'] }}"
                    data-points="{{ service['points'] }}"
@@ -83,7 +83,7 @@
             <div class="bk-svc-card">
               <div class="bk-svc-thumb">
                 {% if service['image'] %}
-                <img src="{{ url_for('static', filename='uploads/services/' + service['image']) }}" alt="{{ service['name'] }}">
+                <img src="{{ url_for('static', filename='uploads/services/' + service['image']) }}" alt="{{ tr(service, 'name') }}">
                 {% else %}
                 <div class="bk-svc-thumb bk-svc-thumb--fallback">
                   <span class="material-symbols-outlined">spa</span>
@@ -92,13 +92,13 @@
               </div>
               <div class="bk-svc-body">
                 <div class="bk-svc-row">
-                  <h3 class="bk-svc-name">{{ service['name'] }}</h3>
+                  <h3 class="bk-svc-name">{{ tr(service, 'name') }}</h3>
                   <span class="bk-svc-price">€{{ service['price'] }}</span>
                 </div>
-                <p class="bk-svc-desc">{{ service['description'] }}</p>
+                <p class="bk-svc-desc">{{ tr(service, 'description') }}</p>
                 <div class="bk-svc-meta">
                   <span class="material-symbols-outlined bk-svc-meta-icon">schedule</span>
-                  {{ service['duration_minutes'] }} min
+                  {{ service['duration_minutes'] }} {{ _('min') }}
                 </div>
               </div>
               <div class="bk-radio-check">
@@ -112,7 +112,7 @@
 
         <div class="bk-nav bk-nav--end">
           <button type="button" class="bk-btn-next">
-            Continue <span class="material-symbols-outlined">arrow_forward</span>
+            {{ _('Continue') }} <span class="material-symbols-outlined">arrow_forward</span>
           </button>
         </div>
       </section>
@@ -123,8 +123,8 @@
          Selected: JS toggle bk-staff-card--selected #}
       <section class="bk-step" id="step-2">
         <div class="bk-step-head">
-          <h2 class="bk-step-title">Choose a Professional</h2>
-          <p class="bk-step-sub">Select your preferred stylist or let us match you.</p>
+          <h2 class="bk-step-title">{{ _('Choose a Professional') }}</h2>
+          <p class="bk-step-sub">{{ _('Select your preferred stylist or let us match you.') }}</p>
         </div>
 
         <div class="bk-staff-grid">
@@ -135,8 +135,8 @@
               <div class="bk-staff-avatar bk-staff-avatar--empty">
                 <span class="material-symbols-outlined">group</span>
               </div>
-              <h3 class="bk-staff-name">No Preference</h3>
-              <p class="bk-staff-role">Any available specialist</p>
+              <h3 class="bk-staff-name">{{ _('No Preference') }}</h3>
+              <p class="bk-staff-role">{{ _('Any available specialist') }}</p>
             </div>
           </label>
 
@@ -154,7 +154,7 @@
               </div>
               {% endif %}
               <h3 class="bk-staff-name">{{ staff['full_name'] }}</h3>
-              <p class="bk-staff-role">{{ staff['role'] or 'Nail Technician' }}</p>
+              <p class="bk-staff-role">{{ staff['role'] or _('Nail Technician') }}</p>
             </div>
           </label>
           {% endfor %}
@@ -163,10 +163,10 @@
 
         <div class="bk-nav">
           <button type="button" class="bk-btn-back">
-            <span class="material-symbols-outlined">arrow_back</span> Back
+            <span class="material-symbols-outlined">arrow_back</span> {{ _('Back') }}
           </button>
           <button type="button" class="bk-btn-next">
-            Continue <span class="material-symbols-outlined">arrow_forward</span>
+            {{ _('Continue') }} <span class="material-symbols-outlined">arrow_forward</span>
           </button>
         </div>
       </section>
@@ -179,34 +179,34 @@
          Chọn xong → cập nhật hidden-booking-date và hidden-start-time #}
       <section class="bk-step" id="step-3">
         <div class="bk-step-head">
-          <h2 class="bk-step-title">Select Date &amp; Time</h2>
-          <p class="bk-step-sub">Pick a date, then choose an available slot.</p>
+          <h2 class="bk-step-title">{{ _('Select Date & Time') }}</h2>
+          <p class="bk-step-sub">{{ _('Pick a date, then choose an available slot.') }}</p>
         </div>
 
         <div class="bk-dt-grid">
 
           <div class="bk-cal-panel">
             <div class="bk-cal-nav">
-              <button type="button" id="prevMonth" class="bk-cal-nav-btn" aria-label="Previous month">
+              <button type="button" id="prevMonth" class="bk-cal-nav-btn" aria-label="{{ _('Previous month') }}">
                 <span class="material-symbols-outlined">chevron_left</span>
               </button>
               <h3 class="bk-cal-month" id="calendarMonthLabel"></h3>
-              <button type="button" id="nextMonth" class="bk-cal-nav-btn" aria-label="Next month">
+              <button type="button" id="nextMonth" class="bk-cal-nav-btn" aria-label="{{ _('Next month') }}">
                 <span class="material-symbols-outlined">chevron_right</span>
               </button>
             </div>
             <div class="bk-cal-weekdays">
-              <span>MO</span><span>TU</span><span>WE</span>
-              <span>TH</span><span>FR</span><span>SA</span><span>SU</span>
+              <span>{{ _('MO') }}</span><span>{{ _('TU') }}</span><span>{{ _('WE') }}</span>
+              <span>{{ _('TH') }}</span><span>{{ _('FR') }}</span><span>{{ _('SA') }}</span><span>{{ _('SU') }}</span>
             </div>
             <div id="calendar" class="bk-cal-grid"></div>
           </div>
 
           <div class="bk-time-panel">
-            <h3 class="bk-time-heading" id="timeslot-heading">Available Times</h3>
-            <p class="bk-time-sub" id="timeslot-sub">Select a date to see available times</p>
+            <h3 class="bk-time-heading" id="timeslot-heading">{{ _('Available Times') }}</h3>
+            <p class="bk-time-sub" id="timeslot-sub">{{ _('Select a date to see available times') }}</p>
             <div class="bk-time-grid" id="timeSlotGrid">
-              <p class="bk-time-placeholder" id="timeslot-placeholder">Please select a date first</p>
+              <p class="bk-time-placeholder" id="timeslot-placeholder">{{ _('Please select a date first') }}</p>
             </div>
           </div>
 
@@ -214,10 +214,10 @@
 
         <div class="bk-nav">
           <button type="button" class="bk-btn-back">
-            <span class="material-symbols-outlined">arrow_back</span> Back
+            <span class="material-symbols-outlined">arrow_back</span> {{ _('Back') }}
           </button>
           <button type="button" class="bk-btn-next">
-            Continue <span class="material-symbols-outlined">arrow_forward</span>
+            {{ _('Continue') }} <span class="material-symbols-outlined">arrow_forward</span>
           </button>
         </div>
       </section>
@@ -229,21 +229,21 @@
          Confirm → form submit → main.create_booking → /verify-email #}
       <section class="bk-step" id="step-4">
         <div class="bk-step-head">
-          <h2 class="bk-step-title">Confirm &amp; Pay</h2>
+          <h2 class="bk-step-title">{{ _('Confirm & Pay') }}</h2>
         </div>
 
         <div class="bk-checkout-grid">
 
           <div class="bk-payment-col">
-            <h3 class="bk-payment-heading">Payment Method</h3>
+            <h3 class="bk-payment-heading">{{ _('Payment Method') }}</h3>
 
             <label class="bk-payment-label">
               <input checked class="bk-sr-only" type="radio" name="payment_method" value="pay_at_salon">
               <div class="bk-payment-card">
                 <span class="material-symbols-outlined bk-payment-icon">storefront</span>
                 <div class="bk-payment-body">
-                  <h4 class="bk-payment-title">Pay at Salon</h4>
-                  <p class="bk-payment-desc">Pay after your service is completed</p>
+                  <h4 class="bk-payment-title">{{ _('Pay at Salon') }}</h4>
+                  <p class="bk-payment-desc">{{ _('Pay after your service is completed') }}</p>
                 </div>
                 <div class="bk-payment-radio">
                   <span class="material-symbols-outlined bk-payment-radio-check">check</span>
@@ -256,8 +256,8 @@
               <div class="bk-payment-card">
                 <span class="material-symbols-outlined bk-payment-icon">credit_card</span>
                 <div class="bk-payment-body">
-                  <h4 class="bk-payment-title">Online Payment</h4>
-                  <p class="bk-payment-desc">Pay now securely by card</p>
+                  <h4 class="bk-payment-title">{{ _('Online Payment') }}</h4>
+                  <p class="bk-payment-desc">{{ _('Pay now securely by card') }}</p>
                 </div>
                 <div class="bk-payment-radio">
                   <span class="material-symbols-outlined bk-payment-radio-check">check</span>
@@ -267,49 +267,48 @@
 
             <div class="bk-info-note">
               <span class="material-symbols-outlined bk-info-note-icon">info</span>
-              <span>You'll receive a verification email after confirming. Your booking will be
-                <strong>pending</strong> until the salon confirms your appointment.</span>
+              <span>{{ _("You'll receive a verification email after confirming. Your booking will be") }} <strong>{{ _('pending') }}</strong> {{ _('until the salon confirms your appointment.') }}</span>
             </div>
           </div>
 
           <div class="bk-summary-col">
             <div class="bk-summary-card">
-              <h3 class="bk-summary-heading">Booking Summary</h3>
+              <h3 class="bk-summary-heading">{{ _('Booking Summary') }}</h3>
               <div class="bk-summary-rows">
                 <div class="bk-summary-row">
-                  <span class="bk-summary-key">Service</span>
+                  <span class="bk-summary-key">{{ _('Service') }}</span>
                   <span class="bk-summary-val" id="summary-service-name">—</span>
                 </div>
                 <div class="bk-summary-row">
-                  <span class="bk-summary-key">Duration</span>
+                  <span class="bk-summary-key">{{ _('Duration') }}</span>
                   <span class="bk-summary-val" id="summary-duration">—</span>
                 </div>
                 <div class="bk-summary-row">
-                  <span class="bk-summary-key">Stylist</span>
-                  <span class="bk-summary-val" id="summary-staff">No Preference</span>
+                  <span class="bk-summary-key">{{ _('Stylist') }}</span>
+                  <span class="bk-summary-val" id="summary-staff">{{ _('No Preference') }}</span>
                 </div>
                 <div class="bk-summary-row">
-                  <span class="bk-summary-key">Date &amp; Time</span>
+                  <span class="bk-summary-key">{{ _('Date & Time') }}</span>
                   <span class="bk-summary-val" id="summary-datetime">—</span>
                 </div>
               </div>
               <div class="bk-summary-price-rows">
                 <div class="bk-summary-price-row">
-                  <span>Subtotal</span><span id="summary-subtotal">€0.00</span>
+                  <span>{{ _('Subtotal') }}</span><span id="summary-subtotal">€0.00</span>
                 </div>
                 <div class="bk-summary-price-row">
-                  <span>VAT (25.5%)</span><span id="summary-vat">€0.00</span>
+                  <span>{{ _('VAT (25.5%%)') }}</span><span id="summary-vat">€0.00</span>
                 </div>
                 <div class="bk-summary-total">
-                  <span>Total</span>
+                  <span>{{ _('Total') }}</span>
                   <span id="summary-total">€0.00</span>
                 </div>
               </div>
               <div class="bk-summary-points-nudge bk-summary-points-nudge--customer">
                 <span class="material-symbols-outlined">stars</span>
-                <span>You'll earn <strong id="summary-points">—</strong> loyalty points with this booking.</span>
+                <span>{{ _("You'll earn") }} <strong id="summary-points">—</strong> {{ _('loyalty points with this booking.') }}</span>
               </div>
-              <p class="bk-summary-policy">By confirming, you agree to our 24h cancellation policy.</p>
+              <p class="bk-summary-policy">{{ _('By confirming, you agree to our 24h cancellation policy.') }}</p>
             </div>
           </div>
 
@@ -317,10 +316,10 @@
 
         <div class="bk-nav">
           <button type="button" class="bk-btn-back">
-            <span class="material-symbols-outlined">arrow_back</span> Back
+            <span class="material-symbols-outlined">arrow_back</span> {{ _('Back') }}
           </button>
           <button type="submit" class="bk-btn-confirm" id="confirm-btn">
-            Confirm &amp; continue <span class="material-symbols-outlined">arrow_forward</span>
+            {{ _('Confirm & continue') }} <span class="material-symbols-outlined">arrow_forward</span>
           </button>
         </div>
       </section>
@@ -407,15 +406,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const p   = parseFloat(svc.dataset.price) || 0;
             const vat = p * VAT;
             document.getElementById('summary-service-name').textContent = svc.dataset.name || '—';
-            document.getElementById('summary-duration').textContent     = svc.dataset.duration ? `${svc.dataset.duration} min` : '—';
+            document.getElementById('summary-duration').textContent     = svc.dataset.duration ? `${svc.dataset.duration} {{ _('min') }}` : '—';
             document.getElementById('summary-subtotal').textContent     = `€${p.toFixed(2)}`;
             document.getElementById('summary-vat').textContent          = `€${vat.toFixed(2)}`;
             document.getElementById('summary-total').textContent        = `€${(p + vat).toFixed(2)}`;
             const pts = Math.round((parseFloat(svc.dataset.points) || 0) * (CALENDAR_CONFIG.pointsMultiplier || 1));
             const ptsEl = document.getElementById('summary-points');
-            if (ptsEl) ptsEl.textContent = pts > 0 ? `${pts} pts` : '—';
+            if (ptsEl) ptsEl.textContent = pts > 0 ? `${pts} {{ _('pts') }}` : '—';
         }
-        if (stf) document.getElementById('summary-staff').textContent = stf.dataset.name || 'No Preference';
+        if (stf) document.getElementById('summary-staff').textContent = stf.dataset.name || '{{ _("No Preference") }}';
     }
     document.querySelectorAll('.service-radio, input[name="staff_id"]').forEach(r => r.addEventListener('change', updateSummary));
     updateSummary();
@@ -423,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('confirm-btn')?.closest('form').addEventListener('submit', () => {
         const btn = document.getElementById('confirm-btn');
         btn.disabled = true;
-        btn.textContent = 'Processing…';
+        btn.textContent = '{{ _("Processing…") }}';
     });
 
     document.querySelectorAll('.bk-staff-label input:checked').forEach(r => {
@@ -514,32 +513,32 @@ document.addEventListener('DOMContentLoaded', () => {
     function tryLoadSlots() {
         const svcEl = document.querySelector('.service-radio:checked');
         if (!svcEl) {
-            timeGridEl.innerHTML = '<p class="bk-time-placeholder">Please select a service first.</p>';
+            timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('Please select a service first.') }}</p>';
             return;
         }
         if (!selectedDate) {
-            timeGridEl.innerHTML = '<p class="bk-time-placeholder">Please select a date first.</p>';
+            timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('Please select a date first.') }}</p>';
             return;
         }
         loadSlots(fmtDate(selectedDate), svcEl.value, document.querySelector('input[name="staff_id"]:checked')?.value || 0);
     }
 
     async function loadSlots(dateStr, svcId, stfId) {
-        timeGridEl.innerHTML = '<p class="bk-time-placeholder">Loading...</p>';
+        timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('Loading...') }}</p>';
         try {
             const res  = await fetch(`${CALENDAR_CONFIG.availableSlotUrl}?booking_date=${dateStr}&staff_id=${stfId}&service_id=${svcId}`);
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || 'Failed');
             renderSlots(data.available_slots || []);
         } catch {
-            timeGridEl.innerHTML = '<p class="bk-time-placeholder">Could not load available times.</p>';
+            timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('Could not load available times.') }}</p>';
         }
     }
 
     function renderSlots(slots) {
         timeGridEl.innerHTML = '';
         if (!slots.length) {
-            timeGridEl.innerHTML = '<p class="bk-time-placeholder">No available slots for this date.</p>';
+            timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('No available slots for this date.') }}</p>';
             return;
         }
         slots.forEach(slot => {

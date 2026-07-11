@@ -35,7 +35,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title %}Staff — DahaCare{% endblock %}</title>
+<title>{% block title %}{{ _('Staff') }} — DahaCare{% endblock %}</title>
 
 {# ── Fonts / Icons ── #}
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -285,7 +285,7 @@ body {
         </div>
         <div>
             <div class="sf-sidebar__logo-name">DahaCare</div>
-            <div class="sf-sidebar__logo-sub">Staff</div>
+            <div class="sf-sidebar__logo-sub">{{ _('Staff') }}</div>
         </div>
     </div>
 
@@ -293,15 +293,15 @@ body {
     <nav class="sf-sidebar__nav">
         <a href="{{ url_for('main.staff_dashboard') }}"
            class="sf-nav-item {% if request.endpoint == 'main.staff_dashboard' %}sf-nav-item--active{% endif %}">
-            <i class="ti ti-calendar-event"></i><span>Lịch của tôi</span>
+            <i class="ti ti-calendar-event"></i><span>{{ _('Lịch của tôi') }}</span>
         </a>
         <a href="{{ url_for('main.staff_history') }}"
            class="sf-nav-item {% if request.endpoint == 'main.staff_history' %}sf-nav-item--active{% endif %}">
-            <i class="ti ti-clock-hour-4"></i><span>Lịch sử</span>
+            <i class="ti ti-clock-hour-4"></i><span>{{ _('Lịch sử') }}</span>
         </a>
         <a href="{{ url_for('main.staff_profile') }}"
            class="sf-nav-item {% if request.endpoint == 'main.staff_profile' %}sf-nav-item--active{% endif %}">
-            <i class="ti ti-user"></i><span>Hồ sơ</span>
+            <i class="ti ti-user"></i><span>{{ _('Hồ sơ') }}</span>
         </a>
     </nav>
 
@@ -313,13 +313,13 @@ body {
         <div class="sf-sidebar__avatar">{{ current_staff.name[:2] | upper }}</div>
         <div class="sf-sidebar__user-info">
             <div class="sf-sidebar__user-name">{{ current_staff.name }}</div>
-            <div class="sf-sidebar__user-role">{{ current_staff.role or 'Staff' }}</div>
+            <div class="sf-sidebar__user-role">{{ current_staff.role or _('Staff') }}</div>
         </div>
     </div>
 
     {# Logout #}
     <a href="{{ url_for('main.admin_logout') }}" class="sf-logout-btn">
-        <i class="ti ti-logout"></i><span>Đăng xuất</span>
+        <i class="ti ti-logout"></i><span>{{ _('Đăng xuất') }}</span>
     </a>
 
 </aside>

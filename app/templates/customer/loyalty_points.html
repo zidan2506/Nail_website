@@ -1062,9 +1062,9 @@
 
     <!-- ===== Header ===== -->
     <div class="lp-header">
-        <span class="lp-label">Rewards Club</span>
-        <h1>Loyalty Points</h1>
-        <p>Your journey to effortless beauty, rewarded.</p>
+        <span class="lp-label">{{ _('Rewards Club') }}</span>
+        <h1>{{ _('Loyalty Points') }}</h1>
+        <p>{{ _('Your journey to effortless beauty, rewarded.') }}</p>
     </div>
 
     <!-- ===== Top Bento: Balance + Mission ===== -->
@@ -1086,9 +1086,9 @@
         <div class="balance-card {{ tier_class | default('tier-silver') }}">
             <div class="balance-top">
                 <div>
-                    <p class="balance-label">Current Balance</p>
+                    <p class="balance-label">{{ _('Current Balance') }}</p>
                     <p class="balance-amount">
-                        {{ balance | default(1250) | int | format_number }}<span>pts</span>
+                        {{ balance | default(1250) | int | format_number }}<span>{{ _('pts') }}</span>
                     </p>
                 </div>
                 <div class="balance-icon">⭐</div>
@@ -1097,10 +1097,10 @@
             <div class="balance-progress">
                 <div class="progress-meta">
                     <span class="tier-badge {{ badge_class | default('badge-silver') }}">
-                        {{ tier_name | default('Silver') }} Tier
+                        {{ tier_name | default('Silver') }} {{ _('Tier') }}
                     </span>
                     <span class="progress-label">
-                        {{ (next_reward_pts | default(2500)) - (balance | default(1250)) }} pts to unlock {{ next_reward_name | default('Free Gel Manicure') }}
+                        {{ _('%(pts)s pts to unlock %(reward)s', pts=((next_reward_pts|default(2500))-(balance|default(1250))), reward=(next_reward_name|default('Free Gel Manicure'))) }}
                     </span>
                 </div>
                 <div class="progress-track">
@@ -1109,9 +1109,9 @@
                 </div>
                 <div class="progress-footer">
                     <span class="next-reward-text">
-                        Next reward: {{ next_reward_name | default('Free Gel Manicure') }} &bull; {{ next_reward_pts | default(2500) }} pts
+                        {{ _('Next reward:') }} {{ next_reward_name | default('Free Gel Manicure') }} &bull; {{ next_reward_pts | default(2500) }} {{ _('pts') }}
                     </span>
-                    <a class="view-benefits-link" href="{{ url_for('main.tier_benefits') }}">View Tier Benefits</a>
+                    <a class="view-benefits-link" href="{{ url_for('main.tier_benefits') }}">{{ _('View Tier Benefits') }}</a>
                 </div>
             </div>
         </div>
@@ -1149,9 +1149,9 @@
                     {% endfor %}
 
                 </div>
-                <div class="mission-card-label">Earn Points <span>✦</span></div>
-                <button class="mission-arrow prev" id="missionPrev" aria-label="Previous">&#8592;</button>
-                <button class="mission-arrow next" id="missionNext" aria-label="Next">&#8594;</button>
+                <div class="mission-card-label">{{ _('Earn Points') }} <span>✦</span></div>
+                <button class="mission-arrow prev" id="missionPrev" aria-label="{{ _('Previous') }}">&#8592;</button>
+                <button class="mission-arrow next" id="missionNext" aria-label="{{ _('Next') }}">&#8594;</button>
 
                 <div class="carousel-dots" id="carouselDots">
                     {% for m in missions %}
@@ -1167,9 +1167,9 @@
     <!-- ===== Available Rewards ===== -->
     <div style="margin-top: 40px;">
         <div class="lp-section-header">
-            <h2>Available Vouchers</h2>
+            <h2>{{ _('Available Vouchers') }}</h2>
             <div class="lp-section-divider"></div>
-            <a href="{{ url_for('main.all_rewards') }}">See All</a>
+            <a href="{{ url_for('main.all_rewards') }}">{{ _('See All') }}</a>
         </div>
 
         <div class="rewards-grid">
@@ -1200,9 +1200,9 @@
                     {% elif reward.lock_reason == 'limit' %}
                         <div class="reward-lock-overlay">✅</div>
                     {% elif reward.available %}
-                        <span class="reward-badge">Available</span>
+                        <span class="reward-badge">{{ _('Available') }}</span>
                         {% if reward.stock_left is not none and reward.stock_left <= 5 %}
-                        <span class="reward-badge-stock">{{ reward.stock_left }} left</span>
+                        <span class="reward-badge-stock">{{ reward.stock_left }} {{ _('left') }}</span>
                         {% endif %}
                     {% endif %}
                 </div>
@@ -1210,31 +1210,31 @@
                 <p>{{ reward.desc }}</p>
                 <div class="reward-meta">
                     {% if reward.redeems_left is not none and reward.redeems_left > 0 %}
-                    <span class="reward-meta-tag tag-limit">{{ reward.redeems_left }} redeem{{ 's' if reward.redeems_left != 1 }} left</span>
+                    <span class="reward-meta-tag tag-limit">{{ reward.redeems_left }} {{ _('redeems left') }}</span>
                     {% endif %}
                     {% if reward.stock_left is not none %}
-                    <span class="reward-meta-tag tag-stock">{{ reward.stock_left }} in stock</span>
+                    <span class="reward-meta-tag tag-stock">{{ reward.stock_left }} {{ _('in stock') }}</span>
                     {% endif %}
                 </div>
                 <div class="reward-footer">
                     <span class="reward-pts {% if reward.locked %}locked{% endif %}">
-                        {{ reward.pts | int }} pts
+                        {{ reward.pts | int }} {{ _('pts') }}
                     </span>
                     {% if reward.lock_reason == 'points' %}
-                        <span class="locked-label">Not enough pts</span>
+                        <span class="locked-label">{{ _('Not enough pts') }}</span>
                     {% elif reward.lock_reason == 'stock' %}
-                        <span class="locked-label" style="color:#dc2626;">Out of stock</span>
+                        <span class="locked-label" style="color:#dc2626;">{{ _('Out of stock') }}</span>
                     {% elif reward.lock_reason == 'limit' %}
-                        <span class="locked-label" style="color:#16a34a;">Limit reached</span>
+                        <span class="locked-label" style="color:#16a34a;">{{ _('Limit reached') }}</span>
                     {% elif reward.lock_reason == 'cooldown' %}
                         <div>
-                            <span class="locked-label" style="color:#16a34a;">Limit reached</span>
-                            <span style="display:block;font-size:0.65rem;color:#73636a;margin-top:2px;">renew in {{ reward.cooldown_remaining }} day{{ 's' if reward.cooldown_remaining != 1 }}</span>
+                            <span class="locked-label" style="color:#16a34a;">{{ _('Limit reached') }}</span>
+                            <span style="display:block;font-size:0.65rem;color:#73636a;margin-top:2px;">{{ _('renew in') }} {{ reward.cooldown_remaining }} {{ _('days') }}</span>
                         </div>
                     {% else %}
                         <button type="button" class="redeem-btn"
                                 onclick="openRedeemModal({{ reward.id }}, '{{ reward.name | e }}', {{ reward.pts | int }}, {{ balance | default(0) | int }}, '')">
-                            Redeem
+                            {{ _('Redeem') }}
                         </button>
                     {% endif %}
                 </div>
@@ -1248,8 +1248,8 @@
 
         <!-- Tab nav -->
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="switchTab('history', this)">Points History</button>
-            <button class="tab-btn" onclick="switchTab('vouchers', this)">My Vouchers</button>
+            <button class="tab-btn active" onclick="switchTab('history', this)">{{ _('Points History') }}</button>
+            <button class="tab-btn" onclick="switchTab('vouchers', this)">{{ _('My Vouchers') }}</button>
         </div>
 
         <!-- Tab: Points History -->
@@ -1277,7 +1277,7 @@
                 </div>
                 {% endfor %}
             </div>
-            <button class="load-more-btn">Load More History</button>
+            <button class="load-more-btn">{{ _('Load More History') }}</button>
         </div>
 
         <!-- Tab: My Vouchers -->
@@ -1304,9 +1304,9 @@
                     </div>
                     <div class="voucher-right">
                         <span class="voucher-status-badge {{ v.status }}">
-                            {% if v.status == 'active' %}Active
-                            {% elif v.status == 'used' %}Used
-                            {% else %}Expired{% endif %}
+                            {% if v.status == 'active' %}{{ _('Active') }}
+                            {% elif v.status == 'used' %}{{ _('Used') }}
+                            {% else %}{{ _('Expired') }}{% endif %}
                         </span>
                     </div>
                 </div>
@@ -1315,8 +1315,8 @@
             {% else %}
             <div class="voucher-empty">
                 <span>🎁</span>
-                You haven't redeemed any rewards yet.<br>
-                Start earning points to unlock vouchers!
+                {{ _("You haven't redeemed any rewards yet.") }}<br>
+                {{ _('Start earning points to unlock vouchers!') }}
             </div>
             {% endif %}
         </div>
@@ -1335,15 +1335,15 @@
         <h3 class="vd-name" id="vd-name"></h3>
         <p class="vd-desc" id="vd-desc"></p>
         <div class="vd-rows">
-            <div class="vd-row"><span class="vd-row-label">Status</span><span class="vd-row-value" id="vd-status"></span></div>
-            <div class="vd-row"><span class="vd-row-label">Points spent</span><span class="vd-row-value pink" id="vd-pts"></span></div>
-            <div class="vd-row"><span class="vd-row-label">Redeemed on</span><span class="vd-row-value" id="vd-redeemed"></span></div>
-            <div class="vd-row"><span class="vd-row-label">Expires</span><span class="vd-row-value" id="vd-expires"></span></div>
+            <div class="vd-row"><span class="vd-row-label">{{ _('Status') }}</span><span class="vd-row-value" id="vd-status"></span></div>
+            <div class="vd-row"><span class="vd-row-label">{{ _('Points spent') }}</span><span class="vd-row-value pink" id="vd-pts"></span></div>
+            <div class="vd-row"><span class="vd-row-label">{{ _('Redeemed on') }}</span><span class="vd-row-value" id="vd-redeemed"></span></div>
+            <div class="vd-row"><span class="vd-row-label">{{ _('Expires') }}</span><span class="vd-row-value" id="vd-expires"></span></div>
         </div>
         <div class="vd-divider"></div>
         <div class="vd-code-block" id="vd-code-block">
-            <div><p class="vd-code-label">Voucher Code</p><p class="vd-code-value" id="vd-code-value"></p></div>
-            <button class="vd-copy-btn" id="vd-copy-btn" onclick="copyCode()">Copy</button>
+            <div><p class="vd-code-label">{{ _('Voucher Code') }}</p><p class="vd-code-value" id="vd-code-value"></p></div>
+            <button class="vd-copy-btn" id="vd-copy-btn" onclick="copyCode()">{{ _('Copy') }}</button>
         </div>
         <p class="vd-note" id="vd-note"></p>
     </div>
@@ -1369,16 +1369,16 @@ function openVoucherDetail(el) {
     document.getElementById('vd-icon-wrap').className = 'vd-icon-wrap ' + status;
     document.getElementById('vd-icon-wrap').textContent = d.icon;
     document.getElementById('vd-name').textContent = d.name;
-    document.getElementById('vd-desc').textContent = d.desc || 'Show this code to our staff when you visit.';
+    document.getElementById('vd-desc').textContent = d.desc || '{{ _("Show this code to our staff when you visit.") }}';
 
     // Status label
-    const statusMap = { active: '✦ Active', used: 'Used', expired: 'Expired' };
+    const statusMap = { active: '✦ {{ _("Active") }}', used: '{{ _("Used") }}', expired: '{{ _("Expired") }}' };
     const statusColor = { active: 'green', used: 'muted', expired: 'muted' };
     const statusEl = document.getElementById('vd-status');
     statusEl.textContent = statusMap[status] || status;
     statusEl.className = 'vd-row-value ' + (statusColor[status] || '');
 
-    document.getElementById('vd-pts').textContent = d.pts ? '−' + d.pts + ' pts' : '—';
+    document.getElementById('vd-pts').textContent = d.pts ? '−' + d.pts + ' {{ _("pts") }}' : '—';
     document.getElementById('vd-redeemed').textContent = d.redeemed || '—';
     document.getElementById('vd-expires').textContent = d.expires || '—';
     document.getElementById('vd-code-value').textContent = d.code;
@@ -1390,16 +1390,16 @@ function openVoucherDetail(el) {
     // Note text
     const noteEl = document.getElementById('vd-note');
     if (status === 'active') {
-        noteEl.textContent = 'Show this code to our staff at your next visit to redeem.';
+        noteEl.textContent = '{{ _("Show this code to our staff at your next visit to redeem.") }}';
     } else if (status === 'used') {
-        noteEl.textContent = 'This voucher has already been used.';
+        noteEl.textContent = '{{ _("This voucher has already been used.") }}';
     } else {
-        noteEl.textContent = 'This voucher has expired and is no longer valid.';
+        noteEl.textContent = '{{ _("This voucher has expired and is no longer valid.") }}';
     }
 
     // Reset copy btn
     const copyBtn = document.getElementById('vd-copy-btn');
-    copyBtn.textContent = 'Copy';
+    copyBtn.textContent = '{{ _("Copy") }}';
     copyBtn.className = 'vd-copy-btn';
 
     document.getElementById('voucherModal').classList.add('open');
@@ -1419,10 +1419,10 @@ function copyCode() {
     const code = document.getElementById('vd-code-value').textContent;
     navigator.clipboard.writeText(code).then(() => {
         const btn = document.getElementById('vd-copy-btn');
-        btn.textContent = '✓ Copied';
+        btn.textContent = '✓ {{ _("Copied") }}';
         btn.classList.add('copied');
         setTimeout(() => {
-            btn.textContent = 'Copy';
+            btn.textContent = '{{ _("Copy") }}';
             btn.classList.remove('copied');
         }, 2000);
     });

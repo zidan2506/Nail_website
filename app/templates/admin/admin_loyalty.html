@@ -1142,7 +1142,11 @@
              data-status="{{ 'active' if v.is_active else 'hidden' }}"
              data-id="{{ v.id }}"
              data-cname="{{ v.name | e }}"
+             data-cname-fi="{{ v.name_fi or '' | e }}"
+             data-cname-vi="{{ v.name_vi or '' | e }}"
              data-description="{{ v.description or '' | e }}"
+             data-description-fi="{{ v.description_fi or '' | e }}"
+             data-description-vi="{{ v.description_vi or '' | e }}"
              data-cost="{{ v.cost }}"
              data-stock="{{ v.stock if v.stock is not none else '' }}"
              data-max-redeems="{{ v.max_redeems_per_customer if v.max_redeems_per_customer is not none else '' }}"
@@ -1384,13 +1388,33 @@
 
             <div class="ly-modal__body">
                 <div class="ly-form-group">
-                    <label class="ly-form-label" for="lyVoucher_name">Tên Voucher *</label>
+                    <label class="ly-form-label" for="lyVoucher_name">Tên Voucher (English) *</label>
                     <input type="text" name="name" id="lyVoucher_name" class="ly-form-input" required>
                 </div>
 
                 <div class="ly-form-group">
-                    <label class="ly-form-label" for="lyVoucher_description">Mô tả</label>
+                    <label class="ly-form-label" for="lyVoucher_name_fi">Tên Voucher (Suomi)</label>
+                    <input type="text" name="name_fi" id="lyVoucher_name_fi" class="ly-form-input">
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyVoucher_name_vi">Tên Voucher (Tiếng Việt)</label>
+                    <input type="text" name="name_vi" id="lyVoucher_name_vi" class="ly-form-input">
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyVoucher_description">Mô tả (English)</label>
                     <textarea name="description" id="lyVoucher_description" class="ly-form-textarea" rows="3"></textarea>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyVoucher_description_fi">Mô tả (Suomi)</label>
+                    <textarea name="description_fi" id="lyVoucher_description_fi" class="ly-form-textarea" rows="3"></textarea>
+                </div>
+
+                <div class="ly-form-group">
+                    <label class="ly-form-label" for="lyVoucher_description_vi">Mô tả (Tiếng Việt)</label>
+                    <textarea name="description_vi" id="lyVoucher_description_vi" class="ly-form-textarea" rows="3"></textarea>
                 </div>
 
                 <div class="ly-form-group">
@@ -1645,7 +1669,11 @@ function openEditVoucherModal(card) {
     document.getElementById('lyVoucherModalTitle').textContent = 'Chỉnh sửa Voucher';
     document.getElementById('lyVoucherForm').action = buildActionUrl(LY_ROUTES.updateVoucher, d.id);
     document.getElementById('lyVoucher_name').value = d.cname;
+    document.getElementById('lyVoucher_name_fi').value = d.cnameFi || '';
+    document.getElementById('lyVoucher_name_vi').value = d.cnameVi || '';
     document.getElementById('lyVoucher_description').value = d.description;
+    document.getElementById('lyVoucher_description_fi').value = d.descriptionFi || '';
+    document.getElementById('lyVoucher_description_vi').value = d.descriptionVi || '';
     document.getElementById('lyVoucher_cost').value = d.cost;
     document.getElementById('lyVoucher_stock').value = d.stock;
     document.getElementById('lyVoucher_maxRedeems').value = d.maxRedeems;

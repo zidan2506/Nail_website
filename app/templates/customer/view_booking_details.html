@@ -1,6 +1,6 @@
 {% extends "customer_base.html" %}
 
-{% block title %}Book Details{% endblock %}
+{% block title %}{{ _('Book Details') }}{% endblock %}
 
 {% block nav_bookings %}active{% endblock %}
 
@@ -14,16 +14,16 @@
   <section class="booking-details-header">
     <div class="booking-details-header__left">
       <a href="{{ url_for('main.my_bookings') }}" class="back-link">
-        ← Back to Appointments
+        ← {{ _('Back to Appointments') }}
       </a>
-      <h1 class="booking-details-title">Booking Details</h1>
+      <h1 class="booking-details-title">{{ _('Booking Details') }}</h1>
     </div>
 
     <div class="booking-details-header__right">
       {% if status == 'confirmed' or status == 'pending' %}
       <a href="{{ calendar_url }}" target="_blank" class="btn btn-outline-pink">
         <span class="btn-icon">📅</span>
-        Add to Calendar
+        {{ _('Add to Calendar') }}
       </a>
       {% endif %}
     </div>
@@ -42,7 +42,7 @@
           <div class="booking-meta-inline">
             <div class="booking-meta-inline__item">
               <span class="meta-icon">🕒</span>
-              <span>{{ duration }} mins</span>
+              <span>{{ duration }} {{ _('mins') }}</span>
             </div>
 
             <div class="booking-meta-inline__item">
@@ -59,7 +59,7 @@
           </div>
 
           <div class="service-description-box">
-            <p class="service-description-box__label">Service Description</p>
+            <p class="service-description-box__label">{{ _('Service Description') }}</p>
             <p class="service-description-box__text">{{ service_description }}</p>
           </div>
         </div>
@@ -67,28 +67,28 @@
         <div class="booking-summary-card__bottom">
           <div class="technician-box">
             <div class="technician-box__avatar">
-              <img src="https://via.placeholder.com/64x64" alt="Technician avatar">
+              <img src="https://via.placeholder.com/64x64" alt="{{ _('Technician avatar') }}">
             </div>
 
             <div class="technician-box__info">
-              <p class="technician-box__label">Artist</p>
+              <p class="technician-box__label">{{ _('Artist') }}</p>
               <h3 class="technician-box__name">{{ staff }}</h3>
               <!-- staff title -->
-              <p class="technician-box__role">Senior Artist • ★ 4.9</p>
+              <p class="technician-box__role">{{ _('Senior Artist') }} • ★ 4.9</p>
             </div>
           </div>
 
           <div class="booking-actions">
             {% if status == 'confirmed' %}
-            <a href="{{ url_for('main.customer_reschedule', booking_id=booking['id']) }}" class="btn btn-dark">Reschedule</a>
+            <a href="{{ url_for('main.customer_reschedule', booking_id=booking['id']) }}" class="btn btn-dark">{{ _('Reschedule') }}</a>
             <form action="{{ url_for('main.cancel_booking', booking_id=booking['id']) }}" method="post" class="inline-form">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="btn btn-text-danger">Cancel</button>
+              <button type="submit" class="btn btn-text-danger">{{ _('Cancel') }}</button>
             </form>
             {% elif status == 'pending' %}
             <form action="{{ url_for('main.cancel_booking', booking_id=booking['id']) }}" method="post" class="inline-form">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="btn btn-text-danger">Cancel</button>
+              <button type="submit" class="btn btn-text-danger">{{ _('Cancel') }}</button>
             </form>
             {% endif %}
           </div>
@@ -98,15 +98,11 @@
       <section class="booking-notes-section">
         <div class="section-title-row">
           <span class="section-title-row__icon">🗒️</span>
-          <h2 class="section-title-row__title">Appointment Notes</h2>
+          <h2 class="section-title-row__title">{{ _('Appointment Notes') }}</h2>
         </div>
 
         <div class="notes-card">
-          <p>
-            Please arrive 5 minutes early to select your polish color.
-            Soak-off for previous gel application is included in your service time.
-            Refreshments are available at the lounge area.
-          </p>
+          <p>{{ _('Please arrive 5 minutes early to select your polish color. Soak-off for previous gel application is included in your service time. Refreshments are available at the lounge area.') }}</p>
         </div>
       </section>
     </div>
@@ -115,7 +111,7 @@
     <aside class="booking-side-column">
       <article class="location-card">
         <div class="location-card__map">
-          <img src="https://via.placeholder.com/420x220" alt="Salon location map">
+          <img src="https://via.placeholder.com/420x220" alt="{{ _('Salon location map') }}">
           <div class="location-card__overlay">
             <h3>DahaCare</h3>
             <p>Espoo</p>
@@ -127,7 +123,7 @@
             <div class="address-block__icon">📍</div>
 
             <div class="address-block__content">
-              <p class="address-block__label">Address</p>
+              <p class="address-block__label">{{ _('Address') }}</p>
               <p class="address-block__text">
                 Kyykysmäki 9 A,<br>
                 02650 Espoo, Finland
@@ -136,13 +132,13 @@
           </div>
 
           <a href="{{ map_url }}" target="_blank" class="btn btn-outline-dark btn-full">
-            Get Directions
+            {{ _('Get Directions') }}
           </a>
         </div>
       </article>
 
       <article class="contact-card">
-        <h3 class="contact-card__title">Salon Contact</h3>
+        <h3 class="contact-card__title">{{ _('Salon Contact') }}</h3>
 
         <div class="contact-list">
           <div class="contact-item">

@@ -1,6 +1,6 @@
 {% extends "customer_base.html" %}
 
-{% block title %}Coming Soon – Daha Care{% endblock %}
+{% block title %}{{ _('Coming Soon') }} – Daha Care{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -126,28 +126,28 @@
 <div class="cs-wrapper">
   <div class="cs-card">
 
-    <span class="cs-badge">Coming Soon</span>
+    <span class="cs-badge">{{ _('Coming Soon') }}</span>
 
     <span class="cs-icon">✦</span>
 
-    <h1 class="cs-heading">This feature is on its way</h1>
+    <h1 class="cs-heading">{{ _('This feature is on its way') }}</h1>
 
-    <p class="cs-status">Currently in development</p>
+    <p class="cs-status">{{ _('Currently in development') }}</p>
 
     {% if feature_name %}
-    <p class="cs-feature-name">{{ feature_name }} · Coming soon</p>
+    <p class="cs-feature-name">{{ feature_name }} · {{ _('Coming soon') }}</p>
     {% endif %}
 
     <p class="cs-body">
-      We're working hard to bring this to you.<br>
-      It'll be available here once it's ready.
+      {{ _("We're working hard to bring this to you.") }}<br>
+      {{ _("It'll be available here once it's ready.") }}
     </p>
 
     <div class="cs-divider"></div>
 
     <p class="cs-brand">Daha Care · Vietnamese Shop</p>
 
-    <a href="{{ url_for('main.customer_dashboard') }}" class="cs-btn">← Back to dashboard</a>
+    <a href="{{ url_for('main.customer_dashboard') }}" class="cs-btn">← {{ _('Back to dashboard') }}</a>
 
   </div>
 </div>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Booking Confirmed | DahaCare{% endblock %}
+{% block title %}{{ _('Booking Confirmed') }} | DahaCare{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/public/success.css') }}">
@@ -68,8 +68,8 @@
                 <div class="bkc-header__icon-ping"></div>
                 <span class="material-symbols-outlined bkc-header__icon">check_circle</span>
             </div>
-            <h1 class="bkc-header__title">Booking Confirmed!</h1>
-            <p class="bkc-header__subtitle">We've reserved your spot. Get ready for some well-deserved pampering.</p>
+            <h1 class="bkc-header__title">{{ _('Booking Confirmed!') }}</h1>
+            <p class="bkc-header__subtitle">{{ _("We've reserved your spot. Get ready for some well-deserved pampering.") }}</p>
         </div>
 
         <!-- Confirmation Card -->
@@ -78,7 +78,7 @@
                 <div class="bkc-card__details">
 
                     <div class="bkc-card__summary-head">
-                        <span class="bkc-card__eyebrow">Appointment Summary</span>
+                        <span class="bkc-card__eyebrow">{{ _('Appointment Summary') }}</span>
                         <h3 class="bkc-card__service-name">{{ service_name }}</h3>
                     </div>
 
@@ -100,7 +100,7 @@
                     <div class="bkc-card__calendar-btn-wrap">
                         <a class="bkc-card__calendar-btn" href="{{ calendar_url }}" target="_blank">
                             <span class="material-symbols-outlined">event</span>
-                            Add to Calendar
+                            {{ _('Add to Calendar') }}
                         </a>
                     </div>
 
@@ -120,20 +120,20 @@
 
         <!-- What's Next -->
         <section class="bkc-next">
-            <h3 class="bkc-next__title">What's Next?</h3>
+            <h3 class="bkc-next__title">{{ _("What's Next?") }}</h3>
             <div class="bkc-next__grid">
                 <div class="bkc-next__card">
                     <span class="material-symbols-outlined bkc-next__icon">mail</span>
                     <div>
-                        <p class="bkc-next__card-title">Check your inbox</p>
-                        <p class="bkc-next__card-text">We sent a detailed confirmation email with our location and contact info.</p>
+                        <p class="bkc-next__card-title">{{ _('Check your inbox') }}</p>
+                        <p class="bkc-next__card-text">{{ _('We sent a detailed confirmation email with our location and contact info.') }}</p>
                     </div>
                 </div>
                 <div class="bkc-next__card">
                     <span class="material-symbols-outlined bkc-next__icon">alarm</span>
                     <div>
-                        <p class="bkc-next__card-title">Arrive on time</p>
-                        <p class="bkc-next__card-text">Please arrive 5-10 minutes early to choose your perfect shade and settle in.</p>
+                        <p class="bkc-next__card-title">{{ _('Arrive on time') }}</p>
+                        <p class="bkc-next__card-text">{{ _('Please arrive 5-10 minutes early to choose your perfect shade and settle in.') }}</p>
                     </div>
                 </div>
             </div>
@@ -145,30 +145,30 @@
         <div class="bkc-account-cta">
             <div class="bkc-account-cta__bg-img"></div>
             <div class="bkc-account-cta__content">
-                <h3 class="bkc-account-cta__title">Manage bookings easily</h3>
-                <p class="bkc-account-cta__text">Create an account to track your loyalty points, reschedule appointments, and save your favorite colors.</p>
-                <a href="{{ url_for('main.register') }}" class="bkc-account-cta__btn">Create Account</a>
+                <h3 class="bkc-account-cta__title">{{ _('Manage bookings easily') }}</h3>
+                <p class="bkc-account-cta__text">{{ _('Create an account to track your loyalty points, reschedule appointments, and save your favorite colors.') }}</p>
+                <a href="{{ url_for('main.register') }}" class="bkc-account-cta__btn">{{ _('Create Account') }}</a>
             </div>
         </div>
         {% endif %}
 
         <!-- Actions -->
         <div class="bkc-actions">
-            <a href="{{ url_for('main.public_booking') }}" class="bkc-actions__btn bkc-actions__btn--primary">Book Another Service</a>
-            <a href="{{ url_for('main.home') }}" class="bkc-actions__btn bkc-actions__btn--secondary">Back to Home</a>
+            <a href="{{ url_for('main.public_booking') }}" class="bkc-actions__btn bkc-actions__btn--primary">{{ _('Book Another Service') }}</a>
+            <a href="{{ url_for('main.home') }}" class="bkc-actions__btn bkc-actions__btn--secondary">{{ _('Back to Home') }}</a>
         </div>
 
         <!-- Location Mini Map -->
         <div class="bkc-location">
             <div class="bkc-location__label">
                 <span class="material-symbols-outlined">location_on</span>
-                <span>Find us at: {{ salon_address }}</span>
+                <span>{{ _('Find us at:') }} {{ salon_address }}</span>
             </div>
             <a class="bkc-location__map-wrap" href="{{ gg_map_url }}" target="_blank">
                 <div class="bkc-location__map-overlay"></div>
                 <img class="bkc-location__map-img"
                      src="/static/images/public/nail_studio.jpg"
-                     alt="Map location">
+                     alt="{{ _('Map location') }}">
             </a>
         </div>
 

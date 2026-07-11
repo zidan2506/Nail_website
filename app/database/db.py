@@ -474,6 +474,8 @@ def get_active_services_with_category():
             s.*,
             c.id AS category_id,
             c.name AS category_name,
+            c.name_fi AS category_name_fi,
+            c.name_vi AS category_name_vi,
             c.slug AS category_slug
         FROM services s
         JOIN service_categories c ON s.category_id = c.id
@@ -549,26 +551,32 @@ def get_service_stats():
     }
 
 
-def create_service(category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon):
+def create_service(category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
+                   name_fi=None, name_vi=None, description_fi=None, description_vi=None):
     conn = get_connection()
     cur = conn.execute("""
-        INSERT INTO services (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon))
+        INSERT INTO services (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
+                              name_fi, name_vi, description_fi, description_vi)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
+          name_fi, name_vi, description_fi, description_vi))
     conn.commit()
     service_id = cur.lastrowid
     conn.close()
     return service_id
 
 
-def update_service(service_id, category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon):
+def update_service(service_id, category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
+                   name_fi=None, name_vi=None, description_fi=None, description_vi=None):
     conn = get_connection()
     conn.execute("""
         UPDATE services
         SET category_id=?, name=?, description=?, duration_minutes=?, price=?, points=?,
-            is_active=?, image=?, badge=?, icon=?, updated_at=CURRENT_TIMESTAMP
+            is_active=?, image=?, badge=?, icon=?,
+            name_fi=?, name_vi=?, description_fi=?, description_vi=?, updated_at=CURRENT_TIMESTAMP
         WHERE id=?
-    """, (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon, service_id))
+    """, (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
+          name_fi, name_vi, description_fi, description_vi, service_id))
     conn.commit()
     conn.close()
 
@@ -587,26 +595,26 @@ def toggle_service_active(service_id):
     conn.close()
 
 
-def create_category(name, slug, is_active):
+def create_category(name, slug, is_active, name_fi=None, name_vi=None):
     conn = get_connection()
     max_sort = conn.execute("SELECT COALESCE(MAX(sort_order), -1) FROM service_categories").fetchone()[0]
     cur = conn.execute("""
-        INSERT INTO service_categories (name, slug, is_active, sort_order)
-        VALUES (?, ?, ?, ?)
-    """, (name, slug, is_active, max_sort + 1))
+        INSERT INTO service_categories (name, slug, is_active, sort_order, name_fi, name_vi)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (name, slug, is_active, max_sort + 1, name_fi, name_vi))
     conn.commit()
     category_id = cur.lastrowid
     conn.close()
     return category_id
 
 
-def update_category(category_id, name, slug, is_active):
+def update_category(category_id, name, slug, is_active, name_fi=None, name_vi=None):
     conn = get_connection()
     conn.execute("""
         UPDATE service_categories
-        SET name=?, slug=?, is_active=?, updated_at=CURRENT_TIMESTAMP
+        SET name=?, slug=?, is_active=?, name_fi=?, name_vi=?, updated_at=CURRENT_TIMESTAMP
         WHERE id=?
-    """, (name, slug, is_active, category_id))
+    """, (name, slug, is_active, name_fi, name_vi, category_id))
     conn.commit()
     conn.close()
 
@@ -662,17 +670,18 @@ def create_gallery_images(rows):
     conn.close()
 
 
-def update_gallery_image(image_id, alt_text, sort_order, is_active, image_url=None):
+def update_gallery_image(image_id, alt_text, sort_order, is_active, image_url=None,
+                         alt_text_fi=None, alt_text_vi=None):
     conn = get_connection()
     if image_url is not None:
         conn.execute(
-            "UPDATE gallery_images SET alt_text=?, sort_order=?, is_active=?, image_url=? WHERE id=?",
-            (alt_text, sort_order, is_active, image_url, image_id)
+            "UPDATE gallery_images SET alt_text=?, alt_text_fi=?, alt_text_vi=?, sort_order=?, is_active=?, image_url=? WHERE id=?",
+            (alt_text, alt_text_fi, alt_text_vi, sort_order, is_active, image_url, image_id)
         )
     else:
         conn.execute(
-            "UPDATE gallery_images SET alt_text=?, sort_order=?, is_active=? WHERE id=?",
-            (alt_text, sort_order, is_active, image_id)
+            "UPDATE gallery_images SET alt_text=?, alt_text_fi=?, alt_text_vi=?, sort_order=?, is_active=? WHERE id=?",
+            (alt_text, alt_text_fi, alt_text_vi, sort_order, is_active, image_id)
         )
     conn.commit()
     conn.close()
@@ -1298,7 +1307,9 @@ def get_popular_services(limit=4):
     and returns full card fields (id, price, image, category slug)."""
     conn = get_connection()
     rows = conn.execute("""
-        SELECT s.id, s.name, s.description, s.price, s.image,
+        SELECT s.id, s.name, s.name_fi, s.name_vi,
+               s.description, s.description_fi, s.description_vi,
+               s.price, s.image,
                c.slug AS category_slug,
                COUNT(CASE WHEN b.status IN ('confirmed', 'done') THEN b.id END) AS booking_count
         FROM services s
@@ -1829,26 +1840,32 @@ def get_missions():
     return [by_key[k] for k in MISSION_KEYS if k in by_key]
 
 
-def create_reward(name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image=None):
+def create_reward(name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image=None,
+                  name_fi=None, name_vi=None, description_fi=None, description_vi=None):
     conn = get_connection()
     cur = conn.execute("""
-        INSERT INTO rewards (name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image, is_active)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 1)
-    """, (name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image))
+        INSERT INTO rewards (name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image, is_active,
+                             name_fi, name_vi, description_fi, description_vi)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
+    """, (name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image,
+          name_fi, name_vi, description_fi, description_vi))
     conn.commit()
     reward_id = cur.lastrowid
     conn.close()
     return reward_id
 
 
-def update_reward(reward_id, name, description, cost, stock, max_redeems_per_customer, cooldown_days, is_active, banner_image):
+def update_reward(reward_id, name, description, cost, stock, max_redeems_per_customer, cooldown_days, is_active, banner_image,
+                  name_fi=None, name_vi=None, description_fi=None, description_vi=None):
     conn = get_connection()
     conn.execute("""
         UPDATE rewards
         SET name = ?, description = ?, cost = ?, stock = ?,
-            max_redeems_per_customer = ?, cooldown_days = ?, is_active = ?, banner_image = ?
+            max_redeems_per_customer = ?, cooldown_days = ?, is_active = ?, banner_image = ?,
+            name_fi = ?, name_vi = ?, description_fi = ?, description_vi = ?
         WHERE id = ?
-    """, (name, description, cost, stock, max_redeems_per_customer, cooldown_days, is_active, banner_image, reward_id))
+    """, (name, description, cost, stock, max_redeems_per_customer, cooldown_days, is_active, banner_image,
+          name_fi, name_vi, description_fi, description_vi, reward_id))
     conn.commit()
     conn.close()
 
@@ -2280,51 +2297,69 @@ def get_next_carousel_sort_order(carousel_key):
     return row[0] + 1
 
 
-def create_homepage_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order):
+def create_homepage_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order,
+                          title_fi=None, title_vi=None, subtitle_fi=None, subtitle_vi=None, badge_fi=None, badge_vi=None,
+                          cta_label_fi=None, cta_label_vi=None, cta2_label_fi=None, cta2_label_vi=None):
     conn = get_connection()
     cur = conn.execute("""
         INSERT INTO carousel_slides
-            (carousel_key, title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order, is_active)
-        VALUES ('homepage', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
-    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order))
+            (carousel_key, title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order, is_active,
+             title_fi, title_vi, subtitle_fi, subtitle_vi, badge_fi, badge_vi, cta_label_fi, cta_label_vi, cta2_label_fi, cta2_label_vi)
+        VALUES ('homepage', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, sort_order,
+          title_fi, title_vi, subtitle_fi, subtitle_vi, badge_fi, badge_vi, cta_label_fi, cta_label_vi, cta2_label_fi, cta2_label_vi))
     conn.commit()
     slide_id = cur.lastrowid
     conn.close()
     return slide_id
 
 
-def update_homepage_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, is_active):
+def update_homepage_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, is_active,
+                          title_fi=None, title_vi=None, subtitle_fi=None, subtitle_vi=None, badge_fi=None, badge_vi=None,
+                          cta_label_fi=None, cta_label_vi=None, cta2_label_fi=None, cta2_label_vi=None):
     conn = get_connection()
     conn.execute("""
         UPDATE carousel_slides
         SET title = ?, subtitle = ?, badge = ?, image = ?, cta_label = ?, cta_url = ?, cta_style = ?,
-            cta2_label = ?, cta2_url = ?, cta2_style = ?, is_active = ?
+            cta2_label = ?, cta2_url = ?, cta2_style = ?, is_active = ?,
+            title_fi = ?, title_vi = ?, subtitle_fi = ?, subtitle_vi = ?, badge_fi = ?, badge_vi = ?,
+            cta_label_fi = ?, cta_label_vi = ?, cta2_label_fi = ?, cta2_label_vi = ?
         WHERE id = ?
-    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, is_active, slide_id))
+    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, is_active,
+          title_fi, title_vi, subtitle_fi, subtitle_vi, badge_fi, badge_vi, cta_label_fi, cta_label_vi, cta2_label_fi, cta2_label_vi,
+          slide_id))
     conn.commit()
     conn.close()
 
 
-def create_offer_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order):
+def create_offer_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order,
+                       title_fi=None, title_vi=None, subtitle_fi=None, subtitle_vi=None,
+                       badge_fi=None, badge_vi=None, cta_label_fi=None, cta_label_vi=None):
     conn = get_connection()
     cur = conn.execute("""
         INSERT INTO carousel_slides
-            (carousel_key, title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order, is_active)
-        VALUES ('dashboard_offers', ?, ?, ?, ?, ?, ?, ?, ?, 1)
-    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order))
+            (carousel_key, title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order, is_active,
+             title_fi, title_vi, subtitle_fi, subtitle_vi, badge_fi, badge_vi, cta_label_fi, cta_label_vi)
+        VALUES ('dashboard_offers', ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order,
+          title_fi, title_vi, subtitle_fi, subtitle_vi, badge_fi, badge_vi, cta_label_fi, cta_label_vi))
     conn.commit()
     slide_id = cur.lastrowid
     conn.close()
     return slide_id
 
 
-def update_offer_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, is_active):
+def update_offer_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, is_active,
+                       title_fi=None, title_vi=None, subtitle_fi=None, subtitle_vi=None,
+                       badge_fi=None, badge_vi=None, cta_label_fi=None, cta_label_vi=None):
     conn = get_connection()
     conn.execute("""
         UPDATE carousel_slides
-        SET title = ?, subtitle = ?, badge = ?, image = ?, cta_label = ?, cta_url = ?, cta_style = ?, is_active = ?
+        SET title = ?, subtitle = ?, badge = ?, image = ?, cta_label = ?, cta_url = ?, cta_style = ?, is_active = ?,
+            title_fi = ?, title_vi = ?, subtitle_fi = ?, subtitle_vi = ?, badge_fi = ?, badge_vi = ?, cta_label_fi = ?, cta_label_vi = ?
         WHERE id = ?
-    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, is_active, slide_id))
+    """, (title, subtitle, badge, image, cta_label, cta_url, cta_style, is_active,
+          title_fi, title_vi, subtitle_fi, subtitle_vi, badge_fi, badge_vi, cta_label_fi, cta_label_vi, slide_id))
     conn.commit()
     conn.close()
 
@@ -2349,13 +2384,13 @@ def get_mission_slides():
     return [dict(r) for r in rows]
 
 
-def update_mission_slide(slot_key, icon, title, pts_label, image):
+def update_mission_slide(slot_key, icon, title, pts_label, image, title_fi=None, title_vi=None):
     conn = get_connection()
     conn.execute("""
         UPDATE carousel_slides
-        SET icon = ?, title = ?, pts_label = ?, image = ?
+        SET icon = ?, title = ?, pts_label = ?, image = ?, title_fi = ?, title_vi = ?
         WHERE carousel_key = 'loyalty_missions' AND slot_key = ?
-    """, (icon, title, pts_label, image, slot_key))
+    """, (icon, title, pts_label, image, title_fi, title_vi, slot_key))
     conn.commit()
     conn.close()
 

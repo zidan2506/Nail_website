@@ -40,7 +40,7 @@
 #}
 {% extends "staff/staff_base.html" %}
 
-{% block title %}Lịch của tôi — DahaCare{% endblock %}
+{% block title %}{{ _('Lịch của tôi') }} — DahaCare{% endblock %}
 
 {% block page_styles %}
 <style>
@@ -239,7 +239,7 @@
   {# ── Header + filter ── #}
   <div class="sf-hdr">
     <div class="sf-hdr-top">
-      <div class="sf-title">Lịch của <em>{{ staff_name }}</em></div>
+      <div class="sf-title">{{ _('Lịch của') }} <em>{{ staff_name }}</em></div>
       <div class="sf-date">{{ now_display }}</div>
     </div>
 
@@ -249,10 +249,10 @@
 
       {# Row 1: date presets + range #}
       <div class="sf-frow">
-        <span class="sf-flabel">Lọc theo ngày</span>
+        <span class="sf-flabel">{{ _('Lọc theo ngày') }}</span>
         <div class="sf-fcontrols">
-          {% set presets = [('today','Hôm nay'),('week','Tuần này'),('month','Tháng này'),
-                            ('last_month','Tháng trước'),('custom','Tùy chọn'),('all','Tất cả')] %}
+          {% set presets = [('today', _('Hôm nay')),('week', _('Tuần này')),('month', _('Tháng này')),
+                            ('last_month', _('Tháng trước')),('custom', _('Tùy chọn')),('all', _('Tất cả'))] %}
           {% for val, label in presets %}
           <button type="button"
                   class="sf-fp {% if active_preset == val %}sf-fp--active{% endif %}"
@@ -271,16 +271,16 @@
 
       {# Row 2: status chips #}
       <div class="sf-frow">
-        <span class="sf-flabel">Lọc theo trạng thái</span>
+        <span class="sf-flabel">{{ _('Lọc theo trạng thái') }}</span>
         <div class="sf-fcontrols">
-          {% set chips = [('all','Tất cả'),('confirmed','Đã xác nhận'),
-                         ('in-progress','Đang thực hiện'),('done','Hoàn thành')] %}
+          {% set chips = [('all', _('Tất cả')),('confirmed', _('Đã xác nhận')),
+                         ('in-progress', _('Đang thực hiện')),('done', _('Hoàn thành'))] %}
           {% for val, label in chips %}
           <button type="button"
                   class="sf-ch {% if active_status == val %}sf-ch--active{% endif %}"
                   onclick="sfSetStatus('{{ val }}')">{{ label }}</button>
           {% endfor %}
-          <a href="{{ url_for('main.staff_dashboard') }}" class="sf-clear">Xóa bộ lọc</a>
+          <a href="{{ url_for('main.staff_dashboard') }}" class="sf-clear">{{ _('Xóa bộ lọc') }}</a>
         </div>
       </div>
     </form>
@@ -290,25 +290,25 @@
   <div class="sf-stats">
     <div class="sf-sc">
       <div class="sf-sn">{{ stats.total }}</div>
-      <div class="sf-sl"><span class="sf-dot" style="background:#60A5FA"></span>Tổng lịch hẹn</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#60A5FA"></span>{{ _('Tổng lịch hẹn') }}</div>
     </div>
     <div class="sf-sc {% if next_upcoming_id %}sf-sc--link{% endif %} {% if stats.upcoming > 0 %}sf-sc--alert{% endif %}"
          {% if next_upcoming_id %}onclick="sfFocusBooking({{ next_upcoming_id }})"
-         title="Tới lịch hẹn sắp tới gần nhất"{% endif %}>
+         title="{{ _('Tới lịch hẹn sắp tới gần nhất') }}"{% endif %}>
       <div class="sf-sn" style="color:#4F46E5">{{ stats.upcoming }}</div>
-      <div class="sf-sl"><span class="sf-dot" style="background:#818CF8"></span>Lịch hẹn sắp tới{% if next_upcoming_id %}<i class="ti ti-arrow-narrow-right" style="font-size:15px"></i>{% endif %}</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#818CF8"></span>{{ _('Lịch hẹn sắp tới') }}{% if next_upcoming_id %}<i class="ti ti-arrow-narrow-right" style="font-size:15px"></i>{% endif %}</div>
     </div>
     <div class="sf-sc">
       <div class="sf-sn" style="color:#C084A0">{{ stats.in_progress }}</div>
-      <div class="sf-sl"><span class="sf-dot" style="background:#C084A0"></span>Đang thực hiện</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#C084A0"></span>{{ _('Đang thực hiện') }}</div>
     </div>
     <div class="sf-sc">
       <div class="sf-sn" style="color:#16A34A">{{ stats.done }}</div>
-      <div class="sf-sl"><span class="sf-dot" style="background:#4ADE80"></span>Hoàn thành</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#4ADE80"></span>{{ _('Hoàn thành') }}</div>
     </div>
     <div class="sf-sc">
       <div class="sf-sn" style="color:#C084A0">{{ stats.pending_payment }}</div>
-      <div class="sf-sl"><span class="sf-dot" style="background:#F9A8C9"></span>Chờ thanh toán</div>
+      <div class="sf-sl"><span class="sf-dot" style="background:#F9A8C9"></span>{{ _('Chờ thanh toán') }}</div>
     </div>
   </div>
 
@@ -317,8 +317,8 @@
     {% if not has_any %}
       <div class="sf-empty">
         <i class="ti ti-calendar-off"></i>
-        <div class="sf-empty-text">Không có lịch hẹn nào{% if empty_scope %} {{ empty_scope }}{% endif %}.</div>
-        <a href="{{ url_for('main.staff_dashboard') }}">Xem tất cả</a>
+        <div class="sf-empty-text">{{ _('Không có lịch hẹn nào') }}{% if empty_scope %} {{ empty_scope }}{% endif %}.</div>
+        <a href="{{ url_for('main.staff_dashboard') }}">{{ _('Xem tất cả') }}</a>
       </div>
     {% else %}
       {% for day in days %}
@@ -327,10 +327,10 @@
           <div class="sf-day-label">
             {% if is_multi_day %}<span class="sf-day-dow">{{ day.dow_vi }}</span>{% endif %}
             <span class="sf-day-date">{{ day.date_display }}</span>
-            <span class="sf-day-count">{{ day.bookings | length }} lịch hẹn</span>
+            <span class="sf-day-count">{{ day.bookings | length }} {{ _('lịch hẹn') }}</span>
           </div>
           <div class="sf-day-line"></div>
-          {% if day.is_today %}<span class="sf-day-today">Hôm nay</span>{% endif %}
+          {% if day.is_today %}<span class="sf-day-today">{{ _('Hôm nay') }}</span>{% endif %}
         </div>
 
         {% if day.bookings %}
@@ -371,13 +371,13 @@
                 <form method="POST" action="{{ url_for('main.mark_done') }}" onclick="event.stopPropagation()">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="booking_id" value="{{ b.id }}">
-                  <button type="submit" class="sf-btn done-btn"><i class="ti ti-check"></i>Hoàn thành</button>
+                  <button type="submit" class="sf-btn done-btn"><i class="ti ti-check"></i>{{ _('Hoàn thành') }}</button>
                 </form>
                 {% if b.pay_method == 'cash' and b.is_paid == 0 %}
                 <form method="POST" action="{{ url_for('main.mark_paid') }}" onclick="event.stopPropagation()">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="booking_id" value="{{ b.id }}">
-                  <button type="submit" class="sf-btn paid-btn"><i class="ti ti-coin"></i>Đã thu tiền</button>
+                  <button type="submit" class="sf-btn paid-btn"><i class="ti ti-coin"></i>{{ _('Đã thu tiền') }}</button>
                 </form>
                 {% endif %}
               {% elif b.status == 'done' %}
@@ -385,26 +385,26 @@
                 <form method="POST" action="{{ url_for('main.mark_paid') }}" onclick="event.stopPropagation()">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="booking_id" value="{{ b.id }}">
-                  <button type="submit" class="sf-btn paid-btn"><i class="ti ti-coin"></i>Đã thu tiền</button>
+                  <button type="submit" class="sf-btn paid-btn"><i class="ti ti-coin"></i>{{ _('Đã thu tiền') }}</button>
                 </form>
                 {% else %}
-                <span class="sf-xdone"><i class="ti ti-circle-check"></i>Đã xong</span>
+                <span class="sf-xdone"><i class="ti ti-circle-check"></i>{{ _('Đã xong') }}</span>
                 {% endif %}
               {% elif b.status == 'confirmed' and b.can_start %}
                 <form method="POST" action="{{ url_for('main.mark_in_progress') }}" onclick="event.stopPropagation()">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="booking_id" value="{{ b.id }}">
-                  <button type="submit" class="sf-btn done-btn"><i class="ti ti-player-play"></i>Bắt đầu làm</button>
+                  <button type="submit" class="sf-btn done-btn"><i class="ti ti-player-play"></i>{{ _('Bắt đầu làm') }}</button>
                 </form>
               {% elif b.status in ('confirmed', 'pending') %}
                 <button type="button" class="sf-btn done-btn" disabled
-                        onclick="event.stopPropagation()"><i class="ti ti-player-play"></i>Bắt đầu làm</button>
+                        onclick="event.stopPropagation()"><i class="ti ti-player-play"></i>{{ _('Bắt đầu làm') }}</button>
               {% endif %}
             </div>
           </div>
           {% endfor %}
         {% elif is_multi_day %}
-          <div class="sf-day-empty">Không có lịch hẹn</div>
+          <div class="sf-day-empty">{{ _('Không có lịch hẹn') }}</div>
         {% endif %}
       </div>
       {% endfor %}
@@ -415,43 +415,43 @@
   <div class="sf-overlay" id="sfOverlay" onclick="if(event.target===this) sfCloseModal()">
     <div class="sf-modal">
       <div class="sf-mhdr">
-        <span class="sf-mtitle">Chi tiết lịch hẹn</span>
+        <span class="sf-mtitle">{{ _('Chi tiết lịch hẹn') }}</span>
         <button type="button" class="sf-mclose" onclick="sfCloseModal()"><i class="ti ti-x"></i></button>
       </div>
       <div class="sf-mbody">
         <div class="sf-msec">
-          <span class="sf-mlabel">Mã booking</span>
+          <span class="sf-mlabel">{{ _('Mã booking') }}</span>
           <div class="sf-mid" id="m-id"></div>
         </div>
         <div class="sf-msec">
-          <span class="sf-mlabel">Khách hàng</span>
-          <div class="sf-mrow"><span class="sf-mk">Họ tên</span><span class="sf-mv" id="m-name"></span></div>
-          <div class="sf-mrow"><span class="sf-mk">Số điện thoại</span><span class="sf-mv" id="m-phone"></span></div>
+          <span class="sf-mlabel">{{ _('Khách hàng') }}</span>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Họ tên') }}</span><span class="sf-mv" id="m-name"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Số điện thoại') }}</span><span class="sf-mv" id="m-phone"></span></div>
         </div>
         <div class="sf-msec">
-          <span class="sf-mlabel">Dịch vụ</span>
-          <div class="sf-mrow"><span class="sf-mk">Tên dịch vụ</span><span class="sf-mv" id="m-svc"></span></div>
-          <div class="sf-mrow"><span class="sf-mk">Ngày hẹn</span><span class="sf-mv" id="m-date"></span></div>
-          <div class="sf-mrow"><span class="sf-mk">Thời gian</span><span class="sf-mv" id="m-time"></span></div>
+          <span class="sf-mlabel">{{ _('Dịch vụ') }}</span>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Tên dịch vụ') }}</span><span class="sf-mv" id="m-svc"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Ngày hẹn') }}</span><span class="sf-mv" id="m-date"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Thời gian') }}</span><span class="sf-mv" id="m-time"></span></div>
         </div>
         <div class="sf-msec">
-          <span class="sf-mlabel">Thanh toán</span>
-          <div class="sf-mrow"><span class="sf-mk">Tổng tiền</span><span class="sf-mv" id="m-price"></span></div>
-          <div class="sf-mrow"><span class="sf-mk">Phương thức</span><span class="sf-mv" id="m-pay"></span></div>
+          <span class="sf-mlabel">{{ _('Thanh toán') }}</span>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Tổng tiền') }}</span><span class="sf-mv" id="m-price"></span></div>
+          <div class="sf-mrow"><span class="sf-mk">{{ _('Phương thức') }}</span><span class="sf-mv" id="m-pay"></span></div>
         </div>
         <div class="sf-msec">
-          <span class="sf-mlabel">Trạng thái</span>
+          <span class="sf-mlabel">{{ _('Trạng thái') }}</span>
           <div><span id="m-status-badge"></span></div>
         </div>
       </div>
       <div class="sf-mftr">
-        <button type="button" class="sf-btn" onclick="sfCloseModal()">Đóng</button>
+        <button type="button" class="sf-btn" onclick="sfCloseModal()">{{ _('Đóng') }}</button>
         <button type="button" class="sf-btn done-btn" id="m-btn-start" style="display:none"
-                onclick="sfModalAction('start')"><i class="ti ti-player-play"></i>Bắt đầu làm</button>
+                onclick="sfModalAction('start')"><i class="ti ti-player-play"></i>{{ _('Bắt đầu làm') }}</button>
         <button type="button" class="sf-btn done-btn" id="m-btn-done" style="display:none"
-                onclick="sfModalAction('done')"><i class="ti ti-check"></i>Hoàn thành</button>
+                onclick="sfModalAction('done')"><i class="ti ti-check"></i>{{ _('Hoàn thành') }}</button>
         <button type="button" class="sf-btn paid-btn" id="m-btn-paid" style="display:none"
-                onclick="sfModalAction('paid')"><i class="ti ti-coin"></i>Đã thu tiền</button>
+                onclick="sfModalAction('paid')"><i class="ti ti-coin"></i>{{ _('Đã thu tiền') }}</button>
       </div>
     </div>
   </div>
@@ -492,11 +492,11 @@ function sfCustomDates() {
 function sfPayTag(method, isPaid) {
   if (method === 'cash') {
     return isPaid === '1'
-      ? '<span class="sf-ptag pt-paid">Tiền mặt - đã thanh toán</span>'
-      : '<span class="sf-ptag pt-unpaid">Tiền mặt - chưa thanh toán</span>';
+      ? '<span class="sf-ptag pt-paid">{{ _("Tiền mặt - đã thanh toán") }}</span>'
+      : '<span class="sf-ptag pt-unpaid">{{ _("Tiền mặt - chưa thanh toán") }}</span>';
   }
-  if (method === 'online') return '<span class="sf-ptag pt-online">Online</span>';
-  return '<span class="sf-mk">Chưa có hóa đơn</span>';
+  if (method === 'online') return '<span class="sf-ptag pt-online">{{ _("Online") }}</span>';
+  return '<span class="sf-mk">{{ _("Chưa có hóa đơn") }}</span>';
 }
 
 function sfOpenModal(card) {

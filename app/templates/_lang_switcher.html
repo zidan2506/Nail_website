@@ -1,0 +1,54 @@
+{#- ═══════════════════════════════════════════════════════════════
+    LANGUAGE SWITCHER MACROS — dùng chung cho public (base.html),
+    customer (customer_base.html), staff (staff_base.html).
+    Import kèm context: {% import "_lang_switcher.html" as ls with context %}
+    · lang_flag(code): SVG cờ nội tuyến (fi / en / vi).
+    · lang_switcher(): dropdown [cờ + mã] → menu chọn ngôn ngữ.
+════════════════════════════════════════════════════════════════════ -#}
+{%- macro lang_flag(code) -%}
+    {%- if code == 'fi' -%}
+    <svg class="lang-flag" viewBox="0 0 18 11" preserveAspectRatio="none" aria-hidden="true">
+        <rect width="18" height="11" fill="#fff"/>
+        <rect y="4.5" width="18" height="2" fill="#003580"/>
+        <rect x="5" width="2" height="11" fill="#003580"/>
+    </svg>
+    {%- elif code == 'vi' -%}
+    <svg class="lang-flag" viewBox="0 0 30 20" preserveAspectRatio="none" aria-hidden="true">
+        <rect width="30" height="20" fill="#da251d"/>
+        <polygon points="15.00,3.40 16.53,7.90 21.28,7.96 17.47,10.80 18.88,15.34 15.00,12.60 11.12,15.34 12.53,10.80 8.72,7.96 13.47,7.90" fill="#ff0"/>
+    </svg>
+    {%- else -%}
+    <svg class="lang-flag" viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true">
+        <rect width="60" height="30" fill="#012169"/>
+        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
+        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#c8102e" stroke-width="4"/>
+        <path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/>
+        <path d="M30,0 V30 M0,15 H60" stroke="#c8102e" stroke-width="6"/>
+    </svg>
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- set lang_codes = {'fi': 'FI', 'en': 'EN', 'vi': 'VI'} -%}
+{%- set lang_names = {'fi': 'Suomi', 'en': 'English', 'vi': 'Tiếng Việt'} -%}
+
+{%- macro lang_switcher() -%}
+    <div class="lang-dropdown" data-lang-dropdown>
+        <button type="button" class="lang-dropdown__trigger" aria-haspopup="listbox" aria-expanded="false">
+            {{ lang_flag(current_lang) }}
+            <span class="lang-dropdown__code">{{ lang_codes[current_lang] }}</span>
+            <span class="material-symbols-outlined lang-dropdown__caret">expand_more</span>
+        </button>
+        <ul class="lang-dropdown__menu" role="listbox">
+            {% for lang in languages %}
+            <li>
+                <a href="{{ url_for('main.set_language', lang=lang) }}"
+                   class="lang-dropdown__item{% if lang == current_lang %} lang-dropdown__item--active{% endif %}"
+                   role="option">
+                    {{ lang_flag(lang) }}
+                    <span class="lang-dropdown__name">{{ lang_names[lang] }}</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+{%- endmacro -%}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Services | DahaCare Atélier{% endblock %}
+{% block title %}{{ _('Services') }} | DahaCare Atélier{% endblock %}
 
 {# Load services-page-specific CSS — base.css đã được load sẵn trong base.html #}
 {% block extra_css %}
@@ -16,11 +16,8 @@
    - Tĩnh, không cần data động
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="svc-hero">
-    <h1 class="svc-hero__title">Our Services</h1>
-    <p class="svc-hero__subtitle">
-        Discover a curated collection of premium nail care and aesthetic treatments
-        designed for the modern individual. Precision meets tranquility in every session.
-    </p>
+    <h1 class="svc-hero__title">{{ _('Our Services') }}</h1>
+    <p class="svc-hero__subtitle">{{ _('Discover a curated collection of premium nail care and aesthetic treatments designed for the modern individual. Precision meets tranquility in every session.') }}</p>
 </section>
 
 
@@ -47,7 +44,7 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 <div class="svc-filter-wrap">
     <div class="svc-filter">
-        <button class="svc-tab svc-tab--active" data-filter="all">All</button>
+        <button class="svc-tab svc-tab--active" data-filter="all">{{ _('All') }}</button>
         {% for category in categories %}
         <button class="svc-tab" data-filter="{{ category.slug }}">{{ category.name }}</button>
         {% endfor %}
@@ -96,26 +93,26 @@
                 </div>
                 {% endif %}
                 <div class="svc-card__badges">
-                    <span class="svc-badge svc-badge--category">{{ service.category_name }}</span>
+                    <span class="svc-badge svc-badge--category">{{ tr(service, 'category_name') }}</span>
                     {% if service.badge == 'Popular' %}
-                    <span class="svc-badge svc-badge--status">Popular</span>
+                    <span class="svc-badge svc-badge--status">{{ _('Popular') }}</span>
                     {% elif service.badge == 'New' %}
-                    <span class="svc-badge svc-badge--new">New</span>
+                    <span class="svc-badge svc-badge--new">{{ _('New') }}</span>
                     {% endif %}
                 </div>
             </div>
             <div class="svc-card__body">
-                <h3 class="svc-card__name">{{ service.name }}</h3>
-                <p class="svc-card__desc">{{ service.description }}</p>
+                <h3 class="svc-card__name">{{ tr(service, 'name') }}</h3>
+                <p class="svc-card__desc">{{ tr(service, 'description') }}</p>
                 <div class="svc-card__meta">
                     <div>
                         <span class="svc-card__price">${{ service.price | int }}</span>
-                        <span class="svc-card__duration">/ {{ service.duration_minutes }} mins</span>
+                        <span class="svc-card__duration">/ {{ service.duration_minutes }} {{ _('mins') }}</span>
                     </div>
                     <span class="material-symbols-outlined svc-card__icon">{{ service.icon }}</span>
                 </div>
             </div>
-            <a href="{{ url_for('main.public_booking', service_id=service.id) }}" class="svc-card__btn">Book now</a>
+            <a href="{{ url_for('main.public_booking', service_id=service.id) }}" class="svc-card__btn">{{ _('Book now') }}</a>
         </div>
         {% endfor %}
     </div>
@@ -132,15 +129,15 @@
     <div class="svc-trust__inner">
         <div class="svc-trust__item">
             <div class="svc-trust__number">4.9/5</div>
-            <div class="svc-trust__label">Average Rating</div>
+            <div class="svc-trust__label">{{ _('Average Rating') }}</div>
         </div>
         <div class="svc-trust__item">
             <div class="svc-trust__number">12k+</div>
-            <div class="svc-trust__label">Satisfied Clients</div>
+            <div class="svc-trust__label">{{ _('Satisfied Clients') }}</div>
         </div>
         <div class="svc-trust__item">
             <div class="svc-trust__number">100%</div>
-            <div class="svc-trust__label">Quality Assurance</div>
+            <div class="svc-trust__label">{{ _('Quality Assurance') }}</div>
         </div>
     </div>
 </section>
@@ -153,9 +150,9 @@
 <section class="svc-cta">
     <div class="svc-cta__glow"></div>
     <div class="svc-cta__inner">
-        <h2 class="svc-cta__title">Ready to define your signature look?</h2>
+        <h2 class="svc-cta__title">{{ _('Ready to define your signature look?') }}</h2>
         <a href="{{ url_for('main.public_booking') }}" class="svc-cta__btn">
-            Book a consultation
+            {{ _('Book a consultation') }}
             <span class="material-symbols-outlined">arrow_forward</span>
         </a>
     </div>

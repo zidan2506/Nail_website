@@ -1,6 +1,6 @@
 {% extends "customer_base.html" %}
 
-{% block title %}My bookings{% endblock %}
+{% block title %}{{ _('My bookings') }}{% endblock %}
 
 {% block nav_bookings %}active{% endblock %}
 
@@ -14,8 +14,8 @@
   <!-- Page Header -->
   <section class="page-header">
     <div class="page-header__left">
-      <h1 class="page-title">Appointments</h1>
-      <p class="page-subtitle">Manage your upcoming visits and booking history.</p>
+      <h1 class="page-title">{{ _('Appointments') }}</h1>
+      <p class="page-subtitle">{{ _('Manage your upcoming visits and booking history.') }}</p>
     </div>
 
   </section>
@@ -26,7 +26,7 @@
 <div class="next-visit-card">
   {% if next_visit %}
     <div class="next-visit-card__content">
-      <p class="section-label">Next Visit</p>
+      <p class="section-label">{{ _('Next Visit') }}</p>
 
       <div class="appointment-status-badge appointment-status-badge--{{ nevi_status }}">
         {{ nevi_status }}
@@ -35,12 +35,12 @@
       <h2 class="next-visit-card__title">{{ nevi_service }}</h2>
 
       <p class="next-visit-card__meta">
-        {{ nevi_date }} • {{ nevi_start }} with {{ nevi_staff }}.
+        {{ _('%(date)s • %(start)s with %(staff)s.', date=nevi_date, start=nevi_start, staff=nevi_staff) }}
       </p>
 
       <div class="next-visit-card__actions">
-        <a href="{{ calendar_url }}" class="btn btn-primary" target="{{ url_target }}">Add to Calendar</a>
-        <a href="{{ url_for('main.view_booking_details', booking_id=next_visit['id']) }}" class="btn btn-secondary">View Details</a>
+        <a href="{{ calendar_url }}" class="btn btn-primary" target="{{ url_target }}">{{ _('Add to Calendar') }}</a>
+        <a href="{{ url_for('main.view_booking_details', booking_id=next_visit['id']) }}" class="btn btn-secondary">{{ _('View Details') }}</a>
       </div>
     </div>
 
@@ -50,16 +50,16 @@
 
   {% else %}
     <div class="next-visit-card__content">
-      <p class="section-label">Next Visit</p>
+      <p class="section-label">{{ _('Next Visit') }}</p>
 
-      <h2 class="next-visit-card__title">No upcoming visits scheduled</h2>
+      <h2 class="next-visit-card__title">{{ _('No upcoming visits scheduled') }}</h2>
 
       <p class="next-visit-card__meta">
-        Ready for a new look? Book your next treatment today.
+        {{ _('Ready for a new look? Book your next treatment today.') }}
       </p>
 
       <div class="next-visit-card__actions">
-        <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">Book new appointment</a>
+        <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">{{ _('Book new appointment') }}</a>
       </div>
     </div>
 
@@ -70,32 +70,30 @@
 </div>
     <!-- Loyalty Reward Card -->
     <aside class="loyalty-reward-card">
-      <p class="section-label section-label--light">Loyalty Reward</p>
+      <p class="section-label section-label--light">{{ _('Loyalty Reward') }}</p>
 
       {% if next_reward %}
       <h3 class="loyalty-reward-card__title">
-        {{ points_needed }} points to {{ next_reward.name }}
+        {{ _('%(points)s points to %(reward)s', points=points_needed, reward=next_reward.name) }}
       </h3>
       <div class="reward-progress">
         <div class="reward-progress__bar">
           <div class="reward-progress__fill" style="width: {{ progress_pct }}%;"></div>
         </div>
         <div class="reward-progress__meta">
-          <span>{{ loyalty_points }} pts</span>
-          <span>{{ progress_pct }}% Complete</span>
+          <span>{{ loyalty_points }} {{ _('pts') }}</span>
+          <span>{{ progress_pct }}% {{ _('Complete') }}</span>
         </div>
       </div>
       {% else %}
-      <h3 class="loyalty-reward-card__title">
-        You've unlocked all rewards!
-      </h3>
+      <h3 class="loyalty-reward-card__title">{{ _("You've unlocked all rewards!") }}</h3>
       <div class="reward-progress">
         <div class="reward-progress__bar">
           <div class="reward-progress__fill" style="width: 100%;"></div>
         </div>
         <div class="reward-progress__meta">
-          <span>{{ loyalty_points }} pts</span>
-          <span>100% Complete</span>
+          <span>{{ loyalty_points }} {{ _('pts') }}</span>
+          <span>100% {{ _('Complete') }}</span>
         </div>
       </div>
       {% endif %}
@@ -106,11 +104,11 @@
   <section class="appointment-manager">
     <div class="section-heading">
       <div>
-        <h2 class="section-title">Manage Appointments</h2>
-        <p class="section-description">View your confirmed, pending, and cancelled bookings.</p>
+        <h2 class="section-title">{{ _('Manage Appointments') }}</h2>
+        <p class="section-description">{{ _('View your confirmed, pending, and cancelled bookings.') }}</p>
       </div>
 
-      <a href=" {{url_for('main.customer_booking')}}" class="btn btn-primary">Book New Appointment</a>
+      <a href=" {{url_for('main.customer_booking')}}" class="btn btn-primary">{{ _('Book New Appointment') }}</a>
     </div>
 
     <!-- Tabs -->
@@ -120,7 +118,7 @@
         class="appointment-tab appointment-tab--active"
         data-tab-target="upcoming"
       >
-        Upcoming <span class="tab-count">({{ upcoming_bookings|length }})</span>
+        {{ _('Upcoming') }} <span class="tab-count">({{ upcoming_bookings|length }})</span>
       </button>
 
       <button
@@ -128,7 +126,7 @@
         class="appointment-tab"
         data-tab-target="pending"
       >
-        Pending <span class="tab-count">({{ pending_bookings|length }})</span>
+        {{ _('Pending') }} <span class="tab-count">({{ pending_bookings|length }})</span>
       </button>
 
       <button
@@ -136,7 +134,7 @@
         class="appointment-tab"
         data-tab-target="cancelled"
       >
-        Cancelled <span class="tab-count">({{ cancelled_bookings|length }})</span>
+        {{ _('Cancelled') }} <span class="tab-count">({{ cancelled_bookings|length }})</span>
       </button>
     </div>
 
@@ -164,9 +162,7 @@
 
             <div class="appointment-card__body">
               <div class="appointment-card__top">
-                <span class="appointment-status-badge appointment-status-badge--confirmed">
-                  Confirmed
-                </span>
+                <span class="appointment-status-badge appointment-status-badge--confirmed">{{ _('Confirmed') }}</span>
 
               </div>
 
@@ -174,27 +170,27 @@
 
               <div class="appointment-card__details">
                 <p class="appointment-card__detail">
-                  <span class="detail-label">Date:</span>
+                  <span class="detail-label">{{ _('Date:') }}</span>
                   <span class="detail-value">{{ booking["booking_date"] }} • {{ booking["booking_time"] }}</span>
                 </p>
 
                 <p class="appointment-card__detail">
-                  <span class="detail-label">Stylist:</span>
+                  <span class="detail-label">{{ _('Stylist:') }}</span>
                   <span class="detail-value">{{ booking['booking']['staff_name'] }}</span>
                 </p>
 
                 <p class="appointment-card__detail">
-                  <span class="detail-label">Duration:</span>
+                  <span class="detail-label">{{ _('Duration:') }}</span>
                   <span class="detail-value">{{ booking['booking']['service_duration'] }}</span>
                 </p>
               </div>
 
               <div class="appointment-card__actions">
-                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">View Details</a>
-                <a href="{{ url_for('main.customer_reschedule', booking_id=booking['booking']['id']) }}" class="btn btn-soft">Reschedule</a>
+                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">{{ _('View Details') }}</a>
+                <a href="{{ url_for('main.customer_reschedule', booking_id=booking['booking']['id']) }}" class="btn btn-soft">{{ _('Reschedule') }}</a>
                 <form action=" {{ url_for('main.cancel_booking', booking_id=booking['booking']['id']) }}" method="post" class="inline-form">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="btn btn-primary">Cancel</button>
+                  <button type="submit" class="btn btn-primary">{{ _('Cancel') }}</button>
                 </form>
               </div>
             </div>
@@ -220,9 +216,7 @@
 
             <div class="appointment-card__body">
               <div class="appointment-card__top">
-                <span class="appointment-status-badge appointment-status-badge--pending">
-                  Pending
-                </span>
+                <span class="appointment-status-badge appointment-status-badge--pending">{{ _('Pending') }}</span>
 
                 <div class="appointment-card__menu">
                   <button type="button" class="icon-btn">⋮</button>
@@ -233,26 +227,26 @@
 
               <div class="appointment-card__details">
                 <p class="appointment-card__detail">
-                  <span class="detail-label">Date:</span>
+                  <span class="detail-label">{{ _('Date:') }}</span>
                   <span class="detail-value">{{ booking['booking_date']}} • {{ booking['booking_time'] }}</span>
                 </p>
 
                 <p class="appointment-card__detail">
-                  <span class="detail-label">Stylist:</span>
+                  <span class="detail-label">{{ _('Stylist:') }}</span>
                   <span class="detail-value">{{ booking['booking']['staff_name']}}</span>
                 </p>
 
                 <p class="appointment-card__detail">
-                  <span class="detail-label">Status:</span>
-                  <span class="detail-value">Awaiting confirmation</span>
+                  <span class="detail-label">{{ _('Status:') }}</span>
+                  <span class="detail-value">{{ _('Awaiting confirmation') }}</span>
                 </p>
               </div>
 
               <div class="appointment-card__actions">
-                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">View Details</a>
+                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">{{ _('View Details') }}</a>
                 <form action="{{ url_for('main.cancel_booking', booking_id=booking['booking']['id']) }}" method="post" class="inline-form">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="btn btn-primary">Cancel</button>
+                  <button type="submit" class="btn btn-primary">{{ _('Cancel') }}</button>
                 </form>
               </div>
             </div>
@@ -278,28 +272,26 @@
 
             <div class="appointment-card__body">
               <div class="appointment-card__top">
-                <span class="appointment-status-badge appointment-status-badge--cancelled">
-                  Cancelled
-                </span>
+                <span class="appointment-status-badge appointment-status-badge--cancelled">{{ _('Cancelled') }}</span>
               </div>
 
               <h3 class="appointment-card__title">{{ booking['booking']['service_name'] }}</h3>
 
               <div class="appointment-card__details">
                 <p class="appointment-card__detail">
-                  <span class="detail-label">Date:</span>
+                  <span class="detail-label">{{ _('Date:') }}</span>
                   <span class="detail-value">{{ booking['booking_date'] }} • {{ booking['booking_time'] }}</span>
                 </p>
 
                 <p class="appointment-card__detail">
-                  <span class="detail-label">Cancelled on:</span>
+                  <span class="detail-label">{{ _('Cancelled on:') }}</span>
                   <span class="detail-value">{{ booking['cancelled_date'] }}</span>
                 </p>
               </div>
 
               <div class="appointment-card__actions">
-                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">View Details</a>
-                <a href=" {{ url_for('main.customer_booking')}}" class="btn btn-primary">Rebook</a>
+                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">{{ _('View Details') }}</a>
+                <a href=" {{ url_for('main.customer_booking')}}" class="btn btn-primary">{{ _('Rebook') }}</a>
               </div>
             </div>
           </article>
@@ -317,13 +309,13 @@
       <div class="cancel-modal__header">
         <div class="cancel-modal__header-left">
           <span class="cancel-modal__icon-badge">✕</span>
-          <h3 class="cancel-modal__title">Cancel appointment?</h3>
+          <h3 class="cancel-modal__title">{{ _('Cancel appointment?') }}</h3>
         </div>
-        <button type="button" class="cancel-modal__close" id="cancel-modal-close" aria-label="Close">✕</button>
+        <button type="button" class="cancel-modal__close" id="cancel-modal-close" aria-label="{{ _('Close') }}">✕</button>
       </div>
 
       <div class="cancel-modal__details">
-        <p class="cancel-modal__details-eyebrow">Appointment details</p>
+        <p class="cancel-modal__details-eyebrow">{{ _('Appointment details') }}</p>
         <p class="cancel-modal__service" id="cancel-modal-service"></p>
         <div class="cancel-modal__detail-row">
           <span class="cancel-modal__row-icon">📅</span>
@@ -337,25 +329,25 @@
 
       <div class="cancel-modal__warning">
         <span class="cancel-modal__warning-icon">⚠</span>
-        <p>Cancellation Policy</p>
+        <p>{{ _('Cancellation Policy') }}</p>
       </div>
 
       <div class="cancel-modal__reason-group">
         <label class="cancel-modal__reason-label" for="cancel-modal-reason">
-          Reason for cancellation <span class="cancel-modal__optional">(optional)</span>
+          {{ _('Reason for cancellation') }} <span class="cancel-modal__optional">{{ _('(optional)') }}</span>
         </label>
         <select class="cancel-modal__reason-select" id="cancel-modal-reason">
-          <option value="">Select a reason...</option>
-          <option value="change_of_plans">Change of plans</option>
-          <option value="feeling_unwell">Feeling unwell</option>
-          <option value="reschedule">Want to reschedule instead</option>
-          <option value="other">Other</option>
+          <option value="">{{ _('Select a reason...') }}</option>
+          <option value="change_of_plans">{{ _('Change of plans') }}</option>
+          <option value="feeling_unwell">{{ _('Feeling unwell') }}</option>
+          <option value="reschedule">{{ _('Want to reschedule instead') }}</option>
+          <option value="other">{{ _('Other') }}</option>
         </select>
       </div>
 
       <div class="cancel-modal__footer">
-        <button type="button" id="cancel-modal-keep" class="btn btn-secondary">Keep appointment</button>
-        <button type="button" id="cancel-modal-confirm" class="btn cancel-modal__confirm-btn">Yes, cancel</button>
+        <button type="button" id="cancel-modal-keep" class="btn btn-secondary">{{ _('Keep appointment') }}</button>
+        <button type="button" id="cancel-modal-confirm" class="btn cancel-modal__confirm-btn">{{ _('Yes, cancel') }}</button>
       </div>
 
     </div>
@@ -365,11 +357,11 @@
   <section class="recent-history">
     <div class="section-heading">
       <div>
-        <h2 class="section-title">Recent History</h2>
-        <p class="section-description">Your completed appointments.</p>
+        <h2 class="section-title">{{ _('Recent History') }}</h2>
+        <p class="section-description">{{ _('Your completed appointments.') }}</p>
       </div>
 
-      <a href="{{ url_for('main.customer_history') }}" class="section-link">View All History</a>
+      <a href="{{ url_for('main.customer_history') }}" class="section-link">{{ _('View All History') }}</a>
     </div>
 
     <div class="history-list">
@@ -385,30 +377,30 @@
           <div class="history-row__service">
             <h3 class="history-row__title">{{ appt['service_name'] }}</h3>
             <p class="history-row__meta">
-              {{ appt['status'] | capitalize }} on {{ appt['booking_date'] | format_date }}
+              {{ _('%(status)s on %(date)s', status=appt['status']|capitalize, date=appt['booking_date']|format_date) }}
             </p>
           </div>
 
           <div class="history-row__stylist">
-            <span class="history-label">Stylist</span>
+            <span class="history-label">{{ _('Stylist') }}</span>
             <span class="history-value">{{ appt['stylist_name'] | short_name if appt['stylist_name'] else '-' }}</span>
           </div>
 
           <div class="history-row__amount">
-            <span class="history-label">Amount</span>
+            <span class="history-label">{{ _('Amount') }}</span>
             <span class="history-value">{{ appt['service_price'] | format_currency if appt['status'] == 'completed' else '$0.00' }}</span>
           </div>
 
           <div class="history-row__actions" onclick="event.stopPropagation()">
-            <a href="{{ url_for('main.customer_booking') }}" class="btn btn-dark">Rebook</a>
+            <a href="{{ url_for('main.customer_booking') }}" class="btn btn-dark">{{ _('Rebook') }}</a>
             {% if appt['status'] == 'completed' and appt['invoice_id'] %}
-            <a href="{{ url_for('main.invoice_detail', invoice_id=appt['invoice_id']) }}" class="text-link">Invoice</a>
+            <a href="{{ url_for('main.invoice_detail', invoice_id=appt['invoice_id']) }}" class="text-link">{{ _('Invoice') }}</a>
             {% endif %}
           </div>
         </article>
         {% endfor %}
       {% else %}
-        <p class="empty-state">No history yet.</p>
+        <p class="empty-state">{{ _('No history yet.') }}</p>
       {% endif %}
     </div>
   </section>

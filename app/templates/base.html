@@ -1,3 +1,4 @@
+{%- import "_lang_switcher.html" as ls with context -%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lang_switcher.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -29,7 +31,7 @@
          - Flask: session.get("user_id") và session.get("role") kiểm soát nhánh
     ════════════════════════════════════════════════════════════════════ -->
     {% block navbar %}
-    <header>
+    <header class="site-header">
         <nav class="navbar">
 
             <!-- Logo — Flask: href="{{ url_for('main.home') }}" -->
@@ -39,33 +41,37 @@
 
             <!-- Desktop nav links -->
             <ul class="nav-links">
-                <li><a href="{{ url_for('main.services') }}">Services</a></li>
-                <li><a href="{{ url_for('main.gallery') }}">Gallery</a></li>
-                <li><a href="{{ url_for('main.about') }}">About</a></li>
-                <li><a href="{{ url_for('main.home') }}#contact">Contact</a></li>
+                <li><a href="{{ url_for('main.services') }}">{{ _('Services') }}</a></li>
+                <li><a href="{{ url_for('main.gallery') }}">{{ _('Gallery') }}</a></li>
+                <li><a href="{{ url_for('main.about') }}">{{ _('About') }}</a></li>
+                <li><a href="{{ url_for('main.home') }}#contact">{{ _('Contact') }}</a></li>
             </ul>
 
             <!-- Right action buttons — conditional on login state -->
             <div class="nav-actions">
+
+                <!-- Language switcher — dropdown [cờ + mã] -->
+                {{ ls.lang_switcher() }}
+
                 {% if not session.get("user_id") %}
                     <!-- Guest: Register + Book Now -->
-                    <a href="{{ url_for('main.register') }}" class="btn-nav-outline">Register</a>
-                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">Book Now</a>
+                    <a href="{{ url_for('main.register') }}" class="btn-nav-outline">{{ _('Register') }}</a>
+                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">{{ _('Book Now') }}</a>
                 {% else %}
                     <!-- Logged in: role-based dashboard link + Book Now -->
                     {% if session.get("role") == "customer" %}
-                        <a href="{{ url_for('main.customer_dashboard') }}" class="btn-nav-outline">My Dashboard</a>
+                        <a href="{{ url_for('main.customer_dashboard') }}" class="btn-nav-outline">{{ _('My Dashboard') }}</a>
                     {% elif session.get("role") == "staff" %}
-                        <a href="{{ url_for('main.staff_dashboard') }}" class="btn-nav-outline">My Schedule</a>
+                        <a href="{{ url_for('main.staff_dashboard') }}" class="btn-nav-outline">{{ _('My Schedule') }}</a>
                     {% elif session.get("role") == "admin" %}
-                        <a href="{{ url_for('main.admin_dashboard') }}" class="btn-nav-outline">Management</a>
+                        <a href="{{ url_for('main.admin_dashboard') }}" class="btn-nav-outline">{{ _('Management') }}</a>
                     {% endif %}
-                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">Book Now</a>
+                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">{{ _('Book Now') }}</a>
                 {% endif %}
             </div>
 
             <!-- Mobile hamburger button — JS toggles .nav-open on <nav> -->
-            <button class="nav-hamburger" aria-label="Open menu">
+            <button class="nav-hamburger" aria-label="{{ _('Open menu') }}">
                 <span class="material-symbols-outlined">menu</span>
             </button>
 
@@ -74,25 +80,29 @@
         <!-- Mobile dropdown menu — hidden by default, toggled via .nav-open -->
         <div class="nav-mobile-menu">
             <ul class="nav-mobile-links">
-                <li><a href="{{ url_for('main.services') }}">Services</a></li>
-                <li><a href="#">Gallery</a></li>
-                <li><a href="#">Membership</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="{{ url_for('main.home') }}#contact">Contact</a></li>
+                <li><a href="{{ url_for('main.services') }}">{{ _('Services') }}</a></li>
+                <li><a href="#">{{ _('Gallery') }}</a></li>
+                <li><a href="#">{{ _('Membership') }}</a></li>
+                <li><a href="#">{{ _('About') }}</a></li>
+                <li><a href="{{ url_for('main.home') }}#contact">{{ _('Contact') }}</a></li>
             </ul>
             <div class="nav-mobile-actions">
+
+                <!-- Language switcher — dropdown [cờ + mã] -->
+                {{ ls.lang_switcher() }}
+
                 {% if not session.get("user_id") %}
-                    <a href="{{ url_for('main.register') }}" class="btn-nav-outline">Register</a>
-                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">Book Now</a>
+                    <a href="{{ url_for('main.register') }}" class="btn-nav-outline">{{ _('Register') }}</a>
+                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">{{ _('Book Now') }}</a>
                 {% else %}
                     {% if session.get("role") == "customer" %}
-                        <a href="{{ url_for('main.customer_dashboard') }}" class="btn-nav-outline">My Dashboard</a>
+                        <a href="{{ url_for('main.customer_dashboard') }}" class="btn-nav-outline">{{ _('My Dashboard') }}</a>
                     {% elif session.get("role") == "staff" %}
-                        <a href="{{ url_for('main.staff_dashboard') }}" class="btn-nav-outline">My Schedule</a>
+                        <a href="{{ url_for('main.staff_dashboard') }}" class="btn-nav-outline">{{ _('My Schedule') }}</a>
                     {% elif session.get("role") == "admin" %}
-                        <a href="{{ url_for('main.admin_dashboard') }}" class="btn-nav-outline">Management</a>
+                        <a href="{{ url_for('main.admin_dashboard') }}" class="btn-nav-outline">{{ _('Management') }}</a>
                     {% endif %}
-                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">Book Now</a>
+                    <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">{{ _('Book Now') }}</a>
                 {% endif %}
             </div>
         </div>
@@ -134,6 +144,34 @@
         if (hamburger && header) {
             hamburger.addEventListener("click", () => header.classList.toggle("nav-open"));
         }
+    });
+
+    /* Language dropdown toggle — đóng khi click ra ngoài hoặc nhấn Escape */
+    document.addEventListener("DOMContentLoaded", function () {
+        const dropdowns = document.querySelectorAll("[data-lang-dropdown]");
+
+        function closeAll(except) {
+            dropdowns.forEach((d) => {
+                if (d === except) return;
+                d.classList.remove("lang-dropdown--open");
+                d.querySelector(".lang-dropdown__trigger").setAttribute("aria-expanded", "false");
+            });
+        }
+
+        dropdowns.forEach((dropdown) => {
+            const trigger = dropdown.querySelector(".lang-dropdown__trigger");
+            trigger.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const open = dropdown.classList.toggle("lang-dropdown--open");
+                trigger.setAttribute("aria-expanded", open ? "true" : "false");
+                closeAll(dropdown);
+            });
+        });
+
+        document.addEventListener("click", () => closeAll(null));
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeAll(null);
+        });
     });
     </script>
 
@@ -178,35 +216,35 @@
                         {% endfor %}
                     </div>
 
-                    <div class="footer-bizid">Business ID: {{ business_id }}</div>
+                    <div class="footer-bizid">{{ _('Business ID:') }} {{ business_id }}</div>
                 </div>
 
                 <!-- Cột 2: Explore -->
                 <div class="footer-col">
-                    <div class="footer-heading">Explore</div>
+                    <div class="footer-heading">{{ _('Explore') }}</div>
                     <ul class="footer-links">
-                        <li><a href="{{ url_for('main.services') }}">Services</a></li>
-                        <li><a href="#">Gallery</a></li>
+                        <li><a href="{{ url_for('main.services') }}">{{ _('Services') }}</a></li>
+                        <li><a href="#">{{ _('Gallery') }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Cột 3: Support -->
                 <div class="footer-col">
-                    <div class="footer-heading">Support</div>
+                    <div class="footer-heading">{{ _('Support') }}</div>
                     <ul class="footer-links">
-                        <li><a href="{{ url_for('main.about')}}">About Us</a></li>
-                        <li><a href="{{ url_for('main.home') }}#contact">Contact</a></li>
-                        <li><a href="#">FAQs</a></li>
+                        <li><a href="{{ url_for('main.about')}}">{{ _('About Us') }}</a></li>
+                        <li><a href="{{ url_for('main.home') }}#contact">{{ _('Contact') }}</a></li>
+                        <li><a href="#">{{ _('FAQs') }}</a></li>
                     </ul>
                 </div>
 
             </div>
 
             <div class="footer-bottom">
-                <span class="footer-copy">&copy; {{ current_year }} DahaCare Atélier. All rights reserved.</span>
+                <span class="footer-copy">&copy; {{ current_year }} DahaCare Atélier. {{ _('All rights reserved.') }}</span>
                 <div class="footer-legal">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
+                    <a href="#">{{ _('Privacy Policy') }}</a>
+                    <a href="#">{{ _('Terms of Service') }}</a>
                 </div>
             </div>
 

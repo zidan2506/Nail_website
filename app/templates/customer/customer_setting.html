@@ -45,9 +45,10 @@
 ================================================================= #}
 
 {% extends "customer_base.html" %}
+{% import "_lang_switcher.html" as ls with context %}
 
 {# ── PAGE TITLE ───────────────────────────────────────────────── #}
-{% block title %}Account Settings – Daha Care{% endblock %}
+{% block title %}{{ _('Account Settings') }} – Daha Care{% endblock %}
 
 {# ── ACTIVE NAV ITEM ──────────────────────────────────────────── #}
 {# Sets "active" class on the Settings nav link in the sidebar #}
@@ -535,6 +536,62 @@
     color: #24161c;
     font-weight: 700;
   }
+
+  /* ── CARD 4: LANGUAGE ───────────────────────────────────────── */
+  .lang-card-hint {
+    font-size: 0.9rem;
+    color: #73636a;
+    margin: 0 0 20px;
+  }
+
+  .lang-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lang-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1.5px solid #efe6ea;
+    background: #ffffff;
+    text-decoration: none;
+    color: #24161c;
+    transition: border-color 0.18s ease, background 0.18s ease;
+  }
+
+  .lang-option:hover {
+    border-color: #f4c2d8;
+    background: #fffafb;
+  }
+
+  .lang-option--active {
+    border-color: #d64682;
+    background: #fdf2f5;
+  }
+
+  .lang-option__name {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .lang-option__check {
+    color: #d64682;
+    font-size: 22px;
+  }
+
+  .lang-option .lang-flag {
+    width: 28px;
+    height: 19px;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+    display: block;
+  }
 </style>
 {% endblock %}
 
@@ -549,9 +606,9 @@
 
 {# ── PAGE HEADER ──────────────────────────────────────────────── #}
 <div class="settings-page-header dashboard-header">
-  <p class="dashboard-label">My Account</p>
-  <h1>Account Settings</h1>
-  <p class="dashboard-subtitle">Manage your personal information and security preferences.</p>
+  <p class="dashboard-label">{{ _('My Account') }}</p>
+  <h1>{{ _('Account Settings') }}</h1>
+  <p class="dashboard-subtitle">{{ _('Manage your personal information and security preferences.') }}</p>
 </div>
 
 {# ── CARDS STACK ──────────────────────────────────────────────── #}
@@ -607,7 +664,7 @@
           {% if current_user.profile_picture %}
           <img
             src="{{ current_user.profile_picture }}"
-            alt="Profile picture of {{ current_user.full_name }}"
+            alt="{{ _('Profile picture of %(name)s', name=current_user.full_name) }}"
           >
           {% else %}
           <span class="avatar-initials" style="background:{{ sidebar_customer.avatar_bg }}; color:{{ sidebar_customer.avatar_color }};">{{ sidebar_customer.initials }}</span>
@@ -619,8 +676,8 @@
         {# CLAUDE CODE: Replace 📷 emoji with an <img> or SVG icon if preferred #}
       </div>
 
-      <span class="avatar-label">Profile Picture</span>
-      <span class="avatar-hint">JPG, GIF or PNG. Max size of 800K</span>
+      <span class="avatar-label">{{ _('Profile Picture') }}</span>
+      <span class="avatar-hint">{{ _('JPG, GIF or PNG. Max size of 800K') }}</span>
     </div>
 
   </div>{# end Card 1 #}
@@ -658,7 +715,7 @@
     <div class="settings-card-header">
       <div class="settings-card-icon">👤</div>
       {# CLAUDE CODE: Replace emoji with SVG icon if project uses icon set #}
-      <h2>Personal Information</h2>
+      <h2>{{ _('Personal Information') }}</h2>
     </div>
 
     {# Personal info form — submitted by Save Changes button below #}
@@ -674,7 +731,7 @@
         {# ── FULL NAME ── #}
         <div class="field-row" data-field="full_name">
           <div class="field-info">
-            <div class="field-label">Full Name</div>
+            <div class="field-label">{{ _('Full Name') }}</div>
             {# Display mode: shows current value #}
             <div class="field-display">{{ current_user.full_name }}</div>
             {# Edit mode: shown on "Change" click via JS #}
@@ -683,35 +740,35 @@
               name="full_name"
               value="{{ current_user.full_name }}"
               class="field-input"
-              placeholder="Enter full name"
+              placeholder="{{ _('Enter full name') }}"
             >
           </div>
-          <button type="button" class="field-change-btn">Change</button>
+          <button type="button" class="field-change-btn">{{ _('Change') }}</button>
         </div>
 
         {# ── EMAIL ADDRESS ── #}
         <div class="field-row" data-field="email">
           <div class="field-info">
-            <div class="field-label">Email Address</div>
+            <div class="field-label">{{ _('Email Address') }}</div>
             <div class="field-display">{{ current_user.email }}</div>
           </div>
-          <button type="button" class="field-change-btn email-change-trigger" onclick="openEmailModal()">Change</button>
+          <button type="button" class="field-change-btn email-change-trigger" onclick="openEmailModal()">{{ _('Change') }}</button>
         </div>
 
         {# ── PHONE NUMBER ── #}
         <div class="field-row" data-field="phone">
           <div class="field-info">
-            <div class="field-label">Phone Number</div>
+            <div class="field-label">{{ _('Phone Number') }}</div>
             <div class="field-display">{{ current_user.phone }}</div>
             <input
               type="tel"
               name="phone"
               value="{{ current_user.phone }}"
               class="field-input"
-              placeholder="Enter phone number"
+              placeholder="{{ _('Enter phone number') }}"
             >
           </div>
-          <button type="button" class="field-change-btn">Change</button>
+          <button type="button" class="field-change-btn">{{ _('Change') }}</button>
         </div>
 
         {# ── DATE OF BIRTH ── #}
@@ -721,12 +778,12 @@
            - Handle None case: if no DOB set, show "Not set" as display text #}
         <div class="field-row" data-field="date_of_birth">
           <div class="field-info">
-            <div class="field-label">Date of Birth</div>
+            <div class="field-label">{{ _('Date of Birth') }}</div>
             <div class="field-display">
               {% if current_user.date_of_birth %}
                 {{ current_user.date_of_birth | format_date }}
               {% else %}
-                Not set
+                {{ _('Not set') }}
               {% endif %}
             </div>
             <input
@@ -736,14 +793,14 @@
               class="field-input"
             >
           </div>
-          <button type="button" class="field-change-btn">Change</button>
+          <button type="button" class="field-change-btn">{{ _('Change') }}</button>
         </div>
 
       </div>{# end field-list #}
 
       {# Save Changes — submits profile-form, inside card bottom-right #}
       <button type="submit" class="save-changes-btn" id="btn-save-changes" disabled>
-        Save Changes
+        {{ _('Save Changes') }}
       </button>
 
     </form>{# end profile-form #}
@@ -780,30 +837,62 @@
     <div class="settings-card-header">
       <div class="settings-card-icon">🔒</div>
       {# CLAUDE CODE: Replace emoji with SVG icon if project uses icon set #}
-      <h2>Security</h2>
+      <h2>{{ _('Security') }}</h2>
     </div>
 
     {# Password row #}
     <div class="password-row-container">
       <div>
-        <div class="password-label">Password</div>
+        <div class="password-label">{{ _('Password') }}</div>
         <div class="password-dots">••••••••</div>
       </div>
       {# Opens password modal — see Modal section below #}
       <button type="button" class="change-password-btn" onclick="openPasswordModal()">
-        Change Password
+        {{ _('Change Password') }}
       </button>
     </div>
 
     {# Last changed metadata — hidden if password_last_changed is None #}
     {% if current_user.password_last_changed %}
     <p class="password-meta">
-      Last changed {{ current_user.password_last_changed | time_ago }}
+      {{ _('Last changed %(time)s', time=current_user.password_last_changed|time_ago) }}
       {# CLAUDE CODE: time_ago filter should return human-readable string e.g. "3 months ago" #}
     </p>
     {% endif %}
 
   </div>{# end Card 3 #}
+
+
+  {# ============================================================
+     CARD 4: LANGUAGE — chọn ngôn ngữ hiển thị
+     Mỗi lựa chọn là link tới /set-language/<code>; route set session
+     rồi redirect về trang trước (chính là trang setting này).
+  ============================================================ #}
+  <div class="settings-card">
+
+    {# Card header #}
+    <div class="settings-card-header">
+      <div class="settings-card-icon">🌐</div>
+      <h2>{{ _('Language') }}</h2>
+    </div>
+
+    <p class="lang-card-hint">{{ _('Choose your preferred display language.') }}</p>
+
+    {% set lang_names = {'fi': 'Suomi', 'en': 'English', 'vi': 'Tiếng Việt'} %}
+    <div class="lang-options">
+      {% for code in languages %}
+      <a href="{{ url_for('main.set_language', lang=code) }}"
+         class="lang-option{% if code == current_lang %} lang-option--active{% endif %}">
+        {{ ls.lang_flag(code) }}
+        <span class="lang-option__name">{{ lang_names[code] }}</span>
+        {% if code == current_lang %}
+        <span class="material-symbols-outlined lang-option__check">check_circle</span>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </div>
+
+  </div>{# end Card 4 #}
 
 </div>{# end settings-stack #}
 
@@ -816,8 +905,8 @@
   <div class="modal-box">
 
     <div class="modal-header">
-      <h3>Change Email Address</h3>
-      <button type="button" class="modal-close-btn" onclick="closeEmailModal()" aria-label="Close">✕</button>
+      <h3>{{ _('Change Email Address') }}</h3>
+      <button type="button" class="modal-close-btn" onclick="closeEmailModal()" aria-label="{{ _('Close') }}">✕</button>
     </div>
 
     <div class="modal-error" id="email-modal-error"></div>
@@ -825,35 +914,35 @@
     {# Step 1: confirm send code to current email #}
     <div id="email-step-1">
       <p style="font-size:0.95rem; color:#534048; margin:0 0 16px;">
-        To verify your identity, we'll send a verification code to your current email address.
+        {{ _("To verify your identity, we'll send a verification code to your current email address.") }}
       </p>
       <div style="background:#faf7f8; border-radius:12px; padding:14px 18px; margin-bottom:24px; font-size:0.95rem; font-weight:700; color:#24161c;">
         {{ current_user.email }}
       </div>
       <div class="modal-actions">
-        <button type="button" class="modal-cancel-btn" onclick="closeEmailModal()">Cancel</button>
-        <button type="button" class="modal-submit-btn" id="email-send-btn" onclick="sendEmailVerificationCode()">Send Code</button>
+        <button type="button" class="modal-cancel-btn" onclick="closeEmailModal()">{{ _('Cancel') }}</button>
+        <button type="button" class="modal-submit-btn" id="email-send-btn" onclick="sendEmailVerificationCode()">{{ _('Send Code') }}</button>
       </div>
     </div>
 
     {# Step 2: enter code + new email #}
     <div id="email-step-2" style="display:none;">
       <p style="font-size:0.9rem; color:#534048; margin:0 0 20px;">
-        Enter the verification code sent to <strong>{{ current_user.email }}</strong> and your new email address.
+        {{ _('Enter the verification code sent to') }} <strong>{{ current_user.email }}</strong> {{ _('and your new email address.') }}
       </p>
       <form action="{{ url_for('main.update_email_address') }}" method="POST" id="email-change-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="modal-field">
-          <label for="email_verification_code">Verification Code</label>
-          <input id="email_verification_code" type="text" name="verification_code" placeholder="Enter 6-digit code" required autocomplete="off">
+          <label for="email_verification_code">{{ _('Verification Code') }}</label>
+          <input id="email_verification_code" type="text" name="verification_code" placeholder="{{ _('Enter 6-digit code') }}" required autocomplete="off">
         </div>
         <div class="modal-field">
-          <label for="new_email">New Email Address</label>
-          <input id="new_email" type="email" name="new_email" placeholder="Enter new email address" required autocomplete="email">
+          <label for="new_email">{{ _('New Email Address') }}</label>
+          <input id="new_email" type="email" name="new_email" placeholder="{{ _('Enter new email address') }}" required autocomplete="email">
         </div>
         <div class="modal-actions">
-          <button type="button" class="modal-cancel-btn" onclick="closeEmailModal()">Cancel</button>
-          <button type="submit" class="modal-submit-btn">Update Email</button>
+          <button type="button" class="modal-cancel-btn" onclick="closeEmailModal()">{{ _('Cancel') }}</button>
+          <button type="submit" class="modal-submit-btn">{{ _('Update Email') }}</button>
         </div>
       </form>
     </div>
@@ -885,8 +974,8 @@
   <div class="modal-box">
 
     <div class="modal-header">
-      <h3 id="pwd-modal-title">Update Password</h3>
-      <button type="button" class="modal-close-btn" onclick="closePasswordModal()" aria-label="Close">✕</button>
+      <h3 id="pwd-modal-title">{{ _('Update Password') }}</h3>
+      <button type="button" class="modal-close-btn" onclick="closePasswordModal()" aria-label="{{ _('Close') }}">✕</button>
     </div>
 
     <div class="modal-error" id="modal-error"></div>
@@ -894,39 +983,39 @@
     {# Step 1: confirm send code #}
     <div id="password-step-1">
       <p style="font-size:0.95rem; color:#534048; margin:0 0 16px;">
-        To verify your identity, we'll send a verification code to your email address.
+        {{ _("To verify your identity, we'll send a verification code to your email address.") }}
       </p>
       <div style="background:#faf7f8; border-radius:12px; padding:14px 18px; margin-bottom:24px; font-size:0.95rem; font-weight:700; color:#24161c;">
         {{ current_user.email }}
       </div>
       <div class="modal-actions">
-        <button type="button" class="modal-cancel-btn" onclick="closePasswordModal()">Cancel</button>
-        <button type="button" class="modal-submit-btn" id="pwd-send-btn" onclick="sendPasswordVerificationCode()">Send Code</button>
+        <button type="button" class="modal-cancel-btn" onclick="closePasswordModal()">{{ _('Cancel') }}</button>
+        <button type="button" class="modal-submit-btn" id="pwd-send-btn" onclick="sendPasswordVerificationCode()">{{ _('Send Code') }}</button>
       </div>
     </div>
 
     {# Step 2: enter code + new password #}
     <div id="password-step-2" style="display:none;">
       <p style="font-size:0.9rem; color:#534048; margin:0 0 20px;">
-        Enter the verification code sent to <strong>{{ current_user.email }}</strong> and your new password.
+        {{ _('Enter the verification code sent to') }} <strong>{{ current_user.email }}</strong> {{ _('and your new password.') }}
       </p>
       <form action="{{ url_for('main.change_password') }}" method="POST" id="password-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="modal-field">
-          <label for="pwd_verification_code">Verification Code</label>
-          <input id="pwd_verification_code" type="text" name="verification_code" placeholder="Enter 6-digit code" required autocomplete="off">
+          <label for="pwd_verification_code">{{ _('Verification Code') }}</label>
+          <input id="pwd_verification_code" type="text" name="verification_code" placeholder="{{ _('Enter 6-digit code') }}" required autocomplete="off">
         </div>
         <div class="modal-field">
-          <label for="new_password">New Password</label>
-          <input id="new_password" type="password" name="new_password" placeholder="Create new password" required autocomplete="new-password">
+          <label for="new_password">{{ _('New Password') }}</label>
+          <input id="new_password" type="password" name="new_password" placeholder="{{ _('Create new password') }}" required autocomplete="new-password">
         </div>
         <div class="modal-field">
-          <label for="confirm_password">Confirm New Password</label>
-          <input id="confirm_password" type="password" name="confirm_password" placeholder="Confirm new password" required autocomplete="new-password">
+          <label for="confirm_password">{{ _('Confirm New Password') }}</label>
+          <input id="confirm_password" type="password" name="confirm_password" placeholder="{{ _('Confirm new password') }}" required autocomplete="new-password">
         </div>
         <div class="modal-actions">
-          <button type="button" class="modal-cancel-btn" onclick="closePasswordModal()">Cancel</button>
-          <button type="submit" class="modal-submit-btn">Update Password</button>
+          <button type="button" class="modal-cancel-btn" onclick="closePasswordModal()">{{ _('Cancel') }}</button>
+          <button type="submit" class="modal-submit-btn">{{ _('Update Password') }}</button>
         </div>
       </form>
     </div>
@@ -970,7 +1059,7 @@
     document.getElementById('modal-error').textContent = '';
     const sendBtn = document.getElementById('pwd-send-btn');
     sendBtn.disabled = false;
-    sendBtn.textContent = 'Send Code';
+    sendBtn.textContent = '{{ _("Send Code") }}';
   }
 
   function closePasswordModal() {
@@ -993,7 +1082,7 @@
     const sendBtn = document.getElementById('pwd-send-btn');
     const errorDiv = document.getElementById('modal-error');
     sendBtn.disabled = true;
-    sendBtn.textContent = 'Sending...';
+    sendBtn.textContent = '{{ _("Sending...") }}';
     errorDiv.style.display = 'none';
 
     try {
@@ -1012,16 +1101,16 @@
         document.getElementById('password-step-2').style.display = 'block';
         document.getElementById('pwd_verification_code').focus();
       } else {
-        errorDiv.textContent = data.message || 'Something went wrong. Please try again.';
+        errorDiv.textContent = data.message || '{{ _("Something went wrong. Please try again.") }}';
         errorDiv.style.display = 'block';
         sendBtn.disabled = false;
-        sendBtn.textContent = 'Send Code';
+        sendBtn.textContent = '{{ _("Send Code") }}';
       }
     } catch {
-      errorDiv.textContent = 'Network error. Please try again.';
+      errorDiv.textContent = '{{ _("Network error. Please try again.") }}';
       errorDiv.style.display = 'block';
       sendBtn.disabled = false;
-      sendBtn.textContent = 'Send Code';
+      sendBtn.textContent = '{{ _("Send Code") }}';
     }
   }
 
@@ -1048,7 +1137,7 @@
         input.style.display = 'none';
         display.style.display = 'block';
         input.value = display.textContent.trim() === 'Not set' ? '' : display.textContent.trim();
-        btn.textContent = 'Change';
+        btn.textContent = '{{ _("Change") }}';
         activeEdits--;
         if (activeEdits === 0) hasUnsavedChanges = false;
         updateSaveBtn();
@@ -1057,7 +1146,7 @@
         display.style.display = 'none';
         input.style.display = 'block';
         input.focus();
-        btn.textContent = 'Cancel';
+        btn.textContent = '{{ _("Cancel") }}';
         activeEdits++;
         hasUnsavedChanges = true;
         updateSaveBtn();
@@ -1072,7 +1161,7 @@
   window.addEventListener('beforeunload', (e) => {
     if (hasUnsavedChanges) {
       e.preventDefault();
-      e.returnValue = 'You have unsaved changes. Do you want to leave without saving?';
+      e.returnValue = '{{ _("You have unsaved changes. Do you want to leave without saving?") }}';
     }
   });
 
@@ -1104,7 +1193,7 @@
     document.getElementById('email-modal-error').textContent = '';
     const sendBtn = document.getElementById('email-send-btn');
     sendBtn.disabled = false;
-    sendBtn.textContent = 'Send Code';
+    sendBtn.textContent = '{{ _("Send Code") }}';
   }
 
   function closeEmailModal() {
@@ -1125,7 +1214,7 @@
     const sendBtn = document.getElementById('email-send-btn');
     const errorDiv = document.getElementById('email-modal-error');
     sendBtn.disabled = true;
-    sendBtn.textContent = 'Sending...';
+    sendBtn.textContent = '{{ _("Sending...") }}';
     errorDiv.style.display = 'none';
 
     try {
@@ -1144,16 +1233,16 @@
         document.getElementById('email-step-2').style.display = 'block';
         document.getElementById('email_verification_code').focus();
       } else {
-        errorDiv.textContent = data.message || 'Something went wrong. Please try again.';
+        errorDiv.textContent = data.message || '{{ _("Something went wrong. Please try again.") }}';
         errorDiv.style.display = 'block';
         sendBtn.disabled = false;
-        sendBtn.textContent = 'Send Code';
+        sendBtn.textContent = '{{ _("Send Code") }}';
       }
     } catch {
-      errorDiv.textContent = 'Network error. Please try again.';
+      errorDiv.textContent = '{{ _("Network error. Please try again.") }}';
       errorDiv.style.display = 'block';
       sendBtn.disabled = false;
-      sendBtn.textContent = 'Send Code';
+      sendBtn.textContent = '{{ _("Send Code") }}';
     }
   }
 </script>

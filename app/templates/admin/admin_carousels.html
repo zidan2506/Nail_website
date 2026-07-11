@@ -444,6 +444,16 @@
              data-cta2-label="{{ s.cta2_label or '' | e }}"
              data-cta2-url="{{ s.cta2_url or '' | e }}"
              data-cta2-style="{{ s.cta2_style or 'outline' }}"
+             data-title-fi="{{ s.title_fi or '' | e }}"
+             data-title-vi="{{ s.title_vi or '' | e }}"
+             data-subtitle-fi="{{ s.subtitle_fi or '' | e }}"
+             data-subtitle-vi="{{ s.subtitle_vi or '' | e }}"
+             data-badge-fi="{{ s.badge_fi or '' | e }}"
+             data-badge-vi="{{ s.badge_vi or '' | e }}"
+             data-cta-label-fi="{{ s.cta_label_fi or '' | e }}"
+             data-cta-label-vi="{{ s.cta_label_vi or '' | e }}"
+             data-cta2-label-fi="{{ s.cta2_label_fi or '' | e }}"
+             data-cta2-label-vi="{{ s.cta2_label_vi or '' | e }}"
              data-active="{{ s.is_active }}"
              data-delete-name="{{ s.title | e }}">
             <div class="cr-slide-thumb">
@@ -505,6 +515,14 @@
              data-cta-label="{{ s.cta_label or '' | e }}"
              data-cta-url="{{ s.cta_url or '' | e }}"
              data-cta-style="{{ s.cta_style or 'primary' }}"
+             data-title-fi="{{ s.title_fi or '' | e }}"
+             data-title-vi="{{ s.title_vi or '' | e }}"
+             data-subtitle-fi="{{ s.subtitle_fi or '' | e }}"
+             data-subtitle-vi="{{ s.subtitle_vi or '' | e }}"
+             data-badge-fi="{{ s.badge_fi or '' | e }}"
+             data-badge-vi="{{ s.badge_vi or '' | e }}"
+             data-cta-label-fi="{{ s.cta_label_fi or '' | e }}"
+             data-cta-label-vi="{{ s.cta_label_vi or '' | e }}"
              data-active="{{ s.is_active }}"
              data-delete-name="{{ s.title | e }}">
             <div class="cr-slide-thumb">
@@ -552,6 +570,8 @@
              data-slot="{{ m.slot_key }}"
              data-icon="{{ m.icon or '' | e }}"
              data-title="{{ m.title | e }}"
+             data-title-fi="{{ m.title_fi or '' | e }}"
+             data-title-vi="{{ m.title_vi or '' | e }}"
              data-pts-label="{{ m.pts_label or '' | e }}"
              data-image="{{ m.image_url or '' }}">
             <div class="cr-mission-icon">{{ m.icon }}</div>
@@ -609,30 +629,64 @@
                 </div>
 
                 <div class="cr-form-group">
-                    <label class="cr-form-label" for="crHomepage_title">Tiêu đề *</label>
+                    <label class="cr-form-label" for="crHomepage_title">Tiêu đề (English) *</label>
                     <input type="text" name="title" id="crHomepage_title" class="cr-form-input" required>
                 </div>
-
                 <div class="cr-form-group">
-                    <label class="cr-form-label" for="crHomepage_subtitle">Subtitle</label>
-                    <textarea name="subtitle" id="crHomepage_subtitle" class="cr-form-textarea" rows="2"></textarea>
+                    <label class="cr-form-label" for="crHomepage_title_fi">Tiêu đề (Suomi)</label>
+                    <input type="text" name="title_fi" id="crHomepage_title_fi" class="cr-form-input">
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_title_vi">Tiêu đề (Tiếng Việt)</label>
+                    <input type="text" name="title_vi" id="crHomepage_title_vi" class="cr-form-input">
                 </div>
 
                 <div class="cr-form-group">
-                    <label class="cr-form-label" for="crHomepage_badge">Badge</label>
+                    <label class="cr-form-label" for="crHomepage_subtitle">Subtitle (English)</label>
+                    <textarea name="subtitle" id="crHomepage_subtitle" class="cr-form-textarea" rows="2"></textarea>
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_subtitle_fi">Subtitle (Suomi)</label>
+                    <textarea name="subtitle_fi" id="crHomepage_subtitle_fi" class="cr-form-textarea" rows="2"></textarea>
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_subtitle_vi">Subtitle (Tiếng Việt)</label>
+                    <textarea name="subtitle_vi" id="crHomepage_subtitle_vi" class="cr-form-textarea" rows="2"></textarea>
+                </div>
+
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_badge">Badge (English)</label>
                     <input type="text" name="badge" id="crHomepage_badge" class="cr-form-input" placeholder="VD: New season collection">
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_badge_fi">Badge (Suomi)</label>
+                    <input type="text" name="badge_fi" id="crHomepage_badge_fi" class="cr-form-input">
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crHomepage_badge_vi">Badge (Tiếng Việt)</label>
+                    <input type="text" name="badge_vi" id="crHomepage_badge_vi" class="cr-form-input">
                 </div>
 
                 <div class="cr-form-divider"></div>
                 <div class="cr-section-title">Nút CTA chính</div>
                 <div class="cr-form-row">
                     <div class="cr-form-group">
-                        <label class="cr-form-label" for="crHomepage_ctaLabel">Nhãn nút</label>
+                        <label class="cr-form-label" for="crHomepage_ctaLabel">Nhãn nút (English)</label>
                         <input type="text" name="cta_label" id="crHomepage_ctaLabel" class="cr-form-input" placeholder="Book Now">
                     </div>
                     <div class="cr-form-group">
                         <label class="cr-form-label" for="crHomepage_ctaUrl">Đường dẫn</label>
                         <input type="text" name="cta_url" id="crHomepage_ctaUrl" class="cr-form-input" placeholder="/public/booking">
+                    </div>
+                </div>
+                <div class="cr-form-row">
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crHomepage_ctaLabel_fi">Nhãn nút (Suomi)</label>
+                        <input type="text" name="cta_label_fi" id="crHomepage_ctaLabel_fi" class="cr-form-input">
+                    </div>
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crHomepage_ctaLabel_vi">Nhãn nút (Tiếng Việt)</label>
+                        <input type="text" name="cta_label_vi" id="crHomepage_ctaLabel_vi" class="cr-form-input">
                     </div>
                 </div>
                 <div class="cr-form-group">
@@ -647,12 +701,22 @@
                 <div class="cr-section-title">Nút CTA phụ (tùy chọn)</div>
                 <div class="cr-form-row">
                     <div class="cr-form-group">
-                        <label class="cr-form-label" for="crHomepage_cta2Label">Nhãn nút</label>
+                        <label class="cr-form-label" for="crHomepage_cta2Label">Nhãn nút (English)</label>
                         <input type="text" name="cta2_label" id="crHomepage_cta2Label" class="cr-form-input" placeholder="Explore Services">
                     </div>
                     <div class="cr-form-group">
                         <label class="cr-form-label" for="crHomepage_cta2Url">Đường dẫn</label>
                         <input type="text" name="cta2_url" id="crHomepage_cta2Url" class="cr-form-input" placeholder="/services">
+                    </div>
+                </div>
+                <div class="cr-form-row">
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crHomepage_cta2Label_fi">Nhãn nút (Suomi)</label>
+                        <input type="text" name="cta2_label_fi" id="crHomepage_cta2Label_fi" class="cr-form-input">
+                    </div>
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crHomepage_cta2Label_vi">Nhãn nút (Tiếng Việt)</label>
+                        <input type="text" name="cta2_label_vi" id="crHomepage_cta2Label_vi" class="cr-form-input">
                     </div>
                 </div>
                 <div class="cr-form-group">
@@ -716,30 +780,64 @@
                 </div>
 
                 <div class="cr-form-group">
-                    <label class="cr-form-label" for="crOffer_title">Tiêu đề *</label>
+                    <label class="cr-form-label" for="crOffer_title">Tiêu đề (English) *</label>
                     <input type="text" name="title" id="crOffer_title" class="cr-form-input" required>
                 </div>
-
                 <div class="cr-form-group">
-                    <label class="cr-form-label" for="crOffer_subtitle">Mô tả</label>
-                    <textarea name="subtitle" id="crOffer_subtitle" class="cr-form-textarea" rows="2"></textarea>
+                    <label class="cr-form-label" for="crOffer_title_fi">Tiêu đề (Suomi)</label>
+                    <input type="text" name="title_fi" id="crOffer_title_fi" class="cr-form-input">
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crOffer_title_vi">Tiêu đề (Tiếng Việt)</label>
+                    <input type="text" name="title_vi" id="crOffer_title_vi" class="cr-form-input">
                 </div>
 
                 <div class="cr-form-group">
-                    <label class="cr-form-label" for="crOffer_badge">Badge</label>
+                    <label class="cr-form-label" for="crOffer_subtitle">Mô tả (English)</label>
+                    <textarea name="subtitle" id="crOffer_subtitle" class="cr-form-textarea" rows="2"></textarea>
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crOffer_subtitle_fi">Mô tả (Suomi)</label>
+                    <textarea name="subtitle_fi" id="crOffer_subtitle_fi" class="cr-form-textarea" rows="2"></textarea>
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crOffer_subtitle_vi">Mô tả (Tiếng Việt)</label>
+                    <textarea name="subtitle_vi" id="crOffer_subtitle_vi" class="cr-form-textarea" rows="2"></textarea>
+                </div>
+
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crOffer_badge">Badge (English)</label>
                     <input type="text" name="badge" id="crOffer_badge" class="cr-form-input" placeholder="✦ Loyalty Reward">
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crOffer_badge_fi">Badge (Suomi)</label>
+                    <input type="text" name="badge_fi" id="crOffer_badge_fi" class="cr-form-input">
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crOffer_badge_vi">Badge (Tiếng Việt)</label>
+                    <input type="text" name="badge_vi" id="crOffer_badge_vi" class="cr-form-input">
                 </div>
 
                 <div class="cr-form-divider"></div>
                 <div class="cr-section-title">Nút CTA</div>
                 <div class="cr-form-row">
                     <div class="cr-form-group">
-                        <label class="cr-form-label" for="crOffer_ctaLabel">Nhãn nút</label>
+                        <label class="cr-form-label" for="crOffer_ctaLabel">Nhãn nút (English)</label>
                         <input type="text" name="cta_label" id="crOffer_ctaLabel" class="cr-form-input" placeholder="Redeem for 300 pts">
                     </div>
                     <div class="cr-form-group">
                         <label class="cr-form-label" for="crOffer_ctaUrl">Đường dẫn</label>
                         <input type="text" name="cta_url" id="crOffer_ctaUrl" class="cr-form-input" placeholder="/customer/loyalty-points">
+                    </div>
+                </div>
+                <div class="cr-form-row">
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crOffer_ctaLabel_fi">Nhãn nút (Suomi)</label>
+                        <input type="text" name="cta_label_fi" id="crOffer_ctaLabel_fi" class="cr-form-input">
+                    </div>
+                    <div class="cr-form-group">
+                        <label class="cr-form-label" for="crOffer_ctaLabel_vi">Nhãn nút (Tiếng Việt)</label>
+                        <input type="text" name="cta_label_vi" id="crOffer_ctaLabel_vi" class="cr-form-input">
                     </div>
                 </div>
                 <div class="cr-form-group">
@@ -814,8 +912,16 @@
                 </div>
 
                 <div class="cr-form-group">
-                    <label class="cr-form-label" for="crMission_title">Tên mission *</label>
+                    <label class="cr-form-label" for="crMission_title">Tên mission (English) *</label>
                     <input type="text" name="title" id="crMission_title" class="cr-form-input" required>
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crMission_title_fi">Tên mission (Suomi)</label>
+                    <input type="text" name="title_fi" id="crMission_title_fi" class="cr-form-input">
+                </div>
+                <div class="cr-form-group">
+                    <label class="cr-form-label" for="crMission_title_vi">Tên mission (Tiếng Việt)</label>
+                    <input type="text" name="title_vi" id="crMission_title_vi" class="cr-form-input">
                 </div>
             </div>
 
@@ -934,6 +1040,16 @@ function openHomepageModal(card) {
         document.getElementById('crHomepage_cta2Label').value = d.cta2Label;
         document.getElementById('crHomepage_cta2Url').value = d.cta2Url;
         document.getElementById('crHomepage_cta2Style').value = d.cta2Style;
+        document.getElementById('crHomepage_title_fi').value = d.titleFi || '';
+        document.getElementById('crHomepage_title_vi').value = d.titleVi || '';
+        document.getElementById('crHomepage_subtitle_fi').value = d.subtitleFi || '';
+        document.getElementById('crHomepage_subtitle_vi').value = d.subtitleVi || '';
+        document.getElementById('crHomepage_badge_fi').value = d.badgeFi || '';
+        document.getElementById('crHomepage_badge_vi').value = d.badgeVi || '';
+        document.getElementById('crHomepage_ctaLabel_fi').value = d.ctaLabelFi || '';
+        document.getElementById('crHomepage_ctaLabel_vi').value = d.ctaLabelVi || '';
+        document.getElementById('crHomepage_cta2Label_fi').value = d.cta2LabelFi || '';
+        document.getElementById('crHomepage_cta2Label_vi').value = d.cta2LabelVi || '';
         document.getElementById('crHomepage_isActive').checked = d.active === '1';
         document.getElementById('crHomepage_activeRow').style.display = 'flex';
         document.getElementById('crHomepage_deleteBtn').style.display = 'inline-block';
@@ -966,6 +1082,14 @@ function openOfferModal(card) {
         document.getElementById('crOffer_ctaLabel').value = d.ctaLabel;
         document.getElementById('crOffer_ctaUrl').value = d.ctaUrl;
         document.getElementById('crOffer_ctaStyle').value = d.ctaStyle;
+        document.getElementById('crOffer_title_fi').value = d.titleFi || '';
+        document.getElementById('crOffer_title_vi').value = d.titleVi || '';
+        document.getElementById('crOffer_subtitle_fi').value = d.subtitleFi || '';
+        document.getElementById('crOffer_subtitle_vi').value = d.subtitleVi || '';
+        document.getElementById('crOffer_badge_fi').value = d.badgeFi || '';
+        document.getElementById('crOffer_badge_vi').value = d.badgeVi || '';
+        document.getElementById('crOffer_ctaLabel_fi').value = d.ctaLabelFi || '';
+        document.getElementById('crOffer_ctaLabel_vi').value = d.ctaLabelVi || '';
         document.getElementById('crOffer_isActive').checked = d.active === '1';
         document.getElementById('crOffer_activeRow').style.display = 'flex';
         document.getElementById('crOffer_deleteBtn').style.display = 'inline-block';
@@ -984,6 +1108,8 @@ function openMissionModal(card) {
     document.getElementById('crMission_icon').value = d.icon;
     document.getElementById('crMission_ptsLabel').value = d.ptsLabel;
     document.getElementById('crMission_title').value = d.title;
+    document.getElementById('crMission_title_fi').value = d.titleFi || '';
+    document.getElementById('crMission_title_vi').value = d.titleVi || '';
     crResetDropzone('crMission');
     if (d.image) crShowPreview('crMission', d.image);
     openModal('crMissionModal');

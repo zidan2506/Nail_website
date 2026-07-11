@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Gallery | DahaCare Atélier{% endblock %}
+{% block title %}{{ _('Gallery') }} | DahaCare Atélier{% endblock %}
 
 {# Load gallery-page-specific CSS — base.css đã được load sẵn trong base.html #}
 {% block extra_css %}
@@ -17,8 +17,8 @@
    - Tĩnh, không cần data động
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="gal-hero">
-    <h1 class="gal-hero__title">Our Work</h1>
-    <p class="gal-hero__subtitle">A glimpse into the artistry and precision behind every visit.</p>
+    <h1 class="gal-hero__title">{{ _('Our Work') }}</h1>
+    <p class="gal-hero__subtitle">{{ _('A glimpse into the artistry and precision behind every visit.') }}</p>
 </section>
 
 
@@ -41,7 +41,7 @@
                     <div class="gal-item__hover-icon">
                         <span class="material-symbols-outlined">zoom_in</span>
                     </div>
-                    <img class="gal-item__img" src="{{ image.image_url }}" alt="{{ image.alt_text }}">
+                    <img class="gal-item__img" src="{{ image.image_url }}" alt="{{ tr(image, 'alt_text') }}">
                 </div>
             {% endfor %}
           Lưu ý: dùng {{ loop.index0 }} (bắt đầu từ 0) cho data-index, không phải
@@ -59,7 +59,7 @@
             <div class="gal-item__hover-icon">
                 <span class="material-symbols-outlined">zoom_in</span>
             </div>
-            <img class="gal-item__img" src="{{ image.image_url if image.image_url.startswith('http') else url_for('static', filename='uploads/gallery/' + image.image_url) }}" alt="{{ image.alt_text }}">
+            <img class="gal-item__img" src="{{ image.image_url if image.image_url.startswith('http') else url_for('static', filename='uploads/gallery/' + image.image_url) }}" alt="{{ tr(image, 'alt_text') }}">
         </div>
         {% endfor %}
     </div>
@@ -72,9 +72,9 @@
    - Đồng bộ style với svc-cta bên services.html
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="gal-cta">
-    <p class="gal-cta__title">Like what you see?</p>
+    <p class="gal-cta__title">{{ _('Like what you see?') }}</p>
     <a href="{{ url_for('main.public_booking') }}" class="gal-cta__btn">
-        Book your session
+        {{ _('Book your session') }}
         <span class="material-symbols-outlined">arrow_forward</span>
     </a>
 </section>
@@ -94,20 +94,20 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 <div class="gal-lightbox" id="lightbox">
     <div class="gal-lightbox__close-wrap">
-        <button class="gal-lightbox__icon-btn" id="lightbox-close" aria-label="Close">
+        <button class="gal-lightbox__icon-btn" id="lightbox-close" aria-label="{{ _('Close') }}">
             <span class="material-symbols-outlined">close</span>
         </button>
     </div>
     <div class="gal-lightbox__counter-wrap">
         <span class="gal-lightbox__counter" id="lightbox-counter">1 / 9</span>
     </div>
-    <button class="gal-lightbox__icon-btn gal-lightbox__nav gal-lightbox__nav--prev" id="lightbox-prev" aria-label="Previous image">
+    <button class="gal-lightbox__icon-btn gal-lightbox__nav gal-lightbox__nav--prev" id="lightbox-prev" aria-label="{{ _('Previous image') }}">
         <span class="material-symbols-outlined">chevron_left</span>
     </button>
     <div class="gal-lightbox__img-wrap">
-        <img class="gal-lightbox__img" id="lightbox-img" src="" alt="Enlarged gallery image">
+        <img class="gal-lightbox__img" id="lightbox-img" src="" alt="{{ _('Enlarged gallery image') }}">
     </div>
-    <button class="gal-lightbox__icon-btn gal-lightbox__nav gal-lightbox__nav--next" id="lightbox-next" aria-label="Next image">
+    <button class="gal-lightbox__icon-btn gal-lightbox__nav gal-lightbox__nav--next" id="lightbox-next" aria-label="{{ _('Next image') }}">
         <span class="material-symbols-outlined">chevron_right</span>
     </button>
 </div>

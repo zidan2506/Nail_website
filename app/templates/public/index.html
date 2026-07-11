@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}DahaCare - Premium Nail Care & Art{% endblock %}
+{% block title %}DahaCare - {{ _('Premium Nail Care & Art') }}{% endblock %}
 
 {# Load homepage-specific CSS — base.css đã được load sẵn trong base.html #}
 {% block extra_css %}
@@ -24,7 +24,7 @@
     <div class="hero__slides">
         {% for slide in slides %}
         <div class="hero__slide{% if loop.first %} hero__slide--active{% endif %}">
-            <img class="hero__bg-img" src="{{ slide.image }}" alt="Salon interior">
+            <img class="hero__bg-img" src="{{ slide.image }}" alt="{{ _('Salon interior') }}">
             <div class="hero__overlay" ></div>
             <div class="hero__content">
                 <span class="hero__badge">{{ slide.badge }}</span>
@@ -71,7 +71,7 @@
 
     <!-- Section header + tab filters -->
     <div class="home-section__header">
-        <h2 class="home-section__title">Popular Service</h2>
+        <h2 class="home-section__title">{{ _('Popular Service') }}</h2>
     </div>
 
     <!-- Service cards grid -->
@@ -92,11 +92,11 @@
                 {% endif %}
             </div>
             <div class="service-card__row">
-                <h3 class="service-card__name">{{ service.name }}</h3>
+                <h3 class="service-card__name">{{ tr(service, 'name') }}</h3>
                 <span class="service-card__price">€{{ service.price | int }}</span>
             </div>
             <p class="service-card__desc">
-                {{ service.description }}
+                {{ tr(service, 'description') }}
             </p>
         </a>
         {% endfor %}
@@ -104,7 +104,7 @@
     </div>
 
     <div style="text-align: center; margin-top: 32px;">
-        <a href="{{ url_for('main.services') }}" class="promo-cta__btn-outline">View All Service</a>
+        <a href="{{ url_for('main.services') }}" class="promo-cta__btn-outline">{{ _('View All Service') }}</a>
     </div>
 </section>
 
@@ -116,8 +116,8 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="home-section">
     <div class="home-section__header">
-        <h2 class="home-section__title">Our work</h2>
-        <p class="home-section__subtitle">A glimpse of what we create every day</p>
+        <h2 class="home-section__title">{{ _('Our work') }}</h2>
+        <p class="home-section__subtitle">{{ _('A glimpse of what we create every day') }}</p>
     </div>
 
     <!-- Gallery grid — item 1 spans 2 rows on desktop -->
@@ -127,7 +127,7 @@
         <a href="{{ url_for('main.gallery') }}" class="gallery-item{% if loop.first %} gallery-item--tall{% endif %}">
             <img
                 src="{{ image.image_url if image.image_url.startswith('http') else url_for('static', filename='uploads/gallery/' + image.image_url) }}"
-                alt="{{ image.alt_text }}"
+                alt="{{ tr(image, 'alt_text') }}"
             >
         </a>
         {% endfor %}
@@ -143,24 +143,24 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="home-section--shaded">
     <div class="home-section__header">
-        <h2 class="home-section__title">Why DahaCare?</h2>
+        <h2 class="home-section__title">{{ _('Why DahaCare?') }}</h2>
     </div>
 
     <div class="stats-grid">
         <div>
             <div class="stat__number">5K+</div>
-            <h3 class="stat__label">Happy clients</h3>
-            <p class="stat__desc">Trusted by thousands of satisfied customers who love our work.</p>
+            <h3 class="stat__label">{{ _('Happy clients') }}</h3>
+            <p class="stat__desc">{{ _('Trusted by thousands of satisfied customers who love our work.') }}</p>
         </div>
         <div>
             <div class="stat__number">100%</div>
-            <h3 class="stat__label">Safe products</h3>
-            <p class="stat__desc">We use only premium, non-toxic products for your health and safety.</p>
+            <h3 class="stat__label">{{ _('Safe products') }}</h3>
+            <p class="stat__desc">{{ _('We use only premium, non-toxic products for your health and safety.') }}</p>
         </div>
         <div>
             <div class="stat__number">10+</div>
-            <h3 class="stat__label">Expert artists</h3>
-            <p class="stat__desc">Our highly trained professionals bring your vision to life.</p>
+            <h3 class="stat__label">{{ _('Expert artists') }}</h3>
+            <p class="stat__desc">{{ _('Our highly trained professionals bring your vision to life.') }}</p>
         </div>
     </div>
 </section>
@@ -173,7 +173,7 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="home-section">
     <div class="home-section__header">
-        <h2 class="home-section__title">What clients say</h2>
+        <h2 class="home-section__title">{{ _('What clients say') }}</h2>
     </div>
 
     <div class="testimonials-grid">
@@ -187,15 +187,12 @@
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
             </div>
-            <p class="testimonial-card__quote">
-                "Absolutely wonderful experience! The attention to detail is unmatched, and my nails have
-                never looked better. Highly recommend the gel extensions."
-            </p>
+            <p class="testimonial-card__quote">{{ _('"Absolutely wonderful experience! The attention to detail is unmatched, and my nails have never looked better. Highly recommend the gel extensions."') }}</p>
             <div class="testimonial-card__author">
                 <div class="testimonial-card__avatar">SJ</div>
                 <div>
                     <div class="testimonial-card__name">Sarah Jenkins</div>
-                    <div class="testimonial-card__role testimonial-card__role--gold">Gold member</div>
+                    <div class="testimonial-card__role testimonial-card__role--gold">{{ _('Gold member') }}</div>
                 </div>
             </div>
         </div>
@@ -209,15 +206,12 @@
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
             </div>
-            <p class="testimonial-card__quote">
-                "The ambiance is so relaxing, and the staff is incredibly professional. I love the creative
-                nail art options they offer. A true luxury experience."
-            </p>
+            <p class="testimonial-card__quote">{{ _('"The ambiance is so relaxing, and the staff is incredibly professional. I love the creative nail art options they offer. A true luxury experience."') }}</p>
             <div class="testimonial-card__author">
                 <div class="testimonial-card__avatar">MR</div>
                 <div>
                     <div class="testimonial-card__name">Maria Rodriguez</div>
-                    <div class="testimonial-card__role testimonial-card__role--muted">First-time client</div>
+                    <div class="testimonial-card__role testimonial-card__role--muted">{{ _('First-time client') }}</div>
                 </div>
             </div>
         </div>
@@ -238,36 +232,34 @@
 
         <!-- Left body -->
         <div class="promo-cta__body">
-            <span class="promo-cta__tag">New member offer</span>
-            <h2 class="promo-cta__title">Create an account &amp; get 15% off your first visit</h2>
-            <p class="promo-cta__subtitle">
-                Join our community today and start enjoying the perks of premium nail care right away.
-            </p>
+            <span class="promo-cta__tag">{{ _('New member offer') }}</span>
+            <h2 class="promo-cta__title">{{ _('Create an account & get 15%% off your first visit') }}</h2>
+            <p class="promo-cta__subtitle">{{ _('Join our community today and start enjoying the perks of premium nail care right away.') }}</p>
             <ul class="promo-cta__list">
                 <li>
                     <span class="material-symbols-outlined">star</span>
-                    Exclusive member updates
+                    {{ _('Exclusive member updates') }}
                 </li>
                 <li>
                     <span class="material-symbols-outlined">calendar_today</span>
-                    Easy online booking
+                    {{ _('Easy online booking') }}
                 </li>
                 <li>
                     <span class="material-symbols-outlined">loyalty</span>
-                    Earn rewards points
+                    {{ _('Earn rewards points') }}
                 </li>
             </ul>
             <div class="promo-cta__btns">
                 {# Flask: register + login routes #}
-                <a href="{{ url_for('main.register') }}" class="promo-cta__btn-solid">Create account</a>
-                <a href="{{ url_for('main.login') }}" class="promo-cta__btn-outline">Already have one? Log in</a>
+                <a href="{{ url_for('main.register') }}" class="promo-cta__btn-solid">{{ _('Create account') }}</a>
+                <a href="{{ url_for('main.login') }}" class="promo-cta__btn-outline">{{ _('Already have one? Log in') }}</a>
             </div>
         </div>
 
         <!-- Right: discount badge -->
         <div class="promo-cta__discount">
             <div class="promo-cta__discount-number">15%</div>
-            <div class="promo-cta__discount-label">welcome discount</div>
+            <div class="promo-cta__discount-label">{{ _('welcome discount') }}</div>
         </div>
 
     </div>
@@ -284,13 +276,13 @@
 
         <!-- Contact info column -->
         <div>
-            <h2 class="contact-info__title">Find us</h2>
+            <h2 class="contact-info__title">{{ _('Find us') }}</h2>
             <div class="contact-info">
 
                 <div class="contact-info__row">
                     <span class="material-symbols-outlined">location_on</span>
                     <div>
-                        <div class="contact-info__label">Address</div>
+                        <div class="contact-info__label">{{ _('Address') }}</div>
                         <div>Kyyhkysmäki 9 A<br>02650 Espoo, Finland</div>
                     </div>
                 </div>
@@ -298,7 +290,7 @@
                 <div class="contact-info__row">
                     <span class="material-symbols-outlined">schedule</span>
                     <div>
-                        <div class="contact-info__label">Hours</div>
+                        <div class="contact-info__label">{{ _('Hours') }}</div>
                         <div>Mon – Fri: 9:00 AM – 8:00 PM<br>Sat – Sun: 10:00 AM – 6:00 PM</div>
                     </div>
                 </div>
@@ -306,7 +298,7 @@
                 <div class="contact-info__row">
                     <span class="material-symbols-outlined">call</span>
                     <div>
-                        <div class="contact-info__label">Phone</div>
+                        <div class="contact-info__label">{{ _('Phone') }}</div>
                         <div>+358 465 978 425</div>
                     </div>
                 </div>
@@ -314,7 +306,7 @@
                 <div class="contact-info__row">
                     <span class="material-symbols-outlined">mail</span>
                     <div>
-                        <div class="contact-info__label">Email</div>
+                        <div class="contact-info__label">{{ _('Email') }}</div>
                         <div>dahacaree@gmail.com</div>
                     </div>
                 </div>
@@ -326,7 +318,7 @@
         <div class="contact-map">
             <div>
                 <span class="material-symbols-outlined">map</span>
-                <p>Map Integration Placeholder</p>
+                <p>{{ _('Map Integration Placeholder') }}</p>
             </div>
         </div>
 
