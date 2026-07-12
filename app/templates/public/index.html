@@ -80,16 +80,10 @@
         {% for service in services %}
         <a class="service-card" href="{{ url_for('main.public_booking', service_id=service.id) }}">
             <div class="service-card__img-wrap">
-                {% if service.image %}
                 <img
-                    src="{{ url_for('static', filename='uploads/services/' + service.image) }}"
+                    src="{{ url_for('static', filename='uploads/services/' + service.image) if service.image else url_for('static', filename='images/Default/Service/test.png') }}"
                     alt="{{ service.name }}"
                 >
-                {% else %}
-                <div class="service-card__img-fallback">
-                    <span class="material-symbols-outlined">spa</span>
-                </div>
-                {% endif %}
             </div>
             <div class="service-card__row">
                 <h3 class="service-card__name">{{ tr(service, 'name') }}</h3>

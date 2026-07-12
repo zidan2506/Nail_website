@@ -83,15 +83,9 @@
         {% for service in services %}
         <div class="svc-card" data-category="{{ service.category_slug }}">
             <div class="svc-card__img-wrap">
-                {% if service.image %}
                 <img class="svc-card__img"
-                     src="{{ url_for('static', filename='uploads/services/' + service.image) }}"
+                     src="{{ url_for('static', filename='uploads/services/' + service.image) if service.image else url_for('static', filename='images/Default/Service/test.png') }}"
                      alt="{{ service.name }}">
-                {% else %}
-                <div class="svc-card__img-fallback">
-                    <span class="material-symbols-outlined">spa</span>
-                </div>
-                {% endif %}
                 <div class="svc-card__badges">
                     <span class="svc-badge svc-badge--category">{{ tr(service, 'category_name') }}</span>
                     {% if service.badge == 'Popular' %}
