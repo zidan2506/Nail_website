@@ -34,7 +34,7 @@ def init_db(seed=False):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Khởi tạo database cho app.")
-    parser.add_argument("--seed", action="store_true", help="nạp thêm seed.sql")
+    parser = argparse.ArgumentParser(description="Init the app database (schema, optional seed).")
+    parser.add_argument("--seed", action="store_true", help="also load seed.sql")
     args = parser.parse_args()
     init_db(seed=args.seed)
