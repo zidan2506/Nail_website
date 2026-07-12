@@ -1,4 +1,5 @@
 from flask import Flask, session
+from werkzeug.middleware.proxy_fix import ProxyFix
 from .config import Config
 from flask_wtf.csrf import CSRFProtect
 from flask_babel import Babel
@@ -22,6 +23,9 @@ def select_locale():
 
 def create_app():
     app = Flask(__name__)
+    # Sau nginx: tin X-Forwarded-Proto/Host để url_for(_external=True) sinh URL
+    # https đúng (Google OAuth callback + Stripe redirect). x_*=1 = 1 proxy (nginx).
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     app.config.from_object(Config)
 

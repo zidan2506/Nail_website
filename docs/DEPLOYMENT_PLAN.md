@@ -39,12 +39,18 @@ Kế hoạch chuẩn bị trước khi deploy, theo hướng tối ưu và dễ 
    - Bỏ `Procfile`/`runtime.txt` (quy ước Heroku/PaaS, VPS+systemd không cần). **Python target: 3.13.**
    - **Verify:** `run:app` import OK · config parse OK · logic `FLASK_DEBUG` đúng. (gunicorn Unix-only → chạy thật ở Phase 3.)
 
-### Phase 3 — Hạ tầng VPS *(bạn làm, sẽ có lệnh cụ thể)*
+### Phase 3 — Hạ tầng VPS *(bạn làm trên server)* — 🟡 Artifacts + code xong, chờ chạy trên VPS
+Artifacts đã tạo sẵn trong repo: `deploy/nail-app.service`, `deploy/nginx-nail-app.conf`, `deploy/backup-db.sh`, và runbook 12 bước → **`docs/DEPLOYMENT_RUNBOOK.md`**.
+Code: ✅ thêm **ProxyFix** vào `app/__init__.py` (để `url_for(_external=True)` sinh URL https đúng cho OAuth/Stripe sau nginx).
+
+Các bước chạy trên server (chi tiết trong runbook):
 5. nginx reverse proxy + HTTPS (Let's Encrypt / certbot). Có HTTPS rồi mới set `SESSION_COOKIE_SECURE=true`.
 6. systemd service chạy gunicorn (auto-restart).
 7. Set env vars thật: `SECRET_KEY` mạnh · Stripe **live** key + `STRIPE_WEBHOOK_SECRET` · Google OAuth redirect URI domain thật.
 8. Chạy `python -m app.database.setup_stripe_prices` trên môi trường live.
 9. Cron backup file SQLite định kỳ.
+
+> Khuyến nghị VPS: **Hetzner / UpCloud** (datacenter Helsinki, gần tiệm + GDPR).
 
 ### Phase 4 — Nên có *(tùy chọn)*
 10. `print()` → `logging`.
