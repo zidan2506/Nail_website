@@ -1,9 +1,12 @@
+import logging
 import sqlite3
 import secrets
 import string
 from pathlib import Path
 from werkzeug.security import generate_password_hash
 from app.utils.helpers import now_helsinki
+
+logger = logging.getLogger(__name__)
 
 base_dir = Path(__file__).resolve().parent
 db_path = base_dir / "database.db"
@@ -87,7 +90,7 @@ def create_booking(customer_id, staff_id, service_id, booking_date, start_time, 
     booking_id = cur.lastrowid
     conn.commit()
     conn.close()
-    print(f"Create new booking done! Status: {status} ")
+    logger.debug("Create new booking done! Status: %s", status)
     return booking_id
 
 def create_customer(full_name,email,phone):
@@ -100,7 +103,7 @@ def create_customer(full_name,email,phone):
     conn.commit()
     customer_id = curr.lastrowid
     conn.close()
-    print("Create new customer done! ")
+    logger.debug("Create new customer done!")
     return customer_id
 
 
@@ -118,7 +121,7 @@ def update_status(id, status):
     )
     conn.commit()
     conn.close()
-    return print(f"Updating status: {status} success!")
+    logger.debug("Updating status: %s success!", status)
 
 def cancel_booking_with_reason(booking_id, reason):
     conn = get_connection()
@@ -143,7 +146,7 @@ def verify_customer(customer_id):
     conn.commit()
     conn.close()
     
-    print(f"Verify customer with id = {id} successfully!")
+    logger.debug("Verify customer with id = %s successfully!", id)
     return True
 
 def update_new_code(id, code, expires_at):
@@ -163,7 +166,7 @@ def update_new_code(id, code, expires_at):
     conn.commit()
     conn.close()
 
-    print(f"Udating new code success!\nNew code: {code}\nExpires at: {expires_at}")
+    logger.debug("Udating new code success! New code: %s Expires at: %s", code, expires_at)
     return True
 
 def get_booking_by_id(id):
@@ -189,7 +192,7 @@ def delete_expired_verifications():
     conn.commit()
     conn.close()
 
-    print("Deleted expired booking!")
+    logger.debug("Deleted expired booking!")
     return True
 
 def get_booking_by_staff_and_date(staff_id, booking_date):
@@ -220,7 +223,7 @@ def expire_unverified_booknigs():
     conn.commit()
     conn.close()
     
-    print("Updated unverified_bookings status = expired!")
+    logger.debug("Updated unverified_bookings status = expired!")
     return True
 
 def get_user_by_email(email):
@@ -265,7 +268,7 @@ def create_user(email, password, role="customer"):
     conn.commit()
     user_id =  user.lastrowid
     conn.close()
-    print(f"Create new user successfully! User id: {user_id}")
+    logger.debug("Create new user successfully! User id: %s", user_id)
     return user_id
 
 def create_oauth_user(email, oauth_provider, oauth_sub, role="customer"):
@@ -284,7 +287,7 @@ def create_oauth_user(email, oauth_provider, oauth_sub, role="customer"):
     conn.commit()
     user_id = user.lastrowid
     conn.close()
-    print(f"Create OAuth user successfully! User id: {user_id}")
+    logger.debug("Create OAuth user successfully! User id: %s", user_id)
     return user_id
 
 def set_user_oauth(user_id, oauth_provider, oauth_sub):
@@ -297,7 +300,7 @@ def set_user_oauth(user_id, oauth_provider, oauth_sub):
     )
     conn.commit()
     conn.close()
-    print(f"Set OAuth for user id={user_id} successfully!")
+    logger.debug("Set OAuth for user id=%s successfully!", user_id)
     return True
 
 def link_customer_to_user(customer_id, user_id):
@@ -311,7 +314,7 @@ def link_customer_to_user(customer_id, user_id):
     )
     conn.commit()
     conn.close()
-    print(f"Link customer with id={customer_id} to user with id={user_id} successfully!")
+    logger.debug("Link customer with id=%s to user with id=%s successfully!", customer_id, user_id)
     return True
 
 def create_verification(verification_code, verification_type, expired_at):
@@ -329,7 +332,7 @@ def create_verification(verification_code, verification_type, expired_at):
     verification_id = curr.lastrowid
     conn.close()
 
-    print(f"Create verification id={verification_id} successfully!")    
+    logger.debug("Create verification id=%s successfully!", verification_id)    
     return verification_id
 
 def get_verification_by_id(verification_id):
@@ -346,7 +349,7 @@ def get_verification_by_id(verification_id):
     ).fetchone()
     conn.close()
 
-    print(f"Get verification with id= {verification_id} successfully!")
+    logger.debug("Get verification with id= %s successfully!", verification_id)
     return verification
 
 def update_verification(verification_id,reference_id, is_used):
@@ -364,7 +367,7 @@ def update_verification(verification_id,reference_id, is_used):
     )
     conn.commit()
     conn.close()
-    print(f"Update verification with id={verification_id} successfully")
+    logger.debug("Update verification with id=%s successfully", verification_id)
     return True
 
 def get_customer_by_user_id(user_id):
@@ -377,7 +380,7 @@ def get_customer_by_user_id(user_id):
 """, (user_id, )
     ).fetchone()
     conn.close()
-    print(f"Get customer by user_id = {user_id} successfully")
+    logger.debug("Get customer by user_id = %s successfully", user_id)
     return customer
 
 def get_staff_by_user_id(user_id):
@@ -390,7 +393,7 @@ def get_staff_by_user_id(user_id):
 """, (user_id, )
     ).fetchone()
     conn.close()
-    print(f"Get staff by user_id = {user_id}  successfully")
+    logger.debug("Get staff by user_id = %s  successfully", user_id)
     return staff
 
 def get_customer_bookings(customer_id):

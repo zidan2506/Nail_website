@@ -4,6 +4,7 @@ Flow: khách chọn "online" -> tạo Checkout session (mode=payment) -> Stripe 
 -> webhook `checkout.session.completed` -> booking chuyển 'confirmed' (bỏ qua OTP)
 + invoice 'paid'. Fulfill idempotent (webhook có thể retry nhiều lần)."""
 
+import logging
 from datetime import datetime, UTC
 
 import stripe
@@ -15,6 +16,8 @@ from app.database.db import (
     upsert_subscription_membership, deactivate_subscription, get_active_subscription_rows,
 )
 from app.utils.helpers import now_helsinki, HELSINKI_TZ
+
+logger = logging.getLogger(__name__)
 
 # VAT khớp với con số Total hiển thị ở form booking
 # (customer_booking.html / public_booking.html: price * (1 + VAT_RATE)).
@@ -100,7 +103,7 @@ def _cancel_other_subscriptions(customer_id, keep_sub_id):
             try:
                 cancel_subscription(sid)
             except Exception as e:
-                print(f"[payment] cancel old sub {sid} failed: {e}")
+                logger.exception("[payment] cancel old sub %s failed", sid)
 
 
 def construct_event(payload, sig_header):
@@ -146,7 +149,7 @@ def fulfill_from_session(session_id):
     try:
         session = stripe.checkout.Session.retrieve(session_id)
     except Exception as e:
-        print(f"[payment] retrieve session failed: {e}")
+        logger.exception("[payment] retrieve session failed")
         return None
     if session["payment_status"] in ("paid", "no_payment_required"):
         _fulfill_session(session)
@@ -196,13 +199,13 @@ def _sync_subscription(sub):
         c = get_customer_by_stripe_customer(sub["customer"])
         customer_id = c["id"] if c else None
     if not customer_id:
-        print(f"[payment] subscription {sub['id']}: khong xac dinh duoc customer")
+        logger.warning("[payment] subscription %s: khong xac dinh duoc customer", sub['id'])
         return
     item = sub["items"]["data"][0]
     price_id = item["price"]["id"]
     tier = get_tier_by_stripe_price(price_id)
     if not tier:
-        print(f"[payment] subscription {sub['id']}: price {price_id} khong map duoc tier")
+        logger.warning("[payment] subscription %s: price %s khong map duoc tier", sub['id'], price_id)
         return
     cancel = 1 if sub["cancel_at_period_end"] else 0
     # current_period_end: API mới nằm ở subscription item, API cũ ở subscription.
@@ -238,7 +241,7 @@ def fulfill_booking_payment(booking_id):
         if conflict:
             # Hiếm: slot đã bị người khác xác nhận trong lúc khách đang trả tiền.
             # Không confirm (tránh double-book). Ghi log để admin xử lý refund/đổi giờ.
-            print(f"[payment] WARN booking {booking_id} paid but slot taken -> cần xử lý thủ công")
+            logger.warning("[payment] booking %s paid but slot taken -> cần xử lý thủ công", booking_id)
         else:
             conn.execute(
                 "UPDATE bookings SET status='confirmed', updated_at=? "

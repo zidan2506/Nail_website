@@ -1,3 +1,5 @@
+import logging
+import os
 from flask import Flask, session
 from werkzeug.middleware.proxy_fix import ProxyFix
 from .config import Config
@@ -22,6 +24,13 @@ def select_locale():
     return "fi"
 
 def create_app():
+    # Log ra stderr (journald của systemd bắt). Mặc định INFO; set LOG_LEVEL=DEBUG
+    # để bật các log chi tiết ở tầng db.
+    logging.basicConfig(
+        level=os.environ.get("LOG_LEVEL", "INFO").upper(),
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+
     app = Flask(__name__)
     # Sau nginx: tin X-Forwarded-Proto/Host để url_for(_external=True) sinh URL
     # https đúng (Google OAuth callback + Stripe redirect). x_*=1 = 1 proxy (nginx).

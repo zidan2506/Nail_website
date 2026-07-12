@@ -52,8 +52,8 @@ Các bước chạy trên server (chi tiết trong runbook):
 
 > Khuyến nghị VPS: **Hetzner / UpCloud** (datacenter Helsinki, gần tiệm + GDPR).
 
-### Phase 4 — Nên có *(tùy chọn)*
-10. `print()` → `logging`.
+### Phase 4 — Nên có *(tùy chọn)* — ✅ HOÀN TẤT (2026-07-12)
+10. ✅ `print()` → `logging`. Cấu hình 1 lần trong `create_app` (`LOG_LEVEL` env, mặc định INFO, ra stderr→journald). `[payment]` error/warning ở routes.py + payment_service.py → `logger.exception`/`logger.warning`; 16 debug noise ở db.py → `logger.debug`. CLI scripts (reset_db/test_data/setup_stripe_prices) giữ nguyên `print()`.
 
 ---
 

@@ -1,5 +1,6 @@
 import os
 import re
+import logging
 import time
 import uuid
 import sqlite3
@@ -39,6 +40,7 @@ def _staff_status_i18n_markers():
             gettext("✓ Claimed"), gettext("✓ All Reviewed"), gettext("Start"), gettext("Claim"))
 from app.database.db import create_oauth_user, set_user_oauth
 main = Blueprint("main",__name__)
+logger = logging.getLogger(__name__)
 
 _failed_logins = {}       # {ip: {"count": int, "blocked_until": float}}
 _MAX_LOGIN_ATTEMPTS = 5
@@ -1169,7 +1171,7 @@ def _redirect_to_stripe(booking_id, service_id, fallback_endpoint):
             cancel_url=url_for('main.payment_cancel', _external=True),
         )
     except Exception as e:
-        print(f"[payment] create session failed: {e}")
+        logger.exception("[payment] create session failed")
         flash("Không tạo được phiên thanh toán. Vui lòng thử lại.", "error")
         return redirect(url_for(fallback_endpoint))
     return redirect(checkout_url)
@@ -1292,7 +1294,7 @@ def upgrade_plan():
                 try:
                     cancel_subscription(s["stripe_subscription_id"])
                 except Exception as e:
-                    print(f"[payment] cancel on downgrade failed: {e}")
+                    logger.exception("[payment] cancel on downgrade failed")
             flash("Your paid membership will stop renewing and revert to Silver at the period end.", "success")
         else:
             flash("You're on the Silver plan.", "success")
@@ -1301,7 +1303,7 @@ def upgrade_plan():
     # Tier trả phí nhưng chưa cấu hình Stripe Price -> lỗi cấu hình, báo rõ (thay vì
     # âm thầm coi như free). Thường do quên chạy setup_stripe_prices sau khi reset DB.
     if not tier["stripe_price_id"]:
-        print(f"[payment] tier {tier['name']} thieu stripe_price_id -> chay: python -m app.database.setup_stripe_prices")
+        logger.warning("[payment] tier %s thieu stripe_price_id -> chay: python -m app.database.setup_stripe_prices", tier['name'])
         flash("This plan isn't available for online payment right now. Please try again later.", "error")
         return redirect(url_for("main.tier_benefits"))
 
@@ -1320,7 +1322,7 @@ def upgrade_plan():
             cancel_url=url_for('main.payment_cancel', _external=True),
         )
     except Exception as e:
-        print(f"[payment] create subscription session failed: {e}")
+        logger.exception("[payment] create subscription session failed")
         flash("Could not start checkout. Please try again.", "error")
         return redirect(url_for("main.tier_benefits"))
     return redirect(checkout_url)
@@ -1343,7 +1345,7 @@ def cancel_membership():
         cancel_subscription(sub_row["stripe_subscription_id"])
         flash("Your membership will not renew. You keep your benefits until the current period ends.", "success")
     except Exception as e:
-        print(f"[payment] cancel failed: {e}")
+        logger.exception("[payment] cancel failed")
         flash("Could not cancel your membership. Please try again.", "error")
     return redirect(url_for("main.tier_benefits"))
 
@@ -1479,7 +1481,7 @@ def billing_portal():
             return_url=url_for("main.tier_benefits", _external=True),
         )
     except Exception as e:
-        print(f"[payment] billing portal failed: {e}")
+        logger.exception("[payment] billing portal failed")
         flash("Could not open the billing portal. Please try again later.", "error")
         return redirect(url_for("main.tier_benefits"))
     return redirect(url)
@@ -4040,7 +4042,7 @@ def payment_success():
         try:
             ptype = fulfill_from_session(session_id)
         except Exception as e:
-            print(f"[payment] success fallback failed: {e}")
+            logger.exception("[payment] success fallback failed")
             ptype = None
         if ptype == "booking":
             next_url, next_label = url_for('main.success'), "View booking now"
@@ -4060,7 +4062,7 @@ def payment_webhook():
     try:
         event = construct_event(payload, sig_header)
     except Exception as e:
-        print(f"[payment] webhook verify failed: {e}")
+        logger.exception("[payment] webhook verify failed")
         return "", 400
 
     handle_event(event)  # lỗi ở đây -> 500 để Stripe retry
