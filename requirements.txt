@@ -1,0 +1,20 @@
+# Web framework
+Flask==3.1.2
+Flask-WTF==1.2.2
+Flask-Babel==4.0.0
+
+# Auth / OAuth  (requests: Authlib fetch OpenID metadata + stripe HTTP client)
+Authlib==1.7.2
+requests==2.32.5
+
+# Payments
+stripe==15.3.0
+
+# Config
+python-dotenv==1.2.1
+
+# Timezone data (zoneinfo "Europe/Helsinki" — không dựa vào tz db của OS)
+tzdata==2025.2
+
+# Production WSGI server
+gunicorn==23.0.0

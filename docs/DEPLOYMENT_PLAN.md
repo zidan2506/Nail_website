@@ -1,0 +1,64 @@
+# Deployment Plan — Nail Booking Web App
+
+**Target:** VPS Linux (gunicorn + nginx) · **Stack:** Flask + SQLite · **Cập nhật:** 2026-07-12
+
+Kế hoạch chuẩn bị trước khi deploy, theo hướng tối ưu và dễ maintain.
+
+---
+
+## Thực trạng — vấn đề đang chặn deploy
+
+| # | Vấn đề | Mức độ |
+|---|--------|--------|
+| 1 | ~~`requirements.txt` là bản `pip freeze` toàn máy — encode UTF-16, ~180 package rác.~~ | ✅ Đã xử lý (Phase 1) |
+| 2 | ~~`app/database/database.db` bị commit vào git.~~ | ✅ Đã xử lý (Phase 1) |
+| 3 | `run.py` dùng `app.run(debug=True)` — Flask dev server + debug mode. Không được lên production (RCE qua debugger, không chịu tải). | 🔴 Chặn |
+| 4 | Không có entry production (Procfile / gunicorn config). | 🔴 Chặn |
+| 5 | `print()` rải khắp `routes.py` / `db.py` thay vì logging. | 🟡 Nên sửa |
+| 6 | Không có scheduler — `auto_expire_bookings` chạy lazy lúc load trang. | 🟢 Ghi chú |
+
+**Điểm tốt sẵn có:** `.env` đã gitignore · `SESSION_COOKIE_SECURE` đọc từ env · CSRF bật · translations `.mo` đã compile · có `schema.sql` + `seed.sql` để init DB sạch.
+
+---
+
+## Plan
+
+### Phase 1 — Dependency & DB *(code)* — ✅ HOÀN TẤT (2026-07-12)
+1. ✅ Viết lại `requirements.txt` (chuyển ra **repo root**, xoá bản `app/requirements.txt` cũ).
+   - Từ ~180 package rác (UTF-16, pip freeze toàn máy) → **9 package thật**, UTF-8, pin version.
+   - Deps: Flask 3.1.2 · Flask-WTF 1.2.2 · Flask-Babel 4.0.0 · Authlib 1.7.2 · requests 2.32.5 · stripe 15.3.0 · python-dotenv 1.2.1 · tzdata 2025.2 · gunicorn 23.0.0.
+   - **`tzdata` được thêm nhờ verification** — venv sạch crash ở `ZoneInfo("Europe/Helsinki")` vì không có tz db của OS; thêm `tzdata` để portable mọi môi trường (Docker slim, Linux tối giản).
+   - **Verify:** venv sạch → `pip install -r requirements.txt` OK → `create_app()` OK, **111 routes**.
+2. ✅ `git rm --cached app/database/database.db` — untrack DB, giữ file local (184KB), `git check-ignore` xác nhận đã ignore (`.gitignore` có sẵn `*.db`). Deploy sẽ init sạch từ `schema.sql` + `seed.sql` (bước init làm ở Phase 2/3).
+
+> **Trạng thái git:** các thay đổi Phase 1 đang staged, **chưa commit**.
+
+### Phase 2 — Production entry *(code)*
+3. Tách `debug=True` khỏi `run.py` (chỉ bật khi chạy local; production dùng gunicorn gọi `app:create_app()`).
+4. Thêm `Procfile` / gunicorn command + `runtime.txt` (bản Python).
+
+### Phase 3 — Hạ tầng VPS *(bạn làm, sẽ có lệnh cụ thể)*
+5. nginx reverse proxy + HTTPS (Let's Encrypt / certbot). Có HTTPS rồi mới set `SESSION_COOKIE_SECURE=true`.
+6. systemd service chạy gunicorn (auto-restart).
+7. Set env vars thật: `SECRET_KEY` mạnh · Stripe **live** key + `STRIPE_WEBHOOK_SECRET` · Google OAuth redirect URI domain thật.
+8. Chạy `python -m app.database.setup_stripe_prices` trên môi trường live.
+9. Cron backup file SQLite định kỳ.
+
+### Phase 4 — Nên có *(tùy chọn)*
+10. `print()` → `logging`.
+
+---
+
+## Checklist bên ngoài code (nhắc lại gọn)
+
+- [ ] `SECRET_KEY` production mạnh, khác local
+- [ ] `SESSION_COOKIE_SECURE=true` (sau khi có HTTPS)
+- [ ] Stripe: đổi `sk_test` → `sk_live`, đăng ký webhook endpoint domain production, set `STRIPE_WEBHOOK_SECRET`
+- [ ] Google OAuth: thêm redirect URI domain production vào Google Console
+- [ ] Backup SQLite định kỳ
+
+---
+
+## Lưu ý SQLite trên VPS
+
+SQLite phù hợp salon nhỏ (ít ghi đồng thời). Trên VPS Linux, file DB nằm bền trên đĩa → chỉ cần backup định kỳ. Không dùng PaaS filesystem ephemeral (sẽ mất DB khi restart). Nếu sau này lưu lượng ghi tăng mạnh mới cân nhắc chuyển Postgres.
