@@ -84,7 +84,7 @@
         <div class="svc-card" data-category="{{ service.category_slug }}">
             <div class="svc-card__img-wrap">
                 <img class="svc-card__img"
-                     src="{{ url_for('static', filename='uploads/services/' + service.image) if service.image else url_for('static', filename='images/Default/Service/test.png') }}"
+                     src="{{ (service.image | img_src('services')) or url_for('static', filename='images/Default/Service/test.png') }}"
                      alt="{{ service.name }}">
                 <div class="svc-card__badges">
                     <span class="svc-badge svc-badge--category">{{ tr(service, 'category_name') }}</span>

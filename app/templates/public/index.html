@@ -81,7 +81,7 @@
         <a class="service-card" href="{{ url_for('main.public_booking', service_id=service.id) }}">
             <div class="service-card__img-wrap">
                 <img
-                    src="{{ url_for('static', filename='uploads/services/' + service.image) if service.image else url_for('static', filename='images/Default/Service/test.png') }}"
+                    src="{{ (service.image | img_src('services')) or url_for('static', filename='images/Default/Service/test.png') }}"
                     alt="{{ service.name }}"
                 >
             </div>
@@ -120,7 +120,7 @@
         {% for image in gallery_images %}
         <a href="{{ url_for('main.gallery') }}" class="gallery-item{% if loop.first %} gallery-item--tall{% endif %}">
             <img
-                src="{{ image.image_url if image.image_url.startswith('http') else url_for('static', filename='uploads/gallery/' + image.image_url) }}"
+                src="{{ image.image_url | img_src('gallery') }}"
                 alt="{{ tr(image, 'alt_text') }}"
             >
         </a>

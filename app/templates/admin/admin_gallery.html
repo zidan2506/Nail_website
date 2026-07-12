@@ -993,7 +993,7 @@
 
         <div class="gl-card__thumb">
             {% if img.image_url %}
-            <img src="{{ url_for('static', filename='uploads/gallery/' + img.image_url) }}" alt="{{ img.alt_text or '' }}">
+            <img src="{{ img.image_url | img_src('gallery') }}" alt="{{ img.alt_text or '' }}">
             {% else %}
             <div class="gl-card__thumb-placeholder">
                 <span class="material-symbols-outlined">photo</span>

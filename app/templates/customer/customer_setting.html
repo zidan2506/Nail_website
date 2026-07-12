@@ -627,7 +627,7 @@
        - POST /customer/setting/update-avatar
        - Field: "avatar" (multipart/form-data)
        - Validate: file type + size ≤ 800KB server-side
-       - Save to: static/uploads/avatars/<user_id>.<ext>
+       - Save to: static/uploads/avatars/<uuid>.<ext> (tên file lưu ở customers.avatar)
        - Update: current_user.profile_picture = saved file URL
        - Flash success: "Profile picture updated."
      

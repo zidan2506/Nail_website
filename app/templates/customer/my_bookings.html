@@ -152,7 +152,7 @@
           <article class="appointment-card">
             <div class="appointment-card__image">
               {% if booking['booking']['service_image'] %}
-              <img src="{{ url_for('static', filename='uploads/services/' + booking['booking']['service_image']) }}" alt="{{ booking['booking']['service_name'] }}" />
+              <img src="{{ booking['booking']['service_image'] | img_src('services') }}" alt="{{ booking['booking']['service_name'] }}" />
               {% else %}
               <div class="appointment-card__image-fallback">
                 <span class="material-symbols-outlined">spa</span>
@@ -206,7 +206,7 @@
           <article class="appointment-card">
             <div class="appointment-card__image">
               {% if booking['booking']['service_image'] %}
-              <img src="{{ url_for('static', filename='uploads/services/' + booking['booking']['service_image']) }}" alt="{{ booking['booking']['service_name'] }}" />
+              <img src="{{ booking['booking']['service_image'] | img_src('services') }}" alt="{{ booking['booking']['service_name'] }}" />
               {% else %}
               <div class="appointment-card__image-fallback">
                 <span class="material-symbols-outlined">spa</span>
@@ -262,7 +262,7 @@
           <article class="appointment-card appointment-card--cancelled">
             <div class="appointment-card__image">
               {% if booking['booking']['service_image'] %}
-              <img src="{{ url_for('static', filename='uploads/services/' + booking['booking']['service_image']) }}" alt="{{ booking['booking']['service_name'] }}" />
+              <img src="{{ booking['booking']['service_image'] | img_src('services') }}" alt="{{ booking['booking']['service_name'] }}" />
               {% else %}
               <div class="appointment-card__image-fallback">
                 <span class="material-symbols-outlined">spa</span>

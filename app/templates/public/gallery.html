@@ -41,7 +41,7 @@
                     <div class="gal-item__hover-icon">
                         <span class="material-symbols-outlined">zoom_in</span>
                     </div>
-                    <img class="gal-item__img" src="{{ image.image_url }}" alt="{{ tr(image, 'alt_text') }}">
+                    <img class="gal-item__img" src="{{ image.image_url | img_src('gallery') }}" alt="{{ tr(image, 'alt_text') }}">
                 </div>
             {% endfor %}
           Lưu ý: dùng {{ loop.index0 }} (bắt đầu từ 0) cho data-index, không phải
@@ -59,7 +59,7 @@
             <div class="gal-item__hover-icon">
                 <span class="material-symbols-outlined">zoom_in</span>
             </div>
-            <img class="gal-item__img" src="{{ image.image_url if image.image_url.startswith('http') else url_for('static', filename='uploads/gallery/' + image.image_url) }}" alt="{{ tr(image, 'alt_text') }}">
+            <img class="gal-item__img" src="{{ image.image_url | img_src('gallery') }}" alt="{{ tr(image, 'alt_text') }}">
         </div>
         {% endfor %}
     </div>

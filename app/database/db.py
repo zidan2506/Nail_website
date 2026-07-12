@@ -1149,6 +1149,16 @@ def update_customer_profile(customer_id, full_name, email, phone, date_of_birth)
     conn.close()
 
 
+def update_customer_avatar(customer_id, avatar):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE customers SET avatar=?, updated_at=CURRENT_TIMESTAMP WHERE id=?",
+        (avatar, customer_id)
+    )
+    conn.commit()
+    conn.close()
+
+
 def update_user_email(user_id, email):
     conn = get_connection()
     conn.execute("UPDATE users SET email=? WHERE id=?", (email, user_id))

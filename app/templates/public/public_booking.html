@@ -82,7 +82,7 @@
             {% set ns.first_service = false %}
             <div class="bk-svc-card">
               <div class="bk-svc-thumb">
-                <img src="{{ url_for('static', filename='uploads/services/' + service['image']) if service['image'] else url_for('static', filename='images/Default/Service/test.png') }}" alt="{{ tr(service, 'name') }}">
+                <img src="{{ (service['image'] | img_src('services')) or url_for('static', filename='images/Default/Service/test.png') }}" alt="{{ tr(service, 'name') }}">
               </div>
               <div class="bk-svc-body">
                 <div class="bk-svc-row">
@@ -141,7 +141,7 @@
             <div class="bk-staff-card">
               {% if staff['photo'] %}
               <div class="bk-staff-avatar"
-                   style="background-image:url('{{ url_for('static', filename='uploads/staff/' + staff['photo']) }}')"></div>
+                   style="background-image:url('{{ staff['photo'] | img_src('staff') }}')"></div>
               {% else %}
               <div class="bk-staff-avatar bk-staff-avatar--empty">
                 <span class="material-symbols-outlined">person</span>

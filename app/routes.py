@@ -14,7 +14,7 @@ from app.database.db import (
     get_report_top_services, get_report_staff_performance, get_report_loyalty,
     get_report_customer_growth,
 )
-from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_current_tier, get_tier_by_name, get_tier_by_id, get_customer_subscription_row, get_active_subscription_rows, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_user_email, update_user_password, cancel_booking_with_reason, get_gallery_images, get_active_staff, get_admin_kpis, get_admin_today_appointments, get_admin_recent_activity, get_admin_revenue_chart, get_all_customers, get_admin_bookings, get_booking_status_counts, update_booking_details, get_staff_stats, get_staff_list, get_staff_role_list, create_staff, update_staff, delete_staff, toggle_staff_active, get_all_categories, get_service_categories_with_services, get_service_stats, create_service, update_service, delete_service, toggle_service_active, create_category, update_category, delete_category, get_admin_customer_stats, get_admin_customers, create_customer_admin, update_customer_admin, delete_customer_admin, get_gallery_images_admin, get_gallery_image_by_id, get_gallery_stats, create_gallery_images, update_gallery_image, delete_gallery_image, bulk_delete_gallery_images, reorder_gallery_images, get_admin_loyalty_customers, get_admin_loyalty_stats, get_rewards_admin, get_missions, create_reward, update_reward, get_reward_by_id, get_reward_redemption_count, delete_reward, deactivate_reward, update_mission_config, toggle_mission_config, get_active_membership_tiers, adjust_membership_admin, MISSION_KEYS, get_carousel_slides, get_carousel_slide_by_id, get_next_carousel_sort_order, create_homepage_slide, update_homepage_slide, create_offer_slide, update_offer_slide, delete_carousel_slide, get_mission_slides, update_mission_slide, reorder_carousel_slides, MISSION_SLOT_KEYS, auto_expire_bookings, get_admin_top_loyalty, get_admin_new_members, get_admin_top_services, get_popular_services, get_staff_bookings_range, get_invoice_by_booking, mark_invoice_paid, create_invoice, get_staff_history, get_staff_history_months, get_staff_history_stats, get_staff_profile_stats, update_staff_photo
+from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_current_tier, get_tier_by_name, get_tier_by_id, get_customer_subscription_row, get_active_subscription_rows, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_customer_avatar, update_user_email, update_user_password, cancel_booking_with_reason, get_gallery_images, get_active_staff, get_admin_kpis, get_admin_today_appointments, get_admin_recent_activity, get_admin_revenue_chart, get_all_customers, get_admin_bookings, get_booking_status_counts, update_booking_details, get_staff_stats, get_staff_list, get_staff_role_list, create_staff, update_staff, delete_staff, toggle_staff_active, get_all_categories, get_service_categories_with_services, get_service_stats, create_service, update_service, delete_service, toggle_service_active, create_category, update_category, delete_category, get_admin_customer_stats, get_admin_customers, create_customer_admin, update_customer_admin, delete_customer_admin, get_gallery_images_admin, get_gallery_image_by_id, get_gallery_stats, create_gallery_images, update_gallery_image, delete_gallery_image, bulk_delete_gallery_images, reorder_gallery_images, get_admin_loyalty_customers, get_admin_loyalty_stats, get_rewards_admin, get_missions, create_reward, update_reward, get_reward_by_id, get_reward_redemption_count, delete_reward, deactivate_reward, update_mission_config, toggle_mission_config, get_active_membership_tiers, adjust_membership_admin, MISSION_KEYS, get_carousel_slides, get_carousel_slide_by_id, get_next_carousel_sort_order, create_homepage_slide, update_homepage_slide, create_offer_slide, update_offer_slide, delete_carousel_slide, get_mission_slides, update_mission_slide, reorder_carousel_slides, MISSION_SLOT_KEYS, auto_expire_bookings, get_admin_top_loyalty, get_admin_new_members, get_admin_top_services, get_popular_services, get_staff_bookings_range, get_invoice_by_booking, mark_invoice_paid, create_invoice, get_staff_history, get_staff_history_months, get_staff_history_stats, get_staff_profile_stats, update_staff_photo
 from datetime import datetime, timedelta, date
 from app.services.email_system import send_verification_email, send_thank_you_email, generate_verification_code
 from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days, complete_booking_txn, revert_booking_txn
@@ -47,10 +47,6 @@ _MAX_LOGIN_ATTEMPTS = 5
 _LOGIN_LOCKOUT = 15 * 60  # 15 phút
 _ADMIN_IDLE_TIMEOUT = 30 * 60  # 30 phút
 
-_AVATAR_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "avatars")
-_ALLOWED_AVATAR_EXT = {"jpg", "jpeg", "png", "gif"}
-_MAX_AVATAR_SIZE = 800 * 1024  # 800KB
-
 # Bảng màu cho avatar initials (dùng khi khách chưa upload ảnh)
 _AVATAR_PALETTE = [
     ("#e0e7ff", "#3730a3"), ("#fce7f3", "#9d174d"),
@@ -58,25 +54,74 @@ _AVATAR_PALETTE = [
     ("#dcfce7", "#166534"), ("#fee2e2", "#991b1b"),
 ]
 
-_SERVICE_IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "services")
-_ALLOWED_SERVICE_IMG_EXT = {"jpg", "jpeg", "png", "webp"}
-_MAX_SERVICE_IMG_SIZE = 2 * 1024 * 1024  # 2MB
+# ── Cơ chế upload ảnh dùng chung (chuẩn hoá cho mọi loại) ──────────────
+# Mỗi loại chỉ khai báo 1 config; save/resolve/delete dùng chung.
+_UPLOAD_ROOT = os.path.join(os.path.dirname(__file__), "static", "uploads")
+_UPLOAD_CONFIG = {
+    "services":  {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 2 * 1024 * 1024},
+    "gallery":   {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 2 * 1024 * 1024},
+    "rewards":   {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 2 * 1024 * 1024},
+    "carousels": {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 2 * 1024 * 1024},
+    "staff":     {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 2 * 1024 * 1024},
+    "avatars":   {"exts": {"jpg", "jpeg", "png", "gif"},  "max": 800 * 1024},
+}
 
-_GALLERY_IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "gallery")
-_ALLOWED_GALLERY_IMG_EXT = {"jpg", "jpeg", "png", "webp"}
-_MAX_GALLERY_IMG_SIZE = 2 * 1024 * 1024  # 2MB
 
-_REWARD_IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "rewards")
-_ALLOWED_REWARD_IMG_EXT = {"jpg", "jpeg", "png", "webp"}
-_MAX_REWARD_IMG_SIZE = 2 * 1024 * 1024  # 2MB
+def _size_label(n):
+    return f"{n // 1024 // 1024}MB" if n % (1024 * 1024) == 0 else f"{n // 1024}KB"
 
-_CAROUSEL_IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "carousels")
-_ALLOWED_CAROUSEL_IMG_EXT = {"jpg", "jpeg", "png", "webp"}
-_MAX_CAROUSEL_IMG_SIZE = 2 * 1024 * 1024  # 2MB
 
-_STAFF_IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "uploads", "staff")
-_ALLOWED_STAFF_IMG_EXT = {"jpg", "jpeg", "png", "webp"}
-_MAX_STAFF_IMG_SIZE = 2 * 1024 * 1024  # 2MB
+def _save_upload(file, subdir):
+    """Lưu ảnh upload thành {uuid}.{ext} dưới uploads/<subdir>/. Trả tên file,
+    hoặc None nếu không có file. Raise ValueError nếu sai định dạng / quá lớn."""
+    if not file or not file.filename:
+        return None
+    cfg = _UPLOAD_CONFIG[subdir]
+    ext = secure_filename(file.filename).rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+    if ext not in cfg["exts"]:
+        allowed = ", ".join(sorted(e.upper() for e in cfg["exts"]))
+        raise ValueError(f"Định dạng ảnh không hợp lệ. Chỉ chấp nhận {allowed}.")
+    file.seek(0, 2)
+    size = file.tell()
+    file.seek(0)
+    if size > cfg["max"]:
+        raise ValueError(f"Ảnh quá lớn. Kích thước tối đa {_size_label(cfg['max'])}.")
+    d = os.path.join(_UPLOAD_ROOT, subdir)
+    os.makedirs(d, exist_ok=True)
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    file.save(os.path.join(d, filename))
+    return filename
+
+
+def _resolve_upload(image, subdir):
+    """image -> src dùng được. URL/absolute (http, /) dùng thẳng; tên file trần
+    -> /static/uploads/<subdir>/<image>. Trả None nếu rỗng."""
+    if not image:
+        return None
+    if image.startswith(("http://", "https://", "/")):
+        return image
+    return url_for("static", filename=f"uploads/{subdir}/{image}")
+
+
+def _is_managed_upload(image):
+    """True nếu image là tên file trần mình tự lưu (xoá được an toàn), không phải
+    URL ngoài hay path /static/... (seed/default)."""
+    return bool(image) and not image.startswith(("http://", "https://", "/"))
+
+
+def _delete_upload(image, subdir):
+    """Xoá file upload nếu là file managed (bỏ qua URL/absolute path)."""
+    if _is_managed_upload(image):
+        p = os.path.join(_UPLOAD_ROOT, subdir, image)
+        if os.path.exists(p):
+            os.remove(p)
+
+
+@main.app_template_filter("img_src")
+def _img_src(image, subdir):
+    """Jinja filter: {{ value | img_src('services') }} -> src dùng được (hoặc '')."""
+    return _resolve_upload(image, subdir) or ""
+
 
 def _slugify(text):
     text = text.replace("đ", "d").replace("Đ", "D")
@@ -84,164 +129,17 @@ def _slugify(text):
     text = re.sub(r"[^a-zA-Z0-9]+", "-", text).strip("-").lower()
     return text
 
-def _save_service_image(file):
-    """Validates and saves an uploaded service image. Returns the stored filename, or None if no file given."""
-    if not file or not file.filename:
-        return None
-    safe_name = secure_filename(file.filename)
-    ext = safe_name.rsplit(".", 1)[-1].lower() if "." in safe_name else ""
-    if ext not in _ALLOWED_SERVICE_IMG_EXT:
-        raise ValueError("Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, WEBP.")
-
-    file.seek(0, 2)
-    size = file.tell()
-    file.seek(0)
-    if size > _MAX_SERVICE_IMG_SIZE:
-        raise ValueError("Ảnh quá lớn. Kích thước tối đa 2MB.")
-
-    os.makedirs(_SERVICE_IMG_DIR, exist_ok=True)
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    file.save(os.path.join(_SERVICE_IMG_DIR, filename))
-    return filename
-
-def _save_gallery_image(file):
-    """Validates and saves an uploaded gallery image. Returns the stored filename, or None if no file given."""
-    if not file or not file.filename:
-        return None
-    safe_name = secure_filename(file.filename)
-    ext = safe_name.rsplit(".", 1)[-1].lower() if "." in safe_name else ""
-    if ext not in _ALLOWED_GALLERY_IMG_EXT:
-        raise ValueError("Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, WEBP.")
-
-    file.seek(0, 2)
-    size = file.tell()
-    file.seek(0)
-    if size > _MAX_GALLERY_IMG_SIZE:
-        raise ValueError("Ảnh quá lớn. Kích thước tối đa 2MB.")
-
-    os.makedirs(_GALLERY_IMG_DIR, exist_ok=True)
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    file.save(os.path.join(_GALLERY_IMG_DIR, filename))
-    return filename
-
-def _save_reward_image(file):
-    """Validates and saves an uploaded reward banner image. Returns the stored filename, or None if no file given."""
-    if not file or not file.filename:
-        return None
-    safe_name = secure_filename(file.filename)
-    ext = safe_name.rsplit(".", 1)[-1].lower() if "." in safe_name else ""
-    if ext not in _ALLOWED_REWARD_IMG_EXT:
-        raise ValueError("Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, WEBP.")
-
-    file.seek(0, 2)
-    size = file.tell()
-    file.seek(0)
-    if size > _MAX_REWARD_IMG_SIZE:
-        raise ValueError("Ảnh quá lớn. Kích thước tối đa 2MB.")
-
-    os.makedirs(_REWARD_IMG_DIR, exist_ok=True)
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    file.save(os.path.join(_REWARD_IMG_DIR, filename))
-    return filename
-
-def _save_carousel_image(file):
-    """Validates and saves an uploaded carousel/mission image. Returns the stored filename, or None if no file given."""
-    if not file or not file.filename:
-        return None
-    safe_name = secure_filename(file.filename)
-    ext = safe_name.rsplit(".", 1)[-1].lower() if "." in safe_name else ""
-    if ext not in _ALLOWED_CAROUSEL_IMG_EXT:
-        raise ValueError("Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, WEBP.")
-
-    file.seek(0, 2)
-    size = file.tell()
-    file.seek(0)
-    if size > _MAX_CAROUSEL_IMG_SIZE:
-        raise ValueError("Ảnh quá lớn. Kích thước tối đa 2MB.")
-
-    os.makedirs(_CAROUSEL_IMG_DIR, exist_ok=True)
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    file.save(os.path.join(_CAROUSEL_IMG_DIR, filename))
-    return filename
-
-def _resolve_carousel_image(image):
-    """carousel_slides.image holds either a bare uploaded filename (new admin uploads,
-    served from static/uploads/carousels/) or a legacy absolute path/URL (the 3
-    pre-existing homepage/mission images migrated from the old hardcoded lists).
-    Returns a ready-to-use src, or None."""
-    if not image:
-        return None
-    if image.startswith("http://") or image.startswith("https://") or image.startswith("/"):
-        return image
-    return url_for("static", filename=f"uploads/carousels/{image}")
-
-def _resolve_staff_photo(photo):
-    """staff.photo holds either a bare uploaded filename (new avatar uploads,
-    served from static/uploads/staff/) or a legacy absolute URL (seed data).
-    Returns a ready-to-use src, or None."""
-    if not photo:
-        return None
-    if photo.startswith("http://") or photo.startswith("https://") or photo.startswith("/"):
-        return photo
-    return url_for("static", filename=f"uploads/staff/{photo}")
-
-def _save_staff_image(file):
-    """Validates and saves an uploaded staff avatar. Returns the stored filename, or None if no file given."""
-    if not file or not file.filename:
-        return None
-    safe_name = secure_filename(file.filename)
-    ext = safe_name.rsplit(".", 1)[-1].lower() if "." in safe_name else ""
-    if ext not in _ALLOWED_STAFF_IMG_EXT:
-        raise ValueError("Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, WEBP.")
-
-    file.seek(0, 2)
-    size = file.tell()
-    file.seek(0)
-    if size > _MAX_STAFF_IMG_SIZE:
-        raise ValueError("Ảnh quá lớn. Kích thước tối đa 2MB.")
-
-    os.makedirs(_STAFF_IMG_DIR, exist_ok=True)
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    file.save(os.path.join(_STAFF_IMG_DIR, filename))
-    return filename
-
 def _name_initials(full_name):
     """Returns up to 2 uppercase initials from a name, e.g. 'Ha Anh' -> 'HA'."""
     parts = (full_name or "").split()
     return "".join(p[0].upper() for p in parts[:2]) or "?"
 
 def _resolve_customer_avatar(user_id):
-    """Returns the customer's avatar URL with a cache-busting version tag, or None if not set.
-    Avatars are stored as {user_id}.{ext} in static/uploads/avatars/."""
-    for ext in _ALLOWED_AVATAR_EXT:
-        path = os.path.join(_AVATAR_DIR, f"{user_id}.{ext}")
-        if os.path.exists(path):
-            version = int(os.path.getmtime(path))
-            return url_for("static", filename=f"uploads/avatars/{user_id}.{ext}", v=version)
+    """Avatar khách: tên file uuid lưu ở customers.avatar, resolve qua uploads/avatars/."""
+    customer = get_customer_by_user_id(user_id)
+    if customer and customer["avatar"]:
+        return _resolve_upload(customer["avatar"], "avatars")
     return None
-
-def _save_avatar_image(file, user_id):
-    """Validates and saves a customer avatar as {user_id}.{ext} (max 800KB, JPG/GIF/PNG).
-    Removes any previous avatar first. Raises ValueError on invalid input."""
-    if not file or not file.filename:
-        raise ValueError("No file selected.")
-    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
-    if ext not in _ALLOWED_AVATAR_EXT:
-        raise ValueError("Invalid file type. JPG, GIF or PNG only.")
-
-    file.seek(0, 2)
-    size = file.tell()
-    file.seek(0)
-    if size > _MAX_AVATAR_SIZE:
-        raise ValueError("File is too large. Max size is 800KB.")
-
-    os.makedirs(_AVATAR_DIR, exist_ok=True)
-    for old_ext in _ALLOWED_AVATAR_EXT:
-        old_path = os.path.join(_AVATAR_DIR, f"{user_id}.{old_ext}")
-        if os.path.exists(old_path):
-            os.remove(old_path)
-
-    file.save(os.path.join(_AVATAR_DIR, f"{user_id}.{ext}"))
 
 @main.route("/set-language/<lang>")
 def set_language(lang):
@@ -341,7 +239,7 @@ def _get_current_staff():
         "role": staff["role"],
         "email": staff["email"],
         "phone": staff["phone"],
-        "avatar": _resolve_staff_photo(staff["photo"]),
+        "avatar": _resolve_upload(staff["photo"], "staff"),
         "hourly_rate": staff["hourly_rate"],
         "commission_rate": staff["commission_rate"],
         "created_at": staff["created_at"],
@@ -396,7 +294,7 @@ def customer_dashboard():
             "title":     tr(s, "title"),
             "subtitle":  tr(s, "subtitle"),
             "badge":     tr(s, "badge"),
-            "image":     _resolve_carousel_image(s["image"]),
+            "image":     _resolve_upload(s["image"], "carousels"),
             "cta_label": tr(s, "cta_label"),
             "cta_url":   s["cta_url"],
         })
@@ -905,10 +803,19 @@ def update_avatar():
     file = request.files.get("avatar")
 
     try:
-        _save_avatar_image(file, user_id)
+        filename = _save_upload(file, "avatars")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.customer_setting"))
+
+    if not filename:
+        flash("No file selected.", "error")
+        return redirect(url_for("main.customer_setting"))
+
+    customer = get_customer_by_user_id(user_id)
+    old = customer["avatar"] if customer else None
+    update_customer_avatar(customer["id"], filename)
+    _delete_upload(old, "avatars")
 
     flash("Profile picture updated.", "success")
     return redirect(url_for("main.customer_setting"))
@@ -1580,7 +1487,7 @@ def customer_loyalty_points():
             "desc":              tr(r, "description") or "",
             "pts":               r["cost"],
             "locked":            not redeemable,
-            "img":               url_for("static", filename=f"uploads/rewards/{r['banner_image']}") if r["banner_image"] else "",
+            "img":               _resolve_upload(r["banner_image"], "rewards") or "",
             "available":         redeemable,
             "lock_reason":       lock_reason,
             "cooldown_remaining": cooldown_remaining,
@@ -1631,7 +1538,7 @@ def customer_loyalty_points():
             "icon":          m["icon"],
             "name":          tr(m, "title"),
             "pts":           m["pts_label"],
-            "img":           _resolve_carousel_image(m["image"]),
+            "img":           _resolve_upload(m["image"], "carousels"),
             "bg":            _MISSION_SLOT_BG.get(slot),
             "url":           _MISSION_SLOT_URLS[slot](),
             "cta":           gettext(_MISSION_SLOT_CTA.get(slot, "Start")),
@@ -2068,7 +1975,7 @@ def staff_update_avatar():
     file = request.files.get("avatar")
 
     try:
-        filename = _save_staff_image(file)
+        filename = _save_upload(file, "staff")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.staff_profile"))
@@ -2077,7 +1984,9 @@ def staff_update_avatar():
         flash("Vui lòng chọn ảnh.", "error")
         return redirect(url_for("main.staff_profile"))
 
+    old = get_staff_by_id(current_staff["id"])
     update_staff_photo(current_staff["id"], filename)
+    _delete_upload(old["photo"] if old else None, "staff")
     flash("Đã cập nhật ảnh đại diện.", "success")
     return redirect(url_for("main.staff_profile"))
 
@@ -2573,7 +2482,7 @@ def admin_create_service():
         return redirect(url_for("main.admin_services"))
 
     try:
-        image = _save_service_image(request.files.get("image"))
+        image = _save_upload(request.files.get("image"), "services")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_services"))
@@ -2612,15 +2521,13 @@ def admin_update_service(service_id):
         return redirect(url_for("main.admin_services"))
 
     try:
-        new_image = _save_service_image(request.files.get("image"))
+        new_image = _save_upload(request.files.get("image"), "services")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_services"))
 
-    if (new_image or remove_image) and service["image"]:
-        old_path = os.path.join(_SERVICE_IMG_DIR, service["image"])
-        if os.path.exists(old_path):
-            os.remove(old_path)
+    if new_image or remove_image:
+        _delete_upload(service["image"], "services")
 
     if new_image:
         image = new_image
@@ -2744,7 +2651,7 @@ def admin_gallery_upload():
     rows = []
     try:
         for i, file in enumerate(files):
-            filename = _save_gallery_image(file)
+            filename = _save_upload(file, "gallery")
             rows.append((filename, alt_text, sort_order_start + i))
     except ValueError as e:
         flash(str(e), "error")
@@ -2770,15 +2677,13 @@ def admin_gallery_update(image_id):
     is_active = 1 if request.form.get("is_active") == "1" else 0
 
     try:
-        new_image = _save_gallery_image(request.files.get("image"))
+        new_image = _save_upload(request.files.get("image"), "gallery")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_gallery"))
 
     if new_image:
-        old_path = os.path.join(_GALLERY_IMG_DIR, image["image_url"])
-        if os.path.exists(old_path):
-            os.remove(old_path)
+        _delete_upload(image["image_url"], "gallery")
         update_gallery_image(image_id, alt_text, sort_order, is_active, image_url=new_image,
                              alt_text_fi=alt_text_fi, alt_text_vi=alt_text_vi)
     else:
@@ -2794,11 +2699,7 @@ def admin_gallery_update(image_id):
 def admin_gallery_delete(image_id):
     image = get_gallery_image_by_id(image_id)
     if image:
-        old_path = os.path.join(_GALLERY_IMG_DIR, image["image_url"])
-        try:
-            os.remove(old_path)
-        except OSError:
-            pass
+        _delete_upload(image["image_url"], "gallery")
         delete_gallery_image(image_id)
         flash("Đã xóa ảnh.", "success")
     return redirect(url_for("main.admin_gallery"))
@@ -2822,11 +2723,7 @@ def admin_gallery_bulk_delete():
     for image_id in image_ids:
         image = get_gallery_image_by_id(image_id)
         if image:
-            old_path = os.path.join(_GALLERY_IMG_DIR, image["image_url"])
-            try:
-                os.remove(old_path)
-            except OSError:
-                pass
+            _delete_upload(image["image_url"], "gallery")
 
     if image_ids:
         bulk_delete_gallery_images(image_ids)
@@ -3075,7 +2972,7 @@ def admin_loyalty_create_voucher():
         return redirect(url_for("main.admin_loyalty"))
 
     try:
-        banner_image = _save_reward_image(request.files.get("image"))
+        banner_image = _save_upload(request.files.get("image"), "rewards")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_loyalty"))
@@ -3112,15 +3009,13 @@ def admin_loyalty_update_voucher(reward_id):
         return redirect(url_for("main.admin_loyalty"))
 
     try:
-        new_image = _save_reward_image(request.files.get("image"))
+        new_image = _save_upload(request.files.get("image"), "rewards")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_loyalty"))
 
-    if (new_image or remove_image) and reward["banner_image"]:
-        old_path = os.path.join(_REWARD_IMG_DIR, reward["banner_image"])
-        if os.path.exists(old_path):
-            os.remove(old_path)
+    if new_image or remove_image:
+        _delete_upload(reward["banner_image"], "rewards")
 
     if new_image:
         banner_image = new_image
@@ -3147,10 +3042,7 @@ def admin_loyalty_delete_voucher(reward_id):
         deactivate_reward(reward_id)
         flash(f"Voucher \"{reward['name']}\" đã có khách đổi nên chỉ được ẩn, không xóa hẳn.", "success")
     else:
-        if reward["banner_image"]:
-            old_path = os.path.join(_REWARD_IMG_DIR, reward["banner_image"])
-            if os.path.exists(old_path):
-                os.remove(old_path)
+        _delete_upload(reward["banner_image"], "rewards")
         delete_reward(reward_id)
         flash(f"Đã xóa voucher \"{reward['name']}\".", "success")
 
@@ -3190,26 +3082,20 @@ def admin_loyalty_toggle_mission(key):
 #         Admin — Carousels
 #====================================
 
-def _is_managed_carousel_image(image):
-    """True if `image` is a bare filename we saved (and can safely delete from
-    disk), as opposed to an external URL or a legacy /static/... path."""
-    return bool(image) and not image.startswith("http://") and not image.startswith("https://") and not image.startswith("/")
-
-
 @main.route("/admin/carousels")
 @admin_required
 def admin_carousels():
     homepage_slides = get_carousel_slides("homepage")
     for s in homepage_slides:
-        s["image_url"] = _resolve_carousel_image(s["image"])
+        s["image_url"] = _resolve_upload(s["image"], "carousels")
 
     mission_slides = get_mission_slides()
     for m in mission_slides:
-        m["image_url"] = _resolve_carousel_image(m["image"])
+        m["image_url"] = _resolve_upload(m["image"], "carousels")
 
     offer_slides = get_carousel_slides("dashboard_offers")
     for s in offer_slides:
-        s["image_url"] = _resolve_carousel_image(s["image"])
+        s["image_url"] = _resolve_upload(s["image"], "carousels")
 
     return render_template(
         "admin/admin_carousels.html",
@@ -3247,7 +3133,7 @@ def admin_carousel_homepage_create():
         return redirect(url_for("main.admin_carousels"))
 
     try:
-        image = _save_carousel_image(request.files.get("image"))
+        image = _save_upload(request.files.get("image"), "carousels")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_carousels"))
@@ -3300,15 +3186,13 @@ def admin_carousel_homepage_update(slide_id):
         return redirect(url_for("main.admin_carousels"))
 
     try:
-        new_image = _save_carousel_image(request.files.get("image"))
+        new_image = _save_upload(request.files.get("image"), "carousels")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_carousels"))
 
-    if (new_image or remove_image) and _is_managed_carousel_image(slide["image"]):
-        old_path = os.path.join(_CAROUSEL_IMG_DIR, slide["image"])
-        if os.path.exists(old_path):
-            os.remove(old_path)
+    if new_image or remove_image:
+        _delete_upload(slide["image"], "carousels")
 
     if new_image:
         image = new_image
@@ -3352,7 +3236,7 @@ def admin_carousel_offer_create():
         return redirect(url_for("main.admin_carousels"))
 
     try:
-        image = _save_carousel_image(request.files.get("image"))
+        image = _save_upload(request.files.get("image"), "carousels")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_carousels"))
@@ -3395,15 +3279,13 @@ def admin_carousel_offer_update(slide_id):
         return redirect(url_for("main.admin_carousels"))
 
     try:
-        new_image = _save_carousel_image(request.files.get("image"))
+        new_image = _save_upload(request.files.get("image"), "carousels")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_carousels"))
 
-    if (new_image or remove_image) and _is_managed_carousel_image(slide["image"]):
-        old_path = os.path.join(_CAROUSEL_IMG_DIR, slide["image"])
-        if os.path.exists(old_path):
-            os.remove(old_path)
+    if new_image or remove_image:
+        _delete_upload(slide["image"], "carousels")
 
     if new_image:
         image = new_image
@@ -3430,10 +3312,7 @@ def admin_carousel_delete(slide_id):
         flash("Không thể xóa mission cố định.", "error")
         return redirect(url_for("main.admin_carousels"))
 
-    if _is_managed_carousel_image(slide["image"]):
-        old_path = os.path.join(_CAROUSEL_IMG_DIR, slide["image"])
-        if os.path.exists(old_path):
-            os.remove(old_path)
+    _delete_upload(slide["image"], "carousels")
 
     delete_carousel_slide(slide_id)
     flash("Đã xóa slide.", "success")
@@ -3461,15 +3340,13 @@ def admin_carousel_mission_update(slot_key):
         return redirect(url_for("main.admin_carousels"))
 
     try:
-        new_image = _save_carousel_image(request.files.get("image"))
+        new_image = _save_upload(request.files.get("image"), "carousels")
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_carousels"))
 
-    if (new_image or remove_image) and slide and _is_managed_carousel_image(slide["image"]):
-        old_path = os.path.join(_CAROUSEL_IMG_DIR, slide["image"])
-        if os.path.exists(old_path):
-            os.remove(old_path)
+    if (new_image or remove_image) and slide:
+        _delete_upload(slide["image"], "carousels")
 
     if new_image:
         image = new_image
@@ -3902,7 +3779,7 @@ def home():
         if s["cta2_label"] and s["cta2_url"]:
             cta.append({"label": tr(s, "cta2_label"), "url": s["cta2_url"], "style": s["cta2_style"] or "outline"})
         slides.append({
-            "image":    _resolve_carousel_image(s["image"]),
+            "image":    _resolve_upload(s["image"], "carousels"),
             "badge":    tr(s, "badge"),
             "title":    tr(s, "title"),
             "subtitle": tr(s, "subtitle"),

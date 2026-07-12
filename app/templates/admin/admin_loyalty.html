@@ -1152,10 +1152,10 @@
              data-max-redeems="{{ v.max_redeems_per_customer if v.max_redeems_per_customer is not none else '' }}"
              data-cooldown="{{ v.cooldown_days if v.cooldown_days is not none else '' }}"
              data-active="{{ v.is_active }}"
-             data-banner="{{ url_for('static', filename='uploads/rewards/' + v.banner_image) if v.banner_image else '' }}">
+             data-banner="{{ v.banner_image | img_src('rewards') }}">
             {% if v.banner_image %}
             <div class="ly-voucher-card__banner">
-                <img src="{{ url_for('static', filename='uploads/rewards/' + v.banner_image) }}" alt="{{ v.name }}">
+                <img src="{{ v.banner_image | img_src('rewards') }}" alt="{{ v.name }}">
             </div>
             {% endif %}
             <div class="ly-voucher-card__top">

@@ -89,6 +89,7 @@ CREATE TABLE customers (
     date_of_birth DATE,
     is_verified INTEGER NOT NULL DEFAULT 0,
     stripe_customer_id TEXT DEFAULT NULL,
+    avatar TEXT DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
