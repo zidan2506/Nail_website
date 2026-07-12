@@ -12,8 +12,8 @@ Kế hoạch chuẩn bị trước khi deploy, theo hướng tối ưu và dễ 
 |---|--------|--------|
 | 1 | ~~`requirements.txt` là bản `pip freeze` toàn máy — encode UTF-16, ~180 package rác.~~ | ✅ Đã xử lý (Phase 1) |
 | 2 | ~~`app/database/database.db` bị commit vào git.~~ | ✅ Đã xử lý (Phase 1) |
-| 3 | `run.py` dùng `app.run(debug=True)` — Flask dev server + debug mode. Không được lên production (RCE qua debugger, không chịu tải). | 🔴 Chặn |
-| 4 | Không có entry production (Procfile / gunicorn config). | 🔴 Chặn |
+| 3 | ~~`run.py` dùng `app.run(debug=True)`.~~ | ✅ Đã xử lý (Phase 2) |
+| 4 | ~~Không có entry production.~~ | ✅ Đã xử lý (Phase 2) |
 | 5 | `print()` rải khắp `routes.py` / `db.py` thay vì logging. | 🟡 Nên sửa |
 | 6 | Không có scheduler — `auto_expire_bookings` chạy lazy lúc load trang. | 🟢 Ghi chú |
 
@@ -33,9 +33,11 @@ Kế hoạch chuẩn bị trước khi deploy, theo hướng tối ưu và dễ 
 
 > **Trạng thái git:** các thay đổi Phase 1 đang staged, **chưa commit**.
 
-### Phase 2 — Production entry *(code)*
-3. Tách `debug=True` khỏi `run.py` (chỉ bật khi chạy local; production dùng gunicorn gọi `app:create_app()`).
-4. Thêm `Procfile` / gunicorn command + `runtime.txt` (bản Python).
+### Phase 2 — Production entry *(code)* — ✅ HOÀN TẤT (2026-07-12)
+3. ✅ `run.py` — bỏ hardcode `debug=True`, đọc từ `FLASK_DEBUG` (mặc định tắt; local set `true` trong `.env`). Production chạy qua `gunicorn run:app` (không đụng block `__main__`).
+4. ✅ Thêm `gunicorn.conf.py` (bind `127.0.0.1:8000`, workers 3, log ra stdout→journald). systemd sẽ gọi `gunicorn -c gunicorn.conf.py run:app`.
+   - Bỏ `Procfile`/`runtime.txt` (quy ước Heroku/PaaS, VPS+systemd không cần). **Python target: 3.13.**
+   - **Verify:** `run:app` import OK · config parse OK · logic `FLASK_DEBUG` đúng. (gunicorn Unix-only → chạy thật ở Phase 3.)
 
 ### Phase 3 — Hạ tầng VPS *(bạn làm, sẽ có lệnh cụ thể)*
 5. nginx reverse proxy + HTTPS (Let's Encrypt / certbot). Có HTTPS rồi mới set `SESSION_COOKIE_SECURE=true`.
