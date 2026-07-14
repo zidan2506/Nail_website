@@ -7,7 +7,7 @@ def translate_field(obj, field):
     """Chọn giá trị đã dịch của `field` theo ngôn ngữ session (i18n nội dung DB).
     Trả `field_<lang>` nếu có & không rỗng, ngược lại fallback về cột gốc (English).
     Hỗ trợ cả sqlite3.Row lẫn dict."""
-    lang = session.get("lang")
+    lang = session.get("lang") or "fi"
     if lang in ("fi", "vi"):
         try:
             val = obj[f"{field}_{lang}"]
