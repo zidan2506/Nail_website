@@ -1172,6 +1172,13 @@ def update_user_password(user_id, password_hash):
     conn.commit()
     conn.close()
 
+
+def update_user_lang(user_id, lang):
+    conn = get_connection()
+    conn.execute("UPDATE users SET lang=? WHERE id=?", (lang, user_id))
+    conn.commit()
+    conn.close()
+
 def get_admin_kpis(date_str):
     conn = get_connection()
     revenue = conn.execute(
