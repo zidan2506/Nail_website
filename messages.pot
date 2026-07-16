@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-11 00:09+0700\n"
+"POT-Creation-Date: 2026-07-17 04:55+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,20 +17,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes.py:35
+#: app/routes.py:36
 msgid "Chờ xác nhận"
 msgstr ""
 
-#: app/routes.py:35 app/templates/staff/staff_bookings.html:276
+#: app/routes.py:36 app/templates/staff/staff_bookings.html:276
 msgid "Đã xác nhận"
 msgstr ""
 
-#: app/routes.py:35 app/templates/staff/staff_bookings.html:277
+#: app/routes.py:36 app/templates/staff/staff_bookings.html:277
 #: app/templates/staff/staff_bookings.html:303
 msgid "Đang thực hiện"
 msgstr ""
 
-#: app/routes.py:36 app/templates/staff/staff_bookings.html:277
+#: app/routes.py:37 app/templates/staff/staff_bookings.html:277
 #: app/templates/staff/staff_bookings.html:307
 #: app/templates/staff/staff_bookings.html:374
 #: app/templates/staff/staff_bookings.html:452
@@ -40,55 +40,55 @@ msgstr ""
 msgid "Hoàn thành"
 msgstr ""
 
-#: app/routes.py:36 app/templates/staff/staff_history.html:233
+#: app/routes.py:37 app/templates/staff/staff_history.html:233
 #: app/templates/staff/staff_history.html:256
 #: app/templates/staff/staff_history.html:312
 #: app/templates/staff/staff_history.html:398
 msgid "Đã hủy"
 msgstr ""
 
-#: app/routes.py:36
+#: app/routes.py:37
 msgid "Không đến"
 msgstr ""
 
-#: app/routes.py:37
+#: app/routes.py:38
 msgid "hôm nay"
 msgstr ""
 
-#: app/routes.py:37
+#: app/routes.py:38
 msgid "trong tuần này"
 msgstr ""
 
-#: app/routes.py:37
+#: app/routes.py:38
 msgid "trong tháng này"
 msgstr ""
 
-#: app/routes.py:38
+#: app/routes.py:39
 msgid "trong tháng trước"
 msgstr ""
 
-#: app/routes.py:39 app/routes.py:1625
+#: app/routes.py:40 app/routes.py:1547
 msgid "✓ Claimed"
 msgstr ""
 
-#: app/routes.py:39 app/routes.py:1627
+#: app/routes.py:40 app/routes.py:1549
 msgid "✓ All Reviewed"
 msgstr ""
 
-#: app/routes.py:39
+#: app/routes.py:40
 msgid "Start"
 msgstr ""
 
-#: app/routes.py:39
+#: app/routes.py:40
 msgid "Claim"
 msgstr ""
 
-#: app/routes.py:1915
+#: app/routes.py:1839
 #, python-format
 msgid "vào ngày %(date)s"
 msgstr ""
 
-#: app/routes.py:1916
+#: app/routes.py:1840
 #, python-format
 msgid "từ %(start)s đến %(end)s"
 msgstr ""
@@ -276,18 +276,18 @@ msgid "Book an Appointment"
 msgstr ""
 
 #: app/templates/customer/customer_booking.html:28
-#: app/templates/customer/customer_booking.html:279
+#: app/templates/customer/customer_booking.html:273
 #: app/templates/public/public_booking.html:25
-#: app/templates/public/public_booking.html:329
+#: app/templates/public/public_booking.html:323
 msgid "Service"
 msgstr ""
 
 #: app/templates/customer/customer_booking.html:32
-#: app/templates/customer/customer_booking.html:287
+#: app/templates/customer/customer_booking.html:281
 #: app/templates/customer/customer_history.html:173
-#: app/templates/customer/my_bookings.html:385
+#: app/templates/customer/my_bookings.html:401
 #: app/templates/public/public_booking.html:29
-#: app/templates/public/public_booking.html:337
+#: app/templates/public/public_booking.html:331
 msgid "Stylist"
 msgstr ""
 
@@ -319,237 +319,237 @@ msgstr ""
 msgid "All Services"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:101
-#: app/templates/customer/customer_booking.html:409
+#: app/templates/customer/customer_booking.html:95
+#: app/templates/customer/customer_booking.html:403
 #: app/templates/customer/invoice_detail.html:83
-#: app/templates/public/public_booking.html:101
-#: app/templates/public/public_booking.html:460
+#: app/templates/public/public_booking.html:95
+#: app/templates/public/public_booking.html:454
 msgid "min"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:115
-#: app/templates/customer/customer_booking.html:169
-#: app/templates/customer/customer_booking.html:220
-#: app/templates/public/public_booking.html:115
-#: app/templates/public/public_booking.html:169
-#: app/templates/public/public_booking.html:220
+#: app/templates/customer/customer_booking.html:109
+#: app/templates/customer/customer_booking.html:163
+#: app/templates/customer/customer_booking.html:214
+#: app/templates/public/public_booking.html:109
+#: app/templates/public/public_booking.html:163
+#: app/templates/public/public_booking.html:214
 msgid "Continue"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:126
-#: app/templates/public/public_booking.html:126
+#: app/templates/customer/customer_booking.html:120
+#: app/templates/public/public_booking.html:120
 msgid "Choose a Professional"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:127
-#: app/templates/public/public_booking.html:127
+#: app/templates/customer/customer_booking.html:121
+#: app/templates/public/public_booking.html:121
 msgid "Select your preferred stylist or let us match you."
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:138
-#: app/templates/customer/customer_booking.html:288
-#: app/templates/customer/customer_booking.html:417
-#: app/templates/public/public_booking.html:138
-#: app/templates/public/public_booking.html:338
-#: app/templates/public/public_booking.html:465
+#: app/templates/customer/customer_booking.html:132
+#: app/templates/customer/customer_booking.html:282
+#: app/templates/customer/customer_booking.html:411
+#: app/templates/public/public_booking.html:132
+#: app/templates/public/public_booking.html:332
+#: app/templates/public/public_booking.html:459
 msgid "No Preference"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:139
-#: app/templates/public/public_booking.html:139
+#: app/templates/customer/customer_booking.html:133
+#: app/templates/public/public_booking.html:133
 msgid "Any available specialist"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:157
-#: app/templates/public/public_booking.html:157
+#: app/templates/customer/customer_booking.html:151
+#: app/templates/public/public_booking.html:151
 msgid "Nail Technician"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:166
-#: app/templates/customer/customer_booking.html:217
-#: app/templates/customer/customer_booking.html:319
-#: app/templates/public/public_booking.html:166
-#: app/templates/public/public_booking.html:217
-#: app/templates/public/public_booking.html:267
-#: app/templates/public/public_booking.html:369
+#: app/templates/customer/customer_booking.html:160
+#: app/templates/customer/customer_booking.html:211
+#: app/templates/customer/customer_booking.html:313
+#: app/templates/public/public_booking.html:160
+#: app/templates/public/public_booking.html:211
+#: app/templates/public/public_booking.html:261
+#: app/templates/public/public_booking.html:363
 msgid "Back"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:182
-#: app/templates/public/public_booking.html:182
+#: app/templates/customer/customer_booking.html:176
+#: app/templates/public/public_booking.html:176
 msgid "Select Date & Time"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:183
-#: app/templates/public/public_booking.html:183
+#: app/templates/customer/customer_booking.html:177
+#: app/templates/public/public_booking.html:177
 msgid "Pick a date, then choose an available slot."
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:190
-#: app/templates/public/public_booking.html:190
+#: app/templates/customer/customer_booking.html:184
+#: app/templates/public/public_booking.html:184
 msgid "Previous month"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:194
-#: app/templates/public/public_booking.html:194
+#: app/templates/customer/customer_booking.html:188
+#: app/templates/public/public_booking.html:188
 msgid "Next month"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:199
+#: app/templates/customer/customer_booking.html:193
 #: app/templates/customer/reschedule.html:111
-#: app/templates/public/public_booking.html:199
+#: app/templates/public/public_booking.html:193
 msgid "MO"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:199
+#: app/templates/customer/customer_booking.html:193
 #: app/templates/customer/reschedule.html:112
-#: app/templates/public/public_booking.html:199
+#: app/templates/public/public_booking.html:193
 msgid "TU"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:199
+#: app/templates/customer/customer_booking.html:193
 #: app/templates/customer/reschedule.html:113
-#: app/templates/public/public_booking.html:199
+#: app/templates/public/public_booking.html:193
 msgid "WE"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/customer_booking.html:194
 #: app/templates/customer/reschedule.html:114
-#: app/templates/public/public_booking.html:200
+#: app/templates/public/public_booking.html:194
 msgid "TH"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/customer_booking.html:194
 #: app/templates/customer/reschedule.html:115
-#: app/templates/public/public_booking.html:200
+#: app/templates/public/public_booking.html:194
 msgid "FR"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/customer_booking.html:194
 #: app/templates/customer/reschedule.html:116
-#: app/templates/public/public_booking.html:200
+#: app/templates/public/public_booking.html:194
 msgid "SA"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:200
+#: app/templates/customer/customer_booking.html:194
 #: app/templates/customer/reschedule.html:117
-#: app/templates/public/public_booking.html:200
+#: app/templates/public/public_booking.html:194
 msgid "SU"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:206
+#: app/templates/customer/customer_booking.html:200
 #: app/templates/customer/reschedule.html:153
-#: app/templates/public/public_booking.html:206
+#: app/templates/public/public_booking.html:200
 msgid "Available Times"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:207
-#: app/templates/public/public_booking.html:207
+#: app/templates/customer/customer_booking.html:201
+#: app/templates/public/public_booking.html:201
 msgid "Select a date to see available times"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:209
-#: app/templates/public/public_booking.html:209
+#: app/templates/customer/customer_booking.html:203
+#: app/templates/public/public_booking.html:203
 msgid "Please select a date first"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:232
-#: app/templates/public/public_booking.html:282
+#: app/templates/customer/customer_booking.html:226
+#: app/templates/public/public_booking.html:276
 msgid "Confirm & Pay"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:238
+#: app/templates/customer/customer_booking.html:232
 #: app/templates/customer/invoice_detail.html:48
-#: app/templates/public/public_booking.html:288
+#: app/templates/public/public_booking.html:282
 msgid "Payment Method"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:245
-#: app/templates/public/public_booking.html:295
+#: app/templates/customer/customer_booking.html:239
+#: app/templates/public/public_booking.html:289
 msgid "Pay at Salon"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:246
-#: app/templates/public/public_booking.html:296
+#: app/templates/customer/customer_booking.html:240
+#: app/templates/public/public_booking.html:290
 msgid "Pay after your service is completed"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:259
-#: app/templates/public/public_booking.html:309
+#: app/templates/customer/customer_booking.html:253
+#: app/templates/public/public_booking.html:303
 msgid "Online Payment"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:260
-#: app/templates/public/public_booking.html:310
+#: app/templates/customer/customer_booking.html:254
+#: app/templates/public/public_booking.html:304
 msgid "Pay now securely by card"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:270
-#: app/templates/public/public_booking.html:320
+#: app/templates/customer/customer_booking.html:264
+#: app/templates/public/public_booking.html:314
 msgid "You'll receive a verification email after confirming. Your booking will be"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:270
-#: app/templates/public/public_booking.html:320
+#: app/templates/customer/customer_booking.html:264
+#: app/templates/public/public_booking.html:314
 msgid "pending"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:270
-#: app/templates/public/public_booking.html:320
+#: app/templates/customer/customer_booking.html:264
+#: app/templates/public/public_booking.html:314
 msgid "until the salon confirms your appointment."
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:276
-#: app/templates/public/public_booking.html:326
+#: app/templates/customer/customer_booking.html:270
+#: app/templates/public/public_booking.html:320
 msgid "Booking Summary"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:283
+#: app/templates/customer/customer_booking.html:277
 #: app/templates/customer/invoice_detail.html:82
-#: app/templates/public/public_booking.html:333
+#: app/templates/public/public_booking.html:327
 msgid "Duration"
+msgstr ""
+
+#: app/templates/customer/customer_booking.html:285
+#: app/templates/public/public_booking.html:335
+msgid "Date & Time"
 msgstr ""
 
 #: app/templates/customer/customer_booking.html:291
 #: app/templates/public/public_booking.html:341
-msgid "Date & Time"
-msgstr ""
-
-#: app/templates/customer/customer_booking.html:297
-#: app/templates/public/public_booking.html:347
 msgid "Subtotal"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:300
-#: app/templates/public/public_booking.html:350
+#: app/templates/customer/customer_booking.html:294
+#: app/templates/public/public_booking.html:344
 #, python-format
 msgid "VAT (25.5%%)"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:303
-#: app/templates/public/public_booking.html:353
+#: app/templates/customer/customer_booking.html:297
+#: app/templates/public/public_booking.html:347
 msgid "Total"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:309
+#: app/templates/customer/customer_booking.html:303
 msgid "You'll earn"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:309
+#: app/templates/customer/customer_booking.html:303
 msgid "loyalty points with this booking."
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:311
-#: app/templates/public/public_booking.html:361
+#: app/templates/customer/customer_booking.html:305
+#: app/templates/public/public_booking.html:355
 msgid "By confirming, you agree to our 24h cancellation policy."
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:322
-#: app/templates/public/public_booking.html:372
+#: app/templates/customer/customer_booking.html:316
+#: app/templates/public/public_booking.html:366
 msgid "Confirm & continue"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:415
+#: app/templates/customer/customer_booking.html:409
 #: app/templates/customer/loyalty_points.html:1091
 #: app/templates/customer/loyalty_points.html:1112
 #: app/templates/customer/loyalty_points.html:1221
@@ -561,34 +561,34 @@ msgstr ""
 msgid "pts"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:425
-#: app/templates/public/public_booking.html:473
+#: app/templates/customer/customer_booking.html:419
+#: app/templates/public/public_booking.html:467
 msgid "Processing…"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:516
-#: app/templates/public/public_booking.html:550
+#: app/templates/customer/customer_booking.html:517
+#: app/templates/public/public_booking.html:551
 msgid "Please select a service first."
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:520
+#: app/templates/customer/customer_booking.html:521
 #: app/templates/customer/reschedule.html:157
-#: app/templates/public/public_booking.html:554
+#: app/templates/public/public_booking.html:555
 msgid "Please select a date first."
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:527
-#: app/templates/public/public_booking.html:561
+#: app/templates/customer/customer_booking.html:528
+#: app/templates/public/public_booking.html:562
 msgid "Loading..."
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:534
-#: app/templates/public/public_booking.html:568
+#: app/templates/customer/customer_booking.html:535
+#: app/templates/public/public_booking.html:569
 msgid "Could not load available times."
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:541
-#: app/templates/public/public_booking.html:575
+#: app/templates/customer/customer_booking.html:545
+#: app/templates/public/public_booking.html:579
 msgid "No available slots for this date."
 msgstr ""
 
@@ -632,9 +632,9 @@ msgstr ""
 
 #: app/templates/customer/customer_dashboard.html:556
 #: app/templates/customer/my_bookings.html:43
-#: app/templates/customer/my_bookings.html:189
-#: app/templates/customer/my_bookings.html:246
-#: app/templates/customer/my_bookings.html:293
+#: app/templates/customer/my_bookings.html:188
+#: app/templates/customer/my_bookings.html:248
+#: app/templates/customer/my_bookings.html:301
 msgid "View Details"
 msgstr ""
 
@@ -753,13 +753,10 @@ msgid "Last year"
 msgstr ""
 
 #: app/templates/customer/customer_history.html:86
-#: app/templates/customer/my_bookings.html:240
 msgid "Status:"
 msgstr ""
 
 #: app/templates/customer/customer_history.html:98
-#: app/templates/customer/my_bookings.html:178
-#: app/templates/customer/my_bookings.html:235
 msgid "Stylist:"
 msgstr ""
 
@@ -815,15 +812,15 @@ msgstr ""
 #: app/templates/customer/customer_history.html:198
 #: app/templates/customer/customer_history.html:581
 #: app/templates/customer/my_bookings.html:137
-#: app/templates/customer/my_bookings.html:275
+#: app/templates/customer/my_bookings.html:283
 msgid "Cancelled"
 msgstr ""
 
 #: app/templates/customer/customer_history.html:200
 #: app/templates/customer/customer_history.html:222
 #: app/templates/customer/customer_history.html:244
-#: app/templates/customer/my_bookings.html:294
-#: app/templates/customer/my_bookings.html:395
+#: app/templates/customer/my_bookings.html:302
+#: app/templates/customer/my_bookings.html:411
 msgid "Rebook"
 msgstr ""
 
@@ -850,7 +847,7 @@ msgid "Payment"
 msgstr ""
 
 #: app/templates/customer/customer_history.html:268
-#: app/templates/customer/my_bookings.html:390
+#: app/templates/customer/my_bookings.html:406
 msgid "Amount"
 msgstr ""
 
@@ -880,7 +877,7 @@ msgstr ""
 
 #: app/templates/customer/customer_history.html:587
 #: app/templates/customer/my_bookings.html:129
-#: app/templates/customer/my_bookings.html:219
+#: app/templates/customer/my_bookings.html:225
 msgid "Pending"
 msgstr ""
 
@@ -1067,7 +1064,7 @@ msgid "Personal Information"
 msgstr ""
 
 #: app/templates/customer/customer_setting.html:734
-#: app/templates/public/public_booking.html:245
+#: app/templates/public/public_booking.html:239
 msgid "Full Name"
 msgstr ""
 
@@ -1084,13 +1081,13 @@ msgid "Change"
 msgstr ""
 
 #: app/templates/customer/customer_setting.html:752
-#: app/templates/public/public_booking.html:254
+#: app/templates/public/public_booking.html:248
 #: app/templates/staff/login.html:31
 msgid "Email Address"
 msgstr ""
 
 #: app/templates/customer/customer_setting.html:761
-#: app/templates/public/public_booking.html:249
+#: app/templates/public/public_booking.html:243
 msgid "Phone Number"
 msgstr ""
 
@@ -1143,7 +1140,7 @@ msgstr ""
 
 #: app/templates/customer/customer_setting.html:909
 #: app/templates/customer/customer_setting.html:978
-#: app/templates/customer/my_bookings.html:314
+#: app/templates/customer/my_bookings.html:328
 #: app/templates/public/gallery.html:97
 msgid "Close"
 msgstr ""
@@ -1159,8 +1156,8 @@ msgstr ""
 #: app/templates/customer/customer_setting.html:992
 #: app/templates/customer/customer_setting.html:1017
 #: app/templates/customer/customer_setting.html:1149
-#: app/templates/customer/my_bookings.html:193
-#: app/templates/customer/my_bookings.html:249
+#: app/templates/customer/my_bookings.html:192
+#: app/templates/customer/my_bookings.html:251
 #: app/templates/customer/redeem_confirm_modal.html:170
 #: app/templates/customer/reschedule.html:250
 #: app/templates/customer/view_booking_details.html:86
@@ -1523,6 +1520,7 @@ msgid "View your confirmed, pending, and cancelled bookings."
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:111
+#: app/templates/customer/my_bookings.html:202
 msgid "Book New Appointment"
 msgstr ""
 
@@ -1534,102 +1532,121 @@ msgstr ""
 msgid "Confirmed"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:173
-#: app/templates/customer/my_bookings.html:230
-#: app/templates/customer/my_bookings.html:282
-msgid "Date:"
-msgstr ""
-
-#: app/templates/customer/my_bookings.html:183
-msgid "Duration:"
-msgstr ""
-
-#: app/templates/customer/my_bookings.html:190
+#: app/templates/customer/my_bookings.html:189
 #: app/templates/customer/reschedule.html:3
 #: app/templates/customer/reschedule.html:21
 #: app/templates/customer/view_booking_details.html:83
 msgid "Reschedule"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:241
+#: app/templates/customer/my_bookings.html:200
+msgid "No upcoming appointments"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:201
+msgid "Book your next treatment to see it here."
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:243
 msgid "Awaiting confirmation"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:287
-msgid "Cancelled on:"
+#: app/templates/customer/my_bookings.html:259
+msgid "No pending requests"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:312
+#: app/templates/customer/my_bookings.html:260
+msgid "Bookings awaiting confirmation will appear here."
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:296
+#, python-format
+msgid "Cancelled on %(date)s"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:309
+msgid "No cancelled appointments"
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:310
+msgid "Any bookings you cancel will show up here."
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:326
 msgid "Cancel appointment?"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:318
+#: app/templates/customer/my_bookings.html:332
 msgid "Appointment details"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:332
+#: app/templates/customer/my_bookings.html:346
 msgid "Cancellation Policy"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:337
+#: app/templates/customer/my_bookings.html:351
 msgid "Reason for cancellation"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:337
+#: app/templates/customer/my_bookings.html:351
 msgid "(optional)"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:340
+#: app/templates/customer/my_bookings.html:354
 msgid "Select a reason..."
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:341
+#: app/templates/customer/my_bookings.html:355
 msgid "Change of plans"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:342
+#: app/templates/customer/my_bookings.html:356
 msgid "Feeling unwell"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:343
+#: app/templates/customer/my_bookings.html:357
 msgid "Want to reschedule instead"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:344
+#: app/templates/customer/my_bookings.html:358
 msgid "Other"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:349
+#: app/templates/customer/my_bookings.html:363
 msgid "Keep appointment"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:350
+#: app/templates/customer/my_bookings.html:364
 msgid "Yes, cancel"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:360
+#: app/templates/customer/my_bookings.html:374
 msgid "Recent History"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:361
+#: app/templates/customer/my_bookings.html:375
 msgid "Your completed appointments."
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:364
+#: app/templates/customer/my_bookings.html:378
 msgid "View All History"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:380
+#: app/templates/customer/my_bookings.html:396
 #, python-format
 msgid "%(status)s on %(date)s"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:397
+#: app/templates/customer/my_bookings.html:413
 msgid "Invoice"
 msgstr ""
 
-#: app/templates/customer/my_bookings.html:403
+#: app/templates/customer/my_bookings.html:421
 msgid "No history yet."
+msgstr ""
+
+#: app/templates/customer/my_bookings.html:422
+msgid "Your completed appointments will appear here."
 msgstr ""
 
 #: app/templates/customer/redeem_confirm_modal.html:84
@@ -1718,7 +1735,7 @@ msgstr ""
 
 #: app/templates/customer/reschedule.html:162
 #: app/templates/customer/view_booking_details.html:45
-#: app/templates/public/services.html:110
+#: app/templates/public/services.html:104
 msgid "mins"
 msgstr ""
 
@@ -1805,7 +1822,7 @@ msgid "Salon location map"
 msgstr ""
 
 #: app/templates/customer/view_booking_details.html:126
-#: app/templates/public/index.html:285
+#: app/templates/public/index.html:279
 msgid "Address"
 msgstr ""
 
@@ -1862,7 +1879,7 @@ msgstr ""
 msgid "Master Artists"
 msgstr ""
 
-#: app/templates/public/about.html:80 app/templates/public/services.html:132
+#: app/templates/public/about.html:80 app/templates/public/services.html:126
 msgid "Average Rating"
 msgstr ""
 
@@ -1966,129 +1983,129 @@ msgstr ""
 msgid "Popular Service"
 msgstr ""
 
-#: app/templates/public/index.html:107
+#: app/templates/public/index.html:101
 msgid "View All Service"
 msgstr ""
 
-#: app/templates/public/index.html:119
+#: app/templates/public/index.html:113
 msgid "Our work"
 msgstr ""
 
-#: app/templates/public/index.html:120
+#: app/templates/public/index.html:114
 msgid "A glimpse of what we create every day"
 msgstr ""
 
-#: app/templates/public/index.html:146
+#: app/templates/public/index.html:140
 msgid "Why DahaCare?"
 msgstr ""
 
-#: app/templates/public/index.html:152
+#: app/templates/public/index.html:146
 msgid "Happy clients"
 msgstr ""
 
-#: app/templates/public/index.html:153
+#: app/templates/public/index.html:147
 msgid "Trusted by thousands of satisfied customers who love our work."
 msgstr ""
 
-#: app/templates/public/index.html:157
+#: app/templates/public/index.html:151
 msgid "Safe products"
 msgstr ""
 
-#: app/templates/public/index.html:158
+#: app/templates/public/index.html:152
 msgid "We use only premium, non-toxic products for your health and safety."
 msgstr ""
 
-#: app/templates/public/index.html:162
+#: app/templates/public/index.html:156
 msgid "Expert artists"
 msgstr ""
 
-#: app/templates/public/index.html:163
+#: app/templates/public/index.html:157
 msgid "Our highly trained professionals bring your vision to life."
 msgstr ""
 
-#: app/templates/public/index.html:176
+#: app/templates/public/index.html:170
 msgid "What clients say"
 msgstr ""
 
-#: app/templates/public/index.html:190
+#: app/templates/public/index.html:184
 msgid ""
 "\"Absolutely wonderful experience! The attention to detail is unmatched, "
 "and my nails have never looked better. Highly recommend the gel "
 "extensions.\""
 msgstr ""
 
-#: app/templates/public/index.html:195
+#: app/templates/public/index.html:189
 msgid "Gold member"
 msgstr ""
 
-#: app/templates/public/index.html:209
+#: app/templates/public/index.html:203
 msgid ""
 "\"The ambiance is so relaxing, and the staff is incredibly professional. "
 "I love the creative nail art options they offer. A true luxury "
 "experience.\""
 msgstr ""
 
-#: app/templates/public/index.html:214
+#: app/templates/public/index.html:208
 msgid "First-time client"
 msgstr ""
 
-#: app/templates/public/index.html:235
+#: app/templates/public/index.html:229
 msgid "New member offer"
 msgstr ""
 
-#: app/templates/public/index.html:236
+#: app/templates/public/index.html:230
 #, python-format
 msgid "Create an account & get 15%% off your first visit"
 msgstr ""
 
-#: app/templates/public/index.html:237
+#: app/templates/public/index.html:231
 msgid ""
 "Join our community today and start enjoying the perks of premium nail "
 "care right away."
 msgstr ""
 
-#: app/templates/public/index.html:241
+#: app/templates/public/index.html:235
 msgid "Exclusive member updates"
 msgstr ""
 
-#: app/templates/public/index.html:245
+#: app/templates/public/index.html:239
 msgid "Easy online booking"
 msgstr ""
 
-#: app/templates/public/index.html:249
+#: app/templates/public/index.html:243
 msgid "Earn rewards points"
 msgstr ""
 
-#: app/templates/public/index.html:254
+#: app/templates/public/index.html:248
 msgid "Create account"
 msgstr ""
 
-#: app/templates/public/index.html:255
+#: app/templates/public/index.html:249
 msgid "Already have one? Log in"
 msgstr ""
 
-#: app/templates/public/index.html:262
+#: app/templates/public/index.html:256
 msgid "welcome discount"
 msgstr ""
 
-#: app/templates/public/index.html:279
+#: app/templates/public/index.html:273
 msgid "Find us"
 msgstr ""
 
-#: app/templates/public/index.html:293
+#: app/templates/public/index.html:287
 msgid "Hours"
 msgstr ""
 
-#: app/templates/public/index.html:301
+#: app/templates/public/index.html:295
 msgid "Phone"
 msgstr ""
 
-#: app/templates/public/index.html:309
+#: app/templates/public/index.html:303
 #: app/templates/staff/staff_profile.html:259
 msgid "Email"
 msgstr ""
 
-#: app/templates/public/index.html:321
+#: app/templates/public/index.html:315
 msgid "Map Integration Placeholder"
 msgstr ""
 
@@ -2096,43 +2113,43 @@ msgstr ""
 msgid "Info"
 msgstr ""
 
-#: app/templates/public/public_booking.html:232
+#: app/templates/public/public_booking.html:226
 msgid "Your Details"
 msgstr ""
 
-#: app/templates/public/public_booking.html:233
+#: app/templates/public/public_booking.html:227
 msgid "Please provide your contact information to secure the booking."
 msgstr ""
 
-#: app/templates/public/public_booking.html:239
+#: app/templates/public/public_booking.html:233
 msgid "Already have an account?"
 msgstr ""
 
-#: app/templates/public/public_booking.html:240
+#: app/templates/public/public_booking.html:234
 msgid "Log in"
 msgstr ""
 
-#: app/templates/public/public_booking.html:246
+#: app/templates/public/public_booking.html:240
 msgid "Jane Doe"
 msgstr ""
 
-#: app/templates/public/public_booking.html:258
+#: app/templates/public/public_booking.html:252
 msgid "Booking Notes"
 msgstr ""
 
-#: app/templates/public/public_booking.html:258
+#: app/templates/public/public_booking.html:252
 msgid "(Optional)"
 msgstr ""
 
-#: app/templates/public/public_booking.html:260
+#: app/templates/public/public_booking.html:254
 msgid "Any special requests or allergies..."
 msgstr ""
 
-#: app/templates/public/public_booking.html:270
+#: app/templates/public/public_booking.html:264
 msgid "Continue to Checkout"
 msgstr ""
 
-#: app/templates/public/public_booking.html:359
+#: app/templates/public/public_booking.html:353
 msgid "Sign in to earn loyalty points with this booking."
 msgstr ""
 
@@ -2147,31 +2164,31 @@ msgid ""
 "tranquility in every session."
 msgstr ""
 
-#: app/templates/public/services.html:98
+#: app/templates/public/services.html:92
 msgid "Popular"
 msgstr ""
 
-#: app/templates/public/services.html:100
+#: app/templates/public/services.html:94
 msgid "New"
 msgstr ""
 
-#: app/templates/public/services.html:115
+#: app/templates/public/services.html:109
 msgid "Book now"
 msgstr ""
 
-#: app/templates/public/services.html:136
+#: app/templates/public/services.html:130
 msgid "Satisfied Clients"
 msgstr ""
 
-#: app/templates/public/services.html:140
+#: app/templates/public/services.html:134
 msgid "Quality Assurance"
 msgstr ""
 
-#: app/templates/public/services.html:153
+#: app/templates/public/services.html:147
 msgid "Ready to define your signature look?"
 msgstr ""
 
-#: app/templates/public/services.html:155
+#: app/templates/public/services.html:149
 msgid "Book a consultation"
 msgstr ""
 
