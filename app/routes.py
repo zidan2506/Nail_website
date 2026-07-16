@@ -1128,6 +1128,7 @@ def create_customer_booking():
     customer_email = customer['email']
 
     try:
+        BookingService.ensure_slot_not_past(booking_date, start_time)
         staff = BookingService.pick_staff(
             staff_id,
             service_id,
@@ -3866,6 +3867,7 @@ def create_public_booking():
     customer_id = int(customer["id"])
     customer_email = customer["email"]
     try:
+        BookingService.ensure_slot_not_past(booking_date, start_time)
         staff = BookingService.pick_staff(
             staff_id,
             service_id,
@@ -4345,6 +4347,10 @@ def check_available_slot():
     
     service_duration = service["duration_minutes"]
 
+    # Slot đã qua trong ngày hôm nay (giờ Helsinki) -> đánh dấu disabled để FE khóa.
+    now_hm = now_helsinki().strftime("%H:%M")
+    is_today = booking_date.strip() == today_helsinki().isoformat()
+
     #Case 1: When user select "No Preference"
     if staff_id == 0:
         staffs = get_all_staff()
@@ -4371,7 +4377,8 @@ def check_available_slot():
 
         available_slots = [{
             "value": time,
-            "label": datetime.strptime(time, "%H:%M").strftime("%I:%M %p")
+            "label": datetime.strptime(time, "%H:%M").strftime("%I:%M %p"),
+            "disabled": is_today and time <= now_hm
         } for time in sorted(union_slots)]
 
     else:
@@ -4398,7 +4405,8 @@ def check_available_slot():
         
         available_slots = [{
             "value": time,
-            "label": datetime.strptime(time, "%H:%M").strftime("%I:%M %p")
+            "label": datetime.strptime(time, "%H:%M").strftime("%I:%M %p"),
+            "disabled": is_today and time <= now_hm
         } for time in slots]
     
     return jsonify({

@@ -21,6 +21,16 @@ VALUES
  'This is a placeholder test service for development. Replace it with a real service.',
  'Tämä on kehitykseen tarkoitettu testipalvelu. Korvaa se oikealla palvelulla.',
  'Đây là dịch vụ thử nghiệm dùng cho phát triển. Hãy thay bằng dịch vụ thật.',
+ 30, 10, 10, 1, NULL, NULL, 'spa'),
+ (1, 'test', 'test', 'test',
+ 'This is a placeholder test service for development. Replace it with a real service.',
+ 'Tämä on kehitykseen tarkoitettu testipalvelu. Korvaa se oikealla palvelulla.',
+ 'Đây là dịch vụ thử nghiệm dùng cho phát triển. Hãy thay bằng dịch vụ thật.',
+ 30, 10, 10, 1, NULL, NULL, 'spa'),
+ (1, 'test', 'test', 'test',
+ 'This is a placeholder test service for development. Replace it with a real service.',
+ 'Tämä on kehitykseen tarkoitettu testipalvelu. Korvaa se oikealla palvelulla.',
+ 'Đây là dịch vụ thử nghiệm dùng cho phát triển. Hãy thay bằng dịch vụ thật.',
  30, 10, 10, 1, NULL, NULL, 'spa');
 
 -- ============================================

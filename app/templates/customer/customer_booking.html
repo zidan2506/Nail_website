@@ -435,6 +435,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const monthLabelEl = document.getElementById('calendarMonthLabel');
     const hiddenDate   = document.getElementById('hidden-booking-date');
     const hiddenTime   = document.getElementById('hidden-start-time');
+    const dtNextBtn    = steps[2]?.querySelector('.bk-btn-next');
+
+    function syncContinueState() {
+        if (dtNextBtn) dtNextBtn.disabled = !hiddenTime.value;
+    }
+    syncContinueState();
 
     function parseLocalDate(s) {
         const [y, m, d] = s.split('-').map(Number);
@@ -446,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const todayDate  = parseLocalDate(CALENDAR_CONFIG.today);
     const maxDate    = parseLocalDate(CALENDAR_CONFIG.maxDate);
-    let selectedDate = null;
+    let selectedDate = todayDate;
     let currentMonth = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
 
     document.getElementById('prevMonth').addEventListener('click', () => {
@@ -486,6 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     selectedDate     = dateObj;
                     hiddenDate.value = fmtDate(dateObj);
                     hiddenTime.value = '';
+                    syncContinueState();
                     renderCalendar();
                     updateDatetimeSummary();
                     tryLoadSlots();
@@ -531,6 +538,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderSlots(slots) {
         timeGridEl.innerHTML = '';
+        hiddenTime.value = '';
+        updateDatetimeSummary();
+        syncContinueState();
         if (!slots.length) {
             timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('No available slots for this date.') }}</p>';
             return;
@@ -540,17 +550,25 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.type = 'button';
             btn.className = 'slot-pill';
             btn.textContent = slot.label;
-            btn.addEventListener('click', () => {
-                timeGridEl.querySelectorAll('.slot-pill').forEach(p => p.classList.remove('selected'));
-                btn.classList.add('selected');
-                hiddenTime.value = slot.value;
-                updateDatetimeSummary();
-            });
+            if (slot.disabled) {
+                btn.disabled = true;
+            } else {
+                btn.addEventListener('click', () => {
+                    timeGridEl.querySelectorAll('.slot-pill').forEach(p => p.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    hiddenTime.value = slot.value;
+                    updateDatetimeSummary();
+                    syncContinueState();
+                });
+            }
             timeGridEl.appendChild(btn);
         });
     }
 
     renderCalendar();
+    hiddenDate.value = fmtDate(selectedDate);
+    updateDatetimeSummary();
+    tryLoadSlots();
     document.querySelectorAll('.service-radio, input[name="staff_id"]').forEach(r =>
         r.addEventListener('change', tryLoadSlots)
     );

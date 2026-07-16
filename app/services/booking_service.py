@@ -98,7 +98,13 @@ class BookingService:
         start_at = datetime.combine(date_obj, time_obj)
         end_at = start_at + timedelta(minutes=duration_minutes)
         return start_at.strftime("%H:%M"), end_at.strftime("%H:%M")
-    
+
+    @staticmethod
+    def ensure_slot_not_past(booking_date, start_time):
+        start_at = datetime.strptime(f"{booking_date} {start_time}", "%Y-%m-%d %H:%M")
+        if start_at <= now_helsinki():
+            raise BookingValidatorError("Selected time has already passed. Please pick another slot.")
+
     def pick_staff(staff_id, service_id, booking_date, start_time, end_time):
         
         staff_id = int(staff_id)

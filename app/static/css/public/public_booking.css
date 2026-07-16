@@ -223,6 +223,11 @@
     opacity: 0.9;
 }
 
+.bk-btn-next:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
 .bk-btn-confirm {
     display: inline-flex;
     align-items: center;
