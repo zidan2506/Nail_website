@@ -6,10 +6,15 @@ from app.database.db import get_staff_by_id, get_available_staff_for_slot , get_
 from app.services.loyalty import get_active_multiplier, get_config_value, already_awarded, award_points, check_streak
 import random
 
+# Giờ làm việc + bước slot — nguồn duy nhất cho toàn app. Đổi giờ tiệm chỉ sửa ở đây.
+BUSINESS_OPEN = "09:00"
+BUSINESS_CLOSE = "18:00"
+SLOT_STEP_MINUTES = 30
+
 def is_overlap(candidate_start, candidate_end, existing_start, existing_end):
     return candidate_start < existing_end and candidate_end > existing_start
 
-def get_available_slots(duration_min, existing_bookings, open_time="09:00", close_time="18:00", step_minutes=30):
+def get_available_slots(duration_min, existing_bookings, open_time=BUSINESS_OPEN, close_time=BUSINESS_CLOSE, step_minutes=SLOT_STEP_MINUTES):
     available_slots = []
     
     current = parse_time(open_time)

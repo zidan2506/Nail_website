@@ -602,7 +602,6 @@ def customer_reschedule(booking_id):
             flash("You can only reschedule within the next 14 days", "error")
             return redirect(url_for('main.customer_reschedule',booking_id=booking_id))
 
-        #TODO: Check available slots here!
         try:
             new_time_obj = datetime.strptime(new_time, "%H:%M").time()
         except ValueError:
@@ -629,10 +628,7 @@ def customer_reschedule(booking_id):
 
         available_slots = get_available_slots(
             service["duration_minutes"],
-            existing_bookings,
-            "09:00",
-            "18:00",
-            30
+            existing_bookings
         )
 
         if new_start_time not in available_slots:
@@ -640,7 +636,6 @@ def customer_reschedule(booking_id):
             flash("Please choose another time.", "error")
             return redirect(url_for('main.customer_reschedule', booking_id=booking_id))
         
-        #TODO: Update booking_date, start_at, end_at
         update_booking_schedule(
             booking_id,
             new_date_string,
@@ -744,10 +739,7 @@ def get_reschedule_available_slots(booking_id):
 
     raw_slots = get_available_slots(
         service_duration,
-        existing_bookings,
-        "09:00",
-        "18:00",
-        30
+        existing_bookings
     )
 
     slots = [
@@ -4385,10 +4377,7 @@ def check_available_slot():
 
             staff_slots = get_available_slots(
                 service_duration,
-                existing_bookings,
-                "09:00",
-                "18:00",
-                30
+                existing_bookings
             )
             union_slots.update(staff_slots)
 
@@ -4414,11 +4403,8 @@ def check_available_slot():
         )
         
         slots = get_available_slots(
-            service_duration, 
-            existing_bookings,
-            "09:00", 
-            "18:00", 
-            30
+            service_duration,
+            existing_bookings
         )
         
         available_slots = [{

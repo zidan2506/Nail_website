@@ -11,9 +11,15 @@ logger = logging.getLogger(__name__)
 base_dir = Path(__file__).resolve().parent
 db_path = base_dir / "database.db"
 def get_connection():
-    conn = sqlite3.connect(db_path)
+    # timeout=5: chờ tối đa 5s nếu DB đang bị lock (3 gunicorn workers ghi song song)
+    conn = sqlite3.connect(db_path, timeout=5)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    # WAL: cho phép đọc song song lúc đang ghi (journal_mode persist theo file DB,
+    # set mỗi lần vô hại). busy_timeout: retry khi lock thay vì fail ngay.
+    conn.execute("PRAGMA journal_mode = WAL")
+    conn.execute("PRAGMA busy_timeout = 5000")
+    conn.execute("PRAGMA synchronous = NORMAL")
     return conn
 
 def get_all_services():
