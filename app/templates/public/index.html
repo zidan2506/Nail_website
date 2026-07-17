@@ -20,7 +20,6 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 <header class="hero">
 
-    <!-- Slides -->
     <div class="hero__slides">
         {% for slide in slides %}
         <div class="hero__slide{% if loop.first %} hero__slide--active{% endif %}">
@@ -40,17 +39,14 @@
         {% endfor %}
     </div>
 
-    <!-- Carousel arrow left -->
     <button class="hero__arrow hero__arrow--left" aria-label="Previous slide">
         <span class="material-symbols-outlined">chevron_left</span>
     </button>
 
-    <!-- Carousel arrow right -->
     <button class="hero__arrow hero__arrow--right" aria-label="Next slide">
         <span class="material-symbols-outlined">chevron_right</span>
     </button>
 
-    <!-- Carousel dots (generated from slides) -->
     <div class="hero__dots">
         {% for slide in slides %}
         <div class="hero__dot{% if loop.first %} hero__dot--active{% endif %}"></div>
@@ -69,12 +65,10 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="home-section">
 
-    <!-- Section header + tab filters -->
     <div class="home-section__header">
         <h2 class="home-section__title">{{ _('Popular Service') }}</h2>
     </div>
 
-    <!-- Service cards grid -->
     <div class="services-grid">
 
         {% for service in services %}
@@ -114,7 +108,6 @@
         <p class="home-section__subtitle">{{ _('A glimpse of what we create every day') }}</p>
     </div>
 
-    <!-- Gallery grid — item 1 spans 2 rows on desktop -->
     <div class="gallery-grid">
 
         {% for image in gallery_images %}
@@ -172,7 +165,6 @@
 
     <div class="testimonials-grid">
 
-        <!-- Testimonial 1 -->
         <div class="testimonial-card">
             <div class="testimonial-card__stars">
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
@@ -191,7 +183,6 @@
             </div>
         </div>
 
-        <!-- Testimonial 2 -->
         <div class="testimonial-card">
             <div class="testimonial-card__stars">
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
@@ -224,7 +215,6 @@
 <section class="home-section">
     <div class="promo-cta">
 
-        <!-- Left body -->
         <div class="promo-cta__body">
             <span class="promo-cta__tag">{{ _('New member offer') }}</span>
             <h2 class="promo-cta__title">{{ _('Create an account & get 15%% off your first visit') }}</h2>
@@ -250,7 +240,6 @@
             </div>
         </div>
 
-        <!-- Right: discount badge -->
         <div class="promo-cta__discount">
             <div class="promo-cta__discount-number">15%</div>
             <div class="promo-cta__discount-label">{{ _('welcome discount') }}</div>
@@ -268,7 +257,6 @@
 <section class="home-section--shaded" id="contact" style="margin-bottom: 80px;">
     <div class="contact-grid">
 
-        <!-- Contact info column -->
         <div>
             <h2 class="contact-info__title">{{ _('Find us') }}</h2>
             <div class="contact-info">
@@ -308,7 +296,6 @@
             </div>
         </div>
 
-        <!-- Map placeholder — swap in với Google Maps iframe sau -->
         <div class="contact-map">
             <div>
                 <span class="material-symbols-outlined">map</span>

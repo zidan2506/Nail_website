@@ -10,7 +10,6 @@
 {% block customer_content %}
 
 <div class="booking-details-page">
-  <!-- Page top bar -->
   <section class="booking-details-header">
     <div class="booking-details-header__left">
       <a href="{{ url_for('main.my_bookings') }}" class="back-link">
@@ -29,9 +28,7 @@
     </div>
   </section>
 
-  <!-- Main content -->
   <section class="booking-details-layout">
-    <!-- LEFT COLUMN -->
     <div class="booking-main-column">
       <article class="booking-summary-card">
         <div class="booking-summary-card__top">
@@ -73,7 +70,6 @@
             <div class="technician-box__info">
               <p class="technician-box__label">{{ _('Artist') }}</p>
               <h3 class="technician-box__name">{{ staff }}</h3>
-              <!-- staff title -->
               <p class="technician-box__role">{{ _('Senior Artist') }} • ★ 4.9</p>
             </div>
           </div>
@@ -107,7 +103,6 @@
       </section>
     </div>
 
-    <!-- RIGHT COLUMN -->
     <aside class="booking-side-column">
       <article class="location-card">
         <div class="location-card__map">

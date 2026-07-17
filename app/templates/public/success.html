@@ -54,7 +54,6 @@
 
 <main class="bkc-main">
 
-    <!-- Subtle background gradients -->
     <div class="bkc-bg-decor">
         <div class="bkc-bg-blob bkc-bg-blob--1"></div>
         <div class="bkc-bg-blob bkc-bg-blob--2"></div>
@@ -62,7 +61,6 @@
 
     <div class="bkc-container">
 
-        <!-- Header Section -->
         <div class="bkc-header">
             <div class="bkc-header__icon-wrap">
                 <div class="bkc-header__icon-ping"></div>
@@ -72,7 +70,6 @@
             <p class="bkc-header__subtitle">{{ _("We've reserved your spot. Get ready for some well-deserved pampering.") }}</p>
         </div>
 
-        <!-- Confirmation Card -->
         <div class="bkc-card">
             <div class="bkc-card__row">
                 <div class="bkc-card__details">
@@ -118,7 +115,6 @@
             </div>
         </div>
 
-        <!-- What's Next -->
         <section class="bkc-next">
             <h3 class="bkc-next__title">{{ _("What's Next?") }}</h3>
             <div class="bkc-next__grid">
@@ -152,13 +148,11 @@
         </div>
         {% endif %}
 
-        <!-- Actions -->
         <div class="bkc-actions">
             <a href="{{ url_for('main.public_booking') }}" class="bkc-actions__btn bkc-actions__btn--primary">{{ _('Book Another Service') }}</a>
             <a href="{{ url_for('main.home') }}" class="bkc-actions__btn bkc-actions__btn--secondary">{{ _('Back to Home') }}</a>
         </div>
 
-        <!-- Location Mini Map -->
         <div class="bkc-location">
             <div class="bkc-location__label">
                 <span class="material-symbols-outlined">location_on</span>

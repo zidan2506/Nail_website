@@ -1559,10 +1559,12 @@ function openDetail(el) {
                     '<div class="cu-booking-item__service"></div>' +
                     '<div class="cu-booking-item__meta"></div>' +
                 '</div>' +
-                '<span class="cu-b-pill cu-b-pill--' + b.status + '"></span>';
+                '<span class="cu-b-pill"></span>';
             item.querySelector('.cu-booking-item__service').textContent = b.service_name;
             item.querySelector('.cu-booking-item__meta').textContent = b.booking_date + ' · ' + b.staff_name;
-            item.querySelector('.cu-b-pill').textContent = CU_STATUS_LABELS[b.status] || b.status;
+            const pill = item.querySelector('.cu-b-pill');
+            pill.classList.add('cu-b-pill--' + b.status);
+            pill.textContent = CU_STATUS_LABELS[b.status] || b.status;
             listEl.appendChild(item);
         });
     }

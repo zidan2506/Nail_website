@@ -10,14 +10,12 @@
 
 {% block customer_content %}
 <div class="ch-wrapper">
-<!-- Page header -->
 <div class="dashboard-header">
     <p class="dashboard-label">{{ _('Your records') }}</p>
     <h1>{{ _('History') }}</h1>
     <p class="dashboard-subtitle">{{ _('Review your past visits and invoices.') }}</p>
 </div>
 
-<!-- Stats Summary -->
 <div class="history-stats">
     <div class="stat-card">
         <div class="stat-card-top">
@@ -56,16 +54,13 @@
     </div>
 </div>
 
-<!-- Tab Switcher -->
 <div class="history-tabs">
     <button class="history-tab active" data-tab="appointments">{{ _('Appointments') }}</button>
     <button class="history-tab" data-tab="invoices">{{ _('Invoices') }}</button>
 </div>
 
-<!-- Filters Bar -->
 <div class="history-filters">
 
-    <!-- Date range - shared -->
     <div class="filter-dropdown" data-filter="date">
         <button class="filter-chip">
             <span class="filter-icon">📅</span>
@@ -80,7 +75,6 @@
         </div>
     </div>
 
-    <!-- status - half_shared -->
     <div class="filter-dropdown" data-filter="status">
         <button class="filter-chip">
             <span class="filter-label">{{ _('Status:') }}</span>
@@ -88,11 +82,9 @@
             <span class="filter-caret">▾</span>
         </button>
         <div class="filter-panel" hidden>
-            <!-- Để js render option -->
         </div>
     </div>
 
-    <!-- stylist - only appointments -->
     <div class="filter-dropdown" data-filter="stylist">
         <button class="filter-chip filter-chip-appointments">
             <span class="filter-label">{{ _('Stylist:') }}</span>
@@ -107,7 +99,6 @@
         </div>
     </div>
 
-    <!-- service  - only appointments -->
     <div class="filter-dropdown" data-filter="service">
         <button class="filter-chip filter-chip-appointments">
             <span class="filter-label">{{ _('Service:') }}</span>
@@ -122,7 +113,6 @@
         </div>
     </div>
 
-    <!-- payment method - only invoices  -->
     <div class="filter-dropdown" data-filter="payment_method">
         <button class="filter-chip filter-chip-invoices" style="display:none;">
             <span class="filter-label">{{ _('Payment:') }}</span>
@@ -143,7 +133,6 @@
 
         <div class="filter-spacer"></div>
 
-        <!-- sort - shared -->
     <div class="filter-dropdown filter-sort-dropdown" data-filter="sort">
         <button class="filter-chip filter-sort">
             <span class="filter-label">⇅</span>
@@ -159,11 +148,9 @@
         </div>
     </div>
         
-        <!-- clear - shared -->
         <button class="filter-clear">{{ _('Clear all') }}</button>
 </div>
 
-<!-- ===== Appointments Tab Content ===== -->
 <div class="history-panel" id="panel-appointments">
     <div class="history-table-wrapper">
         <table class="history-table">
@@ -257,7 +244,6 @@
     </div>
 </div>
 
-<!-- ===== Invoices Tab Content ===== -->
 <div class="history-panel" id="panel-invoices" style="display:none;">
     <div class="history-table-wrapper">
         <table class="history-table">

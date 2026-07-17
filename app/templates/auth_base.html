@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}DahaCare{% endblock %}</title>
 
-    <!-- Plus Jakarta Sans — đồng bộ với base.html chính -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Material Symbols — dùng cho icon mail/lock/visibility/arrow_forward -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -30,7 +28,6 @@
 
     <div class="auth-layout">
 
-        <!-- Left: Atmospheric image panel — dùng chung cho cả 3 trang -->
         <div class="auth-panel">
             <div class="auth-panel__img"
                  style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAWI8tQ3Izn4oFHKUP_TE4nV3P736w_FrhrWNjdfVXIYm-sBQL4RYLxMjiAw_4Lif5DxqWHmP0T4giuLwkYrD3rWSCA81APwCaI8HcyQXbvmo3Mft0nnJbqvJ_93v85B1-8DOtGpL7R3aQpXLswryPNJYjEWwHIutGUyWmnud_cCb2n2zV-0UoAMVVkqnnlMnKlN49K4MHp2xrmpP6ylAVFt_QqyS6CTu0Z3Uv7H1GPTAaUDh4dOoX4R6A8zrNjNZqaRtq5HnBENQuY')">
@@ -44,11 +41,9 @@
             </div>
         </div>
 
-        <!-- Right: Form content — mỗi page override block này -->
         <div class="auth-form-wrap">
             <div class="auth-form-card">
 
-                <!-- Logo — dùng chung, link về trang chủ -->
                 <div class="auth-logo">
                     <a href="{{ url_for('main.home') }}" class="auth-logo__link">
                         Daha<span class="auth-logo__accent">Care</span>

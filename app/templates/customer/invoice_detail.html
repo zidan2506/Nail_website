@@ -11,12 +11,10 @@
 {% block customer_content %}
 <div class="invoice-detail-page">
 
-    <!-- Back link -->
     <a href="{{ url_for('main.customer_history') }}" class="back-link">
         ← {{ _('Back to Invoices') }}
     </a>
 
-    <!-- Header -->
     <div class="invoice-header">
         <h1 class="invoice-number">{{ invoice.invoice_number }}</h1>
         <div class="invoice-meta">
@@ -26,7 +24,6 @@
         </div>
     </div>
 
-    <!-- Stat cards -->
     <div class="stat-cards">
         <div class="stat-card">
             <div class="stat-icon">📅</div>
@@ -60,10 +57,8 @@
         </div>
     </div>
 
-    <!-- Details grid -->
     <div class="details-grid">
 
-        <!-- Service Details -->
         <div class="detail-card">
             <div class="detail-card__header">
                 <span class="detail-card__icon">✦</span>
@@ -89,7 +84,6 @@
             </div>
         </div>
 
-        <!-- Appointment Details -->
         <div class="detail-card">
             <div class="detail-card__header">
                 <span class="detail-card__icon">📆</span>
@@ -116,7 +110,6 @@
 
     </div>
 
-    <!-- Payment Summary -->
     <div class="payment-summary">
         <h3 class="payment-summary__title">{{ _('Payment Summary') }}</h3>
 
@@ -144,7 +137,6 @@
             </div>
         </div>
 
-        <!-- Download btn -->
         <div class="payment-footer">
             <button class="btn-download" onclick="window.print()">
                 ↓ {{ _('Download PDF Invoice') }}

@@ -9,6 +9,7 @@ import string
 import unicodedata
 import calendar
 from flask import Blueprint, flash,render_template, request, jsonify, redirect, url_for, session, Response
+from markupsafe import escape
 from app.database.db import (
     get_report_totals, get_report_revenue_by_day, get_report_revenue_by_hour, get_report_booking_status,
     get_report_top_services, get_report_staff_performance, get_report_loyalty,
@@ -2178,12 +2179,12 @@ def admin_dashboard():
         "no-show":     "#e4a3a3",
     }
     _activity_text = {
-        "pending":     lambda r: f"<strong>{r['customer_name']}</strong> booked {r['service_name']}",
-        "confirmed":   lambda r: f"Booking confirmed for <strong>{r['customer_name']}</strong>",
-        "in-progress": lambda r: f"Service in progress for <strong>{r['customer_name']}</strong>",
-        "done":        lambda r: f"<strong>{r['customer_name']}</strong> completed {r['service_name']}",
-        "cancelled":   lambda r: f"<strong>{r['customer_name']}</strong> cancelled appointment",
-        "no-show":     lambda r: f"<strong>{r['customer_name']}</strong> did not show up",
+        "pending":     lambda r: f"<strong>{escape(r['customer_name'])}</strong> booked {escape(r['service_name'])}",
+        "confirmed":   lambda r: f"Booking confirmed for <strong>{escape(r['customer_name'])}</strong>",
+        "in-progress": lambda r: f"Service in progress for <strong>{escape(r['customer_name'])}</strong>",
+        "done":        lambda r: f"<strong>{escape(r['customer_name'])}</strong> completed {escape(r['service_name'])}",
+        "cancelled":   lambda r: f"<strong>{escape(r['customer_name'])}</strong> cancelled appointment",
+        "no-show":     lambda r: f"<strong>{escape(r['customer_name'])}</strong> did not show up",
     }
     now = now_helsinki()
     activity_feed = []

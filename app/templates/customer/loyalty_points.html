@@ -1060,29 +1060,14 @@
 {% block customer_content %}
 <div class="lp-wrapper">
 
-    <!-- ===== Header ===== -->
     <div class="lp-header">
         <span class="lp-label">{{ _('Rewards Club') }}</span>
         <h1>{{ _('Loyalty Points') }}</h1>
         <p>{{ _('Your journey to effortless beauty, rewarded.') }}</p>
     </div>
 
-    <!-- ===== Top Bento: Balance + Mission ===== -->
     <div class="lp-bento">
 
-        <!-- Balance Card -->
-        <!--
-            tier_class: "tier-silver" | "tier-gold" | "tier-diamond"
-            badge_class: "badge-silver" | "badge-gold" | "badge-diamond"
-            fill_class:  "" (default pink) | "fill-gold" | "fill-diamond"
-            Example context vars from Flask route:
-                balance = 1250
-                tier_name = "Silver"
-                tier_class = "tier-silver"
-                next_reward_name = "Free Gel Manicure"
-                next_reward_pts = 2500
-                progress_pct = 50   (int 0–100)
-        -->
         <div class="balance-card {{ tier_class | default('tier-silver') }}">
             <div class="balance-top">
                 <div>
@@ -1116,7 +1101,6 @@
             </div>
         </div>
 
-        <!-- Mission Carousel Card -->
         <div class="mission-card"
              id="missionCarousel"
              onmouseenter="pauseCarousel()"
@@ -1162,9 +1146,8 @@
             </div>
         </div>
 
-    </div><!-- end .lp-bento -->
+    </div>
 
-    <!-- ===== Available Rewards ===== -->
     <div style="margin-top: 40px;">
         <div class="lp-section-header">
             <h2>{{ _('Available Vouchers') }}</h2>
@@ -1243,16 +1226,13 @@
         </div>
     </div>
 
-    <!-- ===== Points History / My Vouchers ===== -->
     <div class="history-card">
 
-        <!-- Tab nav -->
         <div class="tab-nav">
             <button class="tab-btn active" onclick="switchTab('history', this)">{{ _('Points History') }}</button>
             <button class="tab-btn" onclick="switchTab('vouchers', this)">{{ _('My Vouchers') }}</button>
         </div>
 
-        <!-- Tab: Points History -->
         <div class="tab-panel active" id="tab-history">
             <div class="history-list">
                 {% for item in history | default([
@@ -1280,7 +1260,6 @@
             <button class="load-more-btn">{{ _('Load More History') }}</button>
         </div>
 
-        <!-- Tab: My Vouchers -->
         <div class="tab-panel" id="tab-vouchers">
             {% if vouchers %}
             <div class="voucher-list">
@@ -1323,11 +1302,10 @@
 
     </div>
 
-</div><!-- end .lp-wrapper -->
+</div>
 
 {% include 'customer/redeem_confirm_modal.html' %}
 
-<!-- ===== Voucher Detail Modal ===== -->
 <div class="vd-overlay" id="voucherModal" onclick="closeIfOverlay(event)">
     <div class="vd-modal">
         <button class="vd-close" onclick="closeVoucherDetail()">✕</button>

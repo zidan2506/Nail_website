@@ -12,9 +12,6 @@
 <main class="reschedule-page">
 
 
-    <!-- =========================
-         HERO / PAGE TITLE
-         ========================= -->
     <section class="reschedule-hero">
       <span class="reschedule-badge">{{ _('APPOINTMENT MANAGEMENT') }}</span>
 
@@ -23,7 +20,7 @@
       <p class="reschedule-subtitle">{{ _('Modify your session with ease. Please note our 24-hour rescheduling window to ensure we can accommodate all guests.') }}</p>
     </section>
 
-    <!-- =========================
+    {# =========================
          CURRENT SESSION CARD
          =========================
          BACKEND NOTE:
@@ -34,16 +31,16 @@
          - booking_date
          - booking_time
          - image_url (optional)
-    -->
+    #}
     <section class="current-session-card">
       <div class="current-session-left">
         <div class="current-session-image-wrap">
-          <!--
+          {#
             Nếu có ảnh:
-            <img src="{ss{ booking.image_url }ss}" alt="{{ _('Service image') }}" class="current-session-image">
+            <img src="{ss{ booking.image_url }ss}" alt="Service image" class="current-session-image">
 
             Nếu chưa có ảnh thật thì giữ placeholder này.
-          -->
+          #}
           <img
             src="https://via.placeholder.com/84x84"
             alt="{{ _('Service image') }}"
@@ -71,12 +68,9 @@
       </div>
     </section>
 
-    <!-- =========================
-         DATE + TIME SECTION
-         ========================= -->
     <section class="reschedule-grid">
 
-      <!-- =========================
+      {# =========================
            DATE CARD
            =========================
            BACKEND / JS NOTE:
@@ -85,7 +79,7 @@
            - render calendar bằng Jinja loop
            - hoặc JS build calendar
            - hoặc giữ layout này và thay data thật
-      -->
+      #}
       <div class="panel-card calendar-card">
         <div class="panel-card-header">
           <h3 class="panel-card-title">{{ _('Select New Date') }}</h3>
@@ -101,11 +95,11 @@
           </div>
         </div>
 
-        <!--
+        {#
           Nếu backend render dynamic:
           Ví dụ month_label = "October 2023"
           M có thể add thêm 1 dòng ở đây nếu muốn.
-        -->
+        #}
 
         <div class="calendar-weekdays">
           <span>{{ _('MO') }}</span>
@@ -117,7 +111,7 @@
           <span>{{ _('SU') }}</span>
         </div>
 
-        <!--
+        {#
           BACKEND NOTE:
           Mỗi ngày là 1 button.
           Các class trạng thái gợi ý:
@@ -127,14 +121,13 @@
           - is-today     : nếu muốn highlight hôm nay
 
           Nếu render Jinja:
-          {% for day in calendar_days %}
-            <button class="calendar-day ...">{{ day.label }}</button>
-          {% endfor %}
-        -->
+          for day in calendar_days:
+            button.calendar-day -> day.label
+        #}
         <div id="miniCalendar" class="calendar-grid"></div>
       </div>
 
-      <!-- =========================
+      {# =========================
            TIME CARD
            =========================
            BACKEND NOTE:
@@ -147,7 +140,7 @@
              {"label": "10:30 AM", "disabled": False, "selected": True},
              ...
            ]
-      -->
+      #}
       <div class="panel-card time-card">
         <div class="panel-card-header">
           <h3 class="panel-card-title">{{ _('Available Times') }}</h3>
@@ -164,12 +157,12 @@
       </div>
     </section>
 
-    <!-- =========================
+    {# =========================
          POLICY NOTICE
          =========================
          BACKEND NOTE:
          Nếu policy thay đổi theo config thì chỉ cần thay text này.
-    -->
+    #}
     <section class="policy-notice-card">
       <div class="policy-icon-wrap">
         <span class="policy-icon">i</span>
@@ -181,7 +174,7 @@
       </div>
     </section>
 
-    <!-- =========================
+    {# =========================
          COMPARISON
          =========================
          BACKEND / JS NOTE:
@@ -191,7 +184,7 @@
          Rất hợp để:
          - render giá trị cũ từ backend
          - update giá trị mới bằng JS khi user chọn date/time
-    -->
+    #}
     <section class="comparison-section">
       <h3 class="comparison-title">{{ _('Comparison') }}</h3>
 
@@ -228,7 +221,7 @@
       </div>
     </section>
 
-    <!-- =========================
+    {# =========================
          ACTIONS
          =========================
          BACKEND NOTE:
@@ -236,9 +229,9 @@
          - nút Confirm là submit
          - date/time selected nên map vào hidden input
          Ví dụ:
-         <input type="hidden" name="new_booking_date" value="">
-         <input type="hidden" name="new_start_at" value="">
-    -->
+         input hidden name=new_booking_date
+         input hidden name=new_start_at
+    #}
     <form method="POST" id="rescheduleForm">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <input type="hidden" id="newDateInput" name="new_date">

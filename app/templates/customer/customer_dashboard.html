@@ -492,7 +492,6 @@
 
 {% block customer_content %}
 <div class="db-wrapper">
-<!-- Header -->
 <div class="db-header-row">
     <div>
         <p class="db-label">{{ _('Customer Dashboard') }}</p>
@@ -502,7 +501,6 @@
     <a href="{{ url_for('main.customer_booking') }}" class="book-btn">{{ _('Book Appointment') }}</a>
 </div>
 
-<!-- Carousel: Offers & Deals -->
 <section class="carousel-section">
     <div class="carousel-track" id="carouselTrack">
 
@@ -524,11 +522,9 @@
 
     </div>
 
-    <!-- Arrows -->
     <button class="carousel-arrow prev" id="prevBtn">&#8592;</button>
     <button class="carousel-arrow next" id="nextBtn">&#8594;</button>
 
-    <!-- Dots -->
     <div class="carousel-dots" id="carouselDots">
         {% for reward in carousel_rewards %}
         <div class="dot{% if loop.first %} active{% endif %}" data-index="{{ loop.index0 }}"></div>
@@ -536,10 +532,8 @@
     </div>
 </section>
 
-<!-- Row 2: Upcoming + Loyalty -->
 <div class="dashboard-grid">
 
-    <!-- Upcoming Appointment -->
     <div class="upcoming-card">
         {% if upcoming_booking %}
             <div class="upcoming-card__content">
@@ -578,7 +572,6 @@
         {% endif %}
     </div>
 
-    <!-- Loyalty Points -->
     <div class="loyalty-card">
         <div class="loyalty-header">
             <span class="loyalty-title">{{ _('Loyalty Points') }}</span>

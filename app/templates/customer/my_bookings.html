@@ -11,7 +11,6 @@
 {% block customer_content %}
 
 <main class="customer-appointments-page">
-  <!-- Page Header -->
   <section class="page-header">
     <div class="page-header__left">
       <h1 class="page-title">{{ _('Appointments') }}</h1>
@@ -20,9 +19,7 @@
 
   </section>
 
-  <!-- Top Overview -->
   <section class="appointments-overview">
-    <!-- Next Visit Card -->
 <div class="next-visit-card">
   {% if next_visit %}
     <div class="next-visit-card__content">
@@ -68,7 +65,6 @@
     </div>
   {% endif %}
 </div>
-    <!-- Loyalty Reward Card -->
     <aside class="loyalty-reward-card">
       <p class="section-label section-label--light">{{ _('Loyalty Reward') }}</p>
 
@@ -100,7 +96,6 @@
     </aside>
   </section>
 
-  <!-- Appointment Manager -->
   <section class="appointment-manager">
     <div class="section-heading">
       <div>
@@ -111,7 +106,6 @@
       <a href=" {{url_for('main.customer_booking')}}" class="btn btn-primary">{{ _('Book New Appointment') }}</a>
     </div>
 
-    <!-- Tabs -->
     <div class="appointment-tabs">
       <button
         type="button"
@@ -138,17 +132,14 @@
       </button>
     </div>
 
-    <!-- Tab Panels -->
     <div class="appointment-tab-panels">
 
-      <!-- Upcoming Panel -->
       <div
         class="appointment-tab-panel appointment-tab-panel--active"
         id="upcoming"
       >
         <div class="appointment-card-list">
         {% for booking in upcoming_bookings %}
-          <!-- Appointment Card -->
           <article class="appointment-card">
             <div class="appointment-card__image">
               {% if booking['booking']['service_image'] %}
@@ -205,7 +196,6 @@
         </div>
       </div>
 
-      <!-- Pending Panel -->
       <div class="appointment-tab-panel" id="pending">
         <div class="appointment-card-list">
 {% for booking in pending_bookings %}
@@ -263,7 +253,6 @@
         </div>
       </div>
 
-      <!-- Cancelled Panel -->
       <div class="appointment-tab-panel" id="cancelled">
         <div class="appointment-card-list">
 {% for booking in cancelled_bookings %}
@@ -316,7 +305,6 @@
     </div>
   </section>
 
-  <!-- Cancel Confirm Modal -->
   <div id="cancel-modal" class="cancel-modal-overlay">
     <div class="cancel-modal">
 
@@ -367,7 +355,6 @@
     </div>
   </div>
 
-  <!-- Recent History -->
   <section class="recent-history">
     <div class="section-heading">
       <div>

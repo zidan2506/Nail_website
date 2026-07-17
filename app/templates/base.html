@@ -6,10 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}DahaCare{% endblock %}</title>
 
-    <!-- Plus Jakarta Sans — brand font dùng trong index.html -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Material Symbols — icon font dùng trong index.html -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
@@ -18,28 +16,14 @@
 </head>
 <body>
 
-    <!-- ═══════════════════════════════════════════════════════════════
-         NAV BAR
-         - Sticky top, semi-transparent trắng + backdrop blur
-         - Logo: DahaCare text (không icon ✦) — match với index.html
-         - Links: Services / Gallery / Membership / About / Contact
-         - Right actions: thay đổi theo session state:
-             · Chưa login  → [Register] [Book Now]
-             · Customer    → [My Dashboard] [Book Now]
-             · Staff       → [My Schedule] [Book Now]
-             · Admin       → [Management] [Book Now]
-         - Flask: session.get("user_id") và session.get("role") kiểm soát nhánh
-    ════════════════════════════════════════════════════════════════════ -->
-    {% block navbar %}
+   {% block navbar %}
     <header class="site-header">
         <nav class="navbar">
 
-            <!-- Logo — Flask: href="{{ url_for('main.home') }}" -->
             <a href="{{ url_for('main.home') }}" class="logo">
                 <span class="logo-text">Daha<span class="logo-accent">Care</span></span>
             </a>
 
-            <!-- Desktop nav links -->
             <ul class="nav-links">
                 <li><a href="{{ url_for('main.services') }}">{{ _('Services') }}</a></li>
                 <li><a href="{{ url_for('main.gallery') }}">{{ _('Gallery') }}</a></li>
@@ -47,18 +31,14 @@
                 <li><a href="{{ url_for('main.home') }}#contact">{{ _('Contact') }}</a></li>
             </ul>
 
-            <!-- Right action buttons — conditional on login state -->
             <div class="nav-actions">
 
-                <!-- Language switcher — dropdown [cờ + mã] -->
                 {{ ls.lang_switcher() }}
 
                 {% if not session.get("user_id") %}
-                    <!-- Guest: Register + Book Now -->
                     <a href="{{ url_for('main.register') }}" class="btn-nav-outline">{{ _('Register') }}</a>
                     <a href="{{ url_for('main.public_booking') }}" class="btn-nav-solid">{{ _('Book Now') }}</a>
                 {% else %}
-                    <!-- Logged in: role-based dashboard link + Book Now -->
                     {% if session.get("role") == "customer" %}
                         <a href="{{ url_for('main.customer_dashboard') }}" class="btn-nav-outline">{{ _('My Dashboard') }}</a>
                     {% elif session.get("role") == "staff" %}
@@ -70,14 +50,12 @@
                 {% endif %}
             </div>
 
-            <!-- Mobile hamburger button — JS toggles .nav-open on <nav> -->
             <button class="nav-hamburger" aria-label="{{ _('Open menu') }}">
                 <span class="material-symbols-outlined">menu</span>
             </button>
 
         </nav>
 
-        <!-- Mobile dropdown menu — hidden by default, toggled via .nav-open -->
         <div class="nav-mobile-menu">
             <ul class="nav-mobile-links">
                 <li><a href="{{ url_for('main.services') }}">{{ _('Services') }}</a></li>
@@ -88,7 +66,6 @@
             </ul>
             <div class="nav-mobile-actions">
 
-                <!-- Language switcher — dropdown [cờ + mã] -->
                 {{ ls.lang_switcher() }}
 
                 {% if not session.get("user_id") %}
@@ -109,13 +86,6 @@
     </header>
     {% endblock %}
 
-    <!-- ═══════════════════════════════════════════════════════════════
-         FLASH MESSAGES
-         - Nhận messages từ Flask flash() qua session
-         - Auto-dismiss sau 3 giây với animation fade out
-         - Styles: .flash-error (đỏ) và .flash-success (xanh)
-         - Đặt fixed top-center, z-index cao nhất
-    ════════════════════════════════════════════════════════════════════ -->
     <div class="flash-wrapper">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -127,7 +97,6 @@
     </div>
 
     <script>
-    /* Auto-dismiss flash messages sau 3 giây */
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".auto-dismiss-flash").forEach((flash) => {
             setTimeout(() => {
@@ -137,7 +106,6 @@
         });
     });
 
-    /* Mobile hamburger toggle */
     document.addEventListener("DOMContentLoaded", function () {
         const hamburger = document.querySelector(".nav-hamburger");
         const header   = document.querySelector("header");
@@ -146,7 +114,6 @@
         }
     });
 
-    /* Language dropdown toggle — đóng khi click ra ngoài hoặc nhấn Escape */
     document.addEventListener("DOMContentLoaded", function () {
         const dropdowns = document.querySelectorAll("[data-lang-dropdown]");
 
@@ -178,27 +145,12 @@
     {# Page tự quyết hoàn toàn layout — base không áp padding hay max-width nào #}
     {% block content %}{% endblock %}
 
-    <!-- ═══════════════════════════════════════════════════════════════
-         FOOTER
-         - Dùng chung cho mọi public page, tránh mỗi page tự bịa footer riêng
-         - Cột 1: Logo + branch block (loop qua branches) + Business ID
-         - Cột 2: Explore links
-         - Cột 3: Support links
-         - Bottom row: copyright (year động qua Jinja) + legal links
-         - Flask: truyền biến `branches` (list of dict: name, address) từ view function
-           Hiện chỉ có 1 chi nhánh nên branches = [{ "name": "...", "address": "..." }]
-           Khi mở thêm chi nhánh, chỉ cần thêm phần tử vào list — Jinja tự loop, không sửa HTML
-         - Flask: truyền `business_id` (string) và `current_year` (int, vd: datetime.now().year)
-           Khuyến nghị: dùng context_processor để inject 2 biến này global, khỏi phải
-           pass riêng ở từng route render base.html
-    ════════════════════════════════════════════════════════════════════ -->
     {% block footer %}
     <footer class="site-footer">
         <div class="footer-container">
 
             <div class="footer-grid">
 
-                <!-- Cột 1: Logo + branch + business id -->
                 <div class="footer-col footer-col--brand">
                     <div class="footer-logo">
                         <span class="logo-text">Daha<span class="logo-accent">Care</span></span>
@@ -219,7 +171,6 @@
                     <div class="footer-bizid">{{ _('Business ID:') }} {{ business_id }}</div>
                 </div>
 
-                <!-- Cột 2: Explore -->
                 <div class="footer-col">
                     <div class="footer-heading">{{ _('Explore') }}</div>
                     <ul class="footer-links">
@@ -228,7 +179,6 @@
                     </ul>
                 </div>
 
-                <!-- Cột 3: Support -->
                 <div class="footer-col">
                     <div class="footer-heading">{{ _('Support') }}</div>
                     <ul class="footer-links">
