@@ -39,7 +39,7 @@ def _staff_status_i18n_markers():
             gettext("hôm nay"), gettext("trong tuần này"), gettext("trong tháng này"),
             gettext("trong tháng trước"),
             gettext("✓ Claimed"), gettext("✓ All Reviewed"), gettext("Start"), gettext("Claim"))
-from app.database.db import create_oauth_user, set_user_oauth
+from app.database.db import create_oauth_user, set_user_oauth, register_failed_verification
 main = Blueprint("main",__name__)
 logger = logging.getLogger(__name__)
 
@@ -864,7 +864,11 @@ def change_password():
         return redirect(url_for("main.customer_setting"))
 
     if user_code != verification["verification_code"]:
-        flash("Incorrect verification code.", "error")
+        if register_failed_verification(verification_id):
+            session.pop("password_change_verification_id", None)
+            flash("Too many incorrect attempts. Please request a new code.", "error")
+        else:
+            flash("Incorrect verification code.", "error")
         return redirect(url_for("main.customer_setting"))
 
     if new_password != confirm_password:
@@ -927,7 +931,11 @@ def update_email_address():
         return redirect(url_for("main.customer_setting"))
 
     if user_code != verification["verification_code"]:
-        flash("Incorrect verification code.", "error")
+        if register_failed_verification(verification_id):
+            session.pop("email_change_verification_id", None)
+            flash("Too many incorrect attempts. Please request a new code.", "error")
+        else:
+            flash("Incorrect verification code.", "error")
         return redirect(url_for("main.customer_setting"))
 
     if new_email == customer["email"]:
@@ -2032,7 +2040,11 @@ def staff_change_password():
         return redirect(url_for("main.staff_profile"))
 
     if user_code != verification["verification_code"]:
-        flash("Mã xác thực không đúng.", "error")
+        if register_failed_verification(verification_id):
+            session.pop("staff_pw_verification_id", None)
+            flash("Nhập sai quá nhiều lần. Vui lòng yêu cầu mã mới.", "error")
+        else:
+            flash("Mã xác thực không đúng.", "error")
         return redirect(url_for("main.staff_profile"))
 
     if len(new_password) < 8:
@@ -4474,6 +4486,21 @@ def verify_email():
             }), 400
         verification_code = verification["verification_code"]
 
+        def _wrong_code_response():
+            # Đếm số lần sai; quá ngưỡng thì mã bị vô hiệu (register_failed_verification
+            # set is_used=1) -> lần sau get_verification_by_id trả None, buộc xin mã mới.
+            locked = register_failed_verification(verification_id)
+            if locked:
+                return jsonify({
+                    "success": False,
+                    "message": "Too many incorrect attempts. Please request a new code.",
+                    "redirect_url": url_for("main.home")
+                }), 429
+            return jsonify({
+                "success": False,
+                "message": "Invalid verification code. Please try again."
+            }), 400
+
         if verify_type == "register":
 
             #Register verification solve here!
@@ -4514,11 +4541,7 @@ def verify_email():
                         "redirect_url": url_for("main.login")
                     }), 200
             else:
-                    flash('Invalid verification code!', "error")
-                    return jsonify({
-                        "success": False,
-                        "message": "Invalid verification code"
-                    }), 400
+                    return _wrong_code_response()
 
         if verify_type == "booking":
             #Booking verification solve here!
@@ -4582,10 +4605,7 @@ def verify_email():
                 }), 200
             
             else:
-                return jsonify({
-                    "success": False,
-                    "message": "Invalid verification code. Please resend and try again!"
-                })
+                return _wrong_code_response()
 
         if verify_type == "forgot_password":
             user_id = verify_context.get("user_id")
@@ -4607,10 +4627,7 @@ def verify_email():
                     "redirect_url": url_for("main.set_new_password")
                 }), 200
             else:
-                return jsonify({
-                    "success": False,
-                    "message": "Invalid verification code. Please try again."
-                }), 400
+                return _wrong_code_response()
 
     #Clean up expired verifications
 

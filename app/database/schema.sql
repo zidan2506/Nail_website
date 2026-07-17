@@ -128,6 +128,7 @@ CREATE TABLE email_verifications (
     last_sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     verified_at DATETIME,
     is_used INTEGER NOT NULL DEFAULT 0,
+    attempts INTEGER NOT NULL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

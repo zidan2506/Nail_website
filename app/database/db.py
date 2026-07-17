@@ -164,7 +164,8 @@ def update_new_code(id, code, expires_at):
     SET
         verification_code = ?,
         expired_at = ?,
-        last_sent_at = ?
+        last_sent_at = ?,
+        attempts = 0
     WHERE id = ?
         AND is_used = 0;
 """, (code, expires_at, last_sent_at, id)
@@ -174,6 +175,33 @@ def update_new_code(id, code, expires_at):
 
     logger.debug("Udating new code success! New code: %s Expires at: %s", code, expires_at)
     return True
+
+# Số lần nhập sai tối đa cho 1 mã xác thực trước khi mã bị vô hiệu (chống brute-force
+# mã 6 chữ số). Sau ngưỡng này người dùng phải xin mã mới (có cooldown 60s).
+MAX_VERIFY_ATTEMPTS = 5
+
+def register_failed_verification(verification_id):
+    """Tăng bộ đếm số lần nhập sai của 1 mã xác thực. Khi chạm ngưỡng thì vô hiệu
+    hoá mã (is_used = 1) để buộc người dùng xin mã mới — chặn vét cạn 10^6 tổ hợp.
+    Trả về True nếu mã vừa bị khoá do quá số lần thử."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE email_verifications SET attempts = attempts + 1 WHERE id = ?",
+        (verification_id,)
+    )
+    row = conn.execute(
+        "SELECT attempts FROM email_verifications WHERE id = ?",
+        (verification_id,)
+    ).fetchone()
+    locked = bool(row) and row["attempts"] >= MAX_VERIFY_ATTEMPTS
+    if locked:
+        conn.execute(
+            "UPDATE email_verifications SET is_used = 1 WHERE id = ?",
+            (verification_id,)
+        )
+    conn.commit()
+    conn.close()
+    return locked
 
 def get_booking_by_id(id):
     conn = get_connection()
