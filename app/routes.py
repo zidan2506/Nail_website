@@ -874,8 +874,8 @@ def change_password():
         flash("Passwords do not match.", "error")
         return redirect(url_for("main.customer_setting"))
 
-    if len(new_password) < 6:
-        flash("New password must be at least 6 characters.", "error")
+    if len(new_password) < 8:
+        flash("New password must be at least 8 characters.", "error")
         return redirect(url_for("main.customer_setting"))
 
     update_verification(verification_id, user_id, 1)
@@ -1335,7 +1335,8 @@ def redeem_reward_route():
             else:
                 return _err("You've reached the redeem limit for this reward.")
 
-    redeem_reward(customer_id, reward_id, reward["cost"], reward["name"])
+    if not redeem_reward(customer_id, reward_id, reward["cost"], reward["name"]):
+        return _err("Not enough points.")
     flash(f"Successfully redeemed: {reward['name']}!", "success")
     if is_json:
         return jsonify({"success": True})
@@ -2112,28 +2113,6 @@ def mark_paid():
     mark_invoice_paid(booking_id)
     flash("Đã xác nhận thanh toán.", "success")
     return redirect(request.referrer or url_for("main.staff_dashboard"))
-
-@main.route("/staff/complete-booking/<int:booking_id>", methods=["POST"])
-def complete_booking(booking_id):
-    if session.get("role") not in ("staff", "admin"):
-        flash("Unauthorized.", "error")
-        return redirect(url_for("main.staff_login"))
-
-    booking = get_booking_by_id(booking_id)
-    if not booking:
-        flash("Booking not found.", "error")
-        return redirect(url_for("main.staff_dashboard"))
-
-    if booking["status"] != "confirmed":
-        flash("Only confirmed bookings can be marked as completed.", "error")
-        return redirect(url_for("main.staff_dashboard"))
-
-    if _complete_booking_txn(booking_id):
-        flash("Booking marked as completed.", "success")
-    else:
-        flash("Something went wrong. Please try again.", "error")
-
-    return redirect(url_for("main.staff_dashboard"))
 
 #====================================
 #               Admin
@@ -4031,6 +4010,10 @@ def register():
         flash("Please enter required information!", "error")
         return redirect(url_for('main.register'))
 
+    if len(password) < 8:
+        flash("Password must be at least 8 characters.", "error")
+        return redirect(url_for('main.register'))
+
     existing_user = get_user_by_email(email)
 
     if existing_user:
@@ -4253,8 +4236,8 @@ def set_new_password():
         flash("Passwords do not match.", "error")
         return redirect(url_for("main.set_new_password"))
 
-    if len(new_password) < 6:
-        flash("Password must be at least 6 characters.", "error")
+    if len(new_password) < 8:
+        flash("Password must be at least 8 characters.", "error")
         return redirect(url_for("main.set_new_password"))
 
     update_user_password(user_id, generate_password_hash(new_password))

@@ -12,7 +12,7 @@
 |---|---|---|
 | 🔴 Nghiêm trọng | 1 | ✅ Đã sửa (2026-07-17) |
 | 🟠 Trung bình | 2 | ✅ Đã sửa (2026-07-17) |
-| 🟡 Thấp | 3 | Cân nhắc |
+| 🟡 Thấp | 3 | ✅ Đã sửa (2026-07-17) |
 | 🟢 Đạt chuẩn | nhiều | Không có vấn đề |
 
 ---
@@ -74,23 +74,23 @@ Thay dict RAM bằng bảng `login_attempts` (SQLite) — lưu bền theo IP, **
 
 ## 🟡 THẤP
 
-### #1 — `/staff/complete-booking/<id>` thiếu kiểm tra chủ sở hữu
+### #1 — `/staff/complete-booking/<id>` thiếu kiểm tra chủ sở hữu  ✅ ĐÃ SỬA
 
-**Vị trí:** `routes.py:2113`
+Route `complete_booking` không check `booking["staff_id"] == current_staff["id"]` → bất kỳ nhân viên nào cũng hoàn thành booking của người khác.
 
-Khác với `mark_done` (`routes.py:2075`), route này **không** check `booking["staff_id"] == current_staff["id"]`. Bất kỳ nhân viên nào cũng hoàn thành booking của nhân viên khác (kích hoạt tính điểm/hoa hồng). Có vẻ là route trùng/cũ của `mark_done` — nên xác nhận có còn dùng không.
+**✅ Cách đã sửa:** Xoá hẳn route (dead code — không nơi nào gọi, đã bị `mark_done` có check chủ sở hữu thay thế). Vừa hết lỗ hổng vừa sạch code trùng.
 
-### #2 — TOCTOU khi đổi thưởng
+### #2 — TOCTOU khi đổi thưởng  ✅ ĐÃ SỬA
 
-**Vị trí:** `routes.py:1296` + `db.py:918`
+`get_loyalty_balance` kiểm tra ngoài transaction → hai request đồng thời có thể cùng qua và trừ điểm 2 lần (âm điểm / double-spend).
 
-`get_loyalty_balance` kiểm tra ngoài transaction; hai request đồng thời có thể cùng vượt qua và trừ điểm 2 lần (âm điểm). Nên kiểm tra lại balance bên trong transaction của `redeem_reward`.
+**✅ Cách đã sửa:** `redeem_reward` (`db.py`) dùng `BEGIN IMMEDIATE` khoá ghi ngay rồi **đọc lại balance trong transaction**; số dư không đủ → `ROLLBACK` + trả `False`. Request thứ 2 buộc phải chờ request thứ 1 commit nên thấy số dư đã trừ. Route `redeem_reward_route` xử lý `False` → báo "Not enough points".
 
-### #3 — Chính sách mật khẩu yếu
+### #3 — Chính sách mật khẩu yếu  ✅ ĐÃ SỬA
 
-**Vị trí:** `routes.py:4243`
+Không nhất quán: `register` không check độ dài, có chỗ `< 6`, có chỗ `< 8`.
 
-Chỉ yêu cầu ≥ 6 ký tự, không kiểm tra độ phức tạp.
+**✅ Cách đã sửa:** Đồng bộ **tối thiểu 8 ký tự** cho `register`, `set_new_password`, `change_password` (staff đã 8 sẵn). Theo khuyến nghị NIST — ưu tiên độ dài, không ép ký tự đặc biệt.
 
 ---
 
@@ -114,4 +114,4 @@ Chỉ yêu cầu ≥ 6 ký tự, không kiểm tra độ phức tạp.
 
 ## Kết luận
 
-Nền tảng backend **khá vững**: SQLi / CSRF / IDOR / payment đều ổn, phân quyền nhất quán, quản lý secret sạch. Lỗ hổng 🔴 nghiêm trọng (brute-force OTP → chiếm tài khoản admin) và cả 2 lỗi 🟠 trung bình (rate-limit login) **đã được xử lý**. Còn lại 3 lỗi 🟡 thấp có thể cân nhắc khi có thời gian.
+Nền tảng backend **khá vững**: SQLi / CSRF / IDOR / payment đều ổn, phân quyền nhất quán, quản lý secret sạch. **Toàn bộ phát hiện đã được xử lý**: 🔴 nghiêm trọng (brute-force OTP → chiếm tài khoản admin), 🟠 ×2 (rate-limit login), 🟡 ×3 (ownership check, TOCTOU redeem, password policy).

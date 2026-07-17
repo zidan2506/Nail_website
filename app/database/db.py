@@ -991,10 +991,22 @@ def _generate_voucher_code():
             return code
 
 def redeem_reward(customer_id, reward_id, cost, reward_name=""):
+    """Đổi thưởng atomic. Trả False nếu số dư không đủ (chống double-spend khi 2
+    request đổi đồng thời): BEGIN IMMEDIATE khoá ghi ngay rồi mới đọc lại balance,
+    nên request thứ 2 phải chờ request thứ 1 commit và thấy số dư đã trừ."""
     voucher_code = _generate_voucher_code()
     conn = get_connection()
+    conn.isolation_level = None  # tự quản lý transaction để dùng BEGIN IMMEDIATE
     redeemed_at = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
     try:
+        conn.execute("BEGIN IMMEDIATE")
+        balance = conn.execute(
+            "SELECT COALESCE(SUM(points), 0) FROM loyalty_points_log WHERE customer_id = ?",
+            (customer_id,)
+        ).fetchone()[0]
+        if balance < cost:
+            conn.execute("ROLLBACK")
+            return False
         conn.execute(
             "INSERT INTO reward_redemptions (customer_id, reward_id, points_spent, voucher_code, redeemed_at) VALUES (?, ?, ?, ?, ?)",
             (customer_id, reward_id, cost, voucher_code, redeemed_at)
@@ -1007,9 +1019,10 @@ def redeem_reward(customer_id, reward_id, cost, reward_name=""):
             "INSERT INTO loyalty_points_log (customer_id, points, source, reference_id, note) VALUES (?, ?, ?, ?, ?)",
             (customer_id, -cost, "reward_redemption", reward_id, f"Redeemed: {reward_name}" if reward_name else "Reward redemption")
         )
-        conn.commit()
+        conn.execute("COMMIT")
+        return True
     except Exception:
-        conn.rollback()
+        conn.execute("ROLLBACK")
         raise
     finally:
         conn.close()
