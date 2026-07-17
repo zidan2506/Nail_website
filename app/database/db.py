@@ -2,6 +2,7 @@ import logging
 import sqlite3
 import secrets
 import string
+import time
 from pathlib import Path
 from werkzeug.security import generate_password_hash
 from app.utils.helpers import now_helsinki
@@ -202,6 +203,52 @@ def register_failed_verification(verification_id):
     conn.commit()
     conn.close()
     return locked
+
+def get_login_block_remaining(ip):
+    """Số giây IP còn bị khoá đăng nhập (0 nếu không bị khoá). Lưu bền ở DB nên
+    dùng chung mọi gunicorn worker và sống qua restart."""
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT blocked_until FROM login_attempts WHERE ip = ?", (ip,)
+    ).fetchone()
+    conn.close()
+    if not row:
+        return 0
+    remaining = row["blocked_until"] - time.time()
+    return remaining if remaining > 0 else 0
+
+def record_login_failure(ip, max_attempts, lockout_seconds):
+    """Ghi nhận 1 lần đăng nhập sai cho IP. Khi đạt max_attempts thì khoá
+    lockout_seconds giây rồi reset đếm về 0."""
+    conn = get_connection()
+    now_str = now_helsinki().strftime("%Y-%m-%d %H:%M:%S")
+    row = conn.execute(
+        "SELECT count FROM login_attempts WHERE ip = ?", (ip,)
+    ).fetchone()
+    count = (row["count"] if row else 0) + 1
+    if count >= max_attempts:
+        blocked_until = time.time() + lockout_seconds
+        count = 0
+    else:
+        blocked_until = 0
+    cur = conn.execute(
+        "UPDATE login_attempts SET count = ?, blocked_until = ?, updated_at = ? WHERE ip = ?",
+        (count, blocked_until, now_str, ip)
+    )
+    if cur.rowcount == 0:
+        conn.execute(
+            "INSERT INTO login_attempts (ip, count, blocked_until, updated_at) VALUES (?, ?, ?, ?)",
+            (ip, count, blocked_until, now_str)
+        )
+    conn.commit()
+    conn.close()
+
+def clear_login_attempts(ip):
+    """Xoá lịch sử thất bại của IP sau khi đăng nhập thành công."""
+    conn = get_connection()
+    conn.execute("DELETE FROM login_attempts WHERE ip = ?", (ip,))
+    conn.commit()
+    conn.close()
 
 def get_booking_by_id(id):
     conn = get_connection()

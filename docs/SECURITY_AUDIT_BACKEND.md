@@ -11,7 +11,7 @@
 | Mức độ | Số lượng | Tình trạng |
 |---|---|---|
 | 🔴 Nghiêm trọng | 1 | ✅ Đã sửa (2026-07-17) |
-| 🟠 Trung bình | 2 | Nên sửa |
+| 🟠 Trung bình | 2 | ✅ Đã sửa (2026-07-17) |
 | 🟡 Thấp | 3 | Cân nhắc |
 | 🟢 Đạt chuẩn | nhiều | Không có vấn đề |
 
@@ -42,21 +42,33 @@ Kết quả: không gian brute-force sập từ 10⁶/10 phút xuống còn 5 l�
 
 ---
 
-## 🟠 TRUNG BÌNH #1 — Login khách không có rate-limit
+## 🟠 TRUNG BÌNH #1 — Login khách không có rate-limit  ✅ ĐÃ SỬA
 
-**Vị trí:** `routes.py:4065` (`login`)
+**Vị trí:** `routes.py` (`login`)
 
-Staff login (`routes.py:1602`) có cơ chế `_failed_logins` chặn brute-force, nhưng **login khách hàng thì không** — cho phép dò mật khẩu / credential stuffing không giới hạn trên tài khoản khách.
+Trước đây staff login có cơ chế chặn brute-force nhưng **login khách hàng thì không**.
 
-**Đề xuất sửa:** áp cùng cơ chế `_failed_logins` như `staff_login`.
+### ✅ Cách đã sửa
+
+Áp cùng cơ chế throttle vào route `login()`: kiểm tra `get_login_block_remaining(ip)` đầu request, `record_login_failure()` khi sai, `clear_login_attempts()` khi thành công. Sửa chung một lần với #2 (dùng store DB).
 
 ---
 
-## 🟠 TRUNG BÌNH #2 — Rate-limit chỉ lưu trong RAM, theo từng worker
+## 🟠 TRUNG BÌNH #2 — Rate-limit chỉ lưu trong RAM, theo từng worker  ✅ ĐÃ SỬA
 
-**Vị trí:** `routes.py:46` (`_failed_logins = {}`)
+**Vị trí:** `routes.py` (trước đây: `_failed_logins = {}`)
 
-Chạy 3 gunicorn workers → hiệu lực chặn bị nhân 3 (mỗi worker đếm riêng), và **reset mỗi lần restart/deploy**. Nên cân nhắc lưu vào DB/Redis. (Keying theo `remote_addr` OK vì đã có `ProxyFix x_for=1`.)
+Chạy 3 gunicorn workers → hiệu lực chặn bị nhân 3 (mỗi worker đếm riêng), và **reset mỗi lần restart/deploy**.
+
+### ✅ Cách đã sửa
+
+Thay dict RAM bằng bảng `login_attempts` (SQLite) — lưu bền theo IP, **dùng chung mọi worker và sống qua restart**. Ngưỡng giữ nguyên: 5 lần sai → khoá 15 phút.
+
+- `schema.sql`: thêm bảng `login_attempts (ip, count, blocked_until, updated_at)` + migrate `database.db` production (`CREATE TABLE`).
+- `db.py`: `get_login_block_remaining()`, `record_login_failure()`, `clear_login_attempts()`.
+- `routes.py`: `staff_login` và `login` (khách) đều dùng chung 3 hàm trên; xoá dict `_failed_logins`.
+
+(Keying theo `remote_addr` OK vì đã có `ProxyFix x_for=1`.)
 
 ---
 
@@ -102,4 +114,4 @@ Chỉ yêu cầu ≥ 6 ký tự, không kiểm tra độ phức tạp.
 
 ## Kết luận
 
-Nền tảng backend **khá vững**: SQLi / CSRF / IDOR / payment đều ổn, phân quyền nhất quán, quản lý secret sạch. Lỗ hổng 🔴 nghiêm trọng (brute-force OTP → chiếm tài khoản admin) **đã được xử lý**. Còn lại 2 lỗi 🟠 trung bình về rate-limit nên xử lý tiếp khi có thời gian.
+Nền tảng backend **khá vững**: SQLi / CSRF / IDOR / payment đều ổn, phân quyền nhất quán, quản lý secret sạch. Lỗ hổng 🔴 nghiêm trọng (brute-force OTP → chiếm tài khoản admin) và cả 2 lỗi 🟠 trung bình (rate-limit login) **đã được xử lý**. Còn lại 3 lỗi 🟡 thấp có thể cân nhắc khi có thời gian.

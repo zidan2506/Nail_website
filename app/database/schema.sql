@@ -16,6 +16,7 @@ DROP TABLE IF EXISTS staff;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS email_verifications;
 DROP TABLE IF EXISTS gallery_images;
+DROP TABLE IF EXISTS login_attempts;
 
 CREATE TABLE service_categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -130,6 +131,15 @@ CREATE TABLE email_verifications (
     is_used INTEGER NOT NULL DEFAULT 0,
     attempts INTEGER NOT NULL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Chống brute-force đăng nhập, lưu bền theo IP (dùng chung mọi gunicorn worker,
+-- sống qua restart — khác với dict RAM trước đây). blocked_until = epoch giây.
+CREATE TABLE login_attempts (
+    ip TEXT PRIMARY KEY,
+    count INTEGER NOT NULL DEFAULT 0,
+    blocked_until REAL NOT NULL DEFAULT 0,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE invoices (

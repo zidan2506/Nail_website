@@ -39,11 +39,10 @@ def _staff_status_i18n_markers():
             gettext("hôm nay"), gettext("trong tuần này"), gettext("trong tháng này"),
             gettext("trong tháng trước"),
             gettext("✓ Claimed"), gettext("✓ All Reviewed"), gettext("Start"), gettext("Claim"))
-from app.database.db import create_oauth_user, set_user_oauth, register_failed_verification
+from app.database.db import create_oauth_user, set_user_oauth, register_failed_verification, get_login_block_remaining, record_login_failure, clear_login_attempts
 main = Blueprint("main",__name__)
 logger = logging.getLogger(__name__)
 
-_failed_logins = {}       # {ip: {"count": int, "blocked_until": float}}
 _MAX_LOGIN_ATTEMPTS = 5
 _LOGIN_LOCKOUT = 15 * 60  # 15 phút
 _ADMIN_IDLE_TIMEOUT = 30 * 60  # 30 phút
@@ -1613,22 +1612,14 @@ def staff_login():
         return render_template("staff/login.html")
     
     ip = request.remote_addr
-    now = time.time()
-    attempt = _failed_logins.get(ip, {"count": 0, "blocked_until": 0})
-    if now < attempt["blocked_until"]:
-        remaining = int((attempt["blocked_until"] - now) / 60) + 1
+    block_remaining = get_login_block_remaining(ip)
+    if block_remaining > 0:
+        remaining = int(block_remaining / 60) + 1
         flash(f"Too many failed attempts. Try again in {remaining} minute(s).", "error")
         return redirect(url_for("main.staff_login"))
 
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password","")
-
-    def _record_failure():
-        attempt["count"] += 1
-        if attempt["count"] >= _MAX_LOGIN_ATTEMPTS:
-            attempt["blocked_until"] = time.time() + _LOGIN_LOCKOUT
-            attempt["count"] = 0
-        _failed_logins[ip] = attempt
 
     if not email or not password:
         flash("Please enter email or password!", "error")
@@ -1637,14 +1628,14 @@ def staff_login():
     user = get_user_by_email(email)
 
     if not user:
-        _record_failure()
+        record_login_failure(ip, _MAX_LOGIN_ATTEMPTS, _LOGIN_LOCKOUT)
         flash("Invalid email or password!", "error")
         return redirect(url_for("main.staff_login"))
 
     user_id = user['id']
 
     if not check_password_hash(user["password_hash"], password):
-        _record_failure()
+        record_login_failure(ip, _MAX_LOGIN_ATTEMPTS, _LOGIN_LOCKOUT)
         flash("Invalid email or password!", "error")
         return redirect(url_for("main.staff_login"))
 
@@ -1652,7 +1643,7 @@ def staff_login():
         flash("Please use the customer login portal", "error")
         return redirect(url_for("main.login"))
 
-    _failed_logins.pop(ip, None)
+    clear_login_attempts(ip)
     guest_lang = session.get("lang")
     session.clear()
     session["user_id"] = user_id
@@ -4080,18 +4071,26 @@ def login():
     if request.method == "GET":
         return render_template("/Auth/customer_login.html")
 
+    ip = request.remote_addr
+    block_remaining = get_login_block_remaining(ip)
+    if block_remaining > 0:
+        remaining = int(block_remaining / 60) + 1
+        flash(f"Too many failed attempts. Try again in {remaining} minute(s).", "error")
+        return redirect(url_for('main.login'))
+
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
 
     if not email or not password:
         flash("Please enter email or password!", "error")
         return redirect(url_for('main.login'))
-    
+
     user = get_user_by_email(email)
 
     if not user:
+        record_login_failure(ip, _MAX_LOGIN_ATTEMPTS, _LOGIN_LOCKOUT)
         flash("Invalid email or password!", "error")
-        return redirect(url_for('main.login'))   
+        return redirect(url_for('main.login'))
 
     user_id = user["id"]
     customer = get_customer_by_user_id(user_id)
@@ -4100,10 +4099,12 @@ def login():
         return redirect(url_for('main.login'))
 
     if not check_password_hash(user["password_hash"], password):
+        record_login_failure(ip, _MAX_LOGIN_ATTEMPTS, _LOGIN_LOCKOUT)
         flash("Invalid email or password!", "error")
         return redirect(url_for('main.login'))
     else:
         ##set session
+        clear_login_attempts(ip)
         guest_lang = session.get("lang")
         session.clear()
         session["user_id"] = user_id
