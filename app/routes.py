@@ -17,7 +17,7 @@ from app.database.db import (
 )
 from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_current_tier, get_tier_by_name, get_tier_by_id, get_customer_subscription_row, get_active_subscription_rows, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_customer_avatar, update_user_email, update_user_password, update_user_lang, cancel_booking_with_reason, get_gallery_images, get_active_staff, get_admin_kpis, get_admin_today_appointments, get_admin_recent_activity, get_admin_revenue_chart, get_all_customers, get_admin_bookings, get_booking_status_counts, update_booking_details, get_staff_stats, get_staff_list, get_staff_role_list, create_staff, update_staff, delete_staff, toggle_staff_active, get_all_categories, get_service_categories_with_services, get_service_stats, create_service, update_service, delete_service, toggle_service_active, create_category, update_category, delete_category, get_admin_customer_stats, get_admin_customers, create_customer_admin, update_customer_admin, delete_customer_admin, get_gallery_images_admin, get_gallery_image_by_id, get_gallery_stats, create_gallery_images, update_gallery_image, delete_gallery_image, bulk_delete_gallery_images, reorder_gallery_images, get_admin_loyalty_customers, get_admin_loyalty_stats, get_rewards_admin, get_missions, create_reward, update_reward, get_reward_by_id, get_reward_redemption_count, delete_reward, deactivate_reward, update_mission_config, toggle_mission_config, get_active_membership_tiers, adjust_membership_admin, MISSION_KEYS, get_carousel_slides, get_carousel_slide_by_id, get_next_carousel_sort_order, create_homepage_slide, update_homepage_slide, create_offer_slide, update_offer_slide, delete_carousel_slide, get_mission_slides, update_mission_slide, reorder_carousel_slides, MISSION_SLOT_KEYS, auto_expire_bookings, get_admin_top_loyalty, get_admin_new_members, get_admin_top_services, get_popular_services, get_staff_bookings_range, get_invoice_by_booking, mark_invoice_paid, create_invoice, get_staff_history, get_staff_history_months, get_staff_history_stats, get_staff_profile_stats, update_staff_photo
 from datetime import datetime, timedelta, date
-from app.services.email_system import send_verification_email, send_thank_you_email, generate_verification_code
+from app.services.email_system import send_verification_email, send_thank_you_email, generate_verification_code, is_valid_email, EmailSendError
 from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days, complete_booking_txn, revert_booking_txn
 from app.services.loyalty import get_active_multiplier, get_config_value, already_awarded, award_points, check_streak
 from app.services.payment_service import create_booking_checkout_session, construct_event, handle_event, fulfill_from_session, create_subscription_checkout_session, cancel_subscription, create_billing_portal_session
@@ -835,8 +835,11 @@ def request_password_change():
 
     expires_at = (now_helsinki() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
     code = generate_verification_code()
+    try:
+        send_verification_email(customer["email"], code, "password_change")
+    except EmailSendError:
+        return jsonify({"success": False, "message": "Could not send verification email. Please try again."}), 500
     verification_id = create_verification(code, "password_change", expires_at)
-    send_verification_email(customer["email"], code, "password_change")
     session["password_change_verification_id"] = verification_id
 
     return jsonify({"success": True})
@@ -895,8 +898,11 @@ def request_email_change():
 
     expires_at = (now_helsinki() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
     code = generate_verification_code()
+    try:
+        send_verification_email(customer["email"], code, "email_change")
+    except EmailSendError:
+        return jsonify({"success": False, "message": "Could not send verification email. Please try again."}), 500
     verification_id = create_verification(code, "email_change", expires_at)
-    send_verification_email(customer["email"], code, "email_change")
     session["email_change_verification_id"] = verification_id
 
     return jsonify({"success": True})
@@ -1162,17 +1168,21 @@ def create_customer_booking():
         session["booking_id"] = booking_id  # để /success hiển thị chi tiết sau khi trả tiền
         return _redirect_to_stripe(booking_id, service_id, 'main.customer_booking')
 
-    booking_id, verification_id = BookingService.create(
-        customer_id,
-        staff_id,
-        service_id,
-        booking_date,
-        start_time,
-        end_time,
-        note,
-        customer_email,
-        data["payment_method"]
-    )
+    try:
+        booking_id, verification_id = BookingService.create(
+            customer_id,
+            staff_id,
+            service_id,
+            booking_date,
+            start_time,
+            end_time,
+            note,
+            customer_email,
+            data["payment_method"]
+        )
+    except EmailSendError:
+        flash("Could not send verification email. Please try again.", "error")
+        return redirect(url_for('main.customer_booking'))
 
     session["booking_id"] = booking_id
     session["verify_context"] = {
@@ -2005,8 +2015,11 @@ def staff_send_pw_otp():
     current_staff = _get_current_staff()
     expires_at = (now_helsinki() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
     code = generate_verification_code()
+    try:
+        send_verification_email(current_staff["email"], code, "password_change")
+    except EmailSendError:
+        return jsonify({"ok": False, "error": "Could not send verification email. Please try again."}), 500
     verification_id = create_verification(code, "password_change", expires_at)
-    send_verification_email(current_staff["email"], code, "password_change")
     session["staff_pw_verification_id"] = verification_id
     return jsonify({"ok": True})
 
@@ -3877,17 +3890,21 @@ def create_public_booking():
         session["booking_id"] = booking_id  # để /success hiển thị chi tiết sau khi trả tiền
         return _redirect_to_stripe(booking_id, service_id, 'main.public_booking')
 
-    booking_id, verification_id = BookingService.create(
-        customer_id,
-        staff_id,
-        service_id,
-        booking_date,
-        start_time,
-        end_time,
-        note,
-        customer_email,
-        data["payment_method"]
-    )
+    try:
+        booking_id, verification_id = BookingService.create(
+            customer_id,
+            staff_id,
+            service_id,
+            booking_date,
+            start_time,
+            end_time,
+            note,
+            customer_email,
+            data["payment_method"]
+        )
+    except EmailSendError:
+        flash("Could not send verification email. Please try again.", "error")
+        return redirect(url_for('main.public_booking'))
 
     session["booking_id"] = booking_id
     session["verify_context"] = {
@@ -4010,6 +4027,10 @@ def register():
         flash("Please enter required information!", "error")
         return redirect(url_for('main.register'))
 
+    if not is_valid_email(email):
+        flash("Please enter a valid email address.", "error")
+        return redirect(url_for('main.register'))
+
     if len(password) < 8:
         flash("Password must be at least 8 characters.", "error")
         return redirect(url_for('main.register'))
@@ -4028,9 +4049,12 @@ def register():
     expires_at = expires_at_raw.strftime("%Y-%m-%d %H:%M:%S")
 
     verification_code = generate_verification_code()
+    try:
+        send_verification_email(email, verification_code, "register")
+    except EmailSendError:
+        flash("Could not send verification email. Please try again.", "error")
+        return redirect(url_for('main.register'))
     verification_id = create_verification(verification_code, "register", expires_at)
-
-    send_verification_email(email, verification_code, "register")
 
     session["pending_register"] = {
         "email": email,
@@ -4177,8 +4201,12 @@ def forgot_password():
     if user and user["role"] == "customer":
         expires_at = (now_helsinki() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
         code = generate_verification_code()
+        try:
+            send_verification_email(email, code, "forgot_password")
+        except EmailSendError:
+            flash("Could not send verification email. Please try again.", "error")
+            return redirect(url_for("main.forgot_password"))
         verification_id = create_verification(code, "forgot_password", expires_at)
-        send_verification_email(email, code, "forgot_password")
         session["verify_context"] = {
             "type": "forgot_password",
             "email": email,
@@ -4204,8 +4232,12 @@ def staff_forgot_password():
     if user and user["role"] in ("staff", "admin"):
         expires_at = (now_helsinki() + timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
         code = generate_verification_code()
+        try:
+            send_verification_email(email, code, "forgot_password")
+        except EmailSendError:
+            flash("Could not send verification email. Please try again.", "error")
+            return redirect(url_for("main.staff_forgot_password"))
         verification_id = create_verification(code, "forgot_password", expires_at)
-        send_verification_email(email, code, "forgot_password")
         session["verify_context"] = {
             "type": "forgot_password",
             "email": email,
@@ -4309,9 +4341,15 @@ def redo_verification():
     if not verification["is_used"]:
         
         new_code = generate_verification_code()
-        update_new_code(verification_id, new_code, expires_at) 
-        send_verification_email(email, new_code, verify_context.get("type", "booking"))
-        
+        try:
+            send_verification_email(email, new_code, verify_context.get("type", "booking"))
+        except EmailSendError:
+            return jsonify({
+                "success": False,
+                "message": "Could not send verification email. Please try again."
+            }), 500
+        update_new_code(verification_id, new_code, expires_at)
+
         return jsonify({
             "success": True,
             "message": "Resending new code success!"
@@ -4580,7 +4618,10 @@ def verify_email():
                 service = get_service_by_id(booking["service_id"])
                 staff = get_staff_by_id(booking["staff_id"])
                 if service and staff:
-                    send_thank_you_email(customer["email"], customer["full_name"], service["name"], staff["full_name"], booking["booking_date"], booking["start_time"], booking["end_time"])
+                    try:
+                        send_thank_you_email(customer["email"], customer["full_name"], service["name"], staff["full_name"], booking["booking_date"], booking["start_time"], booking["end_time"])
+                    except Exception:
+                        logger.exception("[email] gui thank-you email that bai cho booking %s", booking_id)
 
                 return jsonify({
                     "success": True,

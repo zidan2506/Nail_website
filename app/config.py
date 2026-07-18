@@ -23,6 +23,8 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+    if not MAIL_USERNAME or not MAIL_PASSWORD:
+        raise RuntimeError("MAIL_USERNAME/MAIL_PASSWORD is not set. Add them to your .env file.")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER") or MAIL_USERNAME
 
     # Session security
