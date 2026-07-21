@@ -18,14 +18,14 @@ class Config:
     STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
     STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET")
 
-    MAIL_SERVER = "smtp.gmail.com"
-    MAIL_PORT = 587
-    MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
-    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-    if not MAIL_USERNAME or not MAIL_PASSWORD:
-        raise RuntimeError("MAIL_USERNAME/MAIL_PASSWORD is not set. Add them to your .env file.")
-    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER") or MAIL_USERNAME
+    # Email gửi qua Resend API (HTTPS/443) — host chặn cổng SMTP outbound.
+    RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+    if not RESEND_API_KEY:
+        raise RuntimeError("RESEND_API_KEY is not set. Add it to your .env file.")
+    # 'from': phải thuộc domain đã verify trên Resend, vd "Misa Nails <noreply@dahatrans.com>"
+    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
+    if not MAIL_DEFAULT_SENDER:
+        raise RuntimeError("MAIL_DEFAULT_SENDER is not set (địa chỉ thuộc domain đã verify trên Resend).")
 
     # Session security
     SESSION_COOKIE_HTTPONLY = True

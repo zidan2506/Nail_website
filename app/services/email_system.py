@@ -2,8 +2,7 @@ import html
 import logging
 import re
 import secrets
-import smtplib
-from email.message import EmailMessage
+import requests
 from flask import current_app
 from flask_babel import gettext as _
 from app.utils.helpers import mask_email
@@ -42,30 +41,35 @@ def send_email(subject: str, body: str, to_email: str) -> None:
         logger.warning("[email] dia chi nhan khong hop le: %s", mask_email(to_email))
         raise EmailSendError("Invalid recipient email")
 
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = current_app.config["MAIL_DEFAULT_SENDER"]
-    msg["To"] = to_email
-    msg.set_content(body)
-    msg.add_alternative(_render_html(body), subtype="html")
-
+    # Gui qua Resend API (HTTPS/443) thay vi SMTP — host chan cong SMTP outbound.
     try:
-        with smtplib.SMTP(
-            current_app.config["MAIL_SERVER"],
-            current_app.config["MAIL_PORT"],
+        resp = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {current_app.config['RESEND_API_KEY']}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": current_app.config["MAIL_DEFAULT_SENDER"],
+                "to": [to_email],
+                "subject": subject,
+                "text": body,
+                "html": _render_html(body),
+            },
             timeout=10,
-        ) as server:
-            if current_app.config.get("MAIL_USE_TLS", False):
-                server.starttls()
-            server.login(
-                current_app.config["MAIL_USERNAME"],
-                current_app.config["MAIL_PASSWORD"]
-            )
-            server.send_message(msg)
-        logger.debug("[email] da gui toi %s", mask_email(to_email))
-    except (smtplib.SMTPException, OSError) as e:
+        )
+    except requests.RequestException as e:
         logger.warning("[email] gui that bai toi %s: %s", mask_email(to_email), e)
         raise EmailSendError(str(e)) from e
+
+    if resp.status_code >= 400:
+        logger.warning(
+            "[email] Resend tu choi toi %s: %s %s",
+            mask_email(to_email), resp.status_code, resp.text[:300],
+        )
+        raise EmailSendError(f"Resend {resp.status_code}")
+
+    logger.debug("[email] da gui toi %s", mask_email(to_email))
 
 
 def generate_verification_code() -> str:
