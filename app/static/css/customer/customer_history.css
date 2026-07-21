@@ -645,12 +645,52 @@
         grid-template-columns: 1fr;
     }
 
+    /* Bảng → card xếp dọc: không cuộn ngang, không mất thông tin */
     .history-table-wrapper {
-        overflow-x: auto;
+        overflow-x: visible;
     }
 
-    .history-table {
-        min-width: 720px;
+    .history-table,
+    .history-table tbody,
+    .history-table tr,
+    .history-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .history-table thead {
+        display: none;
+    }
+
+    .history-table tr {
+        background: #ffffff;
+        border: 1px solid #efe6ea;
+        border-radius: 16px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+    }
+
+    .history-table td {
+        padding: 6px 0;
+        border: none;
+    }
+
+    .history-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 3px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #a9979f;
+    }
+
+    .history-table .cell-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-top: 12px;
     }
 
     .history-pagination {

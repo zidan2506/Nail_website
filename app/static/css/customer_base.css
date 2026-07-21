@@ -422,9 +422,15 @@ body {
         width: 100%;
         min-width: unset;
         max-width: unset;
-        font-size: 16px;
-        height: 42px;
-        padding: 0 16px 0 48px;
+        box-sizing: border-box;
+        font-size: 15px;
+        height: auto;
+        min-height: 42px;
+        padding: 11px 16px 11px 48px;
+        white-space: normal;
+        line-height: 1.4;
+        justify-content: flex-start;
+        text-align: left;
     }
 
     .flash-error::before,
@@ -541,4 +547,88 @@ body {
     font-size: inherit;
     width: 100%;
     text-align: left;
+}
+
+
+/* ================================================================
+   PHẦN 3: MOBILE DRAWER — hamburger sidebar (đồng bộ với staff)
+   Chỉ thêm; override hành vi stack cũ ở ≤860px
+================================================================ */
+
+/* Desktop: ẩn topbar + overlay */
+.customer-topbar { display: none; }
+.customer-navbg { display: none; }
+
+@media (max-width: 860px) {
+    body { overflow-x: hidden; }
+
+    /* Bỏ grid, main chiếm full width */
+    .customer-dashboard { display: block; min-height: 0; }
+
+    /* Top bar chứa hamburger */
+    .customer-topbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        height: 56px;
+        padding: 0 14px;
+        background: #ffffff;
+        border-bottom: 1px solid #ece3e7;
+        position: sticky;
+        top: 0;
+        z-index: 120;
+    }
+    .customer-burger {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ece3e7;
+        border-radius: 12px;
+        background: #ffffff;
+        color: #23161c;
+        cursor: pointer;
+        flex-shrink: 0;
+        padding: 0;
+    }
+    .customer-burger:hover { background: #fdebf2; }
+    .customer-topbar__brand { font-size: 1.05rem; font-weight: 800; color: #23161c; }
+
+    /* Sidebar thành ngăn kéo trượt từ trái */
+    .dashboard-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100dvh;
+        width: min(80vw, 290px);
+        transform: translateX(-100%);
+        transition: transform 0.24s ease;
+        z-index: 200;
+        overflow-y: auto;
+        border-right: 1px solid #ece3e7;
+        border-bottom: none;
+        box-shadow: 0 0 40px rgba(35, 22, 28, 0.15);
+    }
+    body.customer-nav-open .dashboard-sidebar { transform: translateX(0); }
+
+    /* Lớp phủ nền */
+    .customer-navbg {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(35, 22, 28, 0.42);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.24s ease, visibility 0.24s ease;
+        z-index: 150;
+    }
+    body.customer-nav-open .customer-navbg { opacity: 1; visibility: visible; }
+
+    /* Main co padding gọn */
+    .dashboard-main { padding: 20px 16px; }
+}
+
+@media (max-width: 860px) and (prefers-reduced-motion: reduce) {
+    .dashboard-sidebar, .customer-navbg { transition: none; }
 }

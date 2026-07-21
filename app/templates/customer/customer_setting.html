@@ -327,6 +327,18 @@
     color: #24161c;
   }
 
+  /* Mobile: nút Change Password không còn tràn khỏi layout */
+  @media (max-width: 600px) {
+    .password-row-container {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+    }
+    .change-password-btn {
+      width: 100%;
+    }
+  }
+
   /* "Change Password" button — filled pink, same style as save-changes-btn */
   .change-password-btn {
     padding: 12px 22px;

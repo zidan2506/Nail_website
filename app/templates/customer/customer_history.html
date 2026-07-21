@@ -180,9 +180,9 @@
                         <div class="cell-title cell-strike">{{ appt.service_name }}</div>
                         <div class="cell-sub">{{ appt.booking_date | format_date}} • {{ appt.start_time | format_time }}</div>
                     </td>
-                    <td class="cell-medium cell-dim">N/A</td>
-                    <td class="cell-bold cell-dim">$0.00</td>
-                    <td><span class="badge badge-cancelled">{{ _('Cancelled') }}</span></td>
+                    <td class="cell-medium cell-dim" data-label="{{ _('Stylist') }}">N/A</td>
+                    <td class="cell-bold cell-dim" data-label="{{ _('Price') }}">$0.00</td>
+                    <td data-label="{{ _('Status') }}"><span class="badge badge-cancelled">{{ _('Cancelled') }}</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
                         <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>
                     </td>
@@ -201,9 +201,9 @@
                         <div class="cell-title">{{ appt.service_name }}</div>
                         <div class="cell-sub">{{ appt.booking_date | format_date }} • {{ appt.start_time | format_time }}</div>
                     </td>
-                    <td class="cell-medium">{{ appt.stylist_name | short_name }}</td>
-                    <td class="cell-bold">{{ appt.service_price | format_currency }}</td>
-                    <td><span class="badge badge-completed">{{ _('Completed') }}</span></td>
+                    <td class="cell-medium" data-label="{{ _('Stylist') }}">{{ appt.stylist_name | short_name }}</td>
+                    <td class="cell-bold" data-label="{{ _('Price') }}">{{ appt.service_price | format_currency }}</td>
+                    <td data-label="{{ _('Status') }}"><span class="badge badge-completed">{{ _('Completed') }}</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
                         <span class="reviewed-tag">✓ {{ _('Reviewed') }}</span>
                         <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>
@@ -223,9 +223,9 @@
                         <div class="cell-title">{{ appt.service_name }}</div>
                         <div class="cell-sub">{{ appt.booking_date | format_date }} • {{ appt.start_time | format_time }}</div>
                     </td>
-                    <td class="cell-medium">{{ appt.stylist_name | short_name }}</td>
-                    <td class="cell-bold">{{ appt.service_price | format_currency }}</td>
-                    <td><span class="badge badge-completed">{{ _('Completed') }}</span></td>
+                    <td class="cell-medium" data-label="{{ _('Stylist') }}">{{ appt.stylist_name | short_name }}</td>
+                    <td class="cell-bold" data-label="{{ _('Price') }}">{{ appt.service_price | format_currency }}</td>
+                    <td data-label="{{ _('Status') }}"><span class="badge badge-completed">{{ _('Completed') }}</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
                         <button class="btn-review">{{ _('Leave Review') }}</button>
                         <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>
@@ -275,14 +275,14 @@
                             </div>
                         </div>
                     </td>
-                    <td>
+                    <td data-label="{{ _('Payment') }}">
                         <div class="payment-cell">
                             <span class="payment-icon">{{ invoice.payment_method | payment_icon}}</span>
                             <span>{{ invoice.payment_method | payment_label }}</span>
                         </div>
                     </td>
-                    <td class="cell-bold">{{ invoice.amount | format_currency }}</td>
-                    <td><span class="badge badge-{{ invoice.invoice_status }}">{{ invoice.invoice_status}}</span></td>
+                    <td class="cell-bold" data-label="{{ _('Amount') }}">{{ invoice.amount | format_currency }}</td>
+                    <td data-label="{{ _('Status') }}"><span class="badge badge-{{ invoice.invoice_status }}">{{ invoice.invoice_status}}</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
                         <a class="btn-download" href="{{ url_for('main.download_invoice', invoice_id=invoice.invoice_id) }}">⤓ {{ _('Download PDF') }}</a>
                         <button class="btn-more">⋮</button>

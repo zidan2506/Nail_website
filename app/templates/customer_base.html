@@ -13,14 +13,27 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+
+    {# Mobile top bar (chỉ hiện < 860px) #}
+    <div class="customer-topbar">
+        <button type="button" class="customer-burger" id="customerBurger"
+                aria-label="{{ _('Open menu') }}" aria-controls="customerSidebar" aria-expanded="false">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+        <span class="customer-topbar__brand">✦ Misa Nails </span>
+    </div>
+
+    {# Lớp phủ nền khi mở drawer #}
+    <div class="customer-navbg" id="customerNavbg"></div>
+
     <div class="customer-dashboard">
 
 
-        <aside class="dashboard-sidebar">
+        <aside class="dashboard-sidebar" id="customerSidebar">
 
             <div class="sidebar_brand">
                 <a href="{{ url_for('main.home') }}" class="brand-link">
-                    <h2>✦ Daha Care </h2>
+                    <h2>✦ Misa Nails </h2>
                     <p>Vietnamese shop</p>
                 </a>
             </div>
@@ -119,6 +132,26 @@
         });
         </script>
     </div>
+
+    {# Off-canvas sidebar (mobile) #}
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var burger = document.getElementById("customerBurger");
+        var overlay = document.getElementById("customerNavbg");
+        if (!burger) return;
+
+        function setOpen(open) {
+            document.body.classList.toggle("customer-nav-open", open);
+            burger.setAttribute("aria-expanded", open ? "true" : "false");
+        }
+
+        burger.addEventListener("click", function () {
+            setOpen(!document.body.classList.contains("customer-nav-open"));
+        });
+        if (overlay) overlay.addEventListener("click", function () { setOpen(false); });
+        document.addEventListener("keydown", function (e) { if (e.key === "Escape") setOpen(false); });
+    });
+    </script>
 
     {% block script %}{% endblock%}
 </body>

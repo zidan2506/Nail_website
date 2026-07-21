@@ -293,6 +293,7 @@ def customer_dashboard():
                 "time":         format_booking_time(b["start_time"]),
                 "staff_name":   b["staff_name"],
                 "status":       b["status"],
+                "price":        b["service_price"],
                 "calendar_url": _cal["url"],
                 "url_target":   _cal["url_target"],
                 "service_img":  url_for("static", filename=f"uploads/services/{_img}") if _img else None,
@@ -309,6 +310,7 @@ def customer_dashboard():
             "image":     _resolve_upload(s["image"], "carousels"),
             "cta_label": tr(s, "cta_label"),
             "cta_url":   s["cta_url"],
+            "cta_style": s["cta_style"] or "primary",
         })
 
     loyalty_points = get_loyalty_balance(customer_id)
@@ -414,7 +416,7 @@ def my_bookings():
     # Next-visit card's data
     next_visit = booking_groups["next_visit"]
 
-    nevi_status = nevi_service = nevi_staff = nevi_date = nevi_start = None
+    nevi_status = nevi_service = nevi_staff = nevi_date = nevi_start = nevi_service_image = nevi_price = None
     calendar_url = url_target = None
 
     if next_visit:
@@ -427,6 +429,8 @@ def my_bookings():
             nevi_staff = next_visit_staff["full_name"]
             nevi_date = format_booking_date(next_visit["booking_date"])
             nevi_start = format_booking_time(next_visit["start_time"])
+            nevi_service_image = next_visit_service["image"]
+            nevi_price = next_visit_service["price"]
 
             _cal = build_calendar_url(
                 nevi_service, nevi_staff,
@@ -472,6 +476,8 @@ def my_bookings():
         nevi_staff=nevi_staff,
         nevi_date=nevi_date,
         nevi_start=nevi_start,
+        nevi_service_image=nevi_service_image,
+        nevi_price=nevi_price,
         next_visit=next_visit,
         calendar_url=calendar_url,
         url_target=url_target,

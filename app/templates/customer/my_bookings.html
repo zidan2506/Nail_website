@@ -22,27 +22,43 @@
   <section class="appointments-overview">
 <div class="next-visit-card">
   {% if next_visit %}
-    <div class="next-visit-card__content">
-      <p class="section-label">{{ _('Next Visit') }}</p>
+    <div class="appointment-card__image">
+      {% if nevi_service_image %}
+      <img src="{{ nevi_service_image | img_src('services') }}" alt="{{ nevi_service }}" />
+      {% else %}
+      <div class="appointment-card__image-fallback">
+        <span class="material-symbols-outlined">spa</span>
+      </div>
+      {% endif %}
+    </div>
 
-      <div class="appointment-status-badge appointment-status-badge--{{ nevi_status }}">
-        {{ nevi_status }}
+    <div class="next-visit-card__content">
+      <div class="next-visit-card__top">
+        <p class="section-label">{{ _('Next Visit') }}</p>
+        <span class="appointment-status-badge appointment-status-badge--{{ nevi_status }}">{{ nevi_status }}</span>
       </div>
 
       <h2 class="next-visit-card__title">{{ nevi_service }}</h2>
 
-      <p class="next-visit-card__meta">
-        {{ _('%(date)s • %(start)s with %(staff)s.', date=nevi_date, start=nevi_start, staff=nevi_staff) }}
-      </p>
+      <div class="appointment-card__details">
+        <p class="appointment-card__detail">
+          <span class="material-symbols-outlined detail-icon">calendar_today</span>
+          <span class="detail-value">{{ nevi_date }} • {{ nevi_start }}</span>
+        </p>
+        <p class="appointment-card__detail">
+          <span class="material-symbols-outlined detail-icon">person</span>
+          <span class="detail-value">{{ nevi_staff }}</span>
+        </p>
+        <p class="appointment-card__detail">
+          <span class="material-symbols-outlined detail-icon">sell</span>
+          <span class="detail-value">{{ nevi_price | format_currency }}</span>
+        </p>
+      </div>
 
       <div class="next-visit-card__actions">
         <a href="{{ calendar_url }}" class="btn btn-primary" target="{{ url_target }}">{{ _('Add to Calendar') }}</a>
         <a href="{{ url_for('main.view_booking_details', booking_id=next_visit['id']) }}" class="btn btn-secondary">{{ _('View Details') }}</a>
       </div>
-    </div>
-
-    <div class="next-visit-card__icon">
-      <span>📅</span>
     </div>
 
   {% else %}
@@ -58,10 +74,6 @@
       <div class="next-visit-card__actions">
         <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">{{ _('Book new appointment') }}</a>
       </div>
-    </div>
-
-    <div class="next-visit-card__icon">
-      <span>📅</span>
     </div>
   {% endif %}
 </div>
@@ -170,8 +182,8 @@
                 </p>
 
                 <p class="appointment-card__detail">
-                  <span class="material-symbols-outlined detail-icon">schedule</span>
-                  <span class="detail-value">{{ booking['booking']['service_duration'] }}</span>
+                  <span class="material-symbols-outlined detail-icon">sell</span>
+                  <span class="detail-value">{{ booking['booking']['service_price'] | format_currency }}</span>
                 </p>
               </div>
 
@@ -229,8 +241,8 @@
                 </p>
 
                 <p class="appointment-card__detail">
-                  <span class="material-symbols-outlined detail-icon">hourglass_empty</span>
-                  <span class="detail-value">{{ _('Awaiting confirmation') }}</span>
+                  <span class="material-symbols-outlined detail-icon">sell</span>
+                  <span class="detail-value">{{ booking['booking']['service_price'] | format_currency }}</span>
                 </p>
               </div>
 

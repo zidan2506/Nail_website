@@ -204,8 +204,8 @@
 
 .date-tile {
   width: 200px;
-  min-height: 140px;
-  padding: 26px 25px;
+  min-height: 0;
+  padding: 20px 22px;
   border-radius: 24px;
   background: #fdf0f5;
   display: flex;
@@ -215,46 +215,45 @@
 }
 
 .date-tile__monthday {
-  margin-bottom: 10px;
-  font-size: 2.1rem;
+  margin-bottom: 8px;
+  font-size: 1.9rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: #ef3d82;
 }
 
 .date-tile__time {
-  font-size: 1.08rem;
+  font-size: 1.02rem;
   font-weight: 700;
   color: #47373d;
 }
 
 .service-description-box {
-  min-height: 140px;
-  padding: 26px 25px;
+  min-height: 0;
+  padding: 20px 22px;
   border-radius: 24px;
   background: #fdf0f5;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  
+  align-items: flex-start;
 }
 
 .service-description-box__label {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-size: 2.1rem;
+  margin: 0 0 8px;
+  font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
   color: #ef3d82;
 }
 
 .service-description-box__text {
-  font-size: 1.08rem;
-  font-weight: 700;
+  font-size: 0.98rem;
+  font-weight: 500;
   color: #47373d;
-  line-height: 0;
+  line-height: 1.5;
 }
 
 .booking-summary-card__bottom {
@@ -657,9 +656,15 @@
     width: 100%;
   }
 
-  .date-tile {
+  /* middle: date-tile + service box xếp dọc, full-width, không còn vỡ */
+  .booking-summary-card__middle {
+    flex-direction: column;
+  }
+
+  .date-tile,
+  .service-description-box {
     width: 100%;
-    max-width: 180px;
+    max-width: none;
   }
 }
 

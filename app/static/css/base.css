@@ -846,9 +846,15 @@ header.nav-open .nav-mobile-menu {
         width: 100%;
         min-width: unset;
         max-width: unset;
-        font-size: 16px;
-        height: 42px;
-        padding: 0 16px 0 48px;
+        box-sizing: border-box;
+        font-size: 15px;
+        height: auto;
+        min-height: 42px;
+        padding: 11px 16px 11px 48px;
+        white-space: normal;
+        line-height: 1.4;
+        justify-content: flex-start;
+        text-align: left;
     }
 
     .flash-error::before,

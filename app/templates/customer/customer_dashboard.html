@@ -36,146 +36,208 @@
 }
 
 
-/* ── CAROUSEL ───────────────────────────────────────── */
-.carousel-section {
+/* ── HERO CAROUSEL (áp style từ trang Public — BEM hero__) ─────
+   Token của base.css được thay bằng giá trị cụ thể theme customer.
+   Giữ bo góc 26px + cao 420px cho hợp layout dashboard. */
+.hero {
     position: relative;
-    border-radius: 26px;
+    width: 100%;
+    height: 420px;
     overflow: hidden;
-    height: 320px;
-    margin-bottom: 28px;
-    background: #2b0f1c;
-    box-shadow: 0 16px 40px rgba(35,22,28,0.18);
-}
-
-.carousel-track {
-    display: flex;
-    height: 100%;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.carousel-slide {
-    flex: 0 0 100%;
-    height: 100%;
-    position: relative;
     display: flex;
     align-items: center;
-    padding: 0 52px;
+    justify-content: center;
+    background: #3E1F47;
+    border-radius: 26px;
+    margin-bottom: 28px;
 }
 
-.slide-bg {
+.hero__slides { position: absolute; inset: 0; }
+
+.hero__slide {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
-    opacity: 0.35;
-    transition: transform 0.8s ease;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 0;
 }
-.carousel-section:hover .slide-bg { transform: scale(1.04); }
+.hero__slide--active { opacity: 1; pointer-events: auto; z-index: 1; }
 
-.slide-1-bg { background: linear-gradient(135deg, #3d0f22 0%, #7a1a3e 50%, #d64682 100%); }
-.slide-2-bg { background: linear-gradient(135deg, #1a2a3d 0%, #1a4a6e 50%, #2d7abd 100%); }
-.slide-3-bg { background: linear-gradient(135deg, #1a3d2a 0%, #1e6e40 50%, #2dbd72 100%); }
+/* Ken Burns — chỉ chạy khi slide active */
+.hero__slide--active .hero__bg-img { animation: kenburns 8s ease-out forwards; }
+@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.06); } }
 
-.slide-content {
+/* Content stagger — fade-up khi slide active */
+.hero__slide--active .hero__badge,
+.hero__slide--active .hero__title,
+.hero__slide--active .hero__subtitle,
+.hero__slide--active .hero__cta-group { animation: fadeUp 0.6s ease both; }
+.hero__slide--active .hero__badge     { animation-delay: 0.1s; }
+.hero__slide--active .hero__title     { animation-delay: 0.2s; }
+.hero__slide--active .hero__subtitle  { animation-delay: 0.35s; }
+.hero__slide--active .hero__cta-group { animation-delay: 0.5s; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Tôn trọng người dùng tắt hiệu ứng chuyển động */
+@media (prefers-reduced-motion: reduce) {
+    .hero__slide { transition: none; }
+    .hero__slide--active .hero__bg-img,
+    .hero__slide--active .hero__badge,
+    .hero__slide--active .hero__title,
+    .hero__slide--active .hero__subtitle,
+    .hero__slide--active .hero__cta-group { animation: none; }
+}
+
+.hero__bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+    mix-blend-mode: overlay;
+}
+
+.hero__overlay {
+    position: absolute;
+    inset: 0;
+    /* Vignette đối xứng: tối đều 2 bên → nội dung căn giữa hiện đúng ở giữa */
+    background: radial-gradient(ellipse at center, rgba(43,15,28,0.32) 0%, rgba(43,15,28,0.72) 100%);
+}
+
+.hero__content {
     position: relative;
-    z-index: 2;
-    max-width: 580px;
+    z-index: 10;
+    text-align: center;
+    padding: 0 24px;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.slide-badge {
+.hero__badge {
     display: inline-block;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: rgba(214,70,130,0.25);
-    border: 1px solid rgba(214,70,130,0.4);
-    color: #f4a8c8;
-    font-size: 0.72rem;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
+    color: #ffd9e2;
+    background: rgba(171, 34, 97, 0.2);
+    border: 1px solid rgba(255, 217, 226, 0.3);
+    padding: 4px 16px;
+    border-radius: 999px;
     margin-bottom: 16px;
+    backdrop-filter: blur(4px);
 }
 
-.slide-title {
-    margin: 0 0 12px;
-    font-size: 2.4rem;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.15;
+.hero__title {
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: #F8F9FA;
+    margin: 0 0 16px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
 
-.slide-desc {
-    margin: 0 0 22px;
-    color: rgba(255,255,255,0.72);
-    font-size: 0.95rem;
+.hero__subtitle {
+    font-size: 18px;
     line-height: 1.6;
+    color: rgba(248,249,250,0.9);
+    margin: 0 0 32px;
+    max-width: 480px;
 }
 
-.slide-cta {
-    display: inline-block;
-    padding: 12px 26px;
-    border-radius: 12px;
-    background: #fff;
-    color: #23161c;
-    font-weight: 800;
-    font-size: 0.8rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: background 0.18s, color 0.18s;
+.hero__cta-group {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.hero__btn-primary {
+    padding: 14px 32px;
+    border-radius: 14px;
+    background: #ef3976;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     border: none;
     cursor: pointer;
+    min-width: 200px;
+    transition: background 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    box-sizing: border-box;
 }
-.slide-cta:hover { background: #d64682; color: #fff; }
+.hero__btn-primary:hover { background: #e63176; }
 
-/* arrow buttons */
-.carousel-arrow {
+.hero__btn-outline {
+    padding: 14px 32px;
+    border-radius: 14px;
+    background: transparent;
+    color: #F8F9FA;
+    font-weight: 600;
+    font-size: 16px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    border: 1.5px solid #F8F9FA;
+    cursor: pointer;
+    min-width: 200px;
+    transition: background 0.2s ease;
+    backdrop-filter: blur(4px);
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+.hero__btn-outline:hover { background: rgba(248,249,250,0.1); }
+
+.hero__arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 10;
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.12);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
-    font-size: 1.3rem;
+    background: rgba(248,249,250,0.1);
+    border: 1px solid rgba(248,249,250,0.2);
+    color: #F8F9FA;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.18s, opacity 0.2s;
-    opacity: 0;
+    transition: background 0.2s ease;
+    z-index: 10;
 }
-.carousel-section:hover .carousel-arrow { opacity: 1; }
-.carousel-arrow:hover { background: rgba(255,255,255,0.25); }
-.carousel-arrow.prev { left: 16px; }
-.carousel-arrow.next { right: 16px; }
+.hero__arrow:hover { background: rgba(248,249,250,0.2); }
+.hero__arrow--left  { left: 16px; }
+.hero__arrow--right { right: 16px; }
 
-/* dots */
-.carousel-dots {
+.hero__dots {
     position: absolute;
-    bottom: 18px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     gap: 8px;
     z-index: 10;
 }
-.dot {
-    width: 8px;
+.hero__dot {
     height: 8px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.35);
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
+    width: 8px;
+    border-radius: 999px;
+    background: rgba(248,249,250,0.5);
 }
-.dot.active {
-    background: #fff;
-    transform: scale(1.25);
-}
+.hero__dot--active { width: 32px; background: #ef3976; }
 
 /* ── ROW 2 GRID ─────────────────────────────────────── */
 .dashboard-grid {
@@ -186,29 +248,58 @@
 }
 
 /* ── UPCOMING CARD ──────────────────────────────────── */
+/* upcoming-card: layout giống appointment-card, giữ nền hồng nhạt */
 .upcoming-card {
     position: relative;
     display: flex;
-    align-items: stretch;
-    justify-content: space-between;
-    gap: 24px;
-    min-height: 280px;
-    padding: 34px 36px;
+    gap: 22px;
+    min-height: 232px;
+    padding: 22px;
+    border: 1px solid rgba(239, 230, 234, 0.9);
     border-radius: 26px;
     overflow: hidden;
     background: linear-gradient(180deg, #fff3f7 0%, #fdeef4 100%);
-    box-shadow: 0 10px 30px rgba(34,21,27,0.06);
+    box-shadow: 0 8px 24px rgba(34,21,27,0.03);
 }
 
+/* Ảnh service bên trái */
+.upcoming-card__image {
+    flex: 0 0 132px;
+    width: 132px;
+    height: 168px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #f2e8ec;
+}
+.upcoming-card__image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.upcoming-card__image-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ab2261;
+    opacity: 0.4;
+}
+.upcoming-card__image-fallback .material-symbols-outlined { font-size: 52px; }
+
 .upcoming-card__content {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    max-width: 560px;
+}
+
+/* Top row: nhãn + badge trạng thái cùng hàng, sát lề trái */
+.upcoming-card__top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
 }
 
 .upcoming-section-label {
-    margin: 0 0 18px;
+    margin: 0;
     font-size: 0.78rem;
     font-weight: 800;
     text-transform: uppercase;
@@ -217,62 +308,43 @@
 }
 
 .upcoming-card__title {
-    margin: 0 0 12px;
-    font-size: clamp(2rem, 4vw, 3.2rem);
-    line-height: 1.05;
+    margin: 0 0 16px;
+    font-size: 1.4rem;
+    line-height: 1.2;
     font-weight: 800;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.025em;
     color: #23141a;
 }
 
+/* 3 details (date, stylist, status) giống appointment-card */
+.upcoming-card__details { display: grid; gap: 12px; }
+.upcoming-card__detail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.4;
+    color: #5f4e55;
+}
+.upcoming-card__detail-icon { flex-shrink: 0; font-size: 18px; color: #f43f84; opacity: 0.85; }
+.upcoming-card__detail-value { color: #5f4e55; font-weight: 500; }
+
+/* meta: chỉ dùng cho trạng thái rỗng */
 .upcoming-card__meta {
     margin: 0;
-    font-size: 1.18rem;
-    line-height: 1.5;
+    font-size: 0.98rem;
+    line-height: 1.4;
     color: #5f4e55;
 }
 
 .upcoming-card__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 26px;
-}
-
-.upcoming-card__icon {
-    display: flex;
     align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    align-self: center;
-}
-
-.upcoming-card__img {
-    width: 240px;
-    height: 240px;
-    border-radius: 20px;
-    object-fit: cover;
-    box-shadow: 0 8px 24px rgba(35,22,28,0.12);
-    transition: transform 0.4s ease;
-}
-.upcoming-card:hover .upcoming-card__img { transform: rotate(2deg) scale(1.03); }
-
-.upcoming-card__img-placeholder .material-symbols-outlined {
-    font-size: 5rem;
-    color: #ab2261;
-    opacity: 0.5;
-}
-
-.upcoming-card__img-placeholder {
-    width: 240px;
-    height: 240px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #fdebf2 0%, #f4c2d8 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3.5rem;
-    box-shadow: 0 8px 24px rgba(214,70,130,0.10);
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 22px;
 }
 
 /* Button system */
@@ -464,9 +536,33 @@
 }
 
 @media (max-width: 860px) {
-    .carousel-section { height: 260px; }
-    .slide-title { font-size: 1.8rem; }
+    .hero { height: 360px; }
+    .hero__title { font-size: 36px; }
     .db-header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+}
+
+@media (max-width: 640px) {
+    /* Hero carousel: thu gọn cho điện thoại */
+    .hero { height: 300px; }
+    .hero__title { font-size: 26px; }
+    .hero__subtitle { font-size: 15px; margin-bottom: 22px; }
+    .hero__cta-group { flex-direction: column; align-items: center; width: 100%; }
+    .hero__btn-primary,
+    .hero__btn-outline { min-width: 0; width: 100%; max-width: 300px; }
+
+    /* Upcoming card: flex ngang → xếp dọc, ảnh full-width */
+    .upcoming-card {
+        flex-direction: column;
+        min-height: 0;
+        padding: 20px;
+        gap: 18px;
+    }
+    .upcoming-card__meta { font-size: 1rem; }
+    .upcoming-card__image {
+        flex: 0 0 auto;
+        width: 100%;
+        height: 200px;
+    }
 }
 
 .db-wrapper {
@@ -501,61 +597,85 @@
     <a href="{{ url_for('main.customer_booking') }}" class="book-btn">{{ _('Book Appointment') }}</a>
 </div>
 
-<section class="carousel-section">
-    <div class="carousel-track" id="carouselTrack">
+{% if carousel_rewards %}
+<section class="hero">
 
+    <div class="hero__slides">
         {% for slide in carousel_rewards %}
-        <div class="carousel-slide">
-            <div class="slide-bg{% if not slide.image %} slide-{{ (loop.index0 % 3) + 1 }}-bg{% endif %}"
-                 {% if slide.image %}
-                 style="background-image: url('{{ slide.image }}'); background-size: cover; background-position: center;"
-                 {% endif %}
-            ></div>
-            <div class="slide-content">
-                <div class="slide-badge">{{ slide.badge or _('✦ Loyalty Reward') }}</div>
-                <h2 class="slide-title">{{ slide.title }}</h2>
-                <p class="slide-desc">{{ slide.subtitle }}</p>
-                <a href="{{ slide.cta_url }}" class="slide-cta">{{ slide.cta_label }}</a>
+        <div class="hero__slide{% if loop.first %} hero__slide--active{% endif %}">
+            {% if slide.image %}
+            <img class="hero__bg-img" src="{{ slide.image }}" alt="{{ slide.title }}">
+            {% endif %}
+            <div class="hero__overlay"></div>
+            <div class="hero__content">
+                {% if slide.badge %}<span class="hero__badge">{{ slide.badge }}</span>{% endif %}
+                <h2 class="hero__title">{{ slide.title }}</h2>
+                {% if slide.subtitle %}<p class="hero__subtitle">{{ slide.subtitle }}</p>{% endif %}
+                {% if slide.cta_label %}
+                <div class="hero__cta-group">
+                    <a href="{{ slide.cta_url }}" class="hero__btn-{{ slide.cta_style or 'primary' }}">{{ slide.cta_label }}</a>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
-
     </div>
 
-    <button class="carousel-arrow prev" id="prevBtn">&#8592;</button>
-    <button class="carousel-arrow next" id="nextBtn">&#8594;</button>
+    <button class="hero__arrow hero__arrow--left" aria-label="{{ _('Previous slide') }}">
+        <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+    <button class="hero__arrow hero__arrow--right" aria-label="{{ _('Next slide') }}">
+        <span class="material-symbols-outlined">chevron_right</span>
+    </button>
 
-    <div class="carousel-dots" id="carouselDots">
-        {% for reward in carousel_rewards %}
-        <div class="dot{% if loop.first %} active{% endif %}" data-index="{{ loop.index0 }}"></div>
+    <div class="hero__dots">
+        {% for slide in carousel_rewards %}
+        <div class="hero__dot{% if loop.first %} hero__dot--active{% endif %}"></div>
         {% endfor %}
     </div>
+
 </section>
+{% endif %}
 
 <div class="dashboard-grid">
 
     <div class="upcoming-card">
         {% if upcoming_booking %}
+            <div class="upcoming-card__image">
+                {% if upcoming_booking.service_img %}
+                <img src="{{ upcoming_booking.service_img }}" alt="{{ upcoming_booking.service_name }}">
+                {% else %}
+                <div class="upcoming-card__image-fallback"><span class="material-symbols-outlined">spa</span></div>
+                {% endif %}
+            </div>
+
             <div class="upcoming-card__content">
-                <p class="upcoming-section-label">{{ _('Upcoming Appointment') }}</p>
-                <div class="appointment-status-badge appointment-status-badge--{{ upcoming_booking.status }}">
-                    {{ upcoming_booking.status }}
+                <div class="upcoming-card__top">
+                    <p class="upcoming-section-label">{{ _('Upcoming Appointment') }}</p>
+                    <span class="appointment-status-badge appointment-status-badge--{{ upcoming_booking.status }}">{{ upcoming_booking.status }}</span>
                 </div>
+
                 <h2 class="upcoming-card__title">{{ upcoming_booking.service_name }}</h2>
-                <p class="upcoming-card__meta">
-                    {{ _('%(date)s • %(time)s with %(staff)s.', date=upcoming_booking.date, time=upcoming_booking.time, staff=upcoming_booking.staff_name) }}
-                </p>
+
+                <div class="upcoming-card__details">
+                    <p class="upcoming-card__detail">
+                        <span class="material-symbols-outlined upcoming-card__detail-icon">calendar_today</span>
+                        <span class="upcoming-card__detail-value">{{ upcoming_booking.date }} • {{ upcoming_booking.time }}</span>
+                    </p>
+                    <p class="upcoming-card__detail">
+                        <span class="material-symbols-outlined upcoming-card__detail-icon">person</span>
+                        <span class="upcoming-card__detail-value">{{ upcoming_booking.staff_name }}</span>
+                    </p>
+                    <p class="upcoming-card__detail">
+                        <span class="material-symbols-outlined upcoming-card__detail-icon">sell</span>
+                        <span class="upcoming-card__detail-value">{{ upcoming_booking.price | format_currency }}</span>
+                    </p>
+                </div>
+
                 <div class="upcoming-card__actions">
                     <a href="{{ upcoming_booking.calendar_url }}" class="btn btn-primary" target="{{ upcoming_booking.url_target }}">{{ _('Add to Calendar') }}</a>
                     <a href="{{ url_for('main.view_booking_details', booking_id=upcoming_booking.id) }}" class="btn btn-secondary">{{ _('View Details') }}</a>
                 </div>
-            </div>
-            <div class="upcoming-card__icon">
-                {% if upcoming_booking.service_img %}
-                <img class="upcoming-card__img" src="{{ upcoming_booking.service_img }}" alt="{{ upcoming_booking.service_name }}">
-                {% else %}
-                <div class="upcoming-card__img-placeholder"><span class="material-symbols-outlined">spa</span></div>
-                {% endif %}
             </div>
         {% else %}
             <div class="upcoming-card__content">
@@ -565,9 +685,6 @@
                 <div class="upcoming-card__actions">
                     <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">{{ _('Book new appointment') }}</a>
                 </div>
-            </div>
-            <div class="upcoming-card__icon">
-                <div class="upcoming-card__img-placeholder">📅</div>
             </div>
         {% endif %}
     </div>
@@ -608,40 +725,45 @@
 {% block script %}
 <script>
 (function () {
-    const track = document.getElementById('carouselTrack');
-    const dots = document.querySelectorAll('.dot');
-    const totalSlides = dots.length;
+    const slides = document.querySelectorAll('.hero__slide');
+    const dots   = document.querySelectorAll('.hero__dot');
+    if (!slides.length) return;
     let current = 0;
-    let autoTimer;
+    let timer;
 
     function goTo(index) {
-        current = (index + totalSlides) % totalSlides;
-        track.style.transform = `translateX(-${current * 100}%)`;
-        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        slides[current].classList.remove('hero__slide--active');
+        if (dots[current]) dots[current].classList.remove('hero__dot--active');
+        current = (index + slides.length) % slides.length;
+        slides[current].classList.add('hero__slide--active');
+        if (dots[current]) dots[current].classList.add('hero__dot--active');
     }
 
-    function startAuto() {
-        autoTimer = setInterval(() => goTo(current + 1), 4500);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function resetTimer() {
+        clearInterval(timer);
+        if (slides.length > 1 && !reduceMotion) timer = setInterval(function () { goTo(current + 1); }, 5000);
     }
 
-    function resetAuto() {
-        clearInterval(autoTimer);
-        startAuto();
-    }
-
-    document.getElementById('nextBtn').addEventListener('click', () => { goTo(current + 1); resetAuto(); });
-    document.getElementById('prevBtn').addEventListener('click', () => { goTo(current - 1); resetAuto(); });
-    dots.forEach(d => d.addEventListener('click', () => { goTo(+d.dataset.index); resetAuto(); }));
+    const nextBtn = document.querySelector('.hero__arrow--right');
+    const prevBtn = document.querySelector('.hero__arrow--left');
+    if (nextBtn) nextBtn.addEventListener('click', function () { goTo(current + 1); resetTimer(); });
+    if (prevBtn) prevBtn.addEventListener('click', function () { goTo(current - 1); resetTimer(); });
+    dots.forEach(function (dot, i) { dot.addEventListener('click', function () { goTo(i); resetTimer(); }); });
 
     // swipe support
+    const hero = document.querySelector('.hero');
     let startX = 0;
-    track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
-    track.addEventListener('touchend', e => {
-        const diff = startX - e.changedTouches[0].clientX;
-        if (Math.abs(diff) > 40) { goTo(diff > 0 ? current + 1 : current - 1); resetAuto(); }
-    });
+    if (hero) {
+        hero.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
+        hero.addEventListener('touchend', function (e) {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 40) { goTo(diff > 0 ? current + 1 : current - 1); resetTimer(); }
+        });
+    }
 
-    startAuto();
+    resetTimer();
 })();
 </script>
 {% endblock %}
