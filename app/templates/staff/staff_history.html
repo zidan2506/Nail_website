@@ -189,6 +189,33 @@
 .sf-income-total-row { display: flex; justify-content: space-between; }
 .sf-income-total-k { font-size: 15px; font-weight: 500; color: #1C1917; }
 .sf-income-total-v { font-size: 16px; font-weight: 500; color: #C084A0; }
+
+/* ═══════ Mobile (< 768px) ═══════ */
+@media (max-width: 768px) {
+  /* Trang cuộn tự nhiên */
+  .sf-page { height: auto; overflow: visible; }
+  .sf-list { overflow-y: visible; padding: 16px 14px; }
+
+  /* Header + filter co gọn */
+  .sf-hdr { padding: 18px 16px 14px; }
+  .sf-hdr-top { flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 14px; }
+  .sf-title { font-size: 21px; }
+  .sf-frow { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  /* Thanh stats: 4 ô → lưới 2×2 (đồng bộ với Dashboard) */
+  .sf-stats { display: grid; grid-template-columns: 1fr 1fr; }
+  .sf-sc { padding: 14px 18px; border-right: 1px solid #E8D5CE; }
+  .sf-sc:nth-child(2n) { border-right: none; }
+  .sf-sc:nth-child(-n+2) { border-bottom: 1px solid #E8D5CE; }
+  .sf-sn { font-size: 28px; }
+
+  /* Card lịch sử: xếp dọc, nhãn trạng thái xuống dưới */
+  .sf-card { flex-direction: column; gap: 12px; }
+  .sf-hist-label { align-self: flex-start; }
+
+  /* Modal canh giữa viewport */
+  .sf-overlay { position: fixed; }
+}
 </style>
 {% endblock %}
 

@@ -169,6 +169,27 @@
 .sf-lang-name { flex:1; font-size:14px; font-weight:600; }
 .sf-lang-check { color: var(--sf-accent); font-size:18px; }
 .sf-lang-option .lang-flag { width:26px; height:18px; border-radius:3px; box-shadow:0 0 0 1px rgba(0,0,0,0.08); flex-shrink:0; display:block; }
+
+/* ═══════ Mobile (< 768px) ═══════ */
+@media (max-width: 768px) {
+  /* Trang cuộn tự nhiên */
+  .sf-page { height: auto; overflow: visible; }
+  .sf-body { overflow-y: visible; min-height: 0; padding: 16px 14px; }
+
+  /* Header co gọn, xếp dọc */
+  .sf-hdr {
+    flex-direction: column; align-items: flex-start; gap: 4px;
+    padding: 18px 16px 14px;
+  }
+
+  /* Hero + info rows: giảm padding, key/value xếp dọc */
+  .sf-hero { padding: 18px; gap: 16px; }
+  .sf-info-row { flex-direction: column; align-items: flex-start; gap: 4px; padding: 12px 16px; }
+  .sf-info-k { min-width: 0; }
+
+  /* Modal canh giữa viewport */
+  .sf-overlay { position: fixed; }
+}
 </style>
 {% endblock %}
 

@@ -1908,7 +1908,7 @@ def staff_dashboard():
         "/staff/staff_bookings.html",
         current_staff=current_staff,
         staff_name=current_staff["name"],
-        now_display=f"{_dow_vi(today_str)}, {today.strftime('%d/%m/%Y')}",
+        now_display=today.strftime('%d/%m/%Y'),
         stats=stats,
         active_preset=preset,
         active_status=active_status,
