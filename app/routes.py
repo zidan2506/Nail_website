@@ -23,6 +23,7 @@ from app.services.loyalty import get_active_multiplier, get_config_value, alread
 from app.services.payment_service import create_booking_checkout_session, construct_event, handle_event, fulfill_from_session, create_subscription_checkout_session, cancel_subscription, create_billing_portal_session
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
+from PIL import Image, ImageOps
 from functools import wraps
 from app.utils.helpers import split_customer_bookings, format_booking_date, format_booking_time, build_calendar_url, build_gg_map_url, build_services_by_category, mask_email, now_helsinki, today_helsinki
 from collections import Counter
@@ -56,15 +57,23 @@ _AVATAR_PALETTE = [
 
 # ── Cơ chế upload ảnh dùng chung (chuẩn hoá cho mọi loại) ──────────────
 # Mỗi loại chỉ khai báo 1 config; save/resolve/delete dùng chung.
+# "max"  = trần dung lượng FILE GỬI LÊN. Rộng tay được vì _save_upload luôn
+#          encode lại — cái quyết định dung lượng cuối là "size", không phải "max".
+# "size" = trần (rộng, cao) sau khi thu nhỏ, lấy từ docs/IMAGE_AUDIT.md §17.
+#          Dùng thumbnail() nên giữ tỉ lệ gốc, không crop.
 _UPLOAD_ROOT = os.path.join(os.path.dirname(__file__), "static", "uploads")
 _UPLOAD_CONFIG = {
-    "services":  {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 2 * 1024 * 1024},
-    "gallery":   {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 2 * 1024 * 1024},
-    "rewards":   {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 2 * 1024 * 1024},
-    "carousels": {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 2 * 1024 * 1024},
-    "staff":     {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 2 * 1024 * 1024},
-    "avatars":   {"exts": {"jpg", "jpeg", "png", "gif"},  "max": 800 * 1024},
+    "services":  {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 10 * 1024 * 1024, "size": (800, 800)},
+    "gallery":   {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 10 * 1024 * 1024, "size": (1600, 1600)},
+    "rewards":   {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 10 * 1024 * 1024, "size": (800, 800)},
+    "carousels": {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 10 * 1024 * 1024, "size": (1920, 1080)},
+    "staff":     {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 10 * 1024 * 1024, "size": (288, 288)},
+    "avatars":   {"exts": {"jpg", "jpeg", "png", "webp"}, "max": 10 * 1024 * 1024, "size": (360, 360)},
 }
+_WEBP_QUALITY = 82
+# Chặn decompression bomb: Pillow báo lỗi ngay ở Image.open() khi ảnh vượt 2x
+# ngưỡng này, dựa trên header nên chưa tốn RAM giải nén.
+Image.MAX_IMAGE_PIXELS = 40_000_000
 
 
 def _size_label(n):
@@ -72,8 +81,10 @@ def _size_label(n):
 
 
 def _save_upload(file, subdir):
-    """Lưu ảnh upload thành {uuid}.{ext} dưới uploads/<subdir>/. Trả tên file,
-    hoặc None nếu không có file. Raise ValueError nếu sai định dạng / quá lớn."""
+    """Lưu ảnh upload thành {uuid}.webp dưới uploads/<subdir>/. Ảnh được giải mã,
+    xoay đúng chiều theo EXIF, thu nhỏ về trần kích thước của subdir rồi encode
+    lại WebP. Trả tên file, hoặc None nếu không có file. Raise ValueError nếu sai
+    định dạng / quá lớn / không đọc được."""
     if not file or not file.filename:
         return None
     cfg = _UPLOAD_CONFIG[subdir]
@@ -86,10 +97,20 @@ def _save_upload(file, subdir):
     file.seek(0)
     if size > cfg["max"]:
         raise ValueError(f"Ảnh quá lớn. Kích thước tối đa {_size_label(cfg['max'])}.")
+    # Giải mã rồi encode lại: vừa thu nhỏ, vừa đảm bảo thứ ghi ra đĩa là ảnh thật
+    # do Pillow sinh — không phải byte gốc của người gửi (đuôi file có thể giả).
+    try:
+        im = Image.open(file)
+        im = ImageOps.exif_transpose(im)
+        # WebP chỉ nhận RGB/RGBA — ảnh palette (P), grayscale (L), CMYK phải đổi.
+        im = im.convert("RGBA" if im.mode in ("RGBA", "LA", "PA") else "RGB")
+        im.thumbnail(cfg["size"], Image.LANCZOS)
+    except Exception:
+        raise ValueError("Không đọc được file ảnh. Vui lòng chọn ảnh khác.")
     d = os.path.join(_UPLOAD_ROOT, subdir)
     os.makedirs(d, exist_ok=True)
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    file.save(os.path.join(d, filename))
+    filename = f"{uuid.uuid4().hex}.webp"
+    im.save(os.path.join(d, filename), "WEBP", quality=_WEBP_QUALITY, method=6)
     return filename
 
 

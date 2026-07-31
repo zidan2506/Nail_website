@@ -16,5 +16,8 @@ python-dotenv==1.2.1
 # Timezone data (zoneinfo "Europe/Helsinki" — không dựa vào tz db của OS)
 tzdata==2025.2
 
+# Xử lý ảnh upload (resize + encode WebP trong _save_upload)
+Pillow==11.3.0
+
 # Production WSGI server
 gunicorn==23.0.0

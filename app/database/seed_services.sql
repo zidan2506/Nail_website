@@ -31,7 +31,7 @@ INSERT INTO services (
     'Tạo hình móng, chăm sóc cuticle, đánh bóng và sơn thường — gọn gàng tự nhiên.',
     'Kynnen muotoilu, kynsinhoidon hoito, kiillotus ja klassinen lakkaus.',
     45, 40.0, 40,
-    'Phổ biến', 'auto_awesome', '/static/images/services/classic-manicure.png', 1
+    'Phổ biến', 'auto_awesome', '/static/images/services/classic-manicure.webp', 1
 ),
 
 -- 2. Gel Manicure
@@ -44,7 +44,7 @@ INSERT INTO services (
     'Sơn gel bền đẹp lên đến 3 tuần, không tróc, bóng đẹp như mới.',
     'Pitkäkestoinen gelilaakaus UV/LED-valolla, kestää jopa 3 viikkoa.',
     60, 45.0, 45,
-    'Bán chạy', 'colorize', '/static/images/services/gel-manicure.png', 1
+    'Bán chạy', 'colorize', '/static/images/services/gel-manicure.webp', 1
 ),
 
 -- 3. Spa Manicure
@@ -57,7 +57,7 @@ INSERT INTO services (
     'Tẩy tế bào chết, đắp mặt nạ dưỡng ẩm, massage tay và sơn gel cao cấp.',
     'Luksuskäsihoito kuorinnan, kosteuttavan naamion, hieronnan ja gelilaakauksen kanssa.',
     75, 50.0, 50,
-    NULL, 'spa', '/static/images/services/spa-manicure.png', 1
+    NULL, 'spa', '/static/images/services/spa-manicure.webp', 1
 ),
 
 -- ------------------------------------------------------------
@@ -74,7 +74,7 @@ INSERT INTO services (
     'Ngâm chân, tẩy da chai, cắt móng, chăm sóc cuticle và thoa kem dưỡng.',
     'Jalkakayla, kovettumien poisto, kynsien leikkaus, kynsinhoidon hoito ja kosteutusvoide.',
     45, 45.0, 45,
-    NULL, 'clean_hands', '/static/images/services/classic-pedicure.png', 1
+    NULL, 'clean_hands', '/static/images/services/classic-pedicure.webp', 1
 ),
 
 -- 5. Gel Pedicure
@@ -87,7 +87,7 @@ INSERT INTO services (
     'Pedicure đầy đủ kết hợp sơn gel bền màu lên đến 3 tuần.',
     'Täydellinen pedikyyrі pitkäkestoisella gelilakauksella, kestää jopa 3 viikkoa.',
     75, 85.0, 85,
-    'Phổ biến', 'water_drop', '/static/images/services/gel-pedicure.png', 1
+    'Phổ biến', 'water_drop', '/static/images/services/gel-pedicure.webp', 1
 ),
 
 -- 6. Spa Pedicure
@@ -100,7 +100,7 @@ INSERT INTO services (
     'Trải nghiệm spa chân cao cấp — tẩy da chết, massage, trị chai và sơn gel.',
     'Premium jalkahoito kuorinnan, hieronnan, kovettumahoidon ja gelilaakauksen kanssa.',
     90, 90.0, 90,
-    'Cao cấp', 'workspace_premium', '/static/images/services/spa-pedicure.png', 1
+    'Cao cấp', 'workspace_premium', '/static/images/services/spa-pedicure.webp', 1
 ),
 
 -- ------------------------------------------------------------
@@ -117,7 +117,7 @@ INSERT INTO services (
     'Vẽ tay các họa tiết đơn giản, hoa văn hoặc accent nail theo yêu cầu.',
     'Käsinmaalatut yksinkertaiset kuviot tai koristeelliset aksentit kynsille.',
     30, 20.0, 20,
-    NULL, 'brush', '/static/images/services/basic-nail-art.png', 1
+    NULL, 'brush', '/static/images/services/basic-nail-art.webp', 1
 ),
 
 -- 8. Nail Stamping
@@ -130,7 +130,7 @@ INSERT INTO services (
     'Kỹ thuật stamping tạo họa tiết sắc nét, đồng đều trên tất cả các móng.',
     'Tarkka stamppaustekniikka teräville, monimutkaisille kuvioille kaikille kynsille.',
     30, 25.0, 25,
-    'Mới', 'local_florist', '/static/images/services/nail-stamping.png', 1
+    'Mới', 'local_florist', '/static/images/services/nail-stamping.webp', 1
 ),
 
 -- 9. Rhinestone
@@ -143,5 +143,5 @@ INSERT INTO services (
     'Đính đá pha lê lấp lánh lên móng, sang trọng và nổi bật.',
     'Strassikivien kiinnitys kimaltavaa ja glamouria varten mille tahansa kynsityylille.',
     20, 15.0, 15,
-    NULL, 'diamond', '/static/images/services/rhinestone.png', 1
+    NULL, 'diamond', '/static/images/services/rhinestone.webp', 1
 );

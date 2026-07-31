@@ -5,3 +5,6 @@ __pycache__/
 *.db-wal
 *.db-shm
 app/static/uploads/
+
+# Ảnh gốc dùng để tạo ảnh seed — nặng, không cần cho server
+TESTING IMG/

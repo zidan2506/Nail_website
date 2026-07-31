@@ -633,12 +633,12 @@
      BEHAVIOUR:
        - Clicking avatar area or camera icon triggers hidden file input
        - On file select → auto-submit avatar-form via JS
-       - Accepted: image/jpeg, image/gif, image/png — max 800KB
+       - Accepted: image/jpeg, image/png, image/webp — max 10MB
      
      BACKEND (Claude Code: implement this route):
        - POST /customer/setting/update-avatar
        - Field: "avatar" (multipart/form-data)
-       - Validate: file type + size ≤ 800KB server-side
+       - Validate: file type + size ≤ 10MB server-side
        - Save to: static/uploads/avatars/<uuid>.<ext> (tên file lưu ở customers.avatar)
        - Update: current_user.profile_picture = saved file URL
        - Flash success: "Profile picture updated."
@@ -662,7 +662,7 @@
         type="file"
         id="avatar-input"
         name="avatar"
-        accept="image/jpeg,image/gif,image/png"
+        accept="image/jpeg,image/png,image/webp"
         style="display:none;"
       >
     </form>
