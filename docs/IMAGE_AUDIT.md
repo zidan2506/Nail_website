@@ -7,7 +7,7 @@
 ---
 
 ## 0. Tổng quan cơ chế ảnh
-
+./venv/bin/python -m app.init_db
 | Hạng mục | Chi tiết |
 |---|---|
 | Filter resolve | `img_src(subdir)` — `app/routes.py:120` (`_resolve_upload` `app/routes.py:96`) |
