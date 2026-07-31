@@ -43,11 +43,11 @@
 
 <div class="auth-social-row">
     <a href="{{ url_for('main.google_login') }}" class="auth-social-btn">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+        <img src="{{ url_for('static', filename='images/social/google.svg') }}" alt="Google">
         Google
     </a>
     <a href="#" class="auth-social-btn">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+        <img src="{{ url_for('static', filename='images/social/facebook.svg') }}" alt="Facebook">
         Facebook
     </a>
 </div>

@@ -64,7 +64,7 @@
         <div class="booking-summary-card__bottom">
           <div class="technician-box">
             <div class="technician-box__avatar">
-              <img src="https://via.placeholder.com/64x64" alt="{{ _('Technician avatar') }}">
+              <img src="{{ url_for('static', filename='images/Default/avatar-default.svg') }}" alt="{{ _('Technician avatar') }}">
             </div>
 
             <div class="technician-box__info">
@@ -106,7 +106,7 @@
     <aside class="booking-side-column">
       <article class="location-card">
         <div class="location-card__map">
-          <img src="https://via.placeholder.com/420x220" alt="{{ _('Salon location map') }}">
+          <img src="{{ url_for('static', filename='images/public/nail_studio.jpg') }}" alt="{{ _('Salon location map') }}">
           <div class="location-card__overlay">
             <h3>DahaCare</h3>
             <p>Espoo</p>

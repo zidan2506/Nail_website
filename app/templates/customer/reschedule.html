@@ -35,14 +35,8 @@
     <section class="current-session-card">
       <div class="current-session-left">
         <div class="current-session-image-wrap">
-          {#
-            Nếu có ảnh:
-            <img src="{ss{ booking.image_url }ss}" alt="Service image" class="current-session-image">
-
-            Nếu chưa có ảnh thật thì giữ placeholder này.
-          #}
           <img
-            src="https://via.placeholder.com/84x84"
+            src="{{ booking.image_url or url_for('static', filename='images/Default/Service/test.png') }}"
             alt="{{ _('Service image') }}"
             class="current-session-image"
           />
