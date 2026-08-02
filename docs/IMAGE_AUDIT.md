@@ -14,7 +14,7 @@
 | Quy tắc | Giá trị bắt đầu bằng `http://`, `https://`, `/` → dùng thẳng. Ngược lại → `/static/uploads/<subdir>/<file>` |
 | Thư mục upload | `services`, `gallery`, `rewards`, `carousels`, `staff`, `avatars` (`_UPLOAD_CONFIG` `app/routes.py:60`) |
 | Giới hạn upload | 2MB (jpg/jpeg/png/webp) — riêng `avatars` 800KB (jpg/jpeg/png/gif) |
-| Ảnh default hiện có | `images/Default/Service/test.png`, `images/Default/Homepage_Carousel_Slides/default_carousel_index.png`, `images/Default/avatar-default.svg`, `images/public/About_img.png`, `images/public/nail_studio.jpg`, `images/customer/Loyalty Points/*.png`, `images/social/{google,facebook}.svg` |
+| Ảnh default hiện có | `images/Default/Service/test.png`, `images/Default/Homepage_Carousel_Slides/homepage-slide-{1,2,3}.webp`, `images/Default/avatar-default.svg`, `images/public/About_img.png`, `images/public/nail_studio.jpg`, `images/customer/Loyalty Points/*.png`, `images/social/{google,facebook}.svg` |
 | Thư mục rỗng | `images/services/`, `images/staff/`, `images/customer/Profile/` (chưa dùng) |
 
 ---
@@ -23,7 +23,7 @@
 
 | # | Vị trí | Nguồn ảnh | Khung CSS | Khuyến nghị | Gợi ý nội dung |
 |---|---|---|---|---|---|
-| 1.1 | **Hero carousel slide** — `index.html:26` `.hero__bg-img` | `homepage_slides.image` → `uploads/carousels/`; seed default `/static/images/Default/Homepage_Carousel_Slides/default_carousel_index.png` | `.hero` 100% × **500px** (mobile 420px), `object-fit: cover`, `opacity .6` + `mix-blend-mode: overlay` trên nền deep-plum `#3E1F47`, có hiệu ứng Ken Burns scale 1.06 | **1920×800** (≈12:5), export **2560×1080** cho retina | Ảnh không gian salon rộng, tone hồng-be, **chừa vùng giữa trống** vì text + 2 nút CTA đè lên. Vì bị phủ overlay tím + opacity 0.6 → chọn ảnh **sáng, contrast thấp**, tránh chi tiết vụn |
+| 1.1 | **Hero carousel slide** — `index.html:26` `.hero__bg-img` | `homepage_slides.image` → `uploads/carousels/`; seed default `/static/images/Default/Homepage_Carousel_Slides/homepage-slide-{1,2,3}.webp` | `.hero` 100% × **500px** (mobile 420px), `object-fit: cover`, `opacity .6` + `mix-blend-mode: overlay` trên nền deep-plum `#3E1F47`, có hiệu ứng Ken Burns scale 1.06 | **1920×800** (≈12:5), export **2560×1080** cho retina | Ảnh không gian salon rộng, tone hồng-be, **chừa vùng giữa trống** vì text + 2 nút CTA đè lên. Vì bị phủ overlay tím + opacity 0.6 → chọn ảnh **sáng, contrast thấp**, tránh chi tiết vụn |
 | 1.2 | **Service card thumbnail** — `index.html:77-80` `.service-card__img-wrap` | `services.image` → `uploads/services/`; fallback `images/Default/Service/test.png` | **100% × 192px** cố định; grid 4 cột trong 1120px → ~**262×192** (≈4:3), cover | **800×600** (4:3) | Cận cảnh bàn tay/bộ nail đã hoàn thiện, nền trơn pastel. Nên làm **1 bộ 4-6 biến thể** theo nhóm dịch vụ (manicure, pedicure, gel, nail art, chăm sóc, spa tay) |
 | 1.3 | **Gallery preview — ô thường** — `index.html:115-118` `.gallery-item img` | `gallery_images.image_url` → `uploads/gallery/` | `.gallery-grid` 3 cột, `grid-auto-rows: 250px` → ô ~**363×250**, cover | **1080×1080** (1:1, dùng chung với mục 3.1) | Ảnh mẫu nail thành phẩm |
 | 1.4 | **Gallery preview — ô cao** `.gallery-item--tall` | như trên | span 2 hàng → ~**363×516** (≈5:7 dọc) | **1080×1500** (≈3:4 dọc) | Ảnh dọc: bàn tay đặt dọc, hoặc chai sơn dựng đứng |
