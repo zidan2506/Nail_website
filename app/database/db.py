@@ -1066,6 +1066,7 @@ def get_invoice_detail_by_id(invoice_id):
             c.phone     AS customer_phone,
 
             st.full_name AS staff_name,
+            st.photo     AS staff_photo,
 
             sv.name             AS service_name,
             sv.duration_minutes AS service_duration,
@@ -2311,7 +2312,7 @@ def get_report_staff_performance(date_from, date_to):
     conn = get_connection()
     rows = conn.execute(
         """
-        SELECT st.id AS staff_id, st.full_name AS full_name,
+        SELECT st.id AS staff_id, st.full_name AS full_name, st.photo AS photo,
                COUNT(DISTINCT b.id) AS booking_count,
                COALESCE(SUM(i.amount), 0) AS revenue
         FROM bookings b

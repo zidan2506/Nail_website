@@ -102,7 +102,9 @@
                     <span class="detail-row__label">{{ _('Assigned Stylist') }}</span>
                     <div class="stylist-info">
                         <span class="detail-row__value">{{ invoice.staff_name }}</span>
-                        <div class="stylist-avatar">{{ staff_initials }}</div>
+                        <div class="stylist-avatar">
+                            <img src="{{ invoice.staff_photo | staff_avatar }}" alt="{{ invoice.staff_name }}">
+                        </div>
                     </div>
                 </div>
             </div>

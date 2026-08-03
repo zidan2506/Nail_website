@@ -159,16 +159,6 @@ def time_ago(value):
     return f'{years} year{"s" if years != 1 else ""} ago'
 
 
-def initials(value):
-    """'Nguyễn Lan Hương' -> 'LH' (chữ cái đầu của từ đầu và từ cuối)."""
-    if not value:
-        return ''
-    parts = value.strip().split()
-    if len(parts) == 1:
-        return parts[0][:2].upper()
-    return (parts[0][0] + parts[-1][0]).upper()
-
-
 def register_filters(app):
     """Đăng ký tất cả filters với Flask app"""
     app.template_filter('format_date')(format_date)
@@ -180,6 +170,5 @@ def register_filters(app):
     app.template_filter('format_number')(format_number)
     app.template_filter('time_ago')(time_ago)
     app.template_filter('mask_email')(mask_email)
-    app.template_filter('initials')(initials)
     # i18n nội dung DB: {{ tr(service, 'name') }}
     app.jinja_env.globals['tr'] = translate_field

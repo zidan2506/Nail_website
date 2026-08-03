@@ -270,6 +270,14 @@
     font-size: 15px;
     font-weight: 700;
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+.st-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .st-avatar--0 { background: #e0e7ff; color: #3730a3; }
@@ -879,12 +887,6 @@
 
     {% if staff_list %}
         {% for s in staff_list %}
-        {# Initials: last 2 words of full_name #}
-        {% set name_parts = s.full_name.split() %}
-        {% set last_two = name_parts[-2:] if name_parts | length > 1 else name_parts %}
-        {% set initials = last_two[0][0] | upper %}
-        {% if last_two | length > 1 %}{% set initials = initials + (last_two[1][0] | upper) %}{% endif %}
-
         {% set avatar_class = AVATAR_PALETTE[loop.index0 % 5] %}
         {% set total_today = s.total_today or 0 %}
         {% set done_today = s.done_today or 0 %}
@@ -906,7 +908,9 @@
              onclick="openDetail(this)">
 
             <div class="st-card__top">
-                <div class="st-avatar {{ avatar_class }}">{{ initials }}</div>
+                <div class="st-avatar {{ avatar_class }}">
+                    <img src="{{ s.photo | staff_avatar }}" alt="{{ s.full_name }}">
+                </div>
                 <div class="st-card__info">
                     <div class="st-card__name">{{ s.full_name }}</div>
                     <div class="st-card__role">{{ s.role or 'Chưa phân loại' }}</div>
@@ -1364,7 +1368,7 @@ function openDetail(el) {
     const avatarEl = document.getElementById('st_detail_avatar');
     const cardAvatarEl = el.querySelector('.st-avatar');
     avatarEl.className = 'st-avatar ' + ST_AVATAR_PALETTE[parseInt(d.idx, 10) % 5];
-    avatarEl.textContent = cardAvatarEl ? cardAvatarEl.textContent.trim() : '';
+    avatarEl.innerHTML = cardAvatarEl ? cardAvatarEl.innerHTML : '';
 
     document.getElementById('st_detail_name').textContent = d.name;
     document.getElementById('st_detail_role').textContent = d.role || 'Chưa phân loại';

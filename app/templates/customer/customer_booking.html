@@ -139,14 +139,8 @@
             <input class="bk-sr-only" type="radio" name="staff_id"
                    value="{{ staff['id'] }}" data-name="{{ staff['full_name'] }}">
             <div class="bk-staff-card">
-              {% if staff['photo'] %}
               <div class="bk-staff-avatar"
-                   style="background-image:url('{{ staff['photo'] | img_src('staff') }}')"></div>
-              {% else %}
-              <div class="bk-staff-avatar bk-staff-avatar--empty">
-                <span class="material-symbols-outlined">person</span>
-              </div>
-              {% endif %}
+                   style="background-image:url('{{ staff['photo'] | staff_avatar }}')"></div>
               <h3 class="bk-staff-name">{{ staff['full_name'] }}</h3>
               <p class="bk-staff-role">{{ staff['role'] or _('Nail Technician') }}</p>
             </div>

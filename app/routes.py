@@ -144,6 +144,16 @@ def _img_src(image, subdir):
     return _resolve_upload(image, subdir) or ""
 
 
+_DEFAULT_STAFF_AVATAR = "images/Default/avatar-default.svg"
+
+
+@main.app_template_filter("staff_avatar")
+def _staff_avatar(photo):
+    """Jinja filter: {{ staff['photo'] | staff_avatar }} -> ảnh staff, hoặc ảnh
+    default khi staff chưa upload. Nhận cả tên file trần lẫn src đã resolve sẵn."""
+    return _resolve_upload(photo, "staff") or url_for("static", filename=_DEFAULT_STAFF_AVATAR)
+
+
 def _slugify(text):
     text = text.replace("đ", "d").replace("Đ", "D")
     text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
@@ -570,6 +580,7 @@ def view_booking_details(booking_id):
         date2=booking_date2,
         time=booking_time,
         staff=staff["full_name"],
+        staff_photo=staff["photo"],
         map_url=ggmap_url,
         service_description=service["description"],
         booking=booking,
@@ -1092,10 +1103,6 @@ def invoice_detail(invoice_id):
     start_time_display = format_booking_time(invoice["start_time"])  # 10:00 AM
     end_time_display = format_booking_time(invoice["end_time"])      # 10:45 AM
 
-    # Initials cho stylist avatar
-    name_parts = invoice["staff_name"].split()
-    staff_initials = "".join(p[0].upper() for p in name_parts[:2])
-
     return render_template(
         "/customer/invoice_detail.html",
         invoice=invoice,
@@ -1103,7 +1110,6 @@ def invoice_detail(invoice_id):
         issued_at_display=issued_at_display,
         start_time_display=start_time_display,
         end_time_display=end_time_display,
-        staff_initials=staff_initials,
     )
 
 @main.route("/customer/history/download-invoice_id=<int:invoice_id>")
@@ -3664,11 +3670,9 @@ def _build_report_context(df, dt, active_preset):
     max_staff_rev = max((s["revenue"] for s in staff_rows), default=0)
     staff_performance = []
     for s in staff_rows:
-        parts = (s["full_name"] or "").split()
-        initials = "".join(p[0].upper() for p in parts[:2]) or "?"
         staff_performance.append({
             "full_name": s["full_name"],
-            "initials": initials,
+            "photo": s["photo"],
             "booking_count": s["booking_count"],
             "revenue": s["revenue"],
             "revenue_pct": round(s["revenue"] / max_staff_rev * 100, 1) if max_staff_rev else 0,

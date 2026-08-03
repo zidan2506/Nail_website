@@ -64,7 +64,7 @@
         <div class="booking-summary-card__bottom">
           <div class="technician-box">
             <div class="technician-box__avatar">
-              <img src="{{ url_for('static', filename='images/Default/avatar-default.svg') }}" alt="{{ _('Technician avatar') }}">
+              <img src="{{ staff_photo | staff_avatar }}" alt="{{ _('Technician avatar') }}">
             </div>
 
             <div class="technician-box__info">

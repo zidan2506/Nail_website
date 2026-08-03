@@ -208,11 +208,7 @@
         <div class="sf-hero">
             <div class="sf-avatar-wrap">
                 <div class="sf-avatar" onclick="document.getElementById('sf-avatar-input').click()">
-                    {% if current_staff.avatar %}
-                        <img src="{{ current_staff.avatar }}" alt="{{ current_staff.name }}">
-                    {% else %}
-                        {{ current_staff.name | initials }}
-                    {% endif %}
+                    <img src="{{ current_staff.avatar | staff_avatar }}" alt="{{ current_staff.name }}">
                 </div>
                 <div class="sf-avatar-edit" onclick="document.getElementById('sf-avatar-input').click()">
                     <i class="ti ti-camera"></i>

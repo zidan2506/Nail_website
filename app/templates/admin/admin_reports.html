@@ -27,7 +27,7 @@
   ║   booking_status_breakdown: [{status, label, count, pct, color,     ║
   ║        cumulative_offset}]  · total_bookings_count                   ║
   ║   top_services: [{name, booking_count, revenue, revenue_pct}]       ║
-  ║   staff_performance: [{full_name, initials, booking_count, revenue, ║
+  ║   staff_performance: [{full_name, photo, booking_count, revenue,    ║
   ║        revenue_pct}]                                                 ║
   ║   customer_growth: [{label, month, year, count, pct, is_current,    ║
   ║        growth_pct}] — luôn 6 tháng gần nhất                          ║
@@ -234,7 +234,9 @@
     background: #eaf3fc; color: #2f6fb0;
     display: flex; align-items: center; justify-content: center;
     font-size: 13px; font-weight: 700;
+    overflow: hidden;
 }
+.rp-staff__avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .rp-staff__body { flex: 1; min-width: 0; }
 .rp-staff__top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
 .rp-staff__name { font-size: 13.5px; font-weight: 600; color: #191c1e; }
@@ -531,7 +533,9 @@
         <div class="rp-staff-list">
             {% for s in staff_performance %}
             <div class="rp-staff">
-                <div class="rp-staff__avatar">{{ s.initials }}</div>
+                <div class="rp-staff__avatar">
+                    <img src="{{ s.photo | staff_avatar }}" alt="{{ s.full_name }}">
+                </div>
                 <div class="rp-staff__body">
                     <div class="rp-staff__top">
                         <div>

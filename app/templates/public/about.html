@@ -122,9 +122,7 @@
     <div class="abt-team__grid">
         {% for member in staff_members %}
         <div class="abt-team__card">
-            {% if member.photo %}
-            <img class="abt-team__avatar" src="{{ member.photo | img_src('staff') }}" alt="{{ member.full_name }}">
-            {% endif %}
+            <img class="abt-team__avatar" src="{{ member.photo | staff_avatar }}" alt="{{ member.full_name }}">
             <div>
                 <h3 class="abt-team__name">{{ member.full_name }}</h3>
                 {% if member.role %}

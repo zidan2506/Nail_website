@@ -285,6 +285,12 @@
   flex-shrink: 0;
 }
 
+.technician-box__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .technician-box__info {
   min-width: 0;
 }
