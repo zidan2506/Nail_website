@@ -636,14 +636,14 @@ def get_service_stats():
 
 
 def create_service(category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
-                   name_fi=None, name_vi=None, description_fi=None, description_vi=None):
+                   name_fi=None, name_vi=None, description_fi=None, description_vi=None, video_url=None):
     conn = get_connection()
     cur = conn.execute("""
         INSERT INTO services (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
-                              name_fi, name_vi, description_fi, description_vi)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              name_fi, name_vi, description_fi, description_vi, video_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
-          name_fi, name_vi, description_fi, description_vi))
+          name_fi, name_vi, description_fi, description_vi, video_url))
     conn.commit()
     service_id = cur.lastrowid
     conn.close()
@@ -651,18 +651,82 @@ def create_service(category_id, name, description, duration_minutes, price, poin
 
 
 def update_service(service_id, category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
-                   name_fi=None, name_vi=None, description_fi=None, description_vi=None):
+                   name_fi=None, name_vi=None, description_fi=None, description_vi=None, video_url=None):
     conn = get_connection()
     conn.execute("""
         UPDATE services
         SET category_id=?, name=?, description=?, duration_minutes=?, price=?, points=?,
             is_active=?, image=?, badge=?, icon=?,
-            name_fi=?, name_vi=?, description_fi=?, description_vi=?, updated_at=CURRENT_TIMESTAMP
+            name_fi=?, name_vi=?, description_fi=?, description_vi=?, video_url=?, updated_at=CURRENT_TIMESTAMP
         WHERE id=?
     """, (category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
-          name_fi, name_vi, description_fi, description_vi, service_id))
+          name_fi, name_vi, description_fi, description_vi, video_url, service_id))
     conn.commit()
     conn.close()
+
+
+def try_claim_video_job(service_id):
+    """Giành quyền transcode cho service này. Trả False nếu đã có job đang chạy.
+
+    UPDATE có điều kiện nên việc kiểm tra và đánh dấu là MỘT thao tác nguyên tử —
+    hai request gửi lên cùng lúc thì chỉ một cái thắng. Nếu tách thành SELECT rồi
+    UPDATE thì cả hai đều đọc thấy 'rảnh' và cùng chạy, sinh ra file mồ côi và
+    kết quả phụ thuộc thread nào xong sau.
+
+    video_url giữ nguyên giá trị cũ để khách vẫn xem được video cũ trong lúc chờ.
+    """
+    conn = get_connection()
+    cur = conn.execute(
+        "UPDATE services SET video_status='processing', video_error=NULL "
+        "WHERE id=? AND COALESCE(video_status, '') != 'processing'",
+        (service_id,))
+    conn.commit()
+    claimed = cur.rowcount > 0
+    conn.close()
+    return claimed
+
+
+def set_video_ready(service_id, filename):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE services SET video_url=?, video_status='ready', video_error=NULL WHERE id=?",
+        (filename, service_id))
+    conn.commit()
+    conn.close()
+
+
+def set_video_failed(service_id, error):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE services SET video_status='failed', video_error=? WHERE id=?",
+        (error, service_id))
+    conn.commit()
+    conn.close()
+
+
+def clear_service_video(service_id):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE services SET video_url=NULL, video_status=NULL, video_error=NULL WHERE id=?",
+        (service_id,))
+    conn.commit()
+    conn.close()
+
+
+def reset_stuck_video_jobs():
+    """Gọi lúc app khởi động. Thread transcode là daemon nên chết theo process:
+    mọi dòng còn 'processing' chắc chắn không còn ai xử lý -> đánh failed để
+    admin biết mà upload lại, thay vì kẹt 'đang xử lý' vĩnh viễn."""
+    conn = get_connection()
+    cur = conn.execute(
+        "UPDATE services SET video_status='failed', video_error=? WHERE video_status='processing'",
+        ("Xử lý bị gián đoạn do server khởi động lại. Vui lòng upload lại.",))
+    conn.commit()
+    n = cur.rowcount
+    conn.close()
+    if n:
+        logger.warning("Dọn %s job transcode video bị treo lúc khởi động", n)
+    return n
 
 
 def delete_service(service_id):

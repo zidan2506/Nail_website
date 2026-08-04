@@ -8,6 +8,8 @@ import secrets
 import string
 import unicodedata
 import calendar
+import threading
+import subprocess
 from flask import Blueprint, flash,render_template, request, jsonify, redirect, url_for, session, Response
 from markupsafe import escape
 from app.database.db import (
@@ -16,6 +18,11 @@ from app.database.db import (
     get_report_customer_growth,
 )
 from app.database.db import get_connection, get_invoice_detail_by_id, get_customer_appointment_history, get_customer_invoices, get_active_services_with_category ,get_active_service_categories ,update_booking_schedule, get_customer_by_customer_id ,get_customer_bookings ,get_staff_by_user_id ,get_customer_by_user_id ,update_verification ,get_verification_by_id ,create_verification ,link_customer_to_user ,get_customer_by_email, create_user ,get_user_by_email, verify_customer,get_all_services, get_all_staff, get_service_by_id, get_staff_by_id, check_booking_conflict, get_customer_id, create_booking, create_customer,update_status, get_booking_by_id, update_new_code, get_booking_by_staff_and_date, get_loyalty_balance, get_active_rewards, get_loyalty_history, get_customer_current_tier, get_tier_by_name, get_tier_by_id, get_customer_subscription_row, get_active_subscription_rows, upgrade_membership, has_source_award, has_pending_review, get_customer_reward_status, redeem_reward, get_customer_vouchers, update_customer_profile, update_customer_avatar, update_user_email, update_user_password, update_user_lang, cancel_booking_with_reason, get_gallery_images, get_active_staff, get_admin_kpis, get_admin_today_appointments, get_admin_recent_activity, get_admin_revenue_chart, get_all_customers, get_admin_bookings, get_booking_status_counts, update_booking_details, get_staff_stats, get_staff_list, get_staff_role_list, create_staff, update_staff, delete_staff, toggle_staff_active, get_all_categories, get_service_categories_with_services, get_service_stats, create_service, update_service, delete_service, toggle_service_active, create_category, update_category, delete_category, get_admin_customer_stats, get_admin_customers, create_customer_admin, update_customer_admin, delete_customer_admin, get_gallery_images_admin, get_gallery_image_by_id, get_gallery_stats, create_gallery_images, update_gallery_image, delete_gallery_image, bulk_delete_gallery_images, reorder_gallery_images, get_admin_loyalty_customers, get_admin_loyalty_stats, get_rewards_admin, get_missions, create_reward, update_reward, get_reward_by_id, get_reward_redemption_count, delete_reward, deactivate_reward, update_mission_config, toggle_mission_config, get_active_membership_tiers, adjust_membership_admin, MISSION_KEYS, get_carousel_slides, get_carousel_slide_by_id, get_next_carousel_sort_order, create_homepage_slide, update_homepage_slide, create_offer_slide, update_offer_slide, delete_carousel_slide, get_mission_slides, update_mission_slide, reorder_carousel_slides, MISSION_SLOT_KEYS, auto_expire_bookings, get_admin_top_loyalty, get_admin_new_members, get_admin_top_services, get_popular_services, get_staff_bookings_range, get_invoice_by_booking, mark_invoice_paid, create_invoice, get_staff_history, get_staff_history_months, get_staff_history_stats, get_staff_profile_stats, update_staff_photo
+from app.database.db import (
+    try_claim_video_job, set_video_ready, set_video_failed,
+    clear_service_video, reset_stuck_video_jobs,
+)
+from contextlib import contextmanager
 from datetime import datetime, timedelta, date
 from app.services.email_system import send_verification_email, send_thank_you_email, generate_verification_code, is_valid_email, EmailSendError
 from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days, complete_booking_txn, revert_booking_txn
@@ -142,6 +149,210 @@ def _delete_upload(image, subdir):
 def _img_src(image, subdir):
     """Jinja filter: {{ value | img_src('services') }} -> src dùng được (hoặc '')."""
     return _resolve_upload(image, subdir) or ""
+
+
+@main.app_template_filter("video_src")
+def _video_src(video):
+    """Jinja filter: {{ service.video_url | video_src }} -> src dùng được (hoặc '').
+    Cùng quy ước với img_src: tên file trần -> uploads/videos/<file>, URL/absolute
+    dùng thẳng (để sau này chuyển sang CDN không phải sửa template)."""
+    return _resolve_upload(video, "videos") or ""
+
+
+# ─── VIDEO UPLOAD + TRANSCODE ────────────────────────────────────────────────
+# Admin upload video thô (có thể ~150MB quay từ điện thoại). Server hạ về 720p
+# kèm +faststart rồi MỚI ghi video_url. Trong lúc xử lý video_url vẫn NULL nên
+# trang public không bao giờ hiển thị video dở dang.
+_VIDEO_EXTS = {"mp4", "mov", "webm", "m4v"}
+_VIDEO_MAX = 300 * 1024 * 1024      # phải khớp client_max_body_size của nginx
+_VIDEO_HEIGHT = 720
+# File thô để NGOÀI static/ để không bị serve ra ngoài trong lúc đang xử lý
+_VIDEO_TMP = os.path.join(os.path.dirname(__file__), "_tmp")
+_FFMPEG = os.environ.get("FFMPEG_BIN", "ffmpeg")
+_FFPROBE = os.environ.get("FFPROBE_BIN", "ffprobe")
+# Khoá cấp HỆ ĐIỀU HÀNH, không phải threading.Semaphore: gunicorn chạy 3 worker
+# là 3 tiến trình riêng, biến trong RAM của tiến trình này không chặn được tiến
+# trình kia -> sẽ có tới 3 ffmpeg cùng ăn CPU trên VPS 2 vCPU.
+# Lock file được OS tự nhả khi tiến trình chết nên không bao giờ kẹt khoá chết.
+_LOCK_PATH = os.path.join(_VIDEO_TMP, ".transcode.lock")
+# File thô còn sót quá ngưỡng này thì coi là rác (transcode timeout ở 30 phút)
+_TMP_STALE_SECONDS = 6 * 3600
+
+if os.name == "nt":
+    import msvcrt
+
+    def _lock_acquire(f):
+        f.seek(0)
+        msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
+
+    def _lock_release(f):
+        f.seek(0)
+        msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
+else:
+    import fcntl
+
+    def _lock_acquire(f):
+        fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+    def _lock_release(f):
+        fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+
+
+@contextmanager
+def _transcode_slot(poll=2, timeout=3600):
+    """Chỉ cho 1 ffmpeg chạy trên toàn máy, kể cả khi có nhiều worker gunicorn."""
+    os.makedirs(_VIDEO_TMP, exist_ok=True)
+    f = open(_LOCK_PATH, "a+b")
+    deadline = time.time() + timeout
+    try:
+        while True:
+            try:
+                _lock_acquire(f)
+                break
+            except OSError:
+                if time.time() > deadline:
+                    raise TimeoutError("Chờ lượt transcode quá lâu")
+                time.sleep(poll)
+        try:
+            yield
+        finally:
+            try:
+                _lock_release(f)
+            except OSError:
+                pass
+    finally:
+        f.close()
+
+
+def _cleanup_stale_temp():
+    """Xoá file thô bị bỏ lại khi tiến trình chết giữa lúc transcode.
+
+    Chỉ xoá file cũ hơn _TMP_STALE_SECONDS: nhiều worker gunicorn cùng khởi động,
+    xoá theo tuổi thì không bao giờ đụng vào file mà worker khác đang xử lý dở.
+    """
+    if not os.path.isdir(_VIDEO_TMP):
+        return 0
+    now, n = time.time(), 0
+    for name in os.listdir(_VIDEO_TMP):
+        if name == os.path.basename(_LOCK_PATH):
+            continue
+        p = os.path.join(_VIDEO_TMP, name)
+        try:
+            if os.path.isfile(p) and now - os.path.getmtime(p) > _TMP_STALE_SECONDS:
+                os.remove(p)
+                n += 1
+        except OSError:
+            pass
+    if n:
+        logger.warning("Dọn %s file video tạm bị bỏ lại", n)
+    return n
+
+
+def _safe_unlink(path):
+    try:
+        if path and os.path.exists(path):
+            os.remove(path)
+    except OSError:
+        logger.warning("Không xoá được file tạm %s", path)
+
+
+def _save_raw_video(file):
+    """Validate rồi lưu video thô vào thư mục tạm. Trả path, hoặc None nếu không
+    có file. Raise ValueError nếu sai định dạng / quá lớn / rỗng."""
+    if not file or not file.filename:
+        return None
+    ext = secure_filename(file.filename).rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+    if ext not in _VIDEO_EXTS:
+        allowed = ", ".join(sorted(e.upper() for e in _VIDEO_EXTS))
+        raise ValueError(f"Định dạng video không hợp lệ. Chỉ chấp nhận {allowed}.")
+    file.seek(0, 2)
+    size = file.tell()
+    file.seek(0)
+    if size == 0:
+        raise ValueError("File video rỗng.")
+    if size > _VIDEO_MAX:
+        raise ValueError(f"Video quá lớn. Kích thước tối đa {_size_label(_VIDEO_MAX)}.")
+    os.makedirs(_VIDEO_TMP, exist_ok=True)
+    path = os.path.join(_VIDEO_TMP, f"{uuid.uuid4().hex}.{ext}")
+    file.save(path)
+    return path
+
+
+def _probe_height(path):
+    """Chiều cao video, None nếu không đọc được (khi đó bỏ qua bước scale)."""
+    try:
+        out = subprocess.run(
+            [_FFPROBE, "-v", "error", "-select_streams", "v:0",
+             "-show_entries", "stream=height", "-of", "csv=p=0", path],
+            capture_output=True, text=True, timeout=60, check=True,
+        ).stdout.strip()
+        return int(out.splitlines()[0])
+    except Exception:
+        return None
+
+
+def _transcode_video_job(service_id, src_path, old_video):
+    """Chạy trong thread nền. Transcode src_path -> uploads/videos/<uuid>.mp4 rồi
+    cập nhật DB. Luôn xoá file thô ở cuối, kể cả khi lỗi."""
+    out_name = f"{uuid.uuid4().hex}.mp4"
+    out_dir = os.path.join(_UPLOAD_ROOT, "videos")
+    out_path = os.path.join(out_dir, out_name)
+    try:
+        with _transcode_slot():
+            os.makedirs(out_dir, exist_ok=True)
+            cmd = [_FFMPEG, "-y", "-v", "error", "-i", src_path]
+            height = _probe_height(src_path)
+            # Chỉ hạ xuống 720p; video vốn đã nhỏ hơn thì giữ nguyên, không phóng to
+            if height and height > _VIDEO_HEIGHT:
+                cmd += ["-vf", f"scale=-2:{_VIDEO_HEIGHT}"]
+            cmd += [
+                "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+                "-c:a", "aac", "-b:a", "96k",
+                # +faststart dời box moov lên đầu file. Thiếu cờ này thì trình
+                # duyệt phải tải hết file mới bắt đầu phát được.
+                "-movflags", "+faststart",
+                out_path,
+            ]
+            subprocess.run(cmd, capture_output=True, text=True, timeout=1800, check=True)
+        set_video_ready(service_id, out_name)
+        # Chỉ xoá video cũ SAU khi bản mới đã sẵn sàng
+        if old_video:
+            _delete_upload(old_video, "videos")
+        logger.info("Transcode xong service %s -> %s", service_id, out_name)
+    except FileNotFoundError:
+        _safe_unlink(out_path)
+        set_video_failed(service_id, "Server chưa cài ffmpeg. Xem DEPLOYMENT_RUNBOOK bước 2.")
+        logger.exception("Thiếu ffmpeg/ffprobe khi transcode service %s", service_id)
+    except subprocess.TimeoutExpired:
+        _safe_unlink(out_path)
+        set_video_failed(service_id, "Xử lý video quá lâu nên đã huỷ. Thử video ngắn hơn.")
+        logger.error("Transcode timeout service %s", service_id)
+    except subprocess.CalledProcessError as e:
+        _safe_unlink(out_path)
+        set_video_failed(service_id, "Không đọc được file video. Vui lòng thử file khác.")
+        logger.error("ffmpeg lỗi service %s: %s", service_id, (e.stderr or "")[-800:])
+    except Exception:
+        _safe_unlink(out_path)
+        set_video_failed(service_id, "Lỗi không xác định khi xử lý video.")
+        logger.exception("Transcode hỏng service %s", service_id)
+    finally:
+        _safe_unlink(src_path)
+
+
+def _start_video_transcode(service_id, src_path, old_video=None):
+    """Giành quyền rồi đẩy sang thread nền, trả về ngay để request không bị treo.
+    Trả False nếu service này đã có job đang chạy — khi đó file thô vừa nhận bị
+    xoá luôn để không tích rác. daemon=True: thread chết theo process, và
+    reset_stuck_video_jobs() lúc khởi động sẽ dọn trạng thái dở."""
+    if not try_claim_video_job(service_id):
+        _safe_unlink(src_path)
+        return False
+    threading.Thread(
+        target=_transcode_video_job,
+        args=(service_id, src_path, old_video),
+        daemon=True,
+    ).start()
+    return True
 
 
 _DEFAULT_STAFF_AVATAR = "images/Default/avatar-default.svg"
@@ -2511,6 +2722,7 @@ def admin_create_service():
     duration_minutes = request.form.get("duration_minutes", type=int)
     points = request.form.get("points", type=int) or 0
     badge = request.form.get("badge", "").strip() or None
+    video_url = request.form.get("video_url", "").strip() or None
     is_active = 1 if request.form.get("is_active") == "1" else 0
 
     if not name or not category_id or price is None or not duration_minutes:
@@ -2519,13 +2731,22 @@ def admin_create_service():
 
     try:
         image = _save_upload(request.files.get("image"), "services")
+        raw_video = _save_raw_video(request.files.get("video"))
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_services"))
 
-    create_service(category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
-                   name_fi=name_fi, name_vi=name_vi, description_fi=description_fi, description_vi=description_vi)
-    flash(f"Đã thêm dịch vụ {name}.", "success")
+    # Upload file thắng ô dán URL: video_url chỉ ghi ngay khi KHÔNG có file,
+    # còn có file thì để trống, thread transcode sẽ ghi sau khi xong.
+    service_id = create_service(
+        category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
+        name_fi=name_fi, name_vi=name_vi, description_fi=description_fi, description_vi=description_vi,
+        video_url=None if raw_video else video_url)
+
+    if raw_video and _start_video_transcode(service_id, raw_video):
+        flash(f"Đã thêm dịch vụ {name}. Video đang được xử lý, vài phút nữa sẽ hiển thị.", "success")
+    else:
+        flash(f"Đã thêm dịch vụ {name}.", "success")
     return redirect(url_for("main.admin_services"))
 
 
@@ -2549,8 +2770,10 @@ def admin_update_service(service_id):
     duration_minutes = request.form.get("duration_minutes", type=int)
     points = request.form.get("points", type=int) or 0
     badge = request.form.get("badge", "").strip() or None
+    video_url = request.form.get("video_url", "").strip() or None
     is_active = 1 if request.form.get("is_active") == "1" else 0
     remove_image = request.form.get("remove_image") == "1"
+    remove_video = request.form.get("remove_video") == "1"
 
     if not name or not category_id or price is None or not duration_minutes:
         flash("Vui lòng điền đầy đủ thông tin bắt buộc.", "error")
@@ -2558,6 +2781,7 @@ def admin_update_service(service_id):
 
     try:
         new_image = _save_upload(request.files.get("image"), "services")
+        raw_video = _save_raw_video(request.files.get("video"))
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("main.admin_services"))
@@ -2572,17 +2796,43 @@ def admin_update_service(service_id):
     else:
         image = service["image"]
 
+    # Video cũ chỉ bị xoá SAU khi bản mới transcode xong (xem _transcode_video_job),
+    # nên trong lúc chờ khách vẫn xem được video cũ.
+    if raw_video:
+        video_url = service["video_url"]
+    elif remove_video:
+        _delete_upload(service["video_url"], "videos")
+        video_url = None
+    elif not video_url:
+        video_url = service["video_url"]
+
     update_service(service_id, category_id, name, description, duration_minutes, price, points, is_active, image, badge, icon,
-                   name_fi=name_fi, name_vi=name_vi, description_fi=description_fi, description_vi=description_vi)
-    flash(f"Đã cập nhật dịch vụ {name}.", "success")
+                   name_fi=name_fi, name_vi=name_vi, description_fi=description_fi, description_vi=description_vi,
+                   video_url=video_url)
+
+    if raw_video:
+        if _start_video_transcode(service_id, raw_video, old_video=service["video_url"]):
+            flash(f"Đã cập nhật dịch vụ {name}. Video đang được xử lý, vài phút nữa sẽ hiển thị.", "success")
+        else:
+            flash("Video trước của dịch vụ này đang được xử lý. Chờ xong rồi hãy upload tiếp.", "error")
+    else:
+        if remove_video:
+            clear_service_video(service_id)
+        flash(f"Đã cập nhật dịch vụ {name}.", "success")
     return redirect(url_for("main.admin_services"))
 
 
 @main.route("/admin/service/<int:service_id>/delete", methods=["POST"])
 @admin_required
 def admin_delete_service(service_id):
+    service = get_service_by_id(service_id)
     try:
         delete_service(service_id)
+        # Xoá file đính kèm sau khi DELETE thành công (nếu IntegrityError thì
+        # service vẫn còn, không được xoá file của nó).
+        if service:
+            _delete_upload(service["image"], "services")
+            _delete_upload(service["video_url"], "videos")
         flash("Đã xóa dịch vụ.", "success")
     except sqlite3.IntegrityError:
         flash("Không thể xóa dịch vụ đang có lịch hẹn liên kết.", "error")

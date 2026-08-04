@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-19 03:20+0700\n"
+"POT-Creation-Date: 2026-08-05 00:10+0700\n"
 "PO-Revision-Date: 2026-07-10 19:40+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fi\n"
@@ -18,78 +18,78 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes.py:37
+#: app/routes.py:38
 msgid "Chờ xác nhận"
 msgstr "Odottaa vahvistusta"
 
-#: app/routes.py:37 app/templates/staff/staff_bookings.html:276
+#: app/routes.py:38 app/templates/staff/staff_bookings.html:311
 msgid "Đã xác nhận"
 msgstr "Vahvistettu"
 
-#: app/routes.py:37 app/templates/staff/staff_bookings.html:277
-#: app/templates/staff/staff_bookings.html:303
+#: app/routes.py:38 app/templates/staff/staff_bookings.html:312
+#: app/templates/staff/staff_bookings.html:338
 msgid "Đang thực hiện"
 msgstr "Käynnissä"
 
-#: app/routes.py:38 app/templates/staff/staff_bookings.html:277
-#: app/templates/staff/staff_bookings.html:307
-#: app/templates/staff/staff_bookings.html:374
-#: app/templates/staff/staff_bookings.html:452
-#: app/templates/staff/staff_history.html:232
-#: app/templates/staff/staff_history.html:252
-#: app/templates/staff/staff_history.html:397
+#: app/routes.py:39 app/templates/staff/staff_bookings.html:312
+#: app/templates/staff/staff_bookings.html:342
+#: app/templates/staff/staff_bookings.html:409
+#: app/templates/staff/staff_bookings.html:487
+#: app/templates/staff/staff_history.html:259
+#: app/templates/staff/staff_history.html:279
+#: app/templates/staff/staff_history.html:424
 msgid "Hoàn thành"
 msgstr "Valmis"
 
-#: app/routes.py:38 app/templates/staff/staff_history.html:233
-#: app/templates/staff/staff_history.html:256
-#: app/templates/staff/staff_history.html:312
-#: app/templates/staff/staff_history.html:398
+#: app/routes.py:39 app/templates/staff/staff_history.html:260
+#: app/templates/staff/staff_history.html:283
+#: app/templates/staff/staff_history.html:339
+#: app/templates/staff/staff_history.html:425
 msgid "Đã hủy"
 msgstr "Peruttu"
 
-#: app/routes.py:38
+#: app/routes.py:39
 msgid "Không đến"
 msgstr "Ei saapunut"
 
-#: app/routes.py:39
+#: app/routes.py:40
 msgid "hôm nay"
 msgstr "tänään"
 
-#: app/routes.py:39
+#: app/routes.py:40
 msgid "trong tuần này"
 msgstr "tällä viikolla"
 
-#: app/routes.py:39
+#: app/routes.py:40
 msgid "trong tháng này"
 msgstr "tässä kuussa"
 
-#: app/routes.py:40
+#: app/routes.py:41
 msgid "trong tháng trước"
 msgstr "viime kuussa"
 
-#: app/routes.py:41 app/routes.py:1558
+#: app/routes.py:42 app/routes.py:1591
 msgid "✓ Claimed"
 msgstr "✓ Lunastettu"
 
-#: app/routes.py:41 app/routes.py:1560
+#: app/routes.py:42 app/routes.py:1593
 msgid "✓ All Reviewed"
 msgstr "✓ Kaikki arvosteltu"
 
-#: app/routes.py:41
+#: app/routes.py:42
 msgid "Start"
 msgstr "Aloita"
 
-#: app/routes.py:41
+#: app/routes.py:42
 msgid "Claim"
 msgstr "Lunasta"
 
-#: app/routes.py:1842
+#: app/routes.py:1875
 #, python-format
 msgid "vào ngày %(date)s"
 msgstr "päivänä %(date)s"
 
-#: app/routes.py:1843
+#: app/routes.py:1876
 #, python-format
 msgid "từ %(start)s đến %(end)s"
 msgstr "%(start)s – %(end)s"
@@ -122,11 +122,11 @@ msgstr "Käteinen"
 msgid "Bank Transfer"
 msgstr "Tilisiirto"
 
-#: app/services/email_system.py:77
+#: app/services/email_system.py:81
 msgid "Verify your email – Daha Care"
 msgstr ""
 
-#: app/services/email_system.py:79
+#: app/services/email_system.py:83
 #, python-format
 msgid ""
 "Hello,\n"
@@ -140,11 +140,11 @@ msgid ""
 "email.\n"
 msgstr ""
 
-#: app/services/email_system.py:85
+#: app/services/email_system.py:89
 msgid "Password Change Request – Daha Care"
 msgstr ""
 
-#: app/services/email_system.py:87
+#: app/services/email_system.py:91
 #, python-format
 msgid ""
 "Hello,\n"
@@ -157,11 +157,11 @@ msgid ""
 "will remain unchanged.\n"
 msgstr ""
 
-#: app/services/email_system.py:93
+#: app/services/email_system.py:97
 msgid "Email Change Request – Daha Care"
 msgstr ""
 
-#: app/services/email_system.py:95
+#: app/services/email_system.py:99
 #, python-format
 msgid ""
 "Hello,\n"
@@ -174,11 +174,11 @@ msgid ""
 "address will remain unchanged.\n"
 msgstr ""
 
-#: app/services/email_system.py:101
+#: app/services/email_system.py:105
 msgid "Reset Your Password – Daha Care"
 msgstr ""
 
-#: app/services/email_system.py:103
+#: app/services/email_system.py:107
 #, python-format
 msgid ""
 "Hello,\n"
@@ -191,11 +191,11 @@ msgid ""
 "If you did not request a password reset, please ignore this email.\n"
 msgstr ""
 
-#: app/services/email_system.py:109
+#: app/services/email_system.py:113
 msgid "Your Booking Verification Code – Daha Care"
 msgstr ""
 
-#: app/services/email_system.py:111
+#: app/services/email_system.py:115
 #, python-format
 msgid ""
 "Hello,\n"
@@ -207,11 +207,11 @@ msgid ""
 "If you did not request this, please ignore this email.\n"
 msgstr ""
 
-#: app/services/email_system.py:128
+#: app/services/email_system.py:132
 msgid "Your booking request has been received"
 msgstr ""
 
-#: app/services/email_system.py:130
+#: app/services/email_system.py:134
 #, python-format
 msgid ""
 "Hi %(name)s,\n"
@@ -234,84 +234,79 @@ msgid ""
 msgstr ""
 
 #: app/templates/base.html:28 app/templates/base.html:61
-#: app/templates/base.html:177 app/templates/public/services.html:3
+#: app/templates/base.html:176 app/templates/public/services.html:3
 msgid "Services"
 msgstr "Palvelut"
 
 #: app/templates/base.html:29 app/templates/base.html:62
-#: app/templates/base.html:178 app/templates/public/gallery.html:3
+#: app/templates/base.html:177 app/templates/public/gallery.html:3
 msgid "Gallery"
 msgstr "Galleria"
 
-#: app/templates/base.html:30 app/templates/base.html:64
+#: app/templates/base.html:30 app/templates/base.html:63
 msgid "About"
 msgstr "Tietoa"
 
-#: app/templates/base.html:31 app/templates/base.html:65
-#: app/templates/base.html:186
+#: app/templates/base.html:31 app/templates/base.html:64
+#: app/templates/base.html:185
 msgid "Contact"
 msgstr "Yhteystiedot"
 
-#: app/templates/base.html:39 app/templates/base.html:72
+#: app/templates/base.html:39 app/templates/base.html:71
 msgid "Register"
 msgstr "Rekisteröidy"
 
 #: app/templates/base.html:40 app/templates/base.html:49
-#: app/templates/base.html:73 app/templates/base.html:82
-#: app/templates/customer_base.html:80
+#: app/templates/base.html:72 app/templates/base.html:81
+#: app/templates/customer_base.html:93 app/templates/public/index.html:339
 msgid "Book Now"
 msgstr "Varaa nyt"
 
-#: app/templates/base.html:43 app/templates/base.html:76
+#: app/templates/base.html:43 app/templates/base.html:75
 msgid "My Dashboard"
 msgstr "Oma hallinta"
 
-#: app/templates/base.html:45 app/templates/base.html:78
+#: app/templates/base.html:45 app/templates/base.html:77
 msgid "My Schedule"
 msgstr "Oma aikataulu"
 
-#: app/templates/base.html:47 app/templates/base.html:80
+#: app/templates/base.html:47 app/templates/base.html:79
 msgid "Management"
 msgstr "Hallinta"
 
-#: app/templates/base.html:53
+#: app/templates/base.html:53 app/templates/customer_base.html:20
 msgid "Open menu"
 msgstr "Avaa valikko"
 
-#: app/templates/base.html:63
-#: app/templates/customer/customer_membership.html:270
-msgid "Membership"
-msgstr "Jäsenyys"
-
-#: app/templates/base.html:171
+#: app/templates/base.html:170
 msgid "Business ID:"
 msgstr "Y-tunnus:"
 
-#: app/templates/base.html:175
+#: app/templates/base.html:174
 msgid "Explore"
 msgstr "Tutustu"
 
-#: app/templates/base.html:183
+#: app/templates/base.html:182
 msgid "Support"
 msgstr "Tuki"
 
-#: app/templates/base.html:185 app/templates/public/about.html:3
+#: app/templates/base.html:184 app/templates/public/about.html:3
 msgid "About Us"
 msgstr "Tietoa meistä"
 
-#: app/templates/base.html:187
+#: app/templates/base.html:186
 msgid "FAQs"
 msgstr "UKK"
 
-#: app/templates/base.html:194
+#: app/templates/base.html:193
 msgid "All rights reserved."
 msgstr "Kaikki oikeudet pidätetään."
 
-#: app/templates/base.html:196
+#: app/templates/base.html:195
 msgid "Privacy Policy"
 msgstr "Tietosuojakäytäntö"
 
-#: app/templates/base.html:197
+#: app/templates/base.html:196
 msgid "Terms of Service"
 msgstr "Käyttöehdot"
 
@@ -320,36 +315,36 @@ msgid "Customer Portal"
 msgstr "Asiakasportaali"
 
 #: app/templates/customer/customer_dashboard.html:2
-#: app/templates/customer_base.html:35
+#: app/templates/customer_base.html:48
 msgid "Dashboard"
 msgstr "Kojelauta"
 
 #: app/templates/customer/my_bookings.html:3
-#: app/templates/customer_base.html:43
+#: app/templates/customer_base.html:56
 msgid "My bookings"
 msgstr "Varaukseni"
 
-#: app/templates/customer_base.html:48
+#: app/templates/customer_base.html:61
 msgid "Book appointment"
 msgstr "Varaa aika"
 
 #: app/templates/customer/customer_history.html:3
 #: app/templates/customer/customer_history.html:15
-#: app/templates/customer_base.html:56
+#: app/templates/customer_base.html:69
 msgid "History"
 msgstr "Historia"
 
-#: app/templates/customer/customer_dashboard.html:577
-#: app/templates/customer/loyalty_points.html:1065
-#: app/templates/customer_base.html:64
+#: app/templates/customer/customer_dashboard.html:694
+#: app/templates/customer/loyalty_points.html:1078
+#: app/templates/customer_base.html:77
 msgid "Loyalty Points"
 msgstr "Kanta-asiakaspisteet"
 
-#: app/templates/customer_base.html:72
+#: app/templates/customer_base.html:85
 msgid "Setting"
 msgstr "Asetukset"
 
-#: app/templates/customer_base.html:85
+#: app/templates/customer_base.html:98
 msgid "Logout"
 msgstr "Kirjaudu ulos"
 
@@ -388,25 +383,28 @@ msgid "Book an Appointment"
 msgstr "Varaa aika"
 
 #: app/templates/customer/customer_booking.html:28
-#: app/templates/customer/customer_booking.html:273
+#: app/templates/customer/customer_booking.html:267
 #: app/templates/public/public_booking.html:25
-#: app/templates/public/public_booking.html:323
+#: app/templates/public/public_booking.html:317
 msgid "Service"
 msgstr "Palvelu"
 
 #: app/templates/customer/customer_booking.html:32
-#: app/templates/customer/customer_booking.html:281
+#: app/templates/customer/customer_booking.html:275
 #: app/templates/customer/customer_history.html:160
-#: app/templates/customer/my_bookings.html:388
+#: app/templates/customer/customer_history.html:183
+#: app/templates/customer/customer_history.html:204
+#: app/templates/customer/customer_history.html:226
+#: app/templates/customer/my_bookings.html:400
 #: app/templates/public/public_booking.html:29
-#: app/templates/public/public_booking.html:331
+#: app/templates/public/public_booking.html:325
 msgid "Stylist"
 msgstr "Stylisti"
 
 #: app/templates/customer/customer_booking.html:36
 #: app/templates/customer/invoice_detail.html:94
-#: app/templates/customer/reschedule.html:196
-#: app/templates/customer/reschedule.html:212
+#: app/templates/customer/reschedule.html:190
+#: app/templates/customer/reschedule.html:206
 #: app/templates/public/public_booking.html:33
 msgid "Date"
 msgstr "Päivä"
@@ -432,19 +430,19 @@ msgid "All Services"
 msgstr "Kaikki palvelut"
 
 #: app/templates/customer/customer_booking.html:95
-#: app/templates/customer/customer_booking.html:403
+#: app/templates/customer/customer_booking.html:397
 #: app/templates/customer/invoice_detail.html:78
 #: app/templates/public/public_booking.html:95
-#: app/templates/public/public_booking.html:454
+#: app/templates/public/public_booking.html:448
 msgid "min"
 msgstr "min"
 
 #: app/templates/customer/customer_booking.html:109
-#: app/templates/customer/customer_booking.html:163
-#: app/templates/customer/customer_booking.html:214
+#: app/templates/customer/customer_booking.html:157
+#: app/templates/customer/customer_booking.html:208
 #: app/templates/public/public_booking.html:109
-#: app/templates/public/public_booking.html:163
-#: app/templates/public/public_booking.html:214
+#: app/templates/public/public_booking.html:157
+#: app/templates/public/public_booking.html:208
 msgid "Continue"
 msgstr "Jatka"
 
@@ -459,11 +457,11 @@ msgid "Select your preferred stylist or let us match you."
 msgstr "Valitse haluamasi stylisti tai anna meidän valita puolestasi."
 
 #: app/templates/customer/customer_booking.html:132
-#: app/templates/customer/customer_booking.html:282
-#: app/templates/customer/customer_booking.html:411
+#: app/templates/customer/customer_booking.html:276
+#: app/templates/customer/customer_booking.html:405
 #: app/templates/public/public_booking.html:132
-#: app/templates/public/public_booking.html:332
-#: app/templates/public/public_booking.html:459
+#: app/templates/public/public_booking.html:326
+#: app/templates/public/public_booking.html:453
 msgid "No Preference"
 msgstr "Ei väliä"
 
@@ -472,324 +470,325 @@ msgstr "Ei väliä"
 msgid "Any available specialist"
 msgstr "Kuka tahansa vapaa asiantuntija"
 
-#: app/templates/customer/customer_booking.html:151
-#: app/templates/public/public_booking.html:151
+#: app/templates/customer/customer_booking.html:145
+#: app/templates/public/public_booking.html:145
 msgid "Nail Technician"
 msgstr "Kynsiteknikko"
 
-#: app/templates/customer/customer_booking.html:160
-#: app/templates/customer/customer_booking.html:211
-#: app/templates/customer/customer_booking.html:313
-#: app/templates/public/public_booking.html:160
-#: app/templates/public/public_booking.html:211
-#: app/templates/public/public_booking.html:261
-#: app/templates/public/public_booking.html:363
+#: app/templates/customer/customer_booking.html:154
+#: app/templates/customer/customer_booking.html:205
+#: app/templates/customer/customer_booking.html:307
+#: app/templates/public/public_booking.html:154
+#: app/templates/public/public_booking.html:205
+#: app/templates/public/public_booking.html:255
+#: app/templates/public/public_booking.html:357
 msgid "Back"
 msgstr "Takaisin"
 
-#: app/templates/customer/customer_booking.html:176
-#: app/templates/public/public_booking.html:176
+#: app/templates/customer/customer_booking.html:170
+#: app/templates/public/public_booking.html:170
 msgid "Select Date & Time"
 msgstr "Valitse päivä ja aika"
 
-#: app/templates/customer/customer_booking.html:177
-#: app/templates/public/public_booking.html:177
+#: app/templates/customer/customer_booking.html:171
+#: app/templates/public/public_booking.html:171
 msgid "Pick a date, then choose an available slot."
 msgstr "Valitse päivä ja sen jälkeen vapaa aika."
 
-#: app/templates/customer/customer_booking.html:184
-#: app/templates/public/public_booking.html:184
+#: app/templates/customer/customer_booking.html:178
+#: app/templates/public/public_booking.html:178
 msgid "Previous month"
 msgstr "Edellinen kuukausi"
 
-#: app/templates/customer/customer_booking.html:188
-#: app/templates/public/public_booking.html:188
+#: app/templates/customer/customer_booking.html:182
+#: app/templates/public/public_booking.html:182
 msgid "Next month"
 msgstr "Seuraava kuukausi"
 
-#: app/templates/customer/customer_booking.html:193
-#: app/templates/customer/reschedule.html:105
-#: app/templates/public/public_booking.html:193
+#: app/templates/customer/customer_booking.html:187
+#: app/templates/customer/reschedule.html:99
+#: app/templates/public/public_booking.html:187
 msgid "MO"
 msgstr "MA"
 
-#: app/templates/customer/customer_booking.html:193
-#: app/templates/customer/reschedule.html:106
-#: app/templates/public/public_booking.html:193
+#: app/templates/customer/customer_booking.html:187
+#: app/templates/customer/reschedule.html:100
+#: app/templates/public/public_booking.html:187
 msgid "TU"
 msgstr "TI"
 
-#: app/templates/customer/customer_booking.html:193
-#: app/templates/customer/reschedule.html:107
-#: app/templates/public/public_booking.html:193
+#: app/templates/customer/customer_booking.html:187
+#: app/templates/customer/reschedule.html:101
+#: app/templates/public/public_booking.html:187
 msgid "WE"
 msgstr "KE"
 
-#: app/templates/customer/customer_booking.html:194
-#: app/templates/customer/reschedule.html:108
-#: app/templates/public/public_booking.html:194
+#: app/templates/customer/customer_booking.html:188
+#: app/templates/customer/reschedule.html:102
+#: app/templates/public/public_booking.html:188
 msgid "TH"
 msgstr "TO"
 
-#: app/templates/customer/customer_booking.html:194
-#: app/templates/customer/reschedule.html:109
-#: app/templates/public/public_booking.html:194
+#: app/templates/customer/customer_booking.html:188
+#: app/templates/customer/reschedule.html:103
+#: app/templates/public/public_booking.html:188
 msgid "FR"
 msgstr "PE"
 
-#: app/templates/customer/customer_booking.html:194
-#: app/templates/customer/reschedule.html:110
-#: app/templates/public/public_booking.html:194
+#: app/templates/customer/customer_booking.html:188
+#: app/templates/customer/reschedule.html:104
+#: app/templates/public/public_booking.html:188
 msgid "SA"
 msgstr "LA"
 
-#: app/templates/customer/customer_booking.html:194
-#: app/templates/customer/reschedule.html:111
-#: app/templates/public/public_booking.html:194
+#: app/templates/customer/customer_booking.html:188
+#: app/templates/customer/reschedule.html:105
+#: app/templates/public/public_booking.html:188
 msgid "SU"
 msgstr "SU"
 
-#: app/templates/customer/customer_booking.html:200
-#: app/templates/customer/reschedule.html:146
-#: app/templates/public/public_booking.html:200
+#: app/templates/customer/customer_booking.html:194
+#: app/templates/customer/reschedule.html:140
+#: app/templates/public/public_booking.html:194
 msgid "Available Times"
 msgstr "Vapaat ajat"
 
-#: app/templates/customer/customer_booking.html:201
-#: app/templates/public/public_booking.html:201
+#: app/templates/customer/customer_booking.html:195
+#: app/templates/public/public_booking.html:195
 msgid "Select a date to see available times"
 msgstr "Valitse päivä nähdäksesi vapaat ajat"
 
-#: app/templates/customer/customer_booking.html:203
-#: app/templates/public/public_booking.html:203
+#: app/templates/customer/customer_booking.html:197
+#: app/templates/public/public_booking.html:197
 msgid "Please select a date first"
 msgstr "Valitse ensin päivä"
 
-#: app/templates/customer/customer_booking.html:226
-#: app/templates/public/public_booking.html:276
+#: app/templates/customer/customer_booking.html:220
+#: app/templates/public/public_booking.html:270
 msgid "Confirm & Pay"
 msgstr "Vahvista ja maksa"
 
-#: app/templates/customer/customer_booking.html:232
+#: app/templates/customer/customer_booking.html:226
 #: app/templates/customer/invoice_detail.html:45
-#: app/templates/public/public_booking.html:282
+#: app/templates/public/public_booking.html:276
 msgid "Payment Method"
 msgstr "Maksutapa"
 
-#: app/templates/customer/customer_booking.html:239
-#: app/templates/public/public_booking.html:289
+#: app/templates/customer/customer_booking.html:233
+#: app/templates/public/public_booking.html:283
 msgid "Pay at Salon"
 msgstr "Maksa salongilla"
 
-#: app/templates/customer/customer_booking.html:240
-#: app/templates/public/public_booking.html:290
+#: app/templates/customer/customer_booking.html:234
+#: app/templates/public/public_booking.html:284
 msgid "Pay after your service is completed"
 msgstr "Maksa hoidon jälkeen"
 
-#: app/templates/customer/customer_booking.html:253
-#: app/templates/public/public_booking.html:303
+#: app/templates/customer/customer_booking.html:247
+#: app/templates/public/public_booking.html:297
 msgid "Online Payment"
 msgstr "Verkkomaksu"
 
-#: app/templates/customer/customer_booking.html:254
-#: app/templates/public/public_booking.html:304
+#: app/templates/customer/customer_booking.html:248
+#: app/templates/public/public_booking.html:298
 msgid "Pay now securely by card"
 msgstr "Maksa nyt turvallisesti kortilla"
 
-#: app/templates/customer/customer_booking.html:264
-#: app/templates/public/public_booking.html:314
+#: app/templates/customer/customer_booking.html:258
+#: app/templates/public/public_booking.html:308
 msgid "You'll receive a verification email after confirming. Your booking will be"
 msgstr "Saat vahvistussähköpostin vahvistuksen jälkeen. Varauksesi on"
 
-#: app/templates/customer/customer_booking.html:264
-#: app/templates/public/public_booking.html:314
+#: app/templates/customer/customer_booking.html:258
+#: app/templates/public/public_booking.html:308
 msgid "pending"
 msgstr "vahvistamatta"
 
-#: app/templates/customer/customer_booking.html:264
-#: app/templates/public/public_booking.html:314
+#: app/templates/customer/customer_booking.html:258
+#: app/templates/public/public_booking.html:308
 msgid "until the salon confirms your appointment."
 msgstr "kunnes salonki vahvistaa aikasi."
 
-#: app/templates/customer/customer_booking.html:270
-#: app/templates/public/public_booking.html:320
+#: app/templates/customer/customer_booking.html:264
+#: app/templates/public/public_booking.html:314
 msgid "Booking Summary"
 msgstr "Varauksen yhteenveto"
 
-#: app/templates/customer/customer_booking.html:277
+#: app/templates/customer/customer_booking.html:271
 #: app/templates/customer/invoice_detail.html:77
-#: app/templates/public/public_booking.html:327
+#: app/templates/public/public_booking.html:321
 msgid "Duration"
 msgstr "Kesto"
 
-#: app/templates/customer/customer_booking.html:285
-#: app/templates/public/public_booking.html:335
+#: app/templates/customer/customer_booking.html:279
+#: app/templates/public/public_booking.html:329
 msgid "Date & Time"
 msgstr "Päivä ja aika"
 
-#: app/templates/customer/customer_booking.html:291
-#: app/templates/public/public_booking.html:341
+#: app/templates/customer/customer_booking.html:285
+#: app/templates/public/public_booking.html:335
 msgid "Subtotal"
 msgstr "Välisumma"
 
-#: app/templates/customer/customer_booking.html:294
-#: app/templates/public/public_booking.html:344
+#: app/templates/customer/customer_booking.html:288
+#: app/templates/public/public_booking.html:338
 #, python-format
 msgid "VAT (25.5%%)"
 msgstr "ALV (25,5 %%)"
 
-#: app/templates/customer/customer_booking.html:297
-#: app/templates/public/public_booking.html:347
+#: app/templates/customer/customer_booking.html:291
+#: app/templates/public/public_booking.html:341
 msgid "Total"
 msgstr "Yhteensä"
 
-#: app/templates/customer/customer_booking.html:303
+#: app/templates/customer/customer_booking.html:297
 msgid "You'll earn"
 msgstr "Ansaitset"
 
-#: app/templates/customer/customer_booking.html:303
+#: app/templates/customer/customer_booking.html:297
 msgid "loyalty points with this booking."
 msgstr "kanta-asiakaspistettä tästä varauksesta."
 
-#: app/templates/customer/customer_booking.html:305
-#: app/templates/public/public_booking.html:355
+#: app/templates/customer/customer_booking.html:299
+#: app/templates/public/public_booking.html:349
 msgid "By confirming, you agree to our 24h cancellation policy."
 msgstr "Vahvistamalla hyväksyt 24 tunnin peruutusehtomme."
 
-#: app/templates/customer/customer_booking.html:316
-#: app/templates/public/public_booking.html:366
+#: app/templates/customer/customer_booking.html:310
+#: app/templates/public/public_booking.html:360
 msgid "Confirm & continue"
 msgstr "Vahvista ja jatka"
 
-#: app/templates/customer/customer_booking.html:409
-#: app/templates/customer/loyalty_points.html:1076
-#: app/templates/customer/loyalty_points.html:1097
-#: app/templates/customer/loyalty_points.html:1204
-#: app/templates/customer/loyalty_points.html:1359
-#: app/templates/customer/my_bookings.html:80
-#: app/templates/customer/my_bookings.html:91
+#: app/templates/customer/customer_booking.html:403
+#: app/templates/customer/loyalty_points.html:1089
+#: app/templates/customer/loyalty_points.html:1110
+#: app/templates/customer/loyalty_points.html:1217
+#: app/templates/customer/loyalty_points.html:1372
+#: app/templates/customer/my_bookings.html:92
+#: app/templates/customer/my_bookings.html:103
 #: app/templates/customer/redeem_confirm_modal.html:82
 #: app/templates/customer/redeem_confirm_modal.html:96
 msgid "pts"
 msgstr "pistettä"
 
-#: app/templates/customer/customer_booking.html:419
-#: app/templates/public/public_booking.html:467
+#: app/templates/customer/customer_booking.html:413
+#: app/templates/public/public_booking.html:461
 msgid "Processing…"
 msgstr "Käsitellään…"
 
-#: app/templates/customer/customer_booking.html:517
-#: app/templates/public/public_booking.html:551
+#: app/templates/customer/customer_booking.html:511
+#: app/templates/public/public_booking.html:545
 msgid "Please select a service first."
 msgstr "Valitse ensin palvelu."
 
-#: app/templates/customer/customer_booking.html:521
-#: app/templates/customer/reschedule.html:150
-#: app/templates/public/public_booking.html:555
+#: app/templates/customer/customer_booking.html:515
+#: app/templates/customer/reschedule.html:144
+#: app/templates/public/public_booking.html:549
 msgid "Please select a date first."
 msgstr "Valitse ensin päivä."
 
-#: app/templates/customer/customer_booking.html:528
-#: app/templates/public/public_booking.html:562
+#: app/templates/customer/customer_booking.html:522
+#: app/templates/public/public_booking.html:556
 msgid "Loading..."
 msgstr "Ladataan..."
 
-#: app/templates/customer/customer_booking.html:535
-#: app/templates/public/public_booking.html:569
+#: app/templates/customer/customer_booking.html:529
+#: app/templates/public/public_booking.html:563
 msgid "Could not load available times."
 msgstr "Vapaita aikoja ei voitu ladata."
 
-#: app/templates/customer/customer_booking.html:545
-#: app/templates/public/public_booking.html:579
+#: app/templates/customer/customer_booking.html:539
+#: app/templates/public/public_booking.html:573
 msgid "No available slots for this date."
 msgstr "Ei vapaita aikoja tälle päivälle."
 
-#: app/templates/customer/customer_dashboard.html:497
+#: app/templates/customer/customer_dashboard.html:593
 msgid "Customer Dashboard"
 msgstr "Asiakkaan kojelauta"
 
-#: app/templates/customer/customer_dashboard.html:498
+#: app/templates/customer/customer_dashboard.html:594
 #, python-format
 msgid "Good morning, %(name)s!"
 msgstr "Hyvää huomenta, %(name)s!"
 
-#: app/templates/customer/customer_dashboard.html:499
+#: app/templates/customer/customer_dashboard.html:595
 msgid "Ready for your next glow up?"
 msgstr "Valmiina seuraavaan hemmotteluun?"
 
-#: app/templates/customer/customer_dashboard.html:501
+#: app/templates/customer/customer_dashboard.html:597
 msgid "Book Appointment"
 msgstr "Varaa aika"
 
-#: app/templates/customer/customer_dashboard.html:515
-msgid "✦ Loyalty Reward"
-msgstr "✦ Kanta-asiakaspalkinto"
+#: app/templates/customer/customer_dashboard.html:624
+#, fuzzy
+msgid "Previous slide"
+msgstr "Edellinen kuva"
 
-#: app/templates/customer/customer_dashboard.html:540
-#: app/templates/customer/customer_dashboard.html:562
+#: app/templates/customer/customer_dashboard.html:627
+#, fuzzy
+msgid "Next slide"
+msgstr "Seuraava kuva"
+
+#: app/templates/customer/customer_dashboard.html:654
+#: app/templates/customer/customer_dashboard.html:682
 msgid "Upcoming Appointment"
 msgstr "Tuleva aika"
 
-#: app/templates/customer/customer_dashboard.html:546
-#, python-format
-msgid "%(date)s • %(time)s with %(staff)s."
-msgstr "%(date)s • %(time)s – %(staff)s."
-
-#: app/templates/customer/customer_dashboard.html:549
-#: app/templates/customer/my_bookings.html:39
+#: app/templates/customer/customer_dashboard.html:676
+#: app/templates/customer/my_bookings.html:59
 #: app/templates/customer/view_booking_details.html:25
-#: app/templates/public/success.html:100
+#: app/templates/public/success.html:98
 msgid "Add to Calendar"
 msgstr "Lisää kalenteriin"
 
-#: app/templates/customer/customer_dashboard.html:550
-#: app/templates/customer/my_bookings.html:40
-#: app/templates/customer/my_bookings.html:179
-#: app/templates/customer/my_bookings.html:238
-#: app/templates/customer/my_bookings.html:290
+#: app/templates/customer/customer_dashboard.html:677
+#: app/templates/customer/my_bookings.html:60
+#: app/templates/customer/my_bookings.html:191
+#: app/templates/customer/my_bookings.html:250
+#: app/templates/customer/my_bookings.html:302
 msgid "View Details"
 msgstr "Näytä tiedot"
 
-#: app/templates/customer/customer_dashboard.html:563
-#: app/templates/customer/my_bookings.html:52
+#: app/templates/customer/customer_dashboard.html:683
+#: app/templates/customer/my_bookings.html:68
 msgid "No upcoming visits scheduled"
 msgstr "Ei tulevia varauksia"
 
-#: app/templates/customer/customer_dashboard.html:564
-#: app/templates/customer/my_bookings.html:55
+#: app/templates/customer/customer_dashboard.html:684
+#: app/templates/customer/my_bookings.html:71
 msgid "Ready for a new look? Book your next treatment today."
 msgstr "Valmiina uuteen tyyliin? Varaa seuraava hoitosi tänään."
 
-#: app/templates/customer/customer_dashboard.html:566
-#: app/templates/customer/my_bookings.html:59
+#: app/templates/customer/customer_dashboard.html:686
+#: app/templates/customer/my_bookings.html:75
 msgid "Book new appointment"
 msgstr "Varaa uusi aika"
 
-#: app/templates/customer/customer_dashboard.html:582
+#: app/templates/customer/customer_dashboard.html:699
 msgid "Keep blooming —"
 msgstr "Jatka kukoistamista —"
 
-#: app/templates/customer/customer_dashboard.html:582
+#: app/templates/customer/customer_dashboard.html:699
 msgid "your next treat is almost here!"
 msgstr "seuraava herkkusi on jo lähellä!"
 
-#: app/templates/customer/customer_dashboard.html:588
-#: app/templates/customer/my_bookings.html:81
-#: app/templates/customer/my_bookings.html:92
+#: app/templates/customer/customer_dashboard.html:705
+#: app/templates/customer/my_bookings.html:93
+#: app/templates/customer/my_bookings.html:104
 msgid "Complete"
 msgstr "Valmis"
 
-#: app/templates/customer/customer_dashboard.html:593
-#: app/templates/customer/my_bookings.html:73
+#: app/templates/customer/customer_dashboard.html:710
+#: app/templates/customer/my_bookings.html:85
 #, python-format
 msgid "%(points)s points to %(reward)s"
 msgstr "%(points)s pistettä palkintoon %(reward)s"
 
-#: app/templates/customer/customer_dashboard.html:597
+#: app/templates/customer/customer_dashboard.html:714
 msgid "You've unlocked all rewards! 🎉"
 msgstr "Olet avannut kaikki palkinnot! 🎉"
 
-#: app/templates/customer/customer_dashboard.html:601
+#: app/templates/customer/customer_dashboard.html:718
 msgid "View All Rewards"
 msgstr "Näytä kaikki palkinnot"
 
@@ -906,13 +905,20 @@ msgid "Service & Date"
 msgstr "Palvelu ja päivä"
 
 #: app/templates/customer/customer_history.html:161
+#: app/templates/customer/customer_history.html:184
+#: app/templates/customer/customer_history.html:205
+#: app/templates/customer/customer_history.html:227
 msgid "Price"
 msgstr "Hinta"
 
 #: app/templates/customer/customer_history.html:162
+#: app/templates/customer/customer_history.html:185
+#: app/templates/customer/customer_history.html:206
+#: app/templates/customer/customer_history.html:228
 #: app/templates/customer/customer_history.html:255
+#: app/templates/customer/customer_history.html:285
 #: app/templates/customer/invoice_detail.html:52
-#: app/templates/customer/loyalty_points.html:1316
+#: app/templates/customer/loyalty_points.html:1329
 msgid "Status"
 msgstr "Tila"
 
@@ -923,16 +929,16 @@ msgstr "Toiminto"
 
 #: app/templates/customer/customer_history.html:185
 #: app/templates/customer/customer_history.html:567
-#: app/templates/customer/my_bookings.html:131
-#: app/templates/customer/my_bookings.html:272
+#: app/templates/customer/my_bookings.html:143
+#: app/templates/customer/my_bookings.html:284
 msgid "Cancelled"
 msgstr "Peruttu"
 
 #: app/templates/customer/customer_history.html:187
 #: app/templates/customer/customer_history.html:209
 #: app/templates/customer/customer_history.html:231
-#: app/templates/customer/my_bookings.html:291
-#: app/templates/customer/my_bookings.html:398
+#: app/templates/customer/my_bookings.html:303
+#: app/templates/customer/my_bookings.html:410
 msgid "Rebook"
 msgstr "Varaa uudelleen"
 
@@ -955,11 +961,13 @@ msgid "Invoice & Service"
 msgstr "Lasku ja palvelu"
 
 #: app/templates/customer/customer_history.html:253
+#: app/templates/customer/customer_history.html:278
 msgid "Payment"
 msgstr "Maksu"
 
 #: app/templates/customer/customer_history.html:254
-#: app/templates/customer/my_bookings.html:393
+#: app/templates/customer/customer_history.html:284
+#: app/templates/customer/my_bookings.html:405
 msgid "Amount"
 msgstr "Summa"
 
@@ -988,14 +996,18 @@ msgid "Refunded"
 msgstr "Hyvitetty"
 
 #: app/templates/customer/customer_history.html:573
-#: app/templates/customer/my_bookings.html:123
-#: app/templates/customer/my_bookings.html:215
+#: app/templates/customer/my_bookings.html:135
+#: app/templates/customer/my_bookings.html:227
 msgid "Pending"
 msgstr "Odottaa"
 
 #: app/templates/customer/customer_membership.html:3
 msgid "Membership Plans"
 msgstr "Jäsenyystasot"
+
+#: app/templates/customer/customer_membership.html:270
+msgid "Membership"
+msgstr "Jäsenyys"
 
 #: app/templates/customer/customer_membership.html:271
 msgid "Choose your plan"
@@ -1148,118 +1160,118 @@ msgid "VIP lounge access & complimentary drinks"
 msgstr "Pääsy VIP-loungeen ja maksuttomat juomat"
 
 #: app/templates/customer/customer_setting.html:51
-#: app/templates/customer/customer_setting.html:610
+#: app/templates/customer/customer_setting.html:622
 msgid "Account Settings"
 msgstr "Tiliasetukset"
 
-#: app/templates/customer/customer_setting.html:609
+#: app/templates/customer/customer_setting.html:621
 msgid "My Account"
 msgstr "Oma tili"
 
-#: app/templates/customer/customer_setting.html:611
+#: app/templates/customer/customer_setting.html:623
 msgid "Manage your personal information and security preferences."
 msgstr "Hallitse henkilötietojasi ja tietoturva-asetuksiasi."
 
-#: app/templates/customer/customer_setting.html:667
+#: app/templates/customer/customer_setting.html:679
 #, python-format
 msgid "Profile picture of %(name)s"
 msgstr "Käyttäjän %(name)s profiilikuva"
 
-#: app/templates/customer/customer_setting.html:679
+#: app/templates/customer/customer_setting.html:691
 msgid "Profile Picture"
 msgstr "Profiilikuva"
 
-#: app/templates/customer/customer_setting.html:680
+#: app/templates/customer/customer_setting.html:692
 msgid "JPG, GIF or PNG. Max size of 800K"
 msgstr "JPG, GIF tai PNG. Enintään 800K"
 
-#: app/templates/customer/customer_setting.html:718
+#: app/templates/customer/customer_setting.html:730
 msgid "Personal Information"
 msgstr "Henkilötiedot"
 
-#: app/templates/customer/customer_setting.html:734
-#: app/templates/public/public_booking.html:239
+#: app/templates/customer/customer_setting.html:746
+#: app/templates/public/public_booking.html:233
 msgid "Full Name"
 msgstr "Koko nimi"
 
-#: app/templates/customer/customer_setting.html:743
+#: app/templates/customer/customer_setting.html:755
 msgid "Enter full name"
 msgstr "Anna koko nimi"
 
-#: app/templates/customer/customer_setting.html:746
-#: app/templates/customer/customer_setting.html:755
-#: app/templates/customer/customer_setting.html:771
-#: app/templates/customer/customer_setting.html:796
-#: app/templates/customer/customer_setting.html:1140
+#: app/templates/customer/customer_setting.html:758
+#: app/templates/customer/customer_setting.html:767
+#: app/templates/customer/customer_setting.html:783
+#: app/templates/customer/customer_setting.html:808
+#: app/templates/customer/customer_setting.html:1152
 msgid "Change"
 msgstr "Muuta"
 
-#: app/templates/customer/customer_setting.html:752
-#: app/templates/public/public_booking.html:248
+#: app/templates/customer/customer_setting.html:764
+#: app/templates/public/public_booking.html:242
 #: app/templates/staff/login.html:31
 msgid "Email Address"
 msgstr "Sähköpostiosoite"
 
-#: app/templates/customer/customer_setting.html:761
-#: app/templates/public/public_booking.html:243
+#: app/templates/customer/customer_setting.html:773
+#: app/templates/public/public_booking.html:237
 msgid "Phone Number"
 msgstr "Puhelinnumero"
 
-#: app/templates/customer/customer_setting.html:768
+#: app/templates/customer/customer_setting.html:780
 msgid "Enter phone number"
 msgstr "Anna puhelinnumero"
 
-#: app/templates/customer/customer_setting.html:781
+#: app/templates/customer/customer_setting.html:793
 msgid "Date of Birth"
 msgstr "Syntymäaika"
 
-#: app/templates/customer/customer_setting.html:786
+#: app/templates/customer/customer_setting.html:798
 msgid "Not set"
 msgstr "Ei asetettu"
 
-#: app/templates/customer/customer_setting.html:803
+#: app/templates/customer/customer_setting.html:815
 msgid "Save Changes"
 msgstr "Tallenna muutokset"
 
-#: app/templates/customer/customer_setting.html:840
+#: app/templates/customer/customer_setting.html:852
 msgid "Security"
 msgstr "Tietoturva"
 
-#: app/templates/customer/customer_setting.html:846
+#: app/templates/customer/customer_setting.html:858
 #: app/templates/staff/login.html:41
 msgid "Password"
 msgstr "Salasana"
 
-#: app/templates/customer/customer_setting.html:851
+#: app/templates/customer/customer_setting.html:863
 msgid "Change Password"
 msgstr "Vaihda salasana"
 
-#: app/templates/customer/customer_setting.html:858
+#: app/templates/customer/customer_setting.html:870
 #, python-format
 msgid "Last changed %(time)s"
 msgstr "Viimeksi vaihdettu %(time)s"
 
-#: app/templates/customer/customer_setting.html:876
-#: app/templates/staff/staff_profile.html:303
+#: app/templates/customer/customer_setting.html:888
+#: app/templates/staff/staff_profile.html:320
 msgid "Language"
 msgstr "Kieli"
 
-#: app/templates/customer/customer_setting.html:879
+#: app/templates/customer/customer_setting.html:891
 msgid "Choose your preferred display language."
 msgstr "Valitse haluamasi näyttökieli."
 
-#: app/templates/customer/customer_setting.html:908
+#: app/templates/customer/customer_setting.html:920
 msgid "Change Email Address"
 msgstr "Vaihda sähköpostiosoite"
 
-#: app/templates/customer/customer_setting.html:909
-#: app/templates/customer/customer_setting.html:978
-#: app/templates/customer/my_bookings.html:316
-#: app/templates/public/gallery.html:97
+#: app/templates/customer/customer_setting.html:921
+#: app/templates/customer/customer_setting.html:990
+#: app/templates/customer/my_bookings.html:328
+#: app/templates/public/gallery.html:94 app/templates/public/services.html:203
 msgid "Close"
 msgstr "Sulje"
 
-#: app/templates/customer/customer_setting.html:917
+#: app/templates/customer/customer_setting.html:929
 msgid ""
 "To verify your identity, we'll send a verification code to your current "
 "email address."
@@ -1267,110 +1279,110 @@ msgstr ""
 "Vahvistaaksemme henkilöllisyytesi lähetämme vahvistuskoodin nykyiseen "
 "sähköpostiisi."
 
-#: app/templates/customer/customer_setting.html:923
-#: app/templates/customer/customer_setting.html:944
-#: app/templates/customer/customer_setting.html:992
-#: app/templates/customer/customer_setting.html:1017
-#: app/templates/customer/customer_setting.html:1149
-#: app/templates/customer/my_bookings.html:183
-#: app/templates/customer/my_bookings.html:241
+#: app/templates/customer/customer_setting.html:935
+#: app/templates/customer/customer_setting.html:956
+#: app/templates/customer/customer_setting.html:1004
+#: app/templates/customer/customer_setting.html:1029
+#: app/templates/customer/customer_setting.html:1161
+#: app/templates/customer/my_bookings.html:195
+#: app/templates/customer/my_bookings.html:253
 #: app/templates/customer/redeem_confirm_modal.html:124
-#: app/templates/customer/reschedule.html:243
+#: app/templates/customer/reschedule.html:237
 #: app/templates/customer/view_booking_details.html:82
 #: app/templates/customer/view_booking_details.html:87
 msgid "Cancel"
 msgstr "Peruuta"
 
-#: app/templates/customer/customer_setting.html:924
-#: app/templates/customer/customer_setting.html:993
-#: app/templates/customer/customer_setting.html:1062
-#: app/templates/customer/customer_setting.html:1107
-#: app/templates/customer/customer_setting.html:1113
-#: app/templates/customer/customer_setting.html:1196
-#: app/templates/customer/customer_setting.html:1239
-#: app/templates/customer/customer_setting.html:1245
+#: app/templates/customer/customer_setting.html:936
+#: app/templates/customer/customer_setting.html:1005
+#: app/templates/customer/customer_setting.html:1074
+#: app/templates/customer/customer_setting.html:1119
+#: app/templates/customer/customer_setting.html:1125
+#: app/templates/customer/customer_setting.html:1208
+#: app/templates/customer/customer_setting.html:1251
+#: app/templates/customer/customer_setting.html:1257
 msgid "Send Code"
 msgstr "Lähetä koodi"
 
-#: app/templates/customer/customer_setting.html:931
-#: app/templates/customer/customer_setting.html:1000
+#: app/templates/customer/customer_setting.html:943
+#: app/templates/customer/customer_setting.html:1012
 msgid "Enter the verification code sent to"
 msgstr "Anna vahvistuskoodi, joka lähetettiin osoitteeseen"
 
-#: app/templates/customer/customer_setting.html:931
+#: app/templates/customer/customer_setting.html:943
 msgid "and your new email address."
 msgstr "ja uusi sähköpostiosoitteesi."
 
-#: app/templates/customer/customer_setting.html:936
-#: app/templates/customer/customer_setting.html:1005
+#: app/templates/customer/customer_setting.html:948
+#: app/templates/customer/customer_setting.html:1017
 msgid "Verification Code"
 msgstr "Vahvistuskoodi"
 
-#: app/templates/customer/customer_setting.html:937
-#: app/templates/customer/customer_setting.html:1006
+#: app/templates/customer/customer_setting.html:949
+#: app/templates/customer/customer_setting.html:1018
 msgid "Enter 6-digit code"
 msgstr "Anna 6-numeroinen koodi"
 
-#: app/templates/customer/customer_setting.html:940
+#: app/templates/customer/customer_setting.html:952
 msgid "New Email Address"
 msgstr "Uusi sähköpostiosoite"
 
-#: app/templates/customer/customer_setting.html:941
+#: app/templates/customer/customer_setting.html:953
 msgid "Enter new email address"
 msgstr "Anna uusi sähköpostiosoite"
 
-#: app/templates/customer/customer_setting.html:945
+#: app/templates/customer/customer_setting.html:957
 msgid "Update Email"
 msgstr "Päivitä sähköposti"
 
-#: app/templates/customer/customer_setting.html:977
-#: app/templates/customer/customer_setting.html:1018
+#: app/templates/customer/customer_setting.html:989
+#: app/templates/customer/customer_setting.html:1030
 msgid "Update Password"
 msgstr "Päivitä salasana"
 
-#: app/templates/customer/customer_setting.html:986
+#: app/templates/customer/customer_setting.html:998
 msgid ""
 "To verify your identity, we'll send a verification code to your email "
 "address."
 msgstr "Vahvistaaksemme henkilöllisyytesi lähetämme vahvistuskoodin sähköpostiisi."
 
-#: app/templates/customer/customer_setting.html:1000
+#: app/templates/customer/customer_setting.html:1012
 msgid "and your new password."
 msgstr "ja uusi salasanasi."
 
-#: app/templates/customer/customer_setting.html:1009
+#: app/templates/customer/customer_setting.html:1021
 msgid "New Password"
 msgstr "Uusi salasana"
 
-#: app/templates/customer/customer_setting.html:1010
+#: app/templates/customer/customer_setting.html:1022
 msgid "Create new password"
 msgstr "Luo uusi salasana"
 
-#: app/templates/customer/customer_setting.html:1013
+#: app/templates/customer/customer_setting.html:1025
 msgid "Confirm New Password"
 msgstr "Vahvista uusi salasana"
 
-#: app/templates/customer/customer_setting.html:1014
+#: app/templates/customer/customer_setting.html:1026
 msgid "Confirm new password"
 msgstr "Vahvista uusi salasana"
 
-#: app/templates/customer/customer_setting.html:1085
-#: app/templates/customer/customer_setting.html:1217
+#: app/templates/customer/customer_setting.html:1097
+#: app/templates/customer/customer_setting.html:1229
 msgid "Sending..."
 msgstr "Lähetetään..."
 
-#: app/templates/customer/customer_setting.html:1104
-#: app/templates/customer/customer_setting.html:1236
+#: app/templates/customer/customer_setting.html:1116
+#: app/templates/customer/customer_setting.html:1248
 #: app/templates/customer/redeem_confirm_modal.html:497
 msgid "Something went wrong. Please try again."
 msgstr "Jokin meni pieleen. Yritä uudelleen."
 
-#: app/templates/customer/customer_setting.html:1110
-#: app/templates/customer/customer_setting.html:1242
+#: app/templates/customer/customer_setting.html:1122
+#: app/templates/customer/customer_setting.html:1254
 msgid "Network error. Please try again."
 msgstr "Verkkovirhe. Yritä uudelleen."
 
-#: app/templates/customer/customer_setting.html:1164
+#: app/templates/customer/customer_setting.html:1176
 msgid "You have unsaved changes. Do you want to leave without saving?"
 msgstr "Sinulla on tallentamattomia muutoksia. Haluatko poistua tallentamatta?"
 
@@ -1418,192 +1430,192 @@ msgstr "Aikaikkuna"
 msgid "Assigned Stylist"
 msgstr "Osoitettu stylisti"
 
-#: app/templates/customer/invoice_detail.html:114
+#: app/templates/customer/invoice_detail.html:116
 msgid "Payment Summary"
 msgstr "Maksun yhteenveto"
 
-#: app/templates/customer/invoice_detail.html:124
+#: app/templates/customer/invoice_detail.html:126
 msgid "Total Paid Amount"
 msgstr "Maksettu kokonaissumma"
 
-#: app/templates/customer/invoice_detail.html:132
+#: app/templates/customer/invoice_detail.html:134
 msgid "FULLY PAID"
 msgstr "MAKSETTU KOKONAAN"
 
-#: app/templates/customer/invoice_detail.html:133
+#: app/templates/customer/invoice_detail.html:135
 msgid "REFUNDED"
 msgstr "HYVITETTY"
 
-#: app/templates/customer/invoice_detail.html:142
+#: app/templates/customer/invoice_detail.html:144
 msgid "Download PDF Invoice"
 msgstr "Lataa PDF-lasku"
 
-#: app/templates/customer/loyalty_points.html:1064
+#: app/templates/customer/loyalty_points.html:1077
 msgid "Rewards Club"
 msgstr "Palkintokerho"
 
-#: app/templates/customer/loyalty_points.html:1066
+#: app/templates/customer/loyalty_points.html:1079
 msgid "Your journey to effortless beauty, rewarded."
 msgstr "Matkasi vaivattomaan kauneuteen, palkittuna."
 
-#: app/templates/customer/loyalty_points.html:1074
+#: app/templates/customer/loyalty_points.html:1087
 msgid "Current Balance"
 msgstr "Nykyinen saldo"
 
-#: app/templates/customer/loyalty_points.html:1085
+#: app/templates/customer/loyalty_points.html:1098
 msgid "Tier"
 msgstr "Taso"
 
-#: app/templates/customer/loyalty_points.html:1088
+#: app/templates/customer/loyalty_points.html:1101
 #, python-format
 msgid "%(pts)s pts to unlock %(reward)s"
 msgstr "%(pts)s pistettä avataksesi %(reward)s"
 
-#: app/templates/customer/loyalty_points.html:1097
+#: app/templates/customer/loyalty_points.html:1110
 msgid "Next reward:"
 msgstr "Seuraava palkinto:"
 
-#: app/templates/customer/loyalty_points.html:1099
+#: app/templates/customer/loyalty_points.html:1112
 msgid "View Tier Benefits"
 msgstr "Näytä tason edut"
 
-#: app/templates/customer/loyalty_points.html:1136
+#: app/templates/customer/loyalty_points.html:1149
 msgid "Earn Points"
 msgstr "Ansaitse pisteitä"
 
-#: app/templates/customer/loyalty_points.html:1137
+#: app/templates/customer/loyalty_points.html:1150
 msgid "Previous"
 msgstr "Edellinen"
 
-#: app/templates/customer/loyalty_points.html:1138
+#: app/templates/customer/loyalty_points.html:1151
 msgid "Next"
 msgstr "Seuraava"
 
-#: app/templates/customer/loyalty_points.html:1153
+#: app/templates/customer/loyalty_points.html:1166
 msgid "Available Vouchers"
 msgstr "Saatavilla olevat kupongit"
 
-#: app/templates/customer/loyalty_points.html:1155
+#: app/templates/customer/loyalty_points.html:1168
 msgid "See All"
 msgstr "Näytä kaikki"
 
-#: app/templates/customer/loyalty_points.html:1186
+#: app/templates/customer/loyalty_points.html:1199
 msgid "Available"
 msgstr "Saatavilla"
 
-#: app/templates/customer/loyalty_points.html:1188
+#: app/templates/customer/loyalty_points.html:1201
 msgid "left"
 msgstr "jäljellä"
 
-#: app/templates/customer/loyalty_points.html:1196
+#: app/templates/customer/loyalty_points.html:1209
 msgid "redeems left"
 msgstr "lunastusta jäljellä"
 
-#: app/templates/customer/loyalty_points.html:1199
+#: app/templates/customer/loyalty_points.html:1212
 msgid "in stock"
 msgstr "varastossa"
 
-#: app/templates/customer/loyalty_points.html:1207
+#: app/templates/customer/loyalty_points.html:1220
 msgid "Not enough pts"
 msgstr "Ei tarpeeksi pisteitä"
 
-#: app/templates/customer/loyalty_points.html:1209
+#: app/templates/customer/loyalty_points.html:1222
 msgid "Out of stock"
 msgstr "Loppuunmyyty"
 
-#: app/templates/customer/loyalty_points.html:1211
-#: app/templates/customer/loyalty_points.html:1214
+#: app/templates/customer/loyalty_points.html:1224
+#: app/templates/customer/loyalty_points.html:1227
 msgid "Limit reached"
 msgstr "Raja saavutettu"
 
-#: app/templates/customer/loyalty_points.html:1215
+#: app/templates/customer/loyalty_points.html:1228
 msgid "renew in"
 msgstr "uusiutuu"
 
-#: app/templates/customer/loyalty_points.html:1215
+#: app/templates/customer/loyalty_points.html:1228
 msgid "days"
 msgstr "päivää"
 
-#: app/templates/customer/loyalty_points.html:1220
+#: app/templates/customer/loyalty_points.html:1233
 msgid "Redeem"
 msgstr "Lunasta"
 
-#: app/templates/customer/loyalty_points.html:1232
+#: app/templates/customer/loyalty_points.html:1245
 msgid "Points History"
 msgstr "Pistehistoria"
 
-#: app/templates/customer/loyalty_points.html:1233
+#: app/templates/customer/loyalty_points.html:1246
 msgid "My Vouchers"
 msgstr "Kuponkini"
 
-#: app/templates/customer/loyalty_points.html:1260
+#: app/templates/customer/loyalty_points.html:1273
 msgid "Load More History"
 msgstr "Lataa lisää historiaa"
 
-#: app/templates/customer/loyalty_points.html:1286
-#: app/templates/customer/loyalty_points.html:1353
+#: app/templates/customer/loyalty_points.html:1299
+#: app/templates/customer/loyalty_points.html:1366
 msgid "Active"
 msgstr "Voimassa"
 
-#: app/templates/customer/loyalty_points.html:1287
-#: app/templates/customer/loyalty_points.html:1353
+#: app/templates/customer/loyalty_points.html:1300
+#: app/templates/customer/loyalty_points.html:1366
 msgid "Used"
 msgstr "Käytetty"
 
-#: app/templates/customer/loyalty_points.html:1288
-#: app/templates/customer/loyalty_points.html:1353
+#: app/templates/customer/loyalty_points.html:1301
+#: app/templates/customer/loyalty_points.html:1366
 msgid "Expired"
 msgstr "Vanhentunut"
 
-#: app/templates/customer/loyalty_points.html:1297
+#: app/templates/customer/loyalty_points.html:1310
 msgid "You haven't redeemed any rewards yet."
 msgstr "Et ole vielä lunastanut palkintoja."
 
-#: app/templates/customer/loyalty_points.html:1298
+#: app/templates/customer/loyalty_points.html:1311
 msgid "Start earning points to unlock vouchers!"
 msgstr "Aloita pisteiden kerääminen avataksesi kuponkeja!"
 
-#: app/templates/customer/loyalty_points.html:1317
+#: app/templates/customer/loyalty_points.html:1330
 msgid "Points spent"
 msgstr "Käytetyt pisteet"
 
-#: app/templates/customer/loyalty_points.html:1318
+#: app/templates/customer/loyalty_points.html:1331
 msgid "Redeemed on"
 msgstr "Lunastettu"
 
-#: app/templates/customer/loyalty_points.html:1319
+#: app/templates/customer/loyalty_points.html:1332
 msgid "Expires"
 msgstr "Vanhenee"
 
-#: app/templates/customer/loyalty_points.html:1323
+#: app/templates/customer/loyalty_points.html:1336
 msgid "Voucher Code"
 msgstr "Kupongin koodi"
 
-#: app/templates/customer/loyalty_points.html:1324
-#: app/templates/customer/loyalty_points.html:1380
-#: app/templates/customer/loyalty_points.html:1403
+#: app/templates/customer/loyalty_points.html:1337
+#: app/templates/customer/loyalty_points.html:1393
+#: app/templates/customer/loyalty_points.html:1416
 msgid "Copy"
 msgstr "Kopioi"
 
-#: app/templates/customer/loyalty_points.html:1350
+#: app/templates/customer/loyalty_points.html:1363
 msgid "Show this code to our staff when you visit."
 msgstr "Näytä tämä koodi henkilökunnallemme käydessäsi."
 
-#: app/templates/customer/loyalty_points.html:1371
+#: app/templates/customer/loyalty_points.html:1384
 msgid "Show this code to our staff at your next visit to redeem."
 msgstr ""
 "Näytä tämä koodi henkilökunnallemme seuraavalla käynnilläsi lunastaaksesi"
 " sen."
 
-#: app/templates/customer/loyalty_points.html:1373
+#: app/templates/customer/loyalty_points.html:1386
 msgid "This voucher has already been used."
 msgstr "Tämä kuponki on jo käytetty."
 
-#: app/templates/customer/loyalty_points.html:1375
+#: app/templates/customer/loyalty_points.html:1388
 msgid "This voucher has expired and is no longer valid."
 msgstr "Tämä kuponki on vanhentunut eikä ole enää voimassa."
 
-#: app/templates/customer/loyalty_points.html:1400
+#: app/templates/customer/loyalty_points.html:1413
 msgid "Copied"
 msgstr "Kopioitu"
 
@@ -1611,159 +1623,150 @@ msgstr "Kopioitu"
 msgid "Manage your upcoming visits and booking history."
 msgstr "Hallitse tulevia käyntejäsi ja varaushistoriaasi."
 
-#: app/templates/customer/my_bookings.html:26
-#: app/templates/customer/my_bookings.html:50
+#: app/templates/customer/my_bookings.html:37
+#: app/templates/customer/my_bookings.html:66
 msgid "Next Visit"
 msgstr "Seuraava käynti"
 
-#: app/templates/customer/my_bookings.html:35
-#, python-format
-msgid "%(date)s • %(start)s with %(staff)s."
-msgstr "%(date)s • %(start)s – %(staff)s."
-
-#: app/templates/customer/my_bookings.html:69
+#: app/templates/customer/my_bookings.html:81
 msgid "Loyalty Reward"
 msgstr "Kanta-asiakaspalkinto"
 
-#: app/templates/customer/my_bookings.html:85
+#: app/templates/customer/my_bookings.html:97
 msgid "You've unlocked all rewards!"
 msgstr "Olet avannut kaikki palkinnot!"
 
-#: app/templates/customer/my_bookings.html:102
+#: app/templates/customer/my_bookings.html:114
 msgid "Manage Appointments"
 msgstr "Hallitse varauksia"
 
-#: app/templates/customer/my_bookings.html:103
+#: app/templates/customer/my_bookings.html:115
 msgid "View your confirmed, pending, and cancelled bookings."
 msgstr "Katso vahvistetut, odottavat ja perutut varauksesi."
 
-#: app/templates/customer/my_bookings.html:106
-#: app/templates/customer/my_bookings.html:193
+#: app/templates/customer/my_bookings.html:118
+#: app/templates/customer/my_bookings.html:205
 msgid "Book New Appointment"
 msgstr "Varaa uusi aika"
 
-#: app/templates/customer/my_bookings.html:115
+#: app/templates/customer/my_bookings.html:127
 msgid "Upcoming"
 msgstr "Tulevat"
 
-#: app/templates/customer/my_bookings.html:156
+#: app/templates/customer/my_bookings.html:168
 msgid "Confirmed"
 msgstr "Vahvistettu"
 
-#: app/templates/customer/my_bookings.html:180
+#: app/templates/customer/my_bookings.html:192
 #: app/templates/customer/reschedule.html:3
 #: app/templates/customer/reschedule.html:18
 #: app/templates/customer/view_booking_details.html:79
 msgid "Reschedule"
 msgstr "Muuta aikaa"
 
-#: app/templates/customer/my_bookings.html:191
+#: app/templates/customer/my_bookings.html:203
 msgid "No upcoming appointments"
 msgstr "Ei tulevia varauksia"
 
-#: app/templates/customer/my_bookings.html:192
+#: app/templates/customer/my_bookings.html:204
 msgid "Book your next treatment to see it here."
 msgstr "Varaa seuraava hoitosi nähdäksesi sen tässä."
 
-#: app/templates/customer/my_bookings.html:233
-msgid "Awaiting confirmation"
-msgstr "Odottaa vahvistusta"
-
-#: app/templates/customer/my_bookings.html:249
+#: app/templates/customer/my_bookings.html:261
 msgid "No pending requests"
 msgstr "Ei odottavia pyyntöjä"
 
-#: app/templates/customer/my_bookings.html:250
+#: app/templates/customer/my_bookings.html:262
 msgid "Bookings awaiting confirmation will appear here."
 msgstr "Vahvistusta odottavat varaukset näkyvät tässä."
 
-#: app/templates/customer/my_bookings.html:285
+#: app/templates/customer/my_bookings.html:297
 #, python-format
 msgid "Cancelled on %(date)s"
 msgstr "Peruttu %(date)s"
 
-#: app/templates/customer/my_bookings.html:298
+#: app/templates/customer/my_bookings.html:310
 msgid "No cancelled appointments"
 msgstr "Ei peruttuja varauksia"
 
-#: app/templates/customer/my_bookings.html:299
+#: app/templates/customer/my_bookings.html:311
 msgid "Any bookings you cancel will show up here."
 msgstr "Perumasi varaukset näkyvät tässä."
 
-#: app/templates/customer/my_bookings.html:314
+#: app/templates/customer/my_bookings.html:326
 msgid "Cancel appointment?"
 msgstr "Perutaanko aika?"
 
-#: app/templates/customer/my_bookings.html:320
+#: app/templates/customer/my_bookings.html:332
 msgid "Appointment details"
 msgstr "Ajan tiedot"
 
-#: app/templates/customer/my_bookings.html:334
+#: app/templates/customer/my_bookings.html:346
 msgid "Cancellation Policy"
 msgstr "Peruutusehdot"
 
-#: app/templates/customer/my_bookings.html:339
+#: app/templates/customer/my_bookings.html:351
 msgid "Reason for cancellation"
 msgstr "Peruutuksen syy"
 
-#: app/templates/customer/my_bookings.html:339
+#: app/templates/customer/my_bookings.html:351
 msgid "(optional)"
 msgstr "(valinnainen)"
 
-#: app/templates/customer/my_bookings.html:342
+#: app/templates/customer/my_bookings.html:354
 msgid "Select a reason..."
 msgstr "Valitse syy..."
 
-#: app/templates/customer/my_bookings.html:343
+#: app/templates/customer/my_bookings.html:355
 msgid "Change of plans"
 msgstr "Suunnitelmat muuttuivat"
 
-#: app/templates/customer/my_bookings.html:344
+#: app/templates/customer/my_bookings.html:356
 msgid "Feeling unwell"
 msgstr "Huono olo"
 
-#: app/templates/customer/my_bookings.html:345
+#: app/templates/customer/my_bookings.html:357
 msgid "Want to reschedule instead"
 msgstr "Haluan muuttaa aikaa"
 
-#: app/templates/customer/my_bookings.html:346
+#: app/templates/customer/my_bookings.html:358
 msgid "Other"
 msgstr "Muu"
 
-#: app/templates/customer/my_bookings.html:351
+#: app/templates/customer/my_bookings.html:363
 msgid "Keep appointment"
 msgstr "Säilytä aika"
 
-#: app/templates/customer/my_bookings.html:352
+#: app/templates/customer/my_bookings.html:364
 msgid "Yes, cancel"
 msgstr "Kyllä, peruuta"
 
-#: app/templates/customer/my_bookings.html:361
+#: app/templates/customer/my_bookings.html:373
 msgid "Recent History"
 msgstr "Viimeaikainen historia"
 
-#: app/templates/customer/my_bookings.html:362
+#: app/templates/customer/my_bookings.html:374
 msgid "Your completed appointments."
 msgstr "Valmiit varauksesi."
 
-#: app/templates/customer/my_bookings.html:365
+#: app/templates/customer/my_bookings.html:377
 msgid "View All History"
 msgstr "Näytä koko historia"
 
-#: app/templates/customer/my_bookings.html:383
+#: app/templates/customer/my_bookings.html:395
 #, python-format
 msgid "%(status)s on %(date)s"
 msgstr "%(status)s %(date)s"
 
-#: app/templates/customer/my_bookings.html:400
+#: app/templates/customer/my_bookings.html:412
 msgid "Invoice"
 msgstr "Lasku"
 
-#: app/templates/customer/my_bookings.html:408
+#: app/templates/customer/my_bookings.html:420
 msgid "No history yet."
 msgstr "Ei vielä historiaa."
 
-#: app/templates/customer/my_bookings.html:409
+#: app/templates/customer/my_bookings.html:421
 msgid "Your completed appointments will appear here."
 msgstr "Suoritetut varauksesi näkyvät tässä."
 
@@ -1824,45 +1827,46 @@ msgstr ""
 "Muuta aikaasi vaivattomasti. Huomaathan 24 tunnin muutosaikamme, jotta "
 "voimme palvella kaikkia asiakkaita."
 
-#: app/templates/customer/reschedule.html:46
+#: app/templates/customer/reschedule.html:40
 msgid "Service image"
 msgstr "Palvelun kuva"
 
-#: app/templates/customer/reschedule.html:52
+#: app/templates/customer/reschedule.html:46
 msgid "CURRENT SESSION"
 msgstr "NYKYINEN AIKA"
 
-#: app/templates/customer/reschedule.html:54
+#: app/templates/customer/reschedule.html:48
 msgid "Technician:"
 msgstr "Teknikko:"
 
-#: app/templates/customer/reschedule.html:60
+#: app/templates/customer/reschedule.html:54
 msgid "DATE"
 msgstr "PÄIVÄ"
 
-#: app/templates/customer/reschedule.html:65
+#: app/templates/customer/reschedule.html:59
 msgid "TIME"
 msgstr "AIKA"
 
-#: app/templates/customer/reschedule.html:85
+#: app/templates/customer/reschedule.html:79
 msgid "Select New Date"
 msgstr "Valitse uusi päivä"
 
-#: app/templates/customer/reschedule.html:155
+#: app/templates/customer/reschedule.html:149
 msgid "Session duration:"
 msgstr "Käynnin kesto:"
 
-#: app/templates/customer/reschedule.html:155
+#: app/templates/customer/reschedule.html:149
 #: app/templates/customer/view_booking_details.html:42
-#: app/templates/public/services.html:104
+#: app/templates/public/services.html:113
+#: app/templates/public/services.html:143
 msgid "mins"
 msgstr "min"
 
-#: app/templates/customer/reschedule.html:172
+#: app/templates/customer/reschedule.html:166
 msgid "Policy Notice"
 msgstr "Ehtoilmoitus"
 
-#: app/templates/customer/reschedule.html:173
+#: app/templates/customer/reschedule.html:167
 msgid ""
 "Bookings can only be rescheduled at least 24 hours in advance and can "
 "only be changed once. Further changes may require a new deposit."
@@ -1870,32 +1874,32 @@ msgstr ""
 "Varauksia voi siirtää vain vähintään 24 tuntia etukäteen ja vain kerran. "
 "Lisämuutokset voivat vaatia uuden ennakkomaksun."
 
-#: app/templates/customer/reschedule.html:189
+#: app/templates/customer/reschedule.html:183
 msgid "Comparison"
 msgstr "Vertailu"
 
-#: app/templates/customer/reschedule.html:193
+#: app/templates/customer/reschedule.html:187
 msgid "FROM"
 msgstr "MISTÄ"
 
-#: app/templates/customer/reschedule.html:201
-#: app/templates/customer/reschedule.html:217
+#: app/templates/customer/reschedule.html:195
+#: app/templates/customer/reschedule.html:211
 msgid "Time"
 msgstr "Aika"
 
-#: app/templates/customer/reschedule.html:209
+#: app/templates/customer/reschedule.html:203
 msgid "TO (NEW)"
 msgstr "MIHIN (UUSI)"
 
-#: app/templates/customer/reschedule.html:213
+#: app/templates/customer/reschedule.html:207
 msgid "Please select a date"
 msgstr "Valitse päivä"
 
-#: app/templates/customer/reschedule.html:218
+#: app/templates/customer/reschedule.html:212
 msgid "Please select a time"
 msgstr "Valitse aika"
 
-#: app/templates/customer/reschedule.html:247
+#: app/templates/customer/reschedule.html:241
 msgid "Confirm Reschedule"
 msgstr "Vahvista ajan muutos"
 
@@ -2012,7 +2016,7 @@ msgstr "Palveltua asiakasta"
 msgid "Master Artists"
 msgstr "Mestariartistia"
 
-#: app/templates/public/about.html:80 app/templates/public/services.html:126
+#: app/templates/public/about.html:80 app/templates/public/services.html:167
 msgid "Average Rating"
 msgstr "Keskiarvosana"
 
@@ -2020,15 +2024,15 @@ msgstr "Keskiarvosana"
 msgid "Meet the team"
 msgstr "Tutustu tiimiin"
 
-#: app/templates/public/about.html:147
+#: app/templates/public/about.html:145
 msgid "What we stand for"
 msgstr "Arvomme"
 
-#: app/templates/public/about.html:158
+#: app/templates/public/about.html:156
 msgid "Hygiene first"
 msgstr "Hygienia edellä"
 
-#: app/templates/public/about.html:159
+#: app/templates/public/about.html:157
 msgid ""
 "Medical-grade sterilization processes for every tool, ensuring your "
 "safety is never compromised."
@@ -2036,11 +2040,11 @@ msgstr ""
 "Lääketieteellisen tason sterilointi jokaiselle työkalulle takaa, ettei "
 "turvallisuudestasi tingitä koskaan."
 
-#: app/templates/public/about.html:168
+#: app/templates/public/about.html:166
 msgid "Trained artists"
 msgstr "Koulutetut artistit"
 
-#: app/templates/public/about.html:169
+#: app/templates/public/about.html:167
 msgid ""
 "Continuous education and mastery of techniques mean you receive the "
 "pinnacle of modern care."
@@ -2048,11 +2052,11 @@ msgstr ""
 "Jatkuva kouluttautuminen ja tekniikoiden hallinta takaavat, että saat "
 "modernin hoidon huipun."
 
-#: app/templates/public/about.html:178
+#: app/templates/public/about.html:176
 msgid "Quality products"
 msgstr "Laadukkaat tuotteet"
 
-#: app/templates/public/about.html:179
+#: app/templates/public/about.html:177
 msgid ""
 "We source only premium, non-toxic, and sustainable materials for long-"
 "lasting, brilliant results."
@@ -2060,11 +2064,11 @@ msgstr ""
 "Käytämme vain premium-luokan, myrkyttömiä ja kestäviä materiaaleja "
 "pitkäkestoisiin, upeisiin tuloksiin."
 
-#: app/templates/public/about.html:188
+#: app/templates/public/about.html:186
 msgid "Client-first care"
 msgstr "Asiakas edellä"
 
-#: app/templates/public/about.html:189
+#: app/templates/public/about.html:187
 msgid ""
 "Your comfort is our priority. Enjoy a serene environment designed "
 "entirely around your relaxation."
@@ -2072,15 +2076,15 @@ msgstr ""
 "Mukavuutesi on prioriteettimme. Nauti rauhallisesta ympäristöstä, joka on"
 " suunniteltu täysin rentoutumistasi varten."
 
-#: app/templates/public/about.html:203
+#: app/templates/public/about.html:201
 msgid "Come meet the team"
 msgstr "Tule tapaamaan tiimiä"
 
-#: app/templates/public/about.html:204
+#: app/templates/public/about.html:202
 msgid "Experience the DahaCare difference in person."
 msgstr "Koe DahaCaren ero paikan päällä."
 
-#: app/templates/public/about.html:206
+#: app/templates/public/about.html:204
 msgid "Book your visit"
 msgstr "Varaa käyntisi"
 
@@ -2092,23 +2096,23 @@ msgstr "Työmme"
 msgid "A glimpse into the artistry and precision behind every visit."
 msgstr "Katsaus jokaisen käynnin taiteeseen ja tarkkuuteen."
 
-#: app/templates/public/gallery.html:75
+#: app/templates/public/gallery.html:72
 msgid "Like what you see?"
 msgstr "Pidätkö näkemästäsi?"
 
-#: app/templates/public/gallery.html:77
+#: app/templates/public/gallery.html:74
 msgid "Book your session"
 msgstr "Varaa aikasi"
 
-#: app/templates/public/gallery.html:104
+#: app/templates/public/gallery.html:101
 msgid "Previous image"
 msgstr "Edellinen kuva"
 
-#: app/templates/public/gallery.html:108
+#: app/templates/public/gallery.html:105
 msgid "Enlarged gallery image"
 msgstr "Suurennettu galleriakuva"
 
-#: app/templates/public/gallery.html:110
+#: app/templates/public/gallery.html:107
 msgid "Next image"
 msgstr "Seuraava kuva"
 
@@ -2137,8 +2141,8 @@ msgid "A glimpse of what we create every day"
 msgstr "Katsaus siihen, mitä luomme joka päivä"
 
 #: app/templates/public/index.html:133
-msgid "Why DahaCare?"
-msgstr "Miksi DahaCare?"
+msgid "Why MisaNails?"
+msgstr ""
 
 #: app/templates/public/index.html:139
 msgid "Happy clients"
@@ -2250,15 +2254,15 @@ msgid "Phone"
 msgstr "Puhelin"
 
 #: app/templates/public/index.html:291
-#: app/templates/staff/staff_profile.html:259
+#: app/templates/staff/staff_profile.html:276
 msgid "Email"
 msgstr "Sähköposti"
 
-#: app/templates/public/index.html:302
+#: app/templates/public/index.html:303
 msgid "Map to our salon"
 msgstr "Kartta salongillemme"
 
-#: app/templates/public/index.html:311
+#: app/templates/public/index.html:312
 msgid "Get directions"
 msgstr "Reittiohjeet"
 
@@ -2266,43 +2270,43 @@ msgstr "Reittiohjeet"
 msgid "Info"
 msgstr "Tiedot"
 
-#: app/templates/public/public_booking.html:226
+#: app/templates/public/public_booking.html:220
 msgid "Your Details"
 msgstr "Tietosi"
 
-#: app/templates/public/public_booking.html:227
+#: app/templates/public/public_booking.html:221
 msgid "Please provide your contact information to secure the booking."
 msgstr "Anna yhteystietosi varmistaaksesi varauksen."
 
-#: app/templates/public/public_booking.html:233
+#: app/templates/public/public_booking.html:227
 msgid "Already have an account?"
 msgstr "Onko sinulla jo tili?"
 
-#: app/templates/public/public_booking.html:234
+#: app/templates/public/public_booking.html:228
 msgid "Log in"
 msgstr "Kirjaudu"
 
-#: app/templates/public/public_booking.html:240
+#: app/templates/public/public_booking.html:234
 msgid "Jane Doe"
 msgstr "Matti Meikäläinen"
 
-#: app/templates/public/public_booking.html:252
+#: app/templates/public/public_booking.html:246
 msgid "Booking Notes"
 msgstr "Varauksen lisätiedot"
 
-#: app/templates/public/public_booking.html:252
+#: app/templates/public/public_booking.html:246
 msgid "(Optional)"
 msgstr "(Valinnainen)"
 
-#: app/templates/public/public_booking.html:254
+#: app/templates/public/public_booking.html:248
 msgid "Any special requests or allergies..."
 msgstr "Erityistoiveet tai allergiat..."
 
-#: app/templates/public/public_booking.html:264
+#: app/templates/public/public_booking.html:258
 msgid "Continue to Checkout"
 msgstr "Jatka maksuun"
 
-#: app/templates/public/public_booking.html:353
+#: app/templates/public/public_booking.html:347
 msgid "Sign in to earn loyalty points with this booking."
 msgstr "Kirjaudu sisään ansaitaksesi kanta-asiakaspisteitä tästä varauksesta."
 
@@ -2320,31 +2324,41 @@ msgstr ""
 "hoitoja, jotka on suunniteltu modernille yksilölle. Tarkkuus ja rauha "
 "kohtaavat jokaisella kerralla."
 
-#: app/templates/public/services.html:92
+#: app/templates/public/services.html:101
+#: app/templates/public/services.html:135
 msgid "Popular"
 msgstr "Suosittu"
 
-#: app/templates/public/services.html:94
+#: app/templates/public/services.html:103
+#: app/templates/public/services.html:137
 msgid "New"
 msgstr "Uusi"
 
-#: app/templates/public/services.html:109
+#: app/templates/public/services.html:118
+msgid "View details"
+msgstr "Näytä tiedot"
+
+#: app/templates/public/services.html:147
 msgid "Book now"
 msgstr "Varaa nyt"
 
-#: app/templates/public/services.html:130
+#: app/templates/public/services.html:153
+msgid "No services in this category yet."
+msgstr "Tässä kategoriassa ei ole vielä palveluita."
+
+#: app/templates/public/services.html:171
 msgid "Satisfied Clients"
 msgstr "Tyytyväistä asiakasta"
 
-#: app/templates/public/services.html:134
+#: app/templates/public/services.html:175
 msgid "Quality Assurance"
 msgstr "Laadun takuu"
 
-#: app/templates/public/services.html:147
+#: app/templates/public/services.html:188
 msgid "Ready to define your signature look?"
 msgstr "Valmis luomaan tunnusomaisen tyylisi?"
 
-#: app/templates/public/services.html:149
+#: app/templates/public/services.html:190
 msgid "Book a consultation"
 msgstr "Varaa konsultaatio"
 
@@ -2352,37 +2366,37 @@ msgstr "Varaa konsultaatio"
 msgid "Booking Confirmed"
 msgstr "Varaus vahvistettu"
 
-#: app/templates/public/success.html:69
+#: app/templates/public/success.html:67
 msgid "Booking Confirmed!"
 msgstr "Varaus vahvistettu!"
 
-#: app/templates/public/success.html:70
+#: app/templates/public/success.html:68
 msgid "We've reserved your spot. Get ready for some well-deserved pampering."
 msgstr "Olemme varanneet paikkasi. Valmistaudu ansaittuun hemmotteluun."
 
-#: app/templates/public/success.html:78
+#: app/templates/public/success.html:76
 msgid "Appointment Summary"
 msgstr "Ajan yhteenveto"
 
-#: app/templates/public/success.html:119
+#: app/templates/public/success.html:117
 msgid "What's Next?"
 msgstr "Mitä seuraavaksi?"
 
-#: app/templates/public/success.html:124
+#: app/templates/public/success.html:122
 msgid "Check your inbox"
 msgstr "Tarkista sähköpostisi"
 
-#: app/templates/public/success.html:125
+#: app/templates/public/success.html:123
 msgid "We sent a detailed confirmation email with our location and contact info."
 msgstr ""
 "Lähetimme yksityiskohtaisen vahvistussähköpostin sijainti- ja "
 "yhteystietoinemme."
 
-#: app/templates/public/success.html:131
+#: app/templates/public/success.html:129
 msgid "Arrive on time"
 msgstr "Saavu ajoissa"
 
-#: app/templates/public/success.html:132
+#: app/templates/public/success.html:130
 msgid ""
 "Please arrive 5-10 minutes early to choose your perfect shade and settle "
 "in."
@@ -2390,11 +2404,11 @@ msgstr ""
 "Saavu 5–10 minuuttia etuajassa valitaksesi täydellisen sävyn ja "
 "asettuaksesi."
 
-#: app/templates/public/success.html:144
+#: app/templates/public/success.html:142
 msgid "Manage bookings easily"
 msgstr "Hallitse varauksia helposti"
 
-#: app/templates/public/success.html:145
+#: app/templates/public/success.html:143
 msgid ""
 "Create an account to track your loyalty points, reschedule appointments, "
 "and save your favorite colors."
@@ -2402,23 +2416,23 @@ msgstr ""
 "Luo tili seurataksesi kanta-asiakaspisteitäsi, siirtääksesi aikoja ja "
 "tallentaaksesi suosikkivärisi."
 
-#: app/templates/public/success.html:146
+#: app/templates/public/success.html:144
 msgid "Create Account"
 msgstr "Luo tili"
 
-#: app/templates/public/success.html:152
+#: app/templates/public/success.html:150
 msgid "Book Another Service"
 msgstr "Varaa toinen palvelu"
 
-#: app/templates/public/success.html:153
+#: app/templates/public/success.html:151
 msgid "Back to Home"
 msgstr "Takaisin etusivulle"
 
-#: app/templates/public/success.html:159
+#: app/templates/public/success.html:157
 msgid "Find us at:"
 msgstr "Löydät meidät:"
 
-#: app/templates/public/success.html:165
+#: app/templates/public/success.html:163
 msgid "Map location"
 msgstr "Kartan sijainti"
 
@@ -2459,415 +2473,421 @@ msgid "Back to homepage"
 msgstr "Takaisin etusivulle"
 
 #: app/templates/staff/staff_base.html:38
-#: app/templates/staff/staff_base.html:288
-#: app/templates/staff/staff_base.html:316
+#: app/templates/staff/staff_base.html:391
+#: app/templates/staff/staff_base.html:421
 msgid "Staff"
 msgstr "Henkilökunta"
 
-#: app/templates/staff/staff_base.html:296
+#: app/templates/staff/staff_base.html:365
+#, fuzzy
+msgid "Mở menu"
+msgstr "Avaa valikko"
+
+#: app/templates/staff/staff_base.html:399
 #: app/templates/staff/staff_bookings.html:43
 msgid "Lịch của tôi"
 msgstr "Aikatauluni"
 
-#: app/templates/staff/staff_base.html:300
+#: app/templates/staff/staff_base.html:403
 #: app/templates/staff/staff_history.html:41
 msgid "Lịch sử"
 msgstr "Historia"
 
-#: app/templates/staff/staff_base.html:304
+#: app/templates/staff/staff_base.html:407
 #: app/templates/staff/staff_profile.html:25
 msgid "Hồ sơ"
 msgstr "Profiili"
 
-#: app/templates/staff/staff_base.html:322
+#: app/templates/staff/staff_base.html:427
 msgid "Đăng xuất"
 msgstr "Kirjaudu ulos"
 
-#: app/templates/staff/staff_bookings.html:242
+#: app/templates/staff/staff_bookings.html:277
 msgid "Lịch của"
 msgstr "Aikataulu –"
 
-#: app/templates/staff/staff_bookings.html:252
+#: app/templates/staff/staff_bookings.html:287
 msgid "Lọc theo ngày"
 msgstr "Suodata päivän mukaan"
 
-#: app/templates/staff/staff_bookings.html:254
-#: app/templates/staff/staff_bookings.html:333
+#: app/templates/staff/staff_bookings.html:289
+#: app/templates/staff/staff_bookings.html:368
 msgid "Hôm nay"
 msgstr "Tänään"
 
-#: app/templates/staff/staff_bookings.html:254
+#: app/templates/staff/staff_bookings.html:289
 msgid "Tuần này"
 msgstr "Tämä viikko"
 
-#: app/templates/staff/staff_bookings.html:254
+#: app/templates/staff/staff_bookings.html:289
 msgid "Tháng này"
 msgstr "Tämä kuukausi"
 
-#: app/templates/staff/staff_bookings.html:255
+#: app/templates/staff/staff_bookings.html:290
 msgid "Tháng trước"
 msgstr "Viime kuukausi"
 
-#: app/templates/staff/staff_bookings.html:255
+#: app/templates/staff/staff_bookings.html:290
 msgid "Tùy chọn"
 msgstr "Mukautettu"
 
-#: app/templates/staff/staff_bookings.html:255
-#: app/templates/staff/staff_bookings.html:276
-#: app/templates/staff/staff_history.html:212
-#: app/templates/staff/staff_history.html:232
+#: app/templates/staff/staff_bookings.html:290
+#: app/templates/staff/staff_bookings.html:311
+#: app/templates/staff/staff_history.html:239
+#: app/templates/staff/staff_history.html:259
 msgid "Tất cả"
 msgstr "Kaikki"
 
-#: app/templates/staff/staff_bookings.html:274
-#: app/templates/staff/staff_history.html:231
+#: app/templates/staff/staff_bookings.html:309
+#: app/templates/staff/staff_history.html:258
 msgid "Lọc theo trạng thái"
 msgstr "Suodata tilan mukaan"
 
-#: app/templates/staff/staff_bookings.html:283
-#: app/templates/staff/staff_history.html:239
+#: app/templates/staff/staff_bookings.html:318
+#: app/templates/staff/staff_history.html:266
 msgid "Xóa bộ lọc"
 msgstr "Tyhjennä suodattimet"
 
-#: app/templates/staff/staff_bookings.html:293
+#: app/templates/staff/staff_bookings.html:328
 msgid "Tổng lịch hẹn"
 msgstr "Varauksia yhteensä"
 
-#: app/templates/staff/staff_bookings.html:297
+#: app/templates/staff/staff_bookings.html:332
 msgid "Tới lịch hẹn sắp tới gần nhất"
 msgstr "Siirry seuraavaan varaukseen"
 
-#: app/templates/staff/staff_bookings.html:299
+#: app/templates/staff/staff_bookings.html:334
 msgid "Lịch hẹn sắp tới"
 msgstr "Tulevat varaukset"
 
-#: app/templates/staff/staff_bookings.html:311
+#: app/templates/staff/staff_bookings.html:346
 msgid "Chờ thanh toán"
 msgstr "Odottaa maksua"
 
-#: app/templates/staff/staff_bookings.html:320
+#: app/templates/staff/staff_bookings.html:355
 msgid "Không có lịch hẹn nào"
 msgstr "Ei varauksia"
 
-#: app/templates/staff/staff_bookings.html:321
-#: app/templates/staff/staff_history.html:270
+#: app/templates/staff/staff_bookings.html:356
+#: app/templates/staff/staff_history.html:297
 msgid "Xem tất cả"
 msgstr "Näytä kaikki"
 
-#: app/templates/staff/staff_bookings.html:330
-#: app/templates/staff/staff_history.html:279
+#: app/templates/staff/staff_bookings.html:365
+#: app/templates/staff/staff_history.html:306
 msgid "lịch hẹn"
 msgstr "varausta"
 
-#: app/templates/staff/staff_bookings.html:380
-#: app/templates/staff/staff_bookings.html:388
-#: app/templates/staff/staff_bookings.html:454
+#: app/templates/staff/staff_bookings.html:415
+#: app/templates/staff/staff_bookings.html:423
+#: app/templates/staff/staff_bookings.html:489
 msgid "Đã thu tiền"
 msgstr "Maksettu"
 
-#: app/templates/staff/staff_bookings.html:391
-#: app/templates/staff/staff_history.html:310
+#: app/templates/staff/staff_bookings.html:426
+#: app/templates/staff/staff_history.html:337
 msgid "Đã xong"
 msgstr "Valmis"
 
-#: app/templates/staff/staff_bookings.html:397
-#: app/templates/staff/staff_bookings.html:401
-#: app/templates/staff/staff_bookings.html:450
+#: app/templates/staff/staff_bookings.html:432
+#: app/templates/staff/staff_bookings.html:436
+#: app/templates/staff/staff_bookings.html:485
 msgid "Bắt đầu làm"
 msgstr "Aloita"
 
-#: app/templates/staff/staff_bookings.html:407
+#: app/templates/staff/staff_bookings.html:442
 msgid "Không có lịch hẹn"
 msgstr "Ei varauksia"
 
-#: app/templates/staff/staff_bookings.html:418
-#: app/templates/staff/staff_history.html:325
+#: app/templates/staff/staff_bookings.html:453
+#: app/templates/staff/staff_history.html:352
 msgid "Chi tiết lịch hẹn"
 msgstr "Varauksen tiedot"
 
-#: app/templates/staff/staff_bookings.html:423
-#: app/templates/staff/staff_history.html:330
+#: app/templates/staff/staff_bookings.html:458
+#: app/templates/staff/staff_history.html:357
 msgid "Mã booking"
 msgstr "Varauskoodi"
 
-#: app/templates/staff/staff_bookings.html:427
-#: app/templates/staff/staff_history.html:334
+#: app/templates/staff/staff_bookings.html:462
+#: app/templates/staff/staff_history.html:361
 msgid "Khách hàng"
 msgstr "Asiakas"
 
-#: app/templates/staff/staff_bookings.html:428
-#: app/templates/staff/staff_history.html:335
+#: app/templates/staff/staff_bookings.html:463
+#: app/templates/staff/staff_history.html:362
 msgid "Họ tên"
 msgstr "Nimi"
 
-#: app/templates/staff/staff_bookings.html:429
-#: app/templates/staff/staff_history.html:336
-#: app/templates/staff/staff_profile.html:255
+#: app/templates/staff/staff_bookings.html:464
+#: app/templates/staff/staff_history.html:363
+#: app/templates/staff/staff_profile.html:272
 msgid "Số điện thoại"
 msgstr "Puhelinnumero"
 
-#: app/templates/staff/staff_bookings.html:432
-#: app/templates/staff/staff_history.html:339
+#: app/templates/staff/staff_bookings.html:467
+#: app/templates/staff/staff_history.html:366
 msgid "Dịch vụ"
 msgstr "Palvelu"
 
-#: app/templates/staff/staff_bookings.html:433
-#: app/templates/staff/staff_history.html:340
+#: app/templates/staff/staff_bookings.html:468
+#: app/templates/staff/staff_history.html:367
 msgid "Tên dịch vụ"
 msgstr "Palvelun nimi"
 
-#: app/templates/staff/staff_bookings.html:434
-#: app/templates/staff/staff_history.html:341
+#: app/templates/staff/staff_bookings.html:469
+#: app/templates/staff/staff_history.html:368
 msgid "Ngày hẹn"
 msgstr "Varauspäivä"
 
-#: app/templates/staff/staff_bookings.html:435
-#: app/templates/staff/staff_history.html:342
+#: app/templates/staff/staff_bookings.html:470
+#: app/templates/staff/staff_history.html:369
 msgid "Thời gian"
 msgstr "Aika"
 
-#: app/templates/staff/staff_bookings.html:438
-#: app/templates/staff/staff_history.html:345
+#: app/templates/staff/staff_bookings.html:473
+#: app/templates/staff/staff_history.html:372
 msgid "Thanh toán"
 msgstr "Maksu"
 
-#: app/templates/staff/staff_bookings.html:439
+#: app/templates/staff/staff_bookings.html:474
 msgid "Tổng tiền"
 msgstr "Yhteensä"
 
-#: app/templates/staff/staff_bookings.html:440
-#: app/templates/staff/staff_history.html:347
+#: app/templates/staff/staff_bookings.html:475
+#: app/templates/staff/staff_history.html:374
 msgid "Phương thức"
 msgstr "Maksutapa"
 
-#: app/templates/staff/staff_bookings.html:443
-#: app/templates/staff/staff_history.html:350
+#: app/templates/staff/staff_bookings.html:478
+#: app/templates/staff/staff_history.html:377
 msgid "Trạng thái"
 msgstr "Tila"
 
-#: app/templates/staff/staff_bookings.html:448
-#: app/templates/staff/staff_history.html:374
+#: app/templates/staff/staff_bookings.html:483
+#: app/templates/staff/staff_history.html:401
 msgid "Đóng"
 msgstr "Sulje"
 
-#: app/templates/staff/staff_bookings.html:495
+#: app/templates/staff/staff_bookings.html:530
 msgid "Tiền mặt - đã thanh toán"
 msgstr "Käteinen – maksettu"
 
-#: app/templates/staff/staff_bookings.html:496
+#: app/templates/staff/staff_bookings.html:531
 msgid "Tiền mặt - chưa thanh toán"
 msgstr "Käteinen – maksamatta"
 
-#: app/templates/staff/staff_bookings.html:498
-#: app/templates/staff/staff_history.html:391
+#: app/templates/staff/staff_bookings.html:533
+#: app/templates/staff/staff_history.html:418
 msgid "Online"
 msgstr "Verkossa"
 
-#: app/templates/staff/staff_bookings.html:499
+#: app/templates/staff/staff_bookings.html:534
 msgid "Chưa có hóa đơn"
 msgstr "Ei laskua"
 
-#: app/templates/staff/staff_history.html:201
+#: app/templates/staff/staff_history.html:228
 msgid "Lịch sử của"
 msgstr "Historia –"
 
-#: app/templates/staff/staff_history.html:210
+#: app/templates/staff/staff_history.html:237
 msgid "Lọc theo tháng"
 msgstr "Suodata kuukauden mukaan"
 
-#: app/templates/staff/staff_history.html:221
+#: app/templates/staff/staff_history.html:248
 msgid "Tìm kiếm"
 msgstr "Haku"
 
-#: app/templates/staff/staff_history.html:224
+#: app/templates/staff/staff_history.html:251
 msgid "Tên khách hàng..."
 msgstr "Asiakkaan nimi..."
 
-#: app/templates/staff/staff_history.html:233
 #: app/templates/staff/staff_history.html:260
+#: app/templates/staff/staff_history.html:287
 msgid "Chưa hoàn thành"
 msgstr "Keskeneräinen"
 
-#: app/templates/staff/staff_history.html:248
+#: app/templates/staff/staff_history.html:275
 msgid "Tổng lịch sử"
 msgstr "Historiaa yhteensä"
 
-#: app/templates/staff/staff_history.html:269
+#: app/templates/staff/staff_history.html:296
 msgid "Không có lịch sử nào trong khoảng thời gian này."
 msgstr "Ei historiaa tällä aikavälillä."
 
-#: app/templates/staff/staff_history.html:346
+#: app/templates/staff/staff_history.html:373
 msgid "Tổng tiền dịch vụ"
 msgstr "Palvelun kokonaissumma"
 
-#: app/templates/staff/staff_history.html:354
+#: app/templates/staff/staff_history.html:381
 msgid "Thu nhập"
 msgstr "Tulot"
 
-#: app/templates/staff/staff_history.html:357
-#: app/templates/staff/staff_profile.html:271
+#: app/templates/staff/staff_history.html:384
+#: app/templates/staff/staff_profile.html:288
 msgid "Lương theo giờ"
 msgstr "Tuntipalkka"
 
-#: app/templates/staff/staff_history.html:361
+#: app/templates/staff/staff_history.html:388
 msgid "Hoa hồng booking"
 msgstr "Varauksen provisio"
 
-#: app/templates/staff/staff_history.html:366
+#: app/templates/staff/staff_history.html:393
 msgid "Thu nhập sau booking"
 msgstr "Tulot varauksen jälkeen"
 
-#: app/templates/staff/staff_history.html:388
+#: app/templates/staff/staff_history.html:415
 msgid "Tiền mặt – đã thanh toán"
 msgstr "Käteinen – maksettu"
 
-#: app/templates/staff/staff_history.html:389
+#: app/templates/staff/staff_history.html:416
 msgid "Tiền mặt – chưa thanh toán"
 msgstr "Käteinen – maksamatta"
 
-#: app/templates/staff/staff_profile.html:180
+#: app/templates/staff/staff_profile.html:201
 msgid "Hồ sơ của"
 msgstr "Profiili –"
 
-#: app/templates/staff/staff_profile.html:202
-#: app/templates/staff/staff_profile.html:264
+#: app/templates/staff/staff_profile.html:219
+#: app/templates/staff/staff_profile.html:281
 msgid "Nhân viên"
 msgstr "Työntekijä"
 
-#: app/templates/staff/staff_profile.html:205
+#: app/templates/staff/staff_profile.html:222
 msgid "Tham gia từ"
 msgstr "Liittynyt"
 
-#: app/templates/staff/staff_profile.html:207
+#: app/templates/staff/staff_profile.html:224
 msgid "Nhấn vào ảnh để thay đổi"
 msgstr "Vaihda kuvaa napsauttamalla"
 
-#: app/templates/staff/staff_profile.html:207
-msgid "JPG, PNG tối đa 2MB"
+#: app/templates/staff/staff_profile.html:224
+#, fuzzy
+msgid "JPG, PNG tối đa 10MB"
 msgstr "JPG, PNG enintään 2MB"
 
-#: app/templates/staff/staff_profile.html:220
+#: app/templates/staff/staff_profile.html:237
 msgid "Booking tháng này"
 msgstr "Tämän kuun varaukset"
 
-#: app/templates/staff/staff_profile.html:226
+#: app/templates/staff/staff_profile.html:243
 msgid "lịch hẹn hoàn thành"
 msgstr "valmista varausta"
 
-#: app/templates/staff/staff_profile.html:230
+#: app/templates/staff/staff_profile.html:247
 msgid "Thu nhập tháng này"
 msgstr "Tämän kuun tulot"
 
-#: app/templates/staff/staff_profile.html:236
+#: app/templates/staff/staff_profile.html:253
 msgid "lương + hoa hồng"
 msgstr "palkka + provisio"
 
-#: app/templates/staff/staff_profile.html:245
+#: app/templates/staff/staff_profile.html:262
 msgid "Thông tin cá nhân"
 msgstr "Henkilötiedot"
 
-#: app/templates/staff/staff_profile.html:247
+#: app/templates/staff/staff_profile.html:264
 msgid "Chỉ xem"
 msgstr "Vain luku"
 
-#: app/templates/staff/staff_profile.html:251
+#: app/templates/staff/staff_profile.html:268
 msgid "Họ và tên"
 msgstr "Koko nimi"
 
-#: app/templates/staff/staff_profile.html:263
+#: app/templates/staff/staff_profile.html:280
 msgid "Vai trò"
 msgstr "Rooli"
 
-#: app/templates/staff/staff_profile.html:267
+#: app/templates/staff/staff_profile.html:284
 msgid "Ngày vào làm"
 msgstr "Aloituspäivä"
 
-#: app/templates/staff/staff_profile.html:272
+#: app/templates/staff/staff_profile.html:289
 msgid "giờ"
 msgstr "tunti"
 
-#: app/templates/staff/staff_profile.html:275
+#: app/templates/staff/staff_profile.html:292
 msgid "Hoa hồng"
 msgstr "Provisio"
 
-#: app/templates/staff/staff_profile.html:276
+#: app/templates/staff/staff_profile.html:293
 msgid "booking"
 msgstr "varaus"
 
-#: app/templates/staff/staff_profile.html:286
+#: app/templates/staff/staff_profile.html:303
 msgid "Bảo mật"
 msgstr "Tietoturva"
 
-#: app/templates/staff/staff_profile.html:291
+#: app/templates/staff/staff_profile.html:308
 msgid "Mật khẩu"
 msgstr "Salasana"
 
-#: app/templates/staff/staff_profile.html:294
-#: app/templates/staff/staff_profile.html:325
+#: app/templates/staff/staff_profile.html:311
+#: app/templates/staff/staff_profile.html:342
 msgid "Đổi mật khẩu"
 msgstr "Vaihda salasana"
 
-#: app/templates/staff/staff_profile.html:333
+#: app/templates/staff/staff_profile.html:350
 msgid "Để xác nhận danh tính, chúng tôi sẽ gửi mã xác thực đến email của bạn."
 msgstr "Vahvistaaksemme henkilöllisyytesi lähetämme vahvistuskoodin sähköpostiisi."
 
-#: app/templates/staff/staff_profile.html:336
-#: app/templates/staff/staff_profile.html:359
+#: app/templates/staff/staff_profile.html:353
+#: app/templates/staff/staff_profile.html:376
 msgid "Hủy"
 msgstr "Peruuta"
 
-#: app/templates/staff/staff_profile.html:337
-#: app/templates/staff/staff_profile.html:383
-#: app/templates/staff/staff_profile.html:420
-#: app/templates/staff/staff_profile.html:426
+#: app/templates/staff/staff_profile.html:354
+#: app/templates/staff/staff_profile.html:400
+#: app/templates/staff/staff_profile.html:437
+#: app/templates/staff/staff_profile.html:443
 msgid "Gửi mã"
 msgstr "Lähetä koodi"
 
-#: app/templates/staff/staff_profile.html:343
+#: app/templates/staff/staff_profile.html:360
 msgid "Nhập mã xác thực đã gửi đến"
 msgstr "Anna vahvistuskoodi, joka lähetettiin osoitteeseen"
 
-#: app/templates/staff/staff_profile.html:343
+#: app/templates/staff/staff_profile.html:360
 msgid "và mật khẩu mới."
 msgstr "ja uusi salasanasi."
 
-#: app/templates/staff/staff_profile.html:347
+#: app/templates/staff/staff_profile.html:364
 msgid "Mã xác thực"
 msgstr "Vahvistuskoodi"
 
-#: app/templates/staff/staff_profile.html:348
+#: app/templates/staff/staff_profile.html:365
 msgid "Nhập mã gồm 6 chữ số"
 msgstr "Anna 6-numeroinen koodi"
 
-#: app/templates/staff/staff_profile.html:351
+#: app/templates/staff/staff_profile.html:368
 msgid "Mật khẩu mới"
 msgstr "Uusi salasana"
 
-#: app/templates/staff/staff_profile.html:352
+#: app/templates/staff/staff_profile.html:369
 msgid "Tối thiểu 8 ký tự"
 msgstr "Vähintään 8 merkkiä"
 
-#: app/templates/staff/staff_profile.html:355
+#: app/templates/staff/staff_profile.html:372
 msgid "Xác nhận mật khẩu mới"
 msgstr "Vahvista uusi salasana"
 
-#: app/templates/staff/staff_profile.html:356
+#: app/templates/staff/staff_profile.html:373
 msgid "Nhập lại mật khẩu mới"
 msgstr "Anna uusi salasana uudelleen"
 
-#: app/templates/staff/staff_profile.html:360
+#: app/templates/staff/staff_profile.html:377
 msgid "Cập nhật mật khẩu"
 msgstr "Päivitä salasana"
 
-#: app/templates/staff/staff_profile.html:403
+#: app/templates/staff/staff_profile.html:420
 msgid "Đang gửi..."
 msgstr "Lähetetään..."
 
-#: app/templates/staff/staff_profile.html:417
+#: app/templates/staff/staff_profile.html:434
 msgid "Có lỗi xảy ra. Vui lòng thử lại."
 msgstr "Tapahtui virhe. Yritä uudelleen."
 
-#: app/templates/staff/staff_profile.html:423
+#: app/templates/staff/staff_profile.html:440
 msgid "Lỗi mạng. Vui lòng thử lại."
 msgstr "Verkkovirhe. Yritä uudelleen."
 
@@ -2876,4 +2896,19 @@ msgstr "Verkkovirhe. Yritä uudelleen."
 
 #~ msgid "Duration:"
 #~ msgstr "Kesto:"
+
+#~ msgid "✦ Loyalty Reward"
+#~ msgstr "✦ Kanta-asiakaspalkinto"
+
+#~ msgid "%(date)s • %(time)s with %(staff)s."
+#~ msgstr "%(date)s • %(time)s – %(staff)s."
+
+#~ msgid "%(date)s • %(start)s with %(staff)s."
+#~ msgstr "%(date)s • %(start)s – %(staff)s."
+
+#~ msgid "Awaiting confirmation"
+#~ msgstr "Odottaa vahvistusta"
+
+#~ msgid "Why DahaCare?"
+#~ msgstr "Miksi DahaCare?"
 

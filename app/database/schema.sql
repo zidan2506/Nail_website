@@ -44,6 +44,15 @@ CREATE TABLE services (
     points INTEGER NOT NULL DEFAULT 0,
     is_active INTEGER NOT NULL DEFAULT 1,
     image TEXT DEFAULT NULL,
+    -- Tên file trần trong uploads/videos/ (vd 'abc123.mp4') HOẶC URL đầy đủ (vd CDN).
+    -- Cùng quy ước với cột `image`, xem _resolve_upload() trong routes.py.
+    -- Trung lập nhà cung cấp: đổi hosting chỉ cần đổi giá trị, không cần migration.
+    -- CHỈ được ghi khi transcode xong -> public page không bao giờ thấy video dở.
+    video_url TEXT DEFAULT NULL,
+    -- NULL = chưa có video | processing | ready | failed
+    video_status TEXT DEFAULT NULL,
+    -- Thông báo lỗi khi video_status = 'failed', hiện cho admin xem
+    video_error TEXT DEFAULT NULL,
     badge TEXT DEFAULT NULL,
     icon TEXT NOT NULL DEFAULT 'spa',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

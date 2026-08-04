@@ -81,11 +81,20 @@
 <section class="svc-grid-section">
     <div class="svc-grid">
         {% for service in services %}
-        <div class="svc-card" data-category="{{ service.category_slug }}">
+        {#- poster dùng lại ảnh service (cột `image`), không cần asset riêng cho video -#}
+        {%- set poster = (service.image | img_src('services')) or url_for('static', filename='images/Default/Service/test.png') -%}
+        {#- video_url: tên file trần trong uploads/videos/ HOẶC URL đầy đủ (CDN).
+            Filter video_src lo cả hai, cùng cơ chế với img_src. Chỉ có giá trị khi
+            transcode đã xong, nên không cần kiểm tra video_status ở đây. -#}
+        {%- set video = service.video_url | video_src -%}
+        <article class="svc-card" data-category="{{ service.category_slug }}">
             <div class="svc-card__img-wrap">
-                <img class="svc-card__img"
-                     src="{{ (service.image | img_src('services')) or url_for('static', filename='images/Default/Service/test.png') }}"
-                     alt="{{ service.name }}">
+                <img class="svc-card__img" src="{{ poster }}" alt="{{ service.name }}">
+                {% if video %}
+                <span class="svc-card__play" aria-hidden="true">
+                    <span class="material-symbols-outlined">play_arrow</span>
+                </span>
+                {% endif %}
                 <div class="svc-card__badges">
                     <span class="svc-badge svc-badge--category">{{ tr(service, 'category_name') }}</span>
                     {% if service.badge == 'Popular' %}
@@ -106,10 +115,42 @@
                     <span class="material-symbols-outlined svc-card__icon">{{ service.icon }}</span>
                 </div>
             </div>
-            <a href="{{ url_for('main.public_booking', service_id=service.id) }}" class="svc-card__btn">{{ _('Book now') }}</a>
-        </div>
+            <button type="button" class="svc-card__btn" data-svc-open>{{ _('View details') }}</button>
+
+            {#- Nội dung modal render sẵn ở server để i18n (tr/_) nằm trọn trong Jinja;
+                JS chỉ clone sang <dialog> khi mở, không phải dựng chuỗi ở client. -#}
+            <template class="svc-card__detail">
+                <div class="svc-detail__media">
+                    {% if video %}
+                    <video class="svc-detail__video" src="{{ video }}" poster="{{ poster }}"
+                           controls preload="none" playsinline></video>
+                    {% else %}
+                    <img class="svc-detail__poster" src="{{ poster }}" alt="{{ service.name }}">
+                    {% endif %}
+                </div>
+                <div class="svc-detail__content">
+                    <div class="svc-detail__badges">
+                        <span class="svc-badge svc-badge--category">{{ tr(service, 'category_name') }}</span>
+                        {% if service.badge == 'Popular' %}
+                        <span class="svc-badge svc-badge--status">{{ _('Popular') }}</span>
+                        {% elif service.badge == 'New' %}
+                        <span class="svc-badge svc-badge--new">{{ _('New') }}</span>
+                        {% endif %}
+                    </div>
+                    <h2 class="svc-detail__name" id="svcModalTitle">{{ tr(service, 'name') }}</h2>
+                    <div class="svc-detail__meta">
+                        <span class="svc-detail__price">${{ service.price | int }}</span>
+                        <span class="svc-detail__duration">{{ service.duration_minutes }} {{ _('mins') }}</span>
+                    </div>
+                    <p class="svc-detail__desc">{{ tr(service, 'description') }}</p>
+                    <a href="{{ url_for('main.public_booking', service_id=service.id) }}"
+                       class="svc-detail__btn">{{ _('Book now') }}</a>
+                </div>
+            </template>
+        </article>
         {% endfor %}
     </div>
+    <p class="svc-empty" hidden>{{ _('No services in this category yet.') }}</p>
 </section>
 
 
@@ -152,6 +193,19 @@
     </div>
 </section>
 
+{# ═══════════════════════════════════════════════════════════════════════════
+   SERVICE DETAIL MODAL
+   - Một <dialog> duy nhất cho cả trang; nội dung clone từ <template> của card
+     vừa bấm. Native <dialog> lo sẵn focus trap, phím Esc, backdrop.
+   - Cũng chỉ có tối đa MỘT thẻ <video> tồn tại trong DOM tại một thời điểm.
+═══════════════════════════════════════════════════════════════════════════ #}
+<dialog class="svc-modal" id="svcModal" aria-labelledby="svcModalTitle">
+    <button type="button" class="svc-modal__close" data-svc-close aria-label="{{ _('Close') }}">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+    </button>
+    <div class="svc-modal__body"></div>
+</dialog>
+
 {# Footer không khai báo ở đây — đã chuyển sang base.html {% block footer %},
    dùng chung cho mọi public page. Xem base.html. #}
 
@@ -163,6 +217,7 @@
        Jinja loop sinh ra đúng các attribute này từ DB là JS chạy không cần sửa. */
     const tabs  = document.querySelectorAll('.svc-tab');
     const cards = document.querySelectorAll('.svc-card');
+    const empty = document.querySelector('.svc-empty');
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -170,11 +225,51 @@
             tab.classList.add('svc-tab--active');
 
             const filter = tab.dataset.filter;
+            let visible = 0;
             cards.forEach(card => {
                 const match = filter === 'all' || card.dataset.category === filter;
                 card.style.display = match ? '' : 'none';
+                if (match) visible++;
             });
+            empty.hidden = visible > 0;
+
+            /* Tab vừa chọn kéo vào giữa vùng scroll để user thấy mình đang ở đâu */
+            tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         });
+    });
+
+
+    /* ── Modal chi tiết dịch vụ ─────────────────────────────────────────────
+       Mở: clone <template> của card sang .svc-modal__body rồi showModal().
+       Đóng: dừng video + gỡ src (ngắt tải dở), xoá nội dung để DOM không
+             giữ lại thẻ <video> nào. Focus tự quay về nút vừa bấm nhờ <dialog>. */
+    const modal     = document.getElementById('svcModal');
+    const modalBody = modal.querySelector('.svc-modal__body');
+
+    document.querySelectorAll('[data-svc-open]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tpl = btn.closest('.svc-card').querySelector('.svc-card__detail');
+            if (!tpl) return;
+            modalBody.replaceChildren(tpl.content.cloneNode(true));
+            document.body.classList.add('svc-modal-open');
+            modal.showModal();
+        });
+    });
+
+    /* e.target === modal nghĩa là bấm trúng backdrop (vùng ngoài hộp dialog) */
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal || e.target.closest('[data-svc-close]')) modal.close();
+    });
+
+    modal.addEventListener('close', () => {
+        const video = modalBody.querySelector('video');
+        if (video) {
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+        }
+        modalBody.replaceChildren();
+        document.body.classList.remove('svc-modal-open');
     });
 })();
 </script>

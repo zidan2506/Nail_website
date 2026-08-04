@@ -27,6 +27,12 @@ class Config:
     if not MAIL_DEFAULT_SENDER:
         raise RuntimeError("MAIL_DEFAULT_SENDER is not set (địa chỉ thuộc domain đã verify trên Resend).")
 
+    # Trần dung lượng request. Không có nó thì Werkzeug ghi TOÀN BỘ body xuống đĩa
+    # rồi handler mới kiểm tra được kích thước — gửi 5GB là server ghi đủ 5GB.
+    # 310MB = 300MB (trần video trong routes.py) + chỗ dư cho phần multipart khác.
+    # Phải >= client_max_body_size của nginx, nếu không nginx cho qua mà Flask chặn.
+    MAX_CONTENT_LENGTH = 310 * 1024 * 1024
+
     # Session security
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"

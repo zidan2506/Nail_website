@@ -52,6 +52,43 @@ Các bước chạy trên server (chi tiết trong runbook):
 
 > Khuyến nghị VPS: **Hetzner / UpCloud** (datacenter Helsinki, gần tiệm + GDPR).
 
+#### Bổ sung cho tính năng video dịch vụ *(2026-08-05)*
+
+Ba việc dưới đây chạy **một lần duy nhất** trên server, không lặp lại mỗi lần deploy.
+
+**a. Cài ffmpeg.** Đây là gói hệ điều hành, **KHÔNG phải package Python** — không có và không thể có trong `requirements.txt`. Trên PyPI có vài tên gây nhầm (`ffmpeg-python` chỉ là lớp bọc và vẫn cần binary; `ffmpeg` là package chết). App gọi ffmpeg qua `subprocess` nên không cần wrapper nào.
+
+```bash
+sudo apt update && sudo apt install -y ffmpeg
+ffmpeg -version   # xác nhận
+```
+
+Server dùng ffmpeg để transcode video admin upload về 720p kèm `-movflags +faststart`. Thiếu ffmpeg thì mọi upload video đều fail.
+
+> Vì sao bắt buộc transcode: file test thực tế đo được 16 giây / 53MB / bitrate 26.6 Mbps. Sau khi transcode 720p còn **3.2MB**, nhẹ hơn 16 lần. Không transcode thì user phải tải hàng chục MB cho một video minh hoạ.
+
+> Vì sao bắt buộc `+faststart`: cờ này dời box `moov` (chứa metadata) lên đầu file. Thiếu nó thì trình duyệt phải tải **hết** file mới bắt đầu phát được.
+
+**b. Nâng giới hạn upload của nginx.** `deploy/nginx-nail-app.conf` đang để `client_max_body_size 10M` (chỉ đủ cho ảnh). Video thô 1080p60 từ điện thoại khoảng 150MB.
+
+```nginx
+client_max_body_size 300M;
+```
+```bash
+sudo systemctl reload nginx
+```
+
+nginx mặc định buffer toàn bộ request body rồi mới đẩy sang gunicorn, nên upload chậm **không** bị `timeout = 60` của gunicorn giết. Không cần sửa `gunicorn.conf.py`.
+
+**c. Chạy migration DB.** `git pull` **không** tự thêm cột. `schema.sql` chỉ áp dụng khi khởi tạo DB mới, còn DB production đã có dữ liệu thật nên không bao giờ đọc lại file đó.
+
+```bash
+sqlite3 /var/www/nail-app/app/database/database.db \
+  "ALTER TABLE services ADD COLUMN video_url TEXT DEFAULT NULL;"
+```
+
+Thiếu bước này thì sau khi deploy, trang `/services` sập với `sqlite3.OperationalError: no such column: video_url`. Giai đoạn 2 sẽ thêm tiếp `video_status` và `video_error`, cùng vấn đề.
+
 ### Phase 4 — Nên có *(tùy chọn)* — ✅ HOÀN TẤT (2026-07-12)
 10. ✅ `print()` → `logging`. Cấu hình 1 lần trong `create_app` (`LOG_LEVEL` env, mặc định INFO, ra stderr→journald). `[payment]` error/warning ở routes.py + payment_service.py → `logger.exception`/`logger.warning`; 16 debug noise ở db.py → `logger.debug`. CLI scripts (reset_db/test_data/setup_stripe_prices) giữ nguyên `print()`.
 
@@ -64,6 +101,9 @@ Các bước chạy trên server (chi tiết trong runbook):
 - [ ] Stripe: đổi `sk_test` → `sk_live`, đăng ký webhook endpoint domain production, set `STRIPE_WEBHOOK_SECRET`
 - [ ] Google OAuth: thêm redirect URI domain production vào Google Console
 - [ ] Backup SQLite định kỳ
+- [ ] `apt install ffmpeg` trên server (không nằm trong `requirements.txt`)
+- [ ] nginx `client_max_body_size` 10M → 300M cho upload video
+- [ ] Chạy migration ALTER TABLE trước khi restart app (xem Phase 3, mục bổ sung)
 
 ---
 

@@ -8,3 +8,6 @@ app/static/uploads/
 
 # Ảnh gốc dùng để tạo ảnh seed — nặng, không cần cho server
 TESTING IMG/
+
+# Video thô chờ transcode (tự xoá sau khi xử lý xong)
+app/_tmp/

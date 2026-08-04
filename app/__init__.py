@@ -1,6 +1,6 @@
 import logging
 import os
-from flask import Flask, session
+from flask import Flask, session, flash, redirect, request, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 from .config import Config
 from flask_wtf.csrf import CSRFProtect
@@ -54,6 +54,26 @@ def create_app():
 
     from app.routes import main
     app.register_blueprint(main)
-    
+
+    # Body vượt MAX_CONTENT_LENGTH -> Werkzeug ném 413 trước khi vào view, nên
+    # phải bắt ở đây mới báo được cho admin thay vì trả trang lỗi trống.
+    @app.errorhandler(413)
+    def _too_large(_e):
+        flash("File gửi lên quá lớn. Video tối đa 300MB, ảnh tối đa 10MB.", "error")
+        return redirect(request.referrer or url_for("main.home")), 302
+
+    # Thread transcode video là daemon nên chết theo process. Job nào còn
+    # 'processing' lúc này chắc chắn không còn ai xử lý -> dọn để khỏi kẹt.
+    from app.database.db import reset_stuck_video_jobs
+    from app.routes import _cleanup_stale_temp
+    try:
+        reset_stuck_video_jobs()
+    except Exception:
+        # DB chưa init (lần chạy đầu / CI) thì bỏ qua, không chặn app khởi động
+        logging.getLogger(__name__).warning("Bỏ qua dọn job video treo: DB chưa sẵn sàng")
+    try:
+        _cleanup_stale_temp()
+    except Exception:
+        logging.getLogger(__name__).warning("Bỏ qua dọn file video tạm")
 
     return app

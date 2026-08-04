@@ -72,9 +72,16 @@
     white-space: nowrap;
 }
 
-.svc-tab:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+/* Hover chỉ áp cho thiết bị có con trỏ thật — tránh sticky-hover trên iOS */
+@media (hover: hover) {
+    .svc-tab:hover {
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+    }
+}
+
+.svc-tab:active {
+    transform: scale(0.96);
 }
 
 .svc-tab--active,
@@ -109,9 +116,11 @@
     transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.svc-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px -20px rgba(171, 34, 97, 0.15);
+@media (hover: hover) {
+    .svc-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px -20px rgba(171, 34, 97, 0.15);
+    }
 }
 
 .svc-card__img-wrap {
@@ -179,6 +188,29 @@
     color: #ffffff;
 }
 
+/* Dấu hiệu service này có video; chỉ render khi service.video_url có giá trị */
+.svc-card__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: var(--radius-full);
+    background: rgba(34, 25, 29, 0.55);
+    color: #ffffff;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    pointer-events: none;
+}
+
+.svc-card__play .material-symbols-outlined {
+    font-size: 28px;
+}
+
 .svc-card__body {
     flex-grow: 1;
     padding: 0 4px;
@@ -244,10 +276,26 @@
     transition: all 0.2s ease;
 }
 
-.svc-card__btn:hover {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    color: #ffffff;
+@media (hover: hover) {
+    .svc-card__btn:hover {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: #ffffff;
+    }
+}
+
+.svc-card__btn:active {
+    transform: scale(0.98);
+}
+
+
+/* Hiện khi filter không khớp card nào — JS toggle attribute [hidden] */
+.svc-empty {
+    text-align: center;
+    padding: 56px 24px;
+    margin: 0;
+    color: var(--color-text-tertiary);
+    font-size: 15px;
 }
 
 
@@ -347,17 +395,215 @@
     transition: all 0.25s ease;
 }
 
-.svc-cta__btn:hover {
-    box-shadow: 0 20px 40px -10px rgba(171, 34, 97, 0.3);
-    transform: translateY(-4px);
+@media (hover: hover) {
+    .svc-cta__btn:hover {
+        box-shadow: 0 20px 40px -10px rgba(171, 34, 97, 0.3);
+        transform: translateY(-4px);
+    }
+
+    .svc-cta__btn:hover .material-symbols-outlined {
+        transform: translateX(4px);
+    }
+}
+
+.svc-cta__btn:active {
+    transform: scale(0.98);
 }
 
 .svc-cta__btn .material-symbols-outlined {
     transition: transform 0.2s ease;
 }
 
-.svc-cta__btn:hover .material-symbols-outlined {
-    transform: translateX(4px);
+
+/* ─── SERVICE DETAIL MODAL ────────────────────────────────────────────────────
+   <dialog> native lo sẵn focus trap, phím Esc và ::backdrop.
+   Desktop: hộp căn giữa. Mobile: bottom sheet (xem khối RESPONSIVE bên dưới).
+   LƯU Ý: display chỉ được set trong [open], nếu set ở rule gốc thì dialog
+   sẽ hiện cả khi đang đóng (UA style display:none bị ghi đè).
+   ─────────────────────────────────────────────────────────────────────────── */
+.svc-modal {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(560px, calc(100vw - 48px));
+    max-width: none;
+    max-height: min(86dvh, 820px);
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    overflow: hidden;
+    box-shadow: 0 24px 60px -20px rgba(62, 31, 71, 0.35);
+}
+
+.svc-modal[open] {
+    display: flex;
+    flex-direction: column;
+    animation: svc-modal-pop 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.svc-modal::backdrop {
+    background: rgba(34, 25, 29, 0.55);
+}
+
+.svc-modal[open]::backdrop {
+    animation: svc-modal-fade 0.26s ease;
+}
+
+@keyframes svc-modal-pop {
+    from { opacity: 0; transform: translateY(10px) scale(0.985); }
+}
+
+@keyframes svc-modal-fade {
+    from { opacity: 0; }
+}
+
+/* Sheet trượt lên từ đáy — chỉ dùng ở mobile, xem khối RESPONSIVE */
+@keyframes svc-modal-sheet {
+    from { transform: translateY(100%); }
+}
+
+/* Khoá scroll nền khi modal mở */
+body.svc-modal-open {
+    overflow: hidden;
+}
+
+.svc-modal__body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.svc-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-full);
+    background: rgba(34, 25, 29, 0.62);
+    color: #ffffff;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+@media (hover: hover) {
+    .svc-modal__close:hover {
+        background: rgba(34, 25, 29, 0.8);
+    }
+}
+
+.svc-modal__close:active {
+    transform: scale(0.94);
+}
+
+/* Nền tối để video dọc 9:16 letterbox trông có chủ ý thay vì như lỗi layout */
+.svc-detail__media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--color-text-primary);
+    overflow: hidden;
+}
+
+.svc-detail__video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Không có video thì poster lấp đầy khung, không letterbox */
+.svc-detail__poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.svc-detail__content {
+    padding: 20px 24px 24px;
+}
+
+.svc-detail__badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+/* Badge category vốn là nền trắng để nổi trên ảnh; trong modal nền cũng trắng
+   nên phải đổi sang nền hồng nhạt cho đủ tương phản */
+.svc-detail__badges .svc-badge--category {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.svc-detail__name {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-deep-plum);
+    margin: 0 0 10px;
+}
+
+.svc-detail__meta {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.svc-detail__price {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.svc-detail__duration {
+    font-size: 14px;
+    color: var(--color-text-tertiary);
+}
+
+.svc-detail__desc {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-text-secondary);
+    margin: 0 0 24px;
+}
+
+.svc-detail__btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    text-align: center;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-family: var(--font-base);
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+    box-shadow: var(--shadow-md);
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+@media (hover: hover) {
+    .svc-detail__btn:hover {
+        background: var(--color-primary-hover);
+    }
+}
+
+.svc-detail__btn:active {
+    transform: scale(0.985);
 }
 
 
@@ -371,46 +617,233 @@
 @media (max-width: 768px) {
     .svc-hero {
         padding: 40px 24px 0;
+        margin-bottom: 32px;
     }
 
     .svc-hero__title {
         font-size: 32px;
     }
 
+    /* ── Filter: scroll ngang 1 hàng ── */
+    .svc-filter-wrap {
+        padding: 12px 0;
+        margin-bottom: 28px;
+    }
+
+    /* Fade mép phải — báo hiệu còn tab scroll được */
+    .svc-filter-wrap::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 36px;
+        background: linear-gradient(to right, rgba(255, 248, 248, 0), rgba(255, 248, 248, 0.92));
+        pointer-events: none;
+    }
+
     .svc-filter {
         padding: 0 24px;
         justify-content: flex-start;
+        flex-wrap: nowrap;   /* thiếu dòng này nên overflow-x bên dưới không bao giờ kích hoạt */
         overflow-x: auto;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
     }
 
+    .svc-filter::-webkit-scrollbar {
+        display: none;
+    }
+
+    .svc-tab {
+        flex-shrink: 0;
+        scroll-snap-align: start;
+        min-height: 44px;   /* tap target tối thiểu */
+        padding: 10px 18px;
+    }
+
+    /* ── Grid ── */
     .svc-grid-section {
         padding: 0 24px;
     }
 
     .svc-grid {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
 
+    /* Card đổi sang hàng ngang: ảnh vuông bên trái, nội dung bên phải.
+       Cả card là vùng tap (stretched button qua .svc-card__btn bên dưới). */
+    .svc-card {
+        position: relative;
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: var(--radius-lg);
+        transition: transform 0.15s ease;
+    }
+
+    .svc-card:active {
+        transform: scale(0.985);
+    }
+
+    .svc-card__img-wrap {
+        aspect-ratio: 1;
+        border-radius: var(--radius-md);
+        margin-bottom: 0;
+    }
+
+    .svc-card__badges {
+        top: 6px;
+        left: 6px;
+        gap: 4px;
+    }
+
+    .svc-badge {
+        padding: 3px 7px;
+        font-size: 9px;
+    }
+
+    /* Badge category thừa ở list view (đã có tab filter); giữ Popular/New vì là tín hiệu bán hàng */
+    .svc-badge--category {
+        display: none;
+    }
+
+    .svc-card__body {
+        min-width: 0;
+        padding: 0 26px 0 0;   /* chừa chỗ cho chevron */
+    }
+
+    .svc-card__name {
+        font-size: 16px;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Description bỏ hẳn ở list mobile — modal đã hiển thị đầy đủ, không clamp */
+    .svc-card__desc {
+        display: none;
+    }
+
+    .svc-card__play {
+        width: 32px;
+        height: 32px;
+    }
+
+    .svc-card__play .material-symbols-outlined {
+        font-size: 20px;
+    }
+
+    .svc-card__meta {
+        border-top: none;
+        padding-top: 0;
+        margin-bottom: 0;
+    }
+
+    .svc-card__price {
+        font-size: 16px;
+    }
+
+    /* Icon trang trí bỏ ở mobile — đụng chỗ với chevron */
+    .svc-card__icon {
+        display: none;
+    }
+
+    /* Nút thành stretched link phủ toàn card; nhãn "Book now" giữ trong DOM
+       cho screen reader, affordance thị giác là chevron */
+    .svc-card__btn {
+        position: absolute;
+        inset: 0;
+        width: auto;
+        padding: 0;
+        border: none;
+        background: none;
+        font-size: 0;
+        border-radius: var(--radius-lg);
+    }
+
+    .svc-card__btn::after {
+        content: "chevron_right";
+        font-family: 'Material Symbols Outlined';
+        font-size: 22px;
+        font-weight: normal;
+        line-height: 1;
+        -webkit-font-feature-settings: 'liga';
+        font-feature-settings: 'liga';
+        color: var(--color-text-tertiary);
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+    }
+
+    .svc-card__btn:active {
+        transform: none;   /* card đã có feedback scale rồi */
+    }
+
+    .svc-empty {
+        padding: 40px 16px;
+    }
+
+    /* ── Modal thành bottom sheet: dính đáy, bo góc trên, trượt lên ── */
+    .svc-modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: 88dvh;
+        margin: auto auto 0;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    .svc-modal[open] {
+        animation-name: svc-modal-sheet;
+    }
+
+    .svc-detail__content {
+        padding: 18px 20px 24px;
+    }
+
+    .svc-detail__name {
+        font-size: 20px;
+    }
+
+    .svc-detail__price {
+        font-size: 21px;
+    }
+
+    /* ── Trust bar: 3 cột compact thay vì stack dọc + hairline mỗi dòng ── */
     .svc-trust__inner {
-        flex-direction: column;
-        gap: 24px;
-        padding: 32px 24px;
+        padding: 28px 20px;
+        gap: 12px;
     }
 
     .svc-trust__item {
         border-right: none;
-        border-bottom: 0.5px solid var(--color-border-subtle);
-        padding-bottom: 24px;
-        width: 100%;
     }
 
-    .svc-trust__item:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
+    .svc-trust__number {
+        font-size: 22px;
     }
 
+    .svc-trust__label {
+        font-size: 10px;
+        letter-spacing: 0.04em;
+    }
+
+    /* ── CTA ── */
     .svc-cta {
         padding: 64px 0;
+    }
+
+    /* 800px + blur(120px) bị overflow cắt gần hết ở mobile nhưng GPU vẫn phải paint */
+    .svc-cta__glow {
+        width: 420px;
+        height: 420px;
+        filter: blur(80px);
     }
 
     .svc-cta__inner {
@@ -419,5 +852,35 @@
 
     .svc-cta__title {
         font-size: 24px;
+    }
+}
+
+
+/* ─── REDUCED MOTION ──────────────────────────────────────────────────────────*/
+@media (prefers-reduced-motion: reduce) {
+    .svc-card,
+    .svc-card__btn,
+    .svc-tab,
+    .svc-cta__btn,
+    .svc-cta__btn .material-symbols-outlined,
+    .svc-modal__close,
+    .svc-detail__btn {
+        transition: none;
+    }
+
+    .svc-card:hover,
+    .svc-card:active,
+    .svc-tab:active,
+    .svc-card__btn:active,
+    .svc-cta__btn:hover,
+    .svc-cta__btn:active,
+    .svc-modal__close:active,
+    .svc-detail__btn:active {
+        transform: none;
+    }
+
+    .svc-modal[open],
+    .svc-modal[open]::backdrop {
+        animation: none;
     }
 }
