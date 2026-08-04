@@ -59,9 +59,8 @@
         <div class="nav-mobile-menu">
             <ul class="nav-mobile-links">
                 <li><a href="{{ url_for('main.services') }}">{{ _('Services') }}</a></li>
-                <li><a href="#">{{ _('Gallery') }}</a></li>
-                <li><a href="#">{{ _('Membership') }}</a></li>
-                <li><a href="#">{{ _('About') }}</a></li>
+                <li><a href="{{ url_for('main.gallery') }}">{{ _('Gallery') }}</a></li>
+                <li><a href="{{ url_for('main.about') }}">{{ _('About') }}</a></li>
                 <li><a href="{{ url_for('main.home') }}#contact">{{ _('Contact') }}</a></li>
             </ul>
             <div class="nav-mobile-actions">

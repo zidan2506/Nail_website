@@ -95,3 +95,9 @@
     color: #ab2261;
     background: #ffd9e2;
 }
+
+/* Trong mobile menu dropdown nằm sát mép trái → neo trái để menu không tràn ra ngoài */
+.nav-mobile-actions .lang-dropdown__menu {
+    left: 0;
+    right: auto;
+}
