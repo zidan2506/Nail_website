@@ -2311,8 +2311,12 @@ msgid "Email"
 msgstr "Email"
 
 #: app/templates/public/index.html:302
-msgid "Map Integration Placeholder"
-msgstr "Vị trí bản đồ"
+msgid "Map to our salon"
+msgstr "Bản đồ tới salon"
+
+#: app/templates/public/index.html:311
+msgid "Get directions"
+msgstr "Chỉ đường"
 
 #: app/templates/public/public_booking.html:37
 msgid "Info"

@@ -835,6 +835,45 @@
    ─────────────────────────────────────────────────────────────────────────── */
 
 
+/* ─── MAP EMBED ───────────────────────────────────────────────────────────────
+   .contact-map giữ nguyên khung; iframe fill toàn bộ, link chỉ đường nằm dưới
+   ─────────────────────────────────────────────────────────────────────────── */
+.contact-map {
+    overflow: hidden;
+    padding: 0;
+}
+
+.contact-map iframe {
+    width: 100%;
+    height: 100%;
+    align-self: stretch;
+    border: 0;
+    display: block;
+}
+
+.contact-map__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.contact-map__link .material-symbols-outlined {
+    font-size: 20px;
+}
+
+
+/* ─── STICKY BOOK BAR (mobile only) ───────────────────────────────────────────
+   Ẩn hoàn toàn trên desktop. Hiện khi hero đã cuộn khỏi viewport (IntersectionObserver)
+   ─────────────────────────────────────────────────────────────────────────── */
+.mobile-book-bar {
+    display: none;
+}
+
+
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────────────*/
 @media (max-width: 1024px) {
     .services-grid { grid-template-columns: repeat(2, 1fr); }
@@ -842,20 +881,421 @@
     .plan-card--featured { transform: none; }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE (≤768px)
+   Không phải desktop ép xuống 1 cột — mỗi section có layout riêng cho phone.
+   ═══════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-    .hero { height: 420px; }
-    .hero__title { font-size: 32px; }
-    .hero__cta-group { flex-direction: column; align-items: center; }
-    .hero__btn-primary, .hero__btn-outline { min-width: 0; width: 100%; max-width: 300px; }
 
-    .home-section, .home-section--shaded { padding: 48px 24px; }
+    /* ─── HERO: band ảnh 3:2 ở trên + panel plum chứa chữ ở dưới ────────────
+       Ảnh carousel là 16:9 ngang (1376x768). Nếu để object-fit:cover phủ nguyên
+       khung dọc 375x598 thì chỉ còn thấy 35% bề ngang — đúng phần giữa trống của
+       ảnh flat-lay, mất hết chai sơn bên trái và đĩa hoa bên phải.
+       Band 3:2 giữ được 84% bề ngang và đúng với mọi ảnh ngang admin upload sau này.
+       ─────────────────────────────────────────────────────────────────────── */
+    .hero {
+        height: auto;
+        /* band = 100vw/1.5 ≈ 66.67vw (cap 340px cho khổ gần 768px), cộng phần dự
+           trữ cho panel chữ. Slide là position:absolute nên không tự đẩy chiều cao
+           hero — phải chừa đủ chỗ sẵn. */
+        min-height: calc(min(66.67vw, 340px) + 384px);
+        /* .site-header là position:sticky nên đã chiếm 72px trong flow rồi;
+           margin-top ở đây là tàn dư từ hồi nav còn position:fixed */
+        margin-top: 0;
+    }
 
-    .services-grid { grid-template-columns: 1fr; }
-    .gallery-grid { grid-template-columns: 1fr; grid-auto-rows: 220px; }
-    .gallery-item--tall { grid-row: span 1; }
-    .stats-grid { grid-template-columns: 1fr; gap: 32px; }
-    .testimonials-grid { grid-template-columns: 1fr; }
-    .promo-cta { flex-direction: column; }
-    .promo-cta__discount { min-width: 0; width: 100%; }
-    .contact-grid { grid-template-columns: 1fr; padding: 20px; }
+    .hero__slide {
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+    }
+
+    /* Ảnh thoát khỏi absolute, thành band có tỉ lệ cố định ở đầu slide.
+       Bỏ blend mode: overlay trên nền plum làm ảnh salon bị nhuộm tím, mất chi tiết */
+    .hero__bg-img {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 3 / 2;
+        max-height: 340px;
+        flex-shrink: 0;
+        opacity: 1;
+        mix-blend-mode: normal;
+    }
+
+    /* Ken Burns scale(1.06) sẽ tràn khỏi band xuống đè lên panel chữ — tắt trên mobile.
+       Fade giữa slide và stagger của chữ vẫn giữ nguyên. */
+    .hero__slide--active .hero__bg-img {
+        animation: none;
+    }
+
+    /* Overlay chỉ phủ đúng band, làm mép dưới ảnh tan vào panel plum */
+    .hero__overlay {
+        top: 0;
+        bottom: auto;
+        height: auto;
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        max-height: 340px;
+        background: linear-gradient(
+            to bottom,
+            rgba(62, 31, 71, 0.12) 0%,
+            rgba(62, 31, 71, 0) 58%,
+            rgba(62, 31, 71, 0.72) 89%,
+            #3E1F47 100%
+        );
+    }
+
+    .hero__content {
+        flex: 1;
+        justify-content: center;
+        align-items: flex-start;
+        text-align: left;
+        width: 100%;
+        padding: 20px 24px 48px;
+    }
+
+    .hero__badge {
+        font-size: 11px;
+        padding: 4px 12px;
+        margin-bottom: 12px;
+    }
+
+    .hero__title {
+        font-size: clamp(30px, 8.4vw, 40px);
+        margin-bottom: 12px;
+    }
+
+    .hero__subtitle {
+        font-size: 15px;
+        line-height: 1.5;
+        margin-bottom: 22px;
+        max-width: 34ch;
+    }
+
+    .hero__cta-group {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 6px;
+    }
+
+    /* CTA chính full-width; CTA phụ hạ xuống thành text link để hero đỡ chật */
+    .hero__btn-primary {
+        min-width: 0;
+        width: 100%;
+        padding: 15px 24px;
+    }
+
+    .hero__btn-outline {
+        min-width: 0;
+        width: 100%;
+        border: none;
+        background: none;
+        backdrop-filter: none;
+        padding: 12px 8px;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+    }
+
+    /* Mũi tên 48px đè lên chữ trên màn 390px — dùng swipe thay thế */
+    .hero__arrow {
+        display: none;
+    }
+
+    .hero__dots {
+        left: 24px;
+        transform: none;
+        bottom: 24px;
+    }
+
+    /* ─── SECTION: nhịp và type scale riêng cho mobile ────────────────────── */
+    .home-section {
+        padding: 44px 24px;
+    }
+
+    .home-section--shaded {
+        padding: 40px 20px;
+        margin: 0 16px;
+        border-radius: 28px;
+    }
+
+    .home-section__header {
+        margin-bottom: 26px;
+    }
+
+    .home-section__title {
+        font-size: clamp(24px, 6.6vw, 30px);
+    }
+
+    .home-section__subtitle {
+        font-size: 15px;
+    }
+
+    /* ─── SERVICES: scroll-snap ngang, card kế lộ mép báo hiệu "còn nữa" ──── */
+    .services-grid {
+        display: flex;
+        grid-template-columns: none;
+        gap: 14px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scroll-padding-left: 24px;
+        /* tràn ra sát mép màn hình, nhưng vẫn thụt lề 24px ở item đầu/cuối */
+        margin: 0 -24px;
+        padding: 4px 24px 14px;
+        scrollbar-width: none;
+    }
+
+    .services-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .service-card {
+        flex: 0 0 78vw;
+        max-width: 320px;
+        scroll-snap-align: start;
+        padding: 14px;
+        border-radius: 18px;
+    }
+
+    .service-card__img-wrap {
+        height: 168px;
+        margin-bottom: 14px;
+        border-radius: 12px;
+    }
+
+    .service-card__name {
+        font-size: 18px;
+    }
+
+    .service-card__price {
+        font-size: 16px;
+    }
+
+    .service-card__desc {
+        font-size: 14px;
+    }
+
+    /* ─── GALLERY: giữ nhịp masonry 2 cột thay vì làm phẳng 1 cột ─────────── */
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 152px;
+        gap: 10px;
+    }
+
+    .gallery-item {
+        border-radius: 14px;
+    }
+
+    .gallery-item--tall {
+        grid-row: span 2;
+    }
+
+    /* Nếu chỉ có đúng 4 ảnh thì ô cuối trống — cho ảnh cuối span 2 cột */
+    .gallery-item:nth-child(4):last-child {
+        grid-column: span 2;
+    }
+
+    /* ─── STATS: số bên trái / chữ bên phải, giữ đủ nội dung mà gọn 1 nửa ── */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        text-align: left;
+    }
+
+    .stats-grid > div {
+        display: grid;
+        /* cột đủ rộng cho "100%" ở 30px bold — hẹp hơn thì số đè lên label */
+        grid-template-columns: 96px 1fr;
+        column-gap: 14px;
+        align-items: start;
+    }
+
+    .stat__number {
+        grid-row: span 2;
+        font-size: 30px;
+        white-space: nowrap;
+        margin: 0;
+    }
+
+    .stat__label {
+        font-size: 17px;
+        margin: 0 0 4px;
+    }
+
+    .stat__desc {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    /* ─── TESTIMONIALS ────────────────────────────────────────────────────── */
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .testimonial-card {
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .testimonial-card__quote {
+        font-size: 15px;
+        font-style: normal;
+        margin-bottom: 18px;
+    }
+
+    /* ─── PROMO CTA: đưa hook "15%" lên trên, nút full-width ──────────────── */
+    .promo-cta {
+        flex-direction: column;
+        padding: 24px 20px;
+        gap: 20px;
+        border-radius: 24px;
+    }
+
+    .promo-cta__discount {
+        order: -1;
+        min-width: 0;
+        width: 100%;
+        flex-direction: row;
+        align-items: baseline;
+        gap: 10px;
+        padding: 14px 18px;
+        border-radius: 16px;
+    }
+
+    .promo-cta__discount-number {
+        font-size: 40px;
+        margin-bottom: 0;
+    }
+
+    .promo-cta__discount-label {
+        font-size: 14px;
+    }
+
+    .promo-cta__title {
+        font-size: clamp(21px, 5.8vw, 26px);
+    }
+
+    .promo-cta__subtitle {
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    .promo-cta__list {
+        margin-bottom: 24px;
+    }
+
+    .promo-cta__list li {
+        font-size: 15px;
+    }
+
+    .promo-cta__btns {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .promo-cta__btn-solid,
+    .promo-cta__btn-outline {
+        width: 100%;
+        text-align: center;
+        padding: 14px 20px;
+    }
+
+    /* ─── CONTACT ─────────────────────────────────────────────────────────── */
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 0;
+    }
+
+    .contact-info__title {
+        font-size: clamp(24px, 6.6vw, 30px);
+    }
+
+    .contact-map {
+        height: 220px;
+        border-radius: 18px;
+    }
+
+    /* ─── TOUCH FEEDBACK ──────────────────────────────────────────────────────
+       Trên touch không tồn tại :hover — thiếu :active thì tap cảm giác chết
+       ─────────────────────────────────────────────────────────────────────── */
+    .service-card,
+    .gallery-item,
+    .hero__btn-primary,
+    .promo-cta__btn-solid,
+    .promo-cta__btn-outline {
+        transition: transform 0.12s ease;
+    }
+
+    .service-card:active,
+    .gallery-item:active,
+    .hero__btn-primary:active,
+    .promo-cta__btn-solid:active,
+    .promo-cta__btn-outline:active {
+        transform: scale(0.98);
+    }
+
+    /* ─── STICKY BOOK BAR ─────────────────────────────────────────────────── */
+    .mobile-book-bar {
+        display: flex;
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        z-index: 900;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 54px;
+        border-radius: var(--radius-full);
+        background: var(--color-primary);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        box-shadow: 0 10px 28px rgba(62, 31, 71, 0.32);
+        opacity: 0;
+        transform: translateY(130%);
+        pointer-events: none;
+        transition: opacity 0.25s ease, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mobile-book-bar--visible {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    .mobile-book-bar:active {
+        transform: translateY(0) scale(0.98);
+    }
+
+    /* chừa chỗ để bar không che dòng cuối footer */
+    .site-footer {
+        padding-bottom: 96px;
+    }
+}
+
+
+/* ─── REDUCED MOTION ─────────────────────────────────────────────────────────*/
+@media (prefers-reduced-motion: reduce) {
+    .hero__slide {
+        transition: none;
+    }
+
+    .hero__slide--active .hero__bg-img,
+    .hero__slide--active .hero__badge,
+    .hero__slide--active .hero__title,
+    .hero__slide--active .hero__subtitle,
+    .hero__slide--active .hero__cta-group {
+        animation: none;
+    }
+
+    .mobile-book-bar {
+        transition: none;
+    }
 }

@@ -296,11 +296,21 @@
             </div>
         </div>
 
-        <div class="contact-map">
-            <div>
-                <span class="material-symbols-outlined">map</span>
-                <p>{{ _('Map Integration Placeholder') }}</p>
+        <div>
+            <div class="contact-map">
+                <iframe
+                    src="https://www.google.com/maps?q=Kyyhkysm%C3%A4ki+9+A,+02650+Espoo,+Finland&output=embed"
+                    title="{{ _('Map to our salon') }}"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen></iframe>
             </div>
+            <a class="contact-map__link"
+               href="https://www.google.com/maps/dir/?api=1&destination=Kyyhkysm%C3%A4ki+9+A,+02650+Espoo,+Finland"
+               target="_blank" rel="noopener">
+                <span class="material-symbols-outlined">directions</span>
+                {{ _('Get directions') }}
+            </a>
         </div>
 
     </div>
@@ -317,6 +327,18 @@
      contact_phone / contact_email / opening_hours nếu base.html footer
      muốn hiển thị lại các thông tin này).
 ═══════════════════════════════════════════════════════════════════════════ #}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   STICKY BOOK BAR (mobile only)
+   - CSS ẩn hoàn toàn trên desktop (.mobile-book-bar { display: none })
+   - Hiện khi hero đã cuộn khỏi viewport — trên mobile "Book Now" của navbar
+     nằm trong hamburger nên giữa trang khách không còn đường đặt lịch
+═══════════════════════════════════════════════════════════════════════════ #}
+<a class="mobile-book-bar" href="{{ url_for('main.public_booking') }}">
+    <span class="material-symbols-outlined">calendar_month</span>
+    {{ _('Book Now') }}
+</a>
+
 
 <script>
 (function () {
@@ -350,7 +372,38 @@
         dot.addEventListener('click', function () { goTo(i); resetTimer(); });
     });
 
+    // Swipe — trên mobile mũi tên bị ẩn nên đây là cách duy nhất chuyển slide
+    const track = document.querySelector('.hero__slides');
+    let startX = 0, startY = 0;
+
+    track.addEventListener('touchstart', function (e) {
+        startX = e.changedTouches[0].clientX;
+        startY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    track.addEventListener('touchend', function (e) {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        // chỉ nhận vuốt ngang, tránh cướp thao tác cuộn dọc
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+            goTo(dx < 0 ? current + 1 : current - 1);
+            resetTimer();
+        }
+    }, { passive: true });
+
     resetTimer();
+})();
+
+(function () {
+    const bar  = document.querySelector('.mobile-book-bar');
+    const hero = document.querySelector('.hero');
+    if (!bar || !hero || !('IntersectionObserver' in window)) return;
+
+    const io = new IntersectionObserver(function (entries) {
+        bar.classList.toggle('mobile-book-bar--visible', !entries[0].isIntersecting);
+    }, { threshold: 0 });
+
+    io.observe(hero);
 })();
 </script>
 

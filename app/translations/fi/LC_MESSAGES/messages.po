@@ -2255,8 +2255,12 @@ msgid "Email"
 msgstr "Sähköposti"
 
 #: app/templates/public/index.html:302
-msgid "Map Integration Placeholder"
-msgstr "Karttapaikka"
+msgid "Map to our salon"
+msgstr "Kartta salongillemme"
+
+#: app/templates/public/index.html:311
+msgid "Get directions"
+msgstr "Reittiohjeet"
 
 #: app/templates/public/public_booking.html:37
 msgid "Info"

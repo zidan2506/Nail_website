@@ -2216,7 +2216,11 @@ msgid "Email"
 msgstr ""
 
 #: app/templates/public/index.html:302
-msgid "Map Integration Placeholder"
+msgid "Map to our salon"
+msgstr ""
+
+#: app/templates/public/index.html:311
+msgid "Get directions"
 msgstr ""
 
 #: app/templates/public/public_booking.html:37
