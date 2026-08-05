@@ -188,29 +188,6 @@
     color: #ffffff;
 }
 
-/* Dấu hiệu service này có video; chỉ render khi service.video_url có giá trị */
-.svc-card__play {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 46px;
-    height: 46px;
-    border-radius: var(--radius-full);
-    background: rgba(34, 25, 29, 0.55);
-    color: #ffffff;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    pointer-events: none;
-}
-
-.svc-card__play .material-symbols-outlined {
-    font-size: 28px;
-}
-
 .svc-card__body {
     flex-grow: 1;
     padding: 0 4px;
@@ -728,15 +705,6 @@ body.svc-modal-open {
     /* Description bỏ hẳn ở list mobile — modal đã hiển thị đầy đủ, không clamp */
     .svc-card__desc {
         display: none;
-    }
-
-    .svc-card__play {
-        width: 32px;
-        height: 32px;
-    }
-
-    .svc-card__play .material-symbols-outlined {
-        font-size: 20px;
     }
 
     .svc-card__meta {

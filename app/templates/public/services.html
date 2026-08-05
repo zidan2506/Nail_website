@@ -90,11 +90,6 @@
         <article class="svc-card" data-category="{{ service.category_slug }}">
             <div class="svc-card__img-wrap">
                 <img class="svc-card__img" src="{{ poster }}" alt="{{ service.name }}">
-                {% if video %}
-                <span class="svc-card__play" aria-hidden="true">
-                    <span class="material-symbols-outlined">play_arrow</span>
-                </span>
-                {% endif %}
                 <div class="svc-card__badges">
                     <span class="svc-badge svc-badge--category">{{ tr(service, 'category_name') }}</span>
                     {% if service.badge == 'Popular' %}
@@ -253,6 +248,17 @@
             modalBody.replaceChildren(tpl.content.cloneNode(true));
             document.body.classList.add('svc-modal-open');
             modal.showModal();
+
+            /* Tự phát ngay trong nhịp click (còn user gesture) — trình duyệt sẽ
+               chạy khi buffer đủ. Nếu bị chặn vì có tiếng (iOS/Safari) thì tắt
+               tiếng phát lại; user bật tiếng lại bằng controls. */
+            const video = modalBody.querySelector('video');
+            if (video) {
+                video.play().catch(() => {
+                    video.muted = true;
+                    video.play().catch(() => {});
+                });
+            }
         });
     });
 
