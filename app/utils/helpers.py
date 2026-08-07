@@ -75,8 +75,9 @@ def format_booking_date(date_str):
     return date_obj.strftime("%a, %b %d")
 
 def format_booking_time(time_str):
+    """Giờ hiển thị theo quy ước Phần Lan: 24h, không AM/PM."""
     time_obj = datetime.strptime(time_str, "%H:%M")
-    return time_obj.strftime("%I:%M %p")
+    return time_obj.strftime("%H:%M")
 
 def combine_date_time(date_str, time_str):
     datetime_str = f"{date_str} {time_str}"

@@ -822,8 +822,8 @@ msgid "Book new appointment"
 msgstr "Đặt lịch hẹn mới"
 
 #: app/templates/customer/customer_dashboard.html:699
-msgid "Keep blooming —"
-msgstr "Tiếp tục tỏa sáng —"
+msgid "Keep blooming,"
+msgstr "Tiếp tục tỏa sáng,"
 
 #: app/templates/customer/customer_dashboard.html:699
 msgid "your next treat is almost here!"
@@ -2975,3 +2975,11 @@ msgstr ""
 #~ msgid "JPG, PNG tối đa 2MB"
 #~ msgstr ""
 
+
+#: app/routes.py
+msgid "Today"
+msgstr "Hôm nay"
+
+#: app/routes.py
+msgid "Tomorrow"
+msgstr "Ngày mai"

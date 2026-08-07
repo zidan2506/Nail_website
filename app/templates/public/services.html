@@ -68,10 +68,9 @@
                     ...
                 </div>
             {% endfor %}
-       3. Giá hiện format "$65" — nếu DB lưu số (Decimal/Float) thì format trong
-          template bằng {{ "%.0f"|format(service.price) }} hoặc xử lý ở Python
-          tùy convention hiện có của project (m đang dùng VAT 25.5% ở chỗ khác
-          nên có thể đã có helper format giá sẵn — ưu tiên dùng lại helper đó).
+       3. Giá format qua filter dùng chung: {{ service.price | format_currency }}
+          cho ra "65,00 €" (quy ước Phần Lan). Đừng hardcode ký hiệu tiền trong
+          template, sửa ở app/template_filters.py nếu cần đổi định dạng.
        4. Nút "Book now" nên link sang booking flow kèm pre-selected service:
             href="{{ url_for('main.public_booking', service_id=service.id) }}"
           (điều chỉnh tên route/param theo booking flow thực tế của project).
@@ -104,7 +103,7 @@
                 <p class="svc-card__desc">{{ tr(service, 'description') }}</p>
                 <div class="svc-card__meta">
                     <div>
-                        <span class="svc-card__price">${{ service.price | int }}</span>
+                        <span class="svc-card__price">{{ service.price | format_currency }}</span>
                         <span class="svc-card__duration">/ {{ service.duration_minutes }} {{ _('mins') }}</span>
                     </div>
                     <span class="material-symbols-outlined svc-card__icon">{{ service.icon }}</span>
@@ -134,7 +133,7 @@
                     </div>
                     <h2 class="svc-detail__name" id="svcModalTitle">{{ tr(service, 'name') }}</h2>
                     <div class="svc-detail__meta">
-                        <span class="svc-detail__price">${{ service.price | int }}</span>
+                        <span class="svc-detail__price">{{ service.price | format_currency }}</span>
                         <span class="svc-detail__duration">{{ service.duration_minutes }} {{ _('mins') }}</span>
                     </div>
                     <p class="svc-detail__desc">{{ tr(service, 'description') }}</p>

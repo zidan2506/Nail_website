@@ -57,12 +57,12 @@ def format_date(value, format='%b %d, %Y'):
     return value.strftime(format)
 
 
-def format_time(value, format='%I:%M %p'):
+def format_time(value, format='%H:%M'):
     """
-    Convert time string → readable format.
-    
-    '10:00' → '10:00 AM'
-    '14:30' → '2:30 PM'
+    Convert time string → readable format. 24h theo quy ước Phần Lan.
+
+    '10:00' → '10:00'
+    '14:30' → '14:30'
     """
     if not value:
         return ''
@@ -74,22 +74,26 @@ def format_time(value, format='%I:%M %p'):
                 value = datetime.strptime(value, '%H:%M:%S')
             except ValueError:
                 return value
-    return value.strftime(format).lstrip('0')
+    return value.strftime(format)
 
 
-def format_currency(value, currency='$'):
+def format_currency(value, currency='€'):
     """
-    Format số → tiền tệ.
-    
-    25 → '$25.00'
-    25.5 → '$25.50'
+    Format số → tiền tệ, quy ước Phần Lan: dấu phẩy thập phân, khoảng trắng
+    ngăn hàng nghìn, ký hiệu đứng sau số.
+
+    25 → '25,00 €'
+    25.5 → '25,50 €'
+    1234.5 → '1 234,50 €'
     """
-    if value is None:
-        return f'{currency}0.00'
     try:
-        return f'{currency}{float(value):.2f}'
+        amount = float(value) if value is not None else 0.0
     except (ValueError, TypeError):
-        return f'{currency}0.00'
+        amount = 0.0
+    # '1,234.50' → '1 234,50'. Cả hai khoảng trắng đều là nbsp (U+00A0) nên
+    # số và ký hiệu tiền không bị ngắt dòng giữa chừng.
+    body = f'{amount:,.2f}'.replace(',', ' ').replace('.', ',')
+    return f'{body} {currency}'
 
 
 def short_name(value):

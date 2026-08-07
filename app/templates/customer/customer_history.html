@@ -29,9 +29,9 @@
     <div class="stat-card">
         <div class="stat-card-top">
             <span class="stat-label">{{ _('Total Spent') }}</span>
-            <div class="stat-icon stat-icon-pink">$</div>
+            <div class="stat-icon stat-icon-pink">€</div>
         </div>
-        <h3 class="stat-value">${{ total_spent }}</h3>
+        <h3 class="stat-value">{{ total_spent | format_currency }}</h3>
         <p class="stat-sublabel stat-sublabel-accent"></p>
     </div>
 
@@ -181,7 +181,7 @@
                         <div class="cell-sub">{{ appt.booking_date | format_date}} • {{ appt.start_time | format_time }}</div>
                     </td>
                     <td class="cell-medium cell-dim" data-label="{{ _('Stylist') }}">N/A</td>
-                    <td class="cell-bold cell-dim" data-label="{{ _('Price') }}">$0.00</td>
+                    <td class="cell-bold cell-dim" data-label="{{ _('Price') }}">{{ 0 | format_currency }}</td>
                     <td data-label="{{ _('Status') }}"><span class="badge badge-cancelled">{{ _('Cancelled') }}</span></td>
                     <td class="cell-actions" onclick="event.stopPropagation()">
                         <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>

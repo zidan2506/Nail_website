@@ -36,7 +36,7 @@ from app.utils.helpers import split_customer_bookings, format_booking_date, form
 from collections import Counter
 from app import oauth, csrf, LANGUAGES
 from app.template_filters import translate_field as tr
-from flask_babel import gettext, format_date
+from flask_babel import gettext, format_date, format_timedelta
 
 
 def _staff_status_i18n_markers():
@@ -507,6 +507,16 @@ def _get_current_staff():
 #====================================
 #               customer
 #====================================
+def _relative_day(days):
+    """Khoảng cách tới ngày hẹn, dạng người đọc ('Tomorrow', 'in 3 days').
+    CLDR trả 'in 0 days' cho hôm nay nên 0 và 1 phải tự xử."""
+    if days <= 0:
+        return gettext("Today")
+    if days == 1:
+        return gettext("Tomorrow")
+    return format_timedelta(timedelta(days=days), granularity="day", add_direction=True)
+
+
 @main.route("/customer/dashboard")
 @customer_login_required
 def customer_dashboard():
@@ -528,17 +538,20 @@ def customer_dashboard():
                 b["booking_date"], b["start_time"], b["end_time"],
             )
             _img = b["service_image"]
+            _bd  = datetime.strptime(b["booking_date"][:10], "%Y-%m-%d").date()
             upcoming_booking = {
                 "id":           b["id"],
                 "service_name": b["service_name"],
                 "date":         format_booking_date(b["booking_date"]),
                 "time":         format_booking_time(b["start_time"]),
+                "long_date":    format_date(_bd, "d MMMM"),
+                "relative":     _relative_day((_bd - today).days),
                 "staff_name":   b["staff_name"],
                 "status":       b["status"],
                 "price":        b["service_price"],
                 "calendar_url": _cal["url"],
                 "url_target":   _cal["url_target"],
-                "service_img":  url_for("static", filename=f"uploads/services/{_img}") if _img else None,
+                "service_img":  _resolve_upload(_img, "services"),
             }
             break
 
@@ -1311,8 +1324,8 @@ def invoice_detail(invoice_id):
     issued_at_obj = datetime.strptime(invoice["issued_at"], "%Y-%m-%d %H:%M:%S")
     issued_at_display = issued_at_obj.strftime("%B %d, %Y")
 
-    start_time_display = format_booking_time(invoice["start_time"])  # 10:00 AM
-    end_time_display = format_booking_time(invoice["end_time"])      # 10:45 AM
+    start_time_display = format_booking_time(invoice["start_time"])  # 10:00
+    end_time_display = format_booking_time(invoice["end_time"])      # 10:45
 
     return render_template(
         "/customer/invoice_detail.html",
@@ -4272,10 +4285,7 @@ def success():
     role_prefix   = f"{staff['role']}: " if staff["role"] else ""
     staff_display = f"With {role_prefix}{staff['full_name']}"
 
-    service_image = (
-        url_for("static", filename=f"uploads/services/{service['image']}")
-        if service["image"] else None
-    )
+    service_image = _resolve_upload(service["image"], "services")
 
     cal           = build_calendar_url(service["name"], staff["full_name"], booking["booking_date"], booking["start_time"], booking["end_time"])
     salon_address = "Kyyhkysmäki 9, 02650 Espoo"

@@ -766,8 +766,8 @@ msgid "Book new appointment"
 msgstr "Varaa uusi aika"
 
 #: app/templates/customer/customer_dashboard.html:699
-msgid "Keep blooming —"
-msgstr "Jatka kukoistamista —"
+msgid "Keep blooming,"
+msgstr "Jatka kukoistamista,"
 
 #: app/templates/customer/customer_dashboard.html:699
 msgid "your next treat is almost here!"
@@ -2919,3 +2919,11 @@ msgstr "Verkkovirhe. Yritä uudelleen."
 #~ msgid "Why DahaCare?"
 #~ msgstr "Miksi DahaCare?"
 
+
+#: app/routes.py
+msgid "Today"
+msgstr "Tänään"
+
+#: app/routes.py
+msgid "Tomorrow"
+msgstr "Huomenna"

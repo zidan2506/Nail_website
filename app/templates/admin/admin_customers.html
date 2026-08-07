@@ -1537,7 +1537,8 @@ function openDetail(el) {
 
     document.getElementById('cu_detail_points').textContent = d.points;
     document.getElementById('cu_detail_bookings').textContent = d.bookings;
-    document.getElementById('cu_detail_spend').textContent = '$' + parseFloat(d.spend || 0).toFixed(2);
+    document.getElementById('cu_detail_spend').textContent =
+        parseFloat(d.spend || 0).toLocaleString('fi-FI', { style: 'currency', currency: 'EUR' });
     document.getElementById('cu_detail_vouchers').textContent = d.vouchers;
 
     document.getElementById('cu_points_form').action = buildActionUrl(CU_ROUTES.adjustPoints, d.id);

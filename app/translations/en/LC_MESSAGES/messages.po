@@ -764,7 +764,7 @@ msgid "Book new appointment"
 msgstr ""
 
 #: app/templates/customer/customer_dashboard.html:699
-msgid "Keep blooming —"
+msgid "Keep blooming,"
 msgstr ""
 
 #: app/templates/customer/customer_dashboard.html:699
@@ -2878,3 +2878,11 @@ msgstr "Network error. Please try again."
 #~ msgid "Why DahaCare?"
 #~ msgstr ""
 
+
+#: app/routes.py
+msgid "Today"
+msgstr ""
+
+#: app/routes.py
+msgid "Tomorrow"
+msgstr ""

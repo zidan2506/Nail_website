@@ -403,7 +403,7 @@
 
           <div class="history-row__amount">
             <span class="history-label">{{ _('Amount') }}</span>
-            <span class="history-value">{{ appt['service_price'] | format_currency if appt['status'] == 'completed' else '$0.00' }}</span>
+            <span class="history-value">{{ appt['service_price'] | format_currency if appt['status'] == 'completed' else 0 | format_currency }}</span>
           </div>
 
           <div class="history-row__actions" onclick="event.stopPropagation()">

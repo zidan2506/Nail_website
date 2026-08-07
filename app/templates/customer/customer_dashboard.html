@@ -266,7 +266,9 @@
 .upcoming-card__image {
     flex: 0 0 132px;
     width: 132px;
-    height: 168px;
+    /* Giãn theo chiều cao cột chữ, tránh khoảng trống dưới ảnh */
+    align-self: stretch;
+    min-height: 168px;
     border-radius: 18px;
     overflow: hidden;
     background: #f2e8ec;
@@ -290,25 +292,18 @@
     flex-direction: column;
 }
 
-/* Top row: nhãn + badge trạng thái cùng hàng, sát lề trái */
-.upcoming-card__top {
+/* Phân tầng: dịch vụ gì > khi nào > chi tiết > hành động.
+   Mọi dòng dùng chung một mốc lề trái, không tạo cột phụ. */
+.upcoming-card__title-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
-}
-
-.upcoming-section-label {
-    margin: 0;
-    font-size: 0.78rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    color: #f43f84;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 8px;
 }
 
 .upcoming-card__title {
-    margin: 0 0 16px;
+    margin: 0;
     font-size: 1.4rem;
     line-height: 1.2;
     font-weight: 800;
@@ -316,19 +311,30 @@
     color: #23141a;
 }
 
-/* 3 details (date, stylist, status) giống appointment-card */
-.upcoming-card__details { display: grid; gap: 12px; }
-.upcoming-card__detail {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0;
-    font-size: 0.98rem;
-    line-height: 1.4;
-    color: #5f4e55;
+/* Thời gian: tín hiệu mạnh nhất, trả lời thẳng câu "khi nào" */
+.upcoming-card__when {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #ab2261;
 }
-.upcoming-card__detail-icon { flex-shrink: 0; font-size: 18px; color: #f43f84; opacity: 0.85; }
-.upcoming-card__detail-value { color: #5f4e55; font-weight: 500; }
+
+/* Ngày + staff + giá: 1 dòng nhạt, ngăn bằng gạch mảnh thay vì dấu chấm */
+.upcoming-card__facts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #7a6970;
+}
+.upcoming-card__facts span + span {
+    margin-left: 14px;
+    padding-left: 14px;
+    border-left: 1px solid rgba(122, 105, 112, 0.28);
+}
 
 /* meta: chỉ dùng cho trạng thái rỗng */
 .upcoming-card__meta {
@@ -388,7 +394,6 @@
     width: fit-content;
     min-height: 28px;
     padding: 0 14px;
-    margin-bottom: 14px;
     border-radius: 999px;
     font-size: 0.72rem;
     font-weight: 800;
@@ -541,30 +546,6 @@
     .db-header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
 }
 
-@media (max-width: 640px) {
-    /* Hero carousel: thu gọn cho điện thoại */
-    .hero { height: 300px; }
-    .hero__title { font-size: 26px; }
-    .hero__subtitle { font-size: 15px; margin-bottom: 22px; }
-    .hero__cta-group { flex-direction: column; align-items: center; width: 100%; }
-    .hero__btn-primary,
-    .hero__btn-outline { min-width: 0; width: 100%; max-width: 300px; }
-
-    /* Upcoming card: flex ngang → xếp dọc, ảnh full-width */
-    .upcoming-card {
-        flex-direction: column;
-        min-height: 0;
-        padding: 20px;
-        gap: 18px;
-    }
-    .upcoming-card__meta { font-size: 1rem; }
-    .upcoming-card__image {
-        flex: 0 0 auto;
-        width: 100%;
-        height: 200px;
-    }
-}
-
 .db-wrapper {
     max-width: 1100px;
     margin: 0 auto;
@@ -583,6 +564,163 @@
     transition: background 0.18s;
 }
 .book-btn:hover { background: #e63176; color: #fff; }
+
+/* ── MOBILE ≤768px ──────────────────────────────────────
+   Thang bo góc mobile: container 22px · media 16px · button 14px · pill 999px */
+@media (max-width: 768px) {
+
+    /* Header: lời chào xếp dọc, CTA thành nút full-width */
+    .db-header-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+    .db-label    { font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 8px; }
+    .db-heading  { font-size: 1.75rem; }
+    .db-subtitle { font-size: 0.95rem; margin-top: 6px; }
+
+    .book-btn {
+        justify-content: center;
+        width: 100%;
+        box-sizing: border-box; /* codebase không có reset border-box toàn cục */
+        min-height: 52px;
+        padding: 0 24px;
+        font-size: 0.95rem;
+        border-radius: 14px;
+        box-shadow: 0 10px 22px rgba(244,63,132,0.22);
+        transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .book-btn:active {
+        transform: scale(0.985);
+        box-shadow: 0 4px 12px rgba(244,63,132,0.18);
+    }
+
+    /* Hero: gọn lại, nhường toàn bộ chiều ngang cho nội dung */
+    .hero { height: 340px; border-radius: 22px; margin-bottom: 20px; }
+
+    /* Mũi tên ẩn: đã có swipe + dots, giữ lại chỉ đè lên content */
+    .hero__arrow { display: none; }
+
+    .hero__content  { padding: 0 22px; box-sizing: border-box; }
+    .hero__badge    { margin-bottom: 14px; }
+    .hero__title    { font-size: 28px; line-height: 1.15; margin-bottom: 12px; }
+    .hero__subtitle { font-size: 15px; line-height: 1.55; margin-bottom: 22px; }
+
+    .hero__cta-group { flex-direction: column; align-items: center; width: 100%; }
+    .hero__btn-primary,
+    .hero__btn-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 320px;
+        min-width: 0;
+        box-sizing: border-box;
+        min-height: 50px;
+        padding: 0 24px;
+        border-radius: 14px;
+        font-size: 15px;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .hero__btn-primary:active,
+    .hero__btn-outline:active { transform: scale(0.985); }
+
+    /* Dots: vùng chạm ảo 44px, rộng đúng bằng pitch nên không chồng nhau */
+    .hero__dots { bottom: 14px; gap: 12px; }
+    .hero__dot  { position: relative; }
+    .hero__dot::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: calc(100% + 12px);
+        height: 44px;
+    }
+    .hero__dot--active { width: 26px; }
+
+    .dashboard-grid { gap: 18px; }
+
+    /* Upcoming card: flex ngang → xếp dọc, ảnh full-width */
+    .upcoming-card {
+        flex-direction: column;
+        min-height: 0;
+        gap: 18px;
+        padding: 18px;
+        border-radius: 22px;
+        box-shadow: 0 10px 30px rgba(34,21,27,0.05);
+    }
+    .upcoming-card__image {
+        flex: 0 0 auto;
+        width: 100%;
+        height: 190px;
+        border-radius: 16px;
+    }
+
+    .appointment-status-badge { min-height: 26px; padding: 0 12px; font-size: 0.75rem; }
+
+    .upcoming-card__title { font-size: 1.25rem; }
+    .upcoming-card__when  { font-size: 1rem; margin-bottom: 10px; }
+    .upcoming-card__facts { font-size: 0.9rem; row-gap: 4px; }
+    .upcoming-card__facts span + span { margin-left: 10px; padding-left: 10px; }
+    .upcoming-card__meta  { font-size: 0.95rem; }
+
+    /* CTA xếp dọc full-width thay vì wrap lệch */
+    .upcoming-card__actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding-top: 18px;
+    }
+    .upcoming-card__actions .btn {
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 50px;
+        font-size: 0.95rem;
+    }
+
+    /* Touch không có hover: đổi sang phản hồi khi ấn */
+    .btn:hover  { transform: none; }
+    .btn:active { transform: scale(0.985); }
+    .btn-primary:active { box-shadow: 0 4px 12px rgba(244,63,132,0.18); }
+
+    /* Loyalty card */
+    .loyalty-card    { padding: 24px 20px 20px; border-radius: 22px; }
+    .loyalty-header  { margin-bottom: 16px; }
+    .loyalty-title   { font-size: 0.75rem; letter-spacing: 2px; }
+    .loyalty-points-num { font-size: 2.6rem; }
+    .loyalty-tagline { font-size: 0.75rem; letter-spacing: 1.2px; margin-bottom: 22px; }
+
+    .loyalty-progress-section { margin-bottom: 18px; }
+    .progress-reward-name { font-size: 0.9rem; }
+    .progress-pct  { font-size: 0.78rem; }
+    .progress-hint { font-size: 0.75rem; }
+
+    .loyalty-view-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 50px;
+        padding: 0 16px;
+        border-radius: 14px;
+        font-size: 0.78rem;
+        transition: background 0.18s ease, transform 0.2s ease;
+    }
+    .loyalty-view-btn:active {
+        background: rgba(255,255,255,0.14);
+        transform: scale(0.985);
+    }
+}
+
+/* Tôn trọng người dùng tắt hiệu ứng chuyển động */
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+    .book-btn:active,
+    .btn:active,
+    .hero__btn-primary:active,
+    .hero__btn-outline:active,
+    .loyalty-view-btn:active { transform: none; }
+}
 </style>
 {% endblock %}
 
@@ -650,27 +788,18 @@
             </div>
 
             <div class="upcoming-card__content">
-                <div class="upcoming-card__top">
-                    <p class="upcoming-section-label">{{ _('Upcoming Appointment') }}</p>
+                <div class="upcoming-card__title-row">
+                    <h2 class="upcoming-card__title">{{ upcoming_booking.service_name }}</h2>
                     <span class="appointment-status-badge appointment-status-badge--{{ upcoming_booking.status }}">{{ upcoming_booking.status }}</span>
                 </div>
 
-                <h2 class="upcoming-card__title">{{ upcoming_booking.service_name }}</h2>
+                <p class="upcoming-card__when">{{ upcoming_booking.relative }}, {{ upcoming_booking.time }}</p>
 
-                <div class="upcoming-card__details">
-                    <p class="upcoming-card__detail">
-                        <span class="material-symbols-outlined upcoming-card__detail-icon">calendar_today</span>
-                        <span class="upcoming-card__detail-value">{{ upcoming_booking.date }} • {{ upcoming_booking.time }}</span>
-                    </p>
-                    <p class="upcoming-card__detail">
-                        <span class="material-symbols-outlined upcoming-card__detail-icon">person</span>
-                        <span class="upcoming-card__detail-value">{{ upcoming_booking.staff_name }}</span>
-                    </p>
-                    <p class="upcoming-card__detail">
-                        <span class="material-symbols-outlined upcoming-card__detail-icon">sell</span>
-                        <span class="upcoming-card__detail-value">{{ upcoming_booking.price | format_currency }}</span>
-                    </p>
-                </div>
+                <p class="upcoming-card__facts">
+                    <span>{{ upcoming_booking.long_date }}</span>
+                    <span>{{ upcoming_booking.staff_name }}</span>
+                    <span>{{ upcoming_booking.price | format_currency }}</span>
+                </p>
 
                 <div class="upcoming-card__actions">
                     <a href="{{ upcoming_booking.calendar_url }}" class="btn btn-primary" target="{{ upcoming_booking.url_target }}">{{ _('Add to Calendar') }}</a>
@@ -679,7 +808,6 @@
             </div>
         {% else %}
             <div class="upcoming-card__content">
-                <p class="upcoming-section-label">{{ _('Upcoming Appointment') }}</p>
                 <h2 class="upcoming-card__title">{{ _('No upcoming visits scheduled') }}</h2>
                 <p class="upcoming-card__meta">{{ _('Ready for a new look? Book your next treatment today.') }}</p>
                 <div class="upcoming-card__actions">
@@ -696,7 +824,7 @@
         </div>
 
         <div class="loyalty-points-num">{{ loyalty_points or 0 }}</div>
-        <p class="loyalty-tagline">{{ _('Keep blooming —') }}<br>{{ _('your next treat is almost here!') }}</p>
+        <p class="loyalty-tagline">{{ _('Keep blooming,') }}<br>{{ _('your next treat is almost here!') }}</p>
 
         {% if next_reward %}
         <div class="loyalty-progress-section">
