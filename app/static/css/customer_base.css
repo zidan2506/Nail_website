@@ -520,7 +520,7 @@ body {
 /* Logout button — override .nav-item để có outline style
    Giữ class .nav-item và .nav-button trên element để backward compat
    .sidebar-logout-btn override visual thành outline style */
-.sidebar-logout-btn {
+.nav-button.sidebar-logout-btn {
     width: 100%;
     text-align: center;
     background: transparent;
@@ -600,6 +600,8 @@ body {
         position: fixed;
         top: 0;
         left: 0;
+        box-sizing: border-box; /* padding 32px nằm trong 100dvh, không cộng thêm */
+        height: 100vh; /* fallback cho browser không hỗ trợ dvh */
         height: 100dvh;
         width: min(80vw, 290px);
         transform: translateX(-100%);
@@ -611,6 +613,13 @@ body {
         box-shadow: 0 0 40px rgba(35, 22, 28, 0.15);
     }
     body.customer-nav-open .dashboard-sidebar { transform: translateX(0); }
+
+    /* Cho nav co lại + tự scroll để .sidebar-bottom (Book Now + Logout)
+       luôn nằm trong khung drawer, không bị đẩy ra ngoài màn hình */
+    .sidebar-nav {
+        min-height: 0;
+        overflow-y: auto;
+    }
 
     /* Lớp phủ nền */
     .customer-navbg {

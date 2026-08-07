@@ -455,7 +455,24 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.service-radio, input[name="staff_id"]').forEach(r => r.addEventListener('change', updateSummary));
     updateSummary();
 
-    document.getElementById('confirm-btn')?.closest('form').addEventListener('submit', () => {
+    // --Step 4: chặn Continue tới khi guest info đủ (backend yêu cầu name/phone/email)
+    const infoNextBtn = steps[3]?.querySelector('.bk-btn-next');
+    const guestFields = ['full_name', 'phone', 'email'].map(id => document.getElementById(id));
+
+    function guestInfoValid() {
+        const [name, phone, email] = guestFields;
+        return name.value.trim() !== ''
+            && phone.value.trim() !== ''
+            && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+    }
+    function syncInfoState() {
+        if (infoNextBtn) infoNextBtn.disabled = !guestInfoValid();
+    }
+    guestFields.forEach(f => f.addEventListener('input', syncInfoState));
+    syncInfoState();
+
+    document.getElementById('confirm-btn')?.closest('form').addEventListener('submit', e => {
+        if (!guestInfoValid() || !hiddenTime.value) { e.preventDefault(); return; }
         const btn = document.getElementById('confirm-btn');
         btn.disabled = true;
         btn.textContent = '{{ _("Processing…") }}';
