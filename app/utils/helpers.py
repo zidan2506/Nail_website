@@ -99,9 +99,10 @@ def build_gg_calendar_url(title, date, start_time, end_time, details="", locatio
     params = {
         "action": "TEMPLATE",
         "text": title,
-        "dates": f"{start_dt.strftime('%Y%M%dT%H%M%S')}/{end_dt.strftime('%Y%M%dT%H%M%S')}",
+        "dates": f"{start_dt.strftime('%Y%m%dT%H%M%S')}/{end_dt.strftime('%Y%m%dT%H%M%S')}",
         "details": details,
         "location": location,
+        "ctz": "Europe/Helsinki",
     }
 
     return "https://calendar.google.com/calendar/render?" + urlencode(params)
@@ -109,11 +110,11 @@ def build_gg_calendar_url(title, date, start_time, end_time, details="", locatio
 def build_calendar_url( sevi_name, staff_name, date, start_time, end_time):
     
     
-    title = f"{sevi_name} - Brand_name"
+    title = f"{sevi_name} - Misa Nails"
 
-    details = f"Appointment with {staff_name} at Brand_name"
+    details = f"Appointment with {staff_name} at Misa Nails"
 
-    location = f"Address of Salon"
+    location = "Kyyhkysmäki 9, 02650 Espoo"
 
     return {
         "url": build_gg_calendar_url(title, date, start_time, end_time, details, location),
