@@ -28,12 +28,12 @@
    - Tĩnh — nếu sau này muốn dynamic, đưa story_title/story_paragraphs qua context
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="abt-story">
-    <div class="abt-story__img-wrap">
+    <div class="abt-story__img-wrap abt-reveal">
         <img class="abt-story__img"
              src="{{ url_for('static', filename='images/public/About_img.png')}}"
              alt="DahaCare salon interior — soft blossom-pink and stone-white tones">
     </div>
-    <div class="abt-story__text">
+    <div class="abt-story__text abt-reveal">
         <h2 class="abt-story__heading">{{ _('Crafted with intention') }}</h2>
         <div class="abt-story__divider"></div>
         <p class="abt-story__lead">{{ _('At DahaCare, we believe that true luxury lies in the details. Founded on the principle of bringing atelier-level precision to daily wellness, our space was designed as a retreat from the noise of the city.') }}</p>
@@ -61,21 +61,21 @@
        tốt nhất là tính bằng len(team_members) thay vì hardcode riêng, tránh
        lệch số khi thêm/bớt nhân viên.
 ═══════════════════════════════════════════════════════════════════════════ #}
-<section class="abt-stats">
+<section class="abt-stats" id="abt-stats">
     <div class="abt-stats__grid">
-        <div class="abt-stats__item">
+        <div class="abt-stats__item abt-reveal">
             <span class="abt-stats__number">5+</span>
             <span class="abt-stats__label">{{ _('Years of Excellence') }}</span>
         </div>
-        <div class="abt-stats__item">
+        <div class="abt-stats__item abt-reveal">
             <span class="abt-stats__number">12k+</span>
             <span class="abt-stats__label">{{ _('Clients Served') }}</span>
         </div>
-        <div class="abt-stats__item">
+        <div class="abt-stats__item abt-reveal">
             <span class="abt-stats__number">{{ staff_members | length }}</span>
             <span class="abt-stats__label">{{ _('Master Artists') }}</span>
         </div>
-        <div class="abt-stats__item">
+        <div class="abt-stats__item abt-reveal">
             <span class="abt-stats__number">4.9</span>
             <span class="abt-stats__label">{{ _('Average Rating') }}</span>
         </div>
@@ -114,12 +114,15 @@
      thay thế bằng vòng lặp Jinja khi đã có bảng staff_members.
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="abt-team">
-    <div class="abt-team__header">
+    <div class="abt-team__header abt-reveal">
         <h2 class="abt-team__title">{{ _('Meet the team') }}</h2>
         <div class="abt-team__title-rule"></div>
     </div>
 
-    <div class="abt-team__grid">
+    {# Trên mobile grid này chuyển thành rail scroll-snap ngang (xem about.css),
+       nên reveal gắn ở cả khối thay vì từng card: card nằm ngoài mép phải chỉ
+       intersect khi khách vuốt tới, fade từng cái lúc đang vuốt trông giật. #}
+    <div class="abt-team__grid abt-reveal">
         {% for member in staff_members %}
         <div class="abt-team__card">
             <img class="abt-team__avatar" src="{{ member.photo | staff_avatar }}" alt="{{ member.full_name }}">
@@ -148,7 +151,7 @@
 
     <div class="abt-values__grid">
 
-        <div class="abt-value">
+        <div class="abt-value abt-reveal">
             <div class="abt-value__icon-wrap">
                 <span class="material-symbols-outlined abt-value__icon">sanitizer</span>
             </div>
@@ -158,7 +161,7 @@
             </div>
         </div>
 
-        <div class="abt-value">
+        <div class="abt-value abt-reveal">
             <div class="abt-value__icon-wrap">
                 <span class="material-symbols-outlined abt-value__icon">workspace_premium</span>
             </div>
@@ -168,7 +171,7 @@
             </div>
         </div>
 
-        <div class="abt-value">
+        <div class="abt-value abt-reveal">
             <div class="abt-value__icon-wrap">
                 <span class="material-symbols-outlined abt-value__icon">diamond</span>
             </div>
@@ -178,7 +181,7 @@
             </div>
         </div>
 
-        <div class="abt-value">
+        <div class="abt-value abt-reveal">
             <div class="abt-value__icon-wrap">
                 <span class="material-symbols-outlined abt-value__icon">favorite</span>
             </div>
@@ -208,5 +211,94 @@
 
 {# Footer không khai báo ở đây — đã chuyển sang base.html {% block footer %},
    dùng chung cho mọi public page. Xem base.html. #}
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   STICKY BOOK BAR (mobile only)
+   - CSS ẩn hoàn toàn trên desktop (.mobile-book-bar { display: none })
+   - Hiện khi hero đã cuộn khỏi viewport — trên mobile "Book Now" của navbar
+     nằm trong hamburger nên giữa trang khách không còn đường đặt lịch.
+     Cùng component với frontpage/gallery, xem index.html.
+═══════════════════════════════════════════════════════════════════════════ #}
+<a class="mobile-book-bar" href="{{ url_for('main.public_booking') }}">
+    <span class="material-symbols-outlined">calendar_month</span>
+    {{ _('Book Now') }}
+</a>
+
+<script>
+(function () {
+    /* ─── Scroll reveal ──────────────────────────────────────────────────────
+       Class enable (.js-reveal) do JS gắn vào <html> chứ không viết sẵn: nếu JS
+       lỗi hoặc bị chặn thì nội dung hiện bình thường thay vì kẹt ở opacity 0.
+       Delay tính theo thứ tự trong từng đợt IO báo về, không phải index toàn
+       cục — nếu không khối cuối trang phải chờ cả giây mới hiện. */
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const items = document.querySelectorAll('.abt-reveal');
+
+    if (!reduceMotion && items.length && 'IntersectionObserver' in window) {
+        document.documentElement.classList.add('js-reveal');
+        const revealIO = new IntersectionObserver(function (entries) {
+            let shown = 0;
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                entry.target.style.transitionDelay = (shown++ * 70) + 'ms';
+                entry.target.classList.add('abt-reveal--in');
+                revealIO.unobserve(entry.target);
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+        items.forEach(function (item) { revealIO.observe(item); });
+    }
+
+    /* ─── Count-up cho stats bar ─────────────────────────────────────────────
+       Đọc thẳng số đang render ("5+", "12k+", "4.9", số nhân viên từ DB) rồi
+       tách phần số / phần đuôi, nên thêm bớt số liệu trong HTML không cần sửa
+       JS. Chạy đúng 1 lần khi stats bar vào viewport. */
+    const stats = document.getElementById('abt-stats');
+    if (reduceMotion || !stats || !('IntersectionObserver' in window)) return;
+
+    function countUp(el) {
+        const raw = el.textContent.trim();
+        const parts = raw.match(/^(\d+(?:\.\d+)?)(.*)$/);
+        if (!parts) return;
+
+        const target   = parseFloat(parts[1]);
+        const suffix   = parts[2];
+        const decimals = (parts[1].split('.')[1] || '').length;
+        const started  = performance.now();
+
+        (function tick(now) {
+            const p     = Math.min((now - started) / 900, 1);
+            const eased = 1 - Math.pow(1 - p, 3);
+            if (p < 1) {
+                el.textContent = (target * eased).toFixed(decimals) + suffix;
+                requestAnimationFrame(tick);
+            } else {
+                el.textContent = raw;
+            }
+        })(started);
+    }
+
+    const statsIO = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        statsIO.disconnect();
+        stats.querySelectorAll('.abt-stats__number').forEach(countUp);
+    }, { threshold: 0.35 });
+
+    statsIO.observe(stats);
+})();
+
+(function () {
+    const bar  = document.querySelector('.mobile-book-bar');
+    const hero = document.querySelector('.abt-hero');
+    if (!bar || !hero || !('IntersectionObserver' in window)) return;
+
+    const io = new IntersectionObserver(function (entries) {
+        bar.classList.toggle('mobile-book-bar--visible', !entries[0].isIntersecting);
+    }, { threshold: 0 });
+
+    io.observe(hero);
+})();
+</script>
 
 {% endblock %}

@@ -134,6 +134,9 @@
     font-size: 36px;
     font-weight: 700;
     color: var(--color-primary-light);
+    /* count-up (about.html) đếm qua nhiều chữ số — chữ số không đều bề ngang thì
+       cả cụm co giật trong lúc chạy */
+    font-variant-numeric: tabular-nums;
 }
 
 .abt-stats__label {
@@ -345,6 +348,23 @@
 }
 
 
+/* ─── SCROLL REVEAL ───────────────────────────────────────────────────────────
+   Class .js-reveal do JS gắn vào <html>, không viết sẵn trong HTML: JS lỗi hoặc
+   bị chặn thì nội dung hiện bình thường thay vì kẹt ở opacity 0.
+   JS cũng bỏ qua hoàn toàn khối này khi prefers-reduced-motion: reduce.
+   ─────────────────────────────────────────────────────────────────────────── */
+.js-reveal .abt-reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.js-reveal .abt-reveal--in {
+    opacity: 1;
+    transform: none;
+}
+
+
 /* ─── RESPONSIVE ──────────────────────────────────────────────────────────────*/
 @media (max-width: 1024px) {
     .abt-story {
@@ -360,56 +380,242 @@
     }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE (≤768px)
+   Không phải desktop ép xuống 1 cột — mỗi section có layout riêng cho phone.
+   Cùng nhịp với index.css / gallery.css.
+   ═══════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
+
+    /* ─── HERO ────────────────────────────────────────────────────────────────
+       Thu gọn để ảnh story lộ mép ngay trong fold đầu (xem .abt-story bên dưới).
+       Title là italic và chữ "Story" có đuôi 'y' — line-height 1.15 + đệm 2px để
+       không bị cắt chân chữ. */
     .abt-hero {
-        padding: 48px 24px 40px;
+        padding: 40px 24px 26px;
+    }
+
+    .abt-hero__eyebrow {
+        font-size: 11px;
+        margin-bottom: 12px;
     }
 
     .abt-hero__title {
-        font-size: 32px;
+        font-size: clamp(30px, 8.2vw, 38px);
+        line-height: 1.15;
+        padding-bottom: 2px;
     }
 
+    .abt-hero__subtitle {
+        font-size: 15px;
+        line-height: 1.55;
+        max-width: 34ch;
+    }
+
+    /* ─── OUR STORY: ảnh tràn viền, bo 2 góc dưới ─────────────────────────────
+       Ảnh 4:5 full-width ở 390px cao tới 468px, nuốt trọn 1 màn trước khi thấy
+       chữ. Hạ xuống 4:3 (~292px) và cho tràn sát mép: mép trên ăn liền vào hero,
+       2 góc dưới bo lại thành một "band" ảnh, đọc như trang tạp chí. */
     .abt-story {
-        padding: 0 24px;
-        margin-bottom: 64px;
+        padding: 0;
+        margin-bottom: 56px;
+        gap: 26px;
     }
 
+    .abt-story__img-wrap {
+        aspect-ratio: 4 / 3;
+        border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+        /* tràn sát mép thì shadow chỉ còn thấy ở cạnh dưới, thành vệt bẩn */
+        box-shadow: none;
+    }
+
+    .abt-story__text {
+        padding: 0 24px;
+    }
+
+    .abt-story__heading {
+        font-size: clamp(24px, 6.4vw, 30px);
+    }
+
+    .abt-story__lead {
+        font-size: 16px;
+    }
+
+    /* ─── STATS: 2x2 chia bằng hairline thay vì trôi tự do trong khoảng trắng ─*/
     .abt-stats {
-        padding: 40px 0;
-        margin-bottom: 64px;
+        padding: 32px 0;
+        margin-bottom: 56px;
     }
 
     .abt-stats__grid {
         padding: 0 24px;
         grid-template-columns: repeat(2, 1fr);
-        gap: 32px;
+        gap: 0;
     }
 
+    .abt-stats__item {
+        padding: 20px 6px;
+    }
+
+    .abt-stats__item:nth-child(odd) {
+        border-right: 1px solid rgba(248, 249, 250, 0.14);
+    }
+
+    .abt-stats__item:nth-child(-n + 2) {
+        border-bottom: 1px solid rgba(248, 249, 250, 0.14);
+    }
+
+    .abt-stats__number {
+        font-size: 32px;
+    }
+
+    /* ─── TEAM: rail scroll-snap ngang ────────────────────────────────────────
+       Grid 2 cột ở 360px chỉ còn ~146px/card, trừ padding còn 98px cho avatar
+       96px — tên nhân viên gãy dòng. Rail giữ card đủ rộng, lộ mép card kế báo
+       "còn nữa", và không phình dài trang khi team đông thêm.
+       Panel cũng thụt vào 16px: bo góc 24px mà dính sát mép màn nhìn như lỗi. */
     .abt-team {
-        padding: 40px 24px;
-        margin-bottom: 64px;
+        margin: 0 16px 56px;
+        padding: 36px 0;
+    }
+
+    .abt-team__header {
+        padding: 0 24px;
+        margin-bottom: 24px;
+    }
+
+    .abt-team__title {
+        font-size: clamp(24px, 6.4vw, 30px);
     }
 
     .abt-team__grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        display: flex;
+        grid-template-columns: none;
+        /* justify-content: center của desktop làm phần tràn bên trái không cuộn
+           tới được — rail bắt buộc phải flex-start */
+        justify-content: flex-start;
+        gap: 12px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scroll-padding-left: 20px;
+        padding: 4px 20px 12px;
+        scrollbar-width: none;
     }
 
+    .abt-team__grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .abt-team__card {
+        flex: 0 0 clamp(150px, 44vw, 190px);
+        scroll-snap-align: start;
+        padding: 20px 14px;
+        gap: 12px;
+    }
+
+    .abt-team__avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    .abt-team__name {
+        font-size: 15px;
+    }
+
+    .abt-team__role {
+        font-size: 11px;
+    }
+
+    /* ─── VALUES: icon trái / chữ trái ────────────────────────────────────────
+       Bản cũ center + xếp dọc làm mỗi thẻ cao ~180px và chữ căn giữa khó quét.
+       Hàng ngang gọn hơn ~1/3 chiều cao, mắt bám được mép trái. */
     .abt-values {
         padding: 0 24px;
-        margin-bottom: 64px;
+        margin-bottom: 56px;
+    }
+
+    .abt-values__header {
+        margin-bottom: 24px;
+    }
+
+    .abt-values__title {
+        font-size: clamp(24px, 6.4vw, 30px);
+    }
+
+    .abt-values__grid {
+        gap: 12px;
     }
 
     .abt-value {
-        flex-direction: column;
-        text-align: center;
-        align-items: center;
+        padding: 18px;
+        gap: 16px;
     }
 
+    .abt-value__icon-wrap {
+        width: 40px;
+        height: 40px;
+    }
+
+    .abt-value__icon {
+        font-size: 20px;
+    }
+
+    .abt-value__title {
+        font-size: 17px;
+        margin-bottom: 6px;
+    }
+
+    .abt-value__desc {
+        font-size: 14px;
+        line-height: 1.55;
+    }
+
+    /* ─── BOTTOM CTA ──────────────────────────────────────────────────────────*/
     .abt-cta {
-        padding: 64px 24px;
+        padding: 56px 24px 64px;
     }
 
     .abt-cta__title {
-        font-size: 26px;
+        font-size: clamp(24px, 6.6vw, 30px);
+    }
+
+    .abt-cta__subtitle {
+        font-size: 15px;
+        margin-bottom: 26px;
+    }
+
+    .abt-cta__btn {
+        width: 100%;
+        justify-content: center;
+        padding: 16px 24px;
+    }
+
+    /* ─── TOUCH FEEDBACK ──────────────────────────────────────────────────────
+       Trên touch không tồn tại :hover — thiếu :active thì tap cảm giác chết
+       ─────────────────────────────────────────────────────────────────────── */
+    .abt-team__card,
+    .abt-cta__btn {
+        transition: transform 0.12s ease;
+    }
+
+    .abt-team__card:active,
+    .abt-cta__btn:active {
+        transform: scale(0.98);
+    }
+}
+
+
+/* ─── REDUCED MOTION ─────────────────────────────────────────────────────────
+   Scroll reveal và count-up đã được JS bỏ qua từ đầu (about.html), ở đây chỉ
+   cần tắt nốt phần transform thuần CSS.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .abt-team__card {
+        transition: none;
+    }
+
+    .abt-team__card:hover {
+        transform: none;
     }
 }
