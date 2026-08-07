@@ -24,30 +24,13 @@
 
 {# ═══════════════════════════════════════════════════════════════════════════
    GALLERY GRID
-   - 3 cột desktop / 2 cột tablet / 1 cột mobile, tất cả ô vuông (aspect-ratio 1:1)
+   - Ảnh lấy từ bảng `gallery_images` qua get_gallery_images() trong routes.py,
+     đã lọc is_active và sắp theo sort_order
    - Không filter category (đã chốt: chỉ 1 grid chung)
+   - Layout: 3 cột desktop / 2 cột tablet / masonry 2 cột mobile (xem gallery.css)
    - data-index dùng để map ảnh trong lightbox JS phía dưới — PHẢI tăng dần
-     liên tục từ 0, không có khoảng trống, vì JS dùng index này để build mảng
-     `images` và tính prev/next theo modulo
-   - HIỆN TẠI: hardcode 9 ảnh mẫu (đúng asset từ bản Stitch gốc)
-   - DB INTEGRATION (cho Claude Code):
-       1. Cần bảng `gallery_images` (id, image_url, alt_text, sort_order [nullable,
-          dùng để control thứ tự hiển thị nếu cần], uploaded_at)
-       2. View function `main.gallery` query:
-            images = GalleryImage.query.order_by(GalleryImage.sort_order).all()
-          rồi loop:
-            {% for image in images %}
-                <div class="gal-item" data-index="{{ loop.index0 }}">
-                    <div class="gal-item__hover-icon">
-                        <span class="material-symbols-outlined">zoom_in</span>
-                    </div>
-                    <img class="gal-item__img" src="{{ image.image_url | img_src('gallery') }}" alt="{{ tr(image, 'alt_text') }}">
-                </div>
-            {% endfor %}
-          Lưu ý: dùng {{ loop.index0 }} (bắt đầu từ 0) cho data-index, không phải
-          {{ loop.index }} (bắt đầu từ 1) — khớp với cách JS lightbox đang đếm.
-   - Bản dưới đây là PLACEHOLDER tĩnh 9 ảnh, giữ đúng cấu trúc để Claude Code
-     thay thế bằng vòng lặp Jinja khi đã có bảng gallery_images.
+     liên tục từ 0 nên phải dùng loop.index0 (không phải loop.index), vì JS dùng
+     index này để build mảng `images` và tính prev/next theo modulo
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="gal-grid-section">
     <div class="gal-grid" id="gallery-container">
@@ -56,7 +39,19 @@
             <div class="gal-item__hover-icon">
                 <span class="material-symbols-outlined">zoom_in</span>
             </div>
-            <img class="gal-item__img" src="{{ image.image_url | img_src('gallery') }}" alt="{{ tr(image, 'alt_text') }}">
+            {# 2 ảnh đầu eager (nằm trong viewport đầu tiên trên mobile — lazy sẽ
+               làm chậm LCP), phần còn lại lazy để không kéo cả album qua 4G #}
+            <img class="gal-item__img"
+                 src="{{ image.image_url | img_src('gallery') }}"
+                 alt="{{ tr(image, 'alt_text') }}"
+                 loading="{{ 'eager' if loop.index0 < 2 else 'lazy' }}"
+                 decoding="async">
+        </div>
+        {% else %}
+        <div class="gal-empty">
+            <span class="material-symbols-outlined">photo_library</span>
+            <p class="gal-empty__title">{{ _('No photos yet') }}</p>
+            <p class="gal-empty__text">{{ _('Our latest work will appear here soon.') }}</p>
         </div>
         {% endfor %}
     </div>
@@ -81,6 +76,19 @@
 
 
 {# ═══════════════════════════════════════════════════════════════════════════
+   STICKY BOOK BAR (mobile only)
+   - CSS ẩn hoàn toàn trên desktop (.mobile-book-bar { display: none })
+   - Hiện khi hero đã cuộn khỏi viewport — trên mobile "Book Now" của navbar
+     nằm trong hamburger nên giữa trang khách không còn đường đặt lịch.
+     Cùng component với frontpage, xem index.html.
+═══════════════════════════════════════════════════════════════════════════ #}
+<a class="mobile-book-bar" href="{{ url_for('main.public_booking') }}">
+    <span class="material-symbols-outlined">calendar_month</span>
+    {{ _('Book Now') }}
+</a>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════
    LIGHTBOX OVERLAY
    - Nằm ngoài <main> trong code Stitch gốc, nhưng trong Jinja content block
      này nó vẫn render đúng vị trí cuối trang trước footer — vì footer giờ
@@ -96,7 +104,7 @@
         </button>
     </div>
     <div class="gal-lightbox__counter-wrap">
-        <span class="gal-lightbox__counter" id="lightbox-counter">1 / 9</span>
+        <span class="gal-lightbox__counter" id="lightbox-counter"></span>
     </div>
     <button class="gal-lightbox__icon-btn gal-lightbox__nav gal-lightbox__nav--prev" id="lightbox-prev" aria-label="{{ _('Previous image') }}">
         <span class="material-symbols-outlined">chevron_left</span>
@@ -112,36 +120,104 @@
 <script>
 (function () {
     /* Lightbox — đọc data-index từ mỗi .gal-item để biết thứ tự ảnh.
-       Khi chuyển sang DB-driven (xem comment GALLERY GRID phía trên), JS này
-       KHÔNG cần sửa gì — chỉ cần Jinja loop sinh đúng data-index liên tục
-       từ 0 (dùng  loop.index0 ) là lightbox tự hoạt động đúng. */
+       Chỉ cần Jinja loop sinh đúng data-index liên tục từ 0 (loop.index0)
+       là lightbox tự hoạt động đúng, không phụ thuộc số lượng ảnh. */
+    const grid         = document.getElementById('gallery-container');
     const galleryItems = document.querySelectorAll('.gal-item');
-    const lightbox      = document.getElementById('lightbox');
-    const lightboxImg   = document.getElementById('lightbox-img');
-    const closeBtn       = document.getElementById('lightbox-close');
-    const prevBtn        = document.getElementById('lightbox-prev');
-    const nextBtn        = document.getElementById('lightbox-next');
-    const counter         = document.getElementById('lightbox-counter');
+    if (!galleryItems.length) return;
+
+    const lightbox    = document.getElementById('lightbox');
+    const imgWrap     = lightbox.querySelector('.gal-lightbox__img-wrap');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeBtn    = document.getElementById('lightbox-close');
+    const prevBtn     = document.getElementById('lightbox-prev');
+    const nextBtn     = document.getElementById('lightbox-next');
+    const counter     = document.getElementById('lightbox-counter');
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let currentIndex = 0;
+    let savedScrollY = 0;
     const totalImages = galleryItems.length;
     const images = Array.from(galleryItems).map(item => item.querySelector('img').src);
+
+    /* ─── Scroll reveal ──────────────────────────────────────────────────────
+       Class enable được gắn bằng JS chứ không viết sẵn trong HTML: nếu JS lỗi
+       thì ảnh hiện bình thường thay vì kẹt ở opacity 0. Delay tính theo thứ tự
+       trong từng đợt IntersectionObserver báo về (không phải index toàn cục),
+       nếu không ảnh thứ 20 sẽ phải chờ 1.4s mới hiện. */
+    if (!reduceMotion && 'IntersectionObserver' in window) {
+        grid.classList.add('gal-grid--reveal');
+        const revealIO = new IntersectionObserver(function (entries) {
+            let shown = 0;
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                entry.target.style.transitionDelay = (shown++ * 70) + 'ms';
+                entry.target.classList.add('gal-item--in');
+                revealIO.unobserve(entry.target);
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+        galleryItems.forEach(function (item) { revealIO.observe(item); });
+    }
+
+    /* ─── Scroll lock ────────────────────────────────────────────────────────
+       body thành position:fixed (xem gallery.css) nên phải tự nhớ và khôi phục
+       vị trí cuộn, không thì đóng lightbox là nhảy về đầu trang */
+    function lockScroll() {
+        savedScrollY = window.scrollY || window.pageYOffset;
+        document.body.style.top = -savedScrollY + 'px';
+        document.body.classList.add('gal-lightbox-active');
+    }
+
+    function unlockScroll() {
+        document.body.classList.remove('gal-lightbox-active');
+        document.body.style.top = '';
+        window.scrollTo(0, savedScrollY);
+    }
+
+    function preload(index) {
+        const img = new Image();
+        img.src = images[index];
+    }
 
     function openLightbox(index) {
         currentIndex = index;
         updateLightbox();
         lightbox.classList.add('gal-lightbox--open');
-        document.body.classList.add('gal-lightbox-active');
+        lockScroll();
     }
 
     function closeLightbox() {
         lightbox.classList.remove('gal-lightbox--open');
-        document.body.classList.remove('gal-lightbox-active');
+        lightbox.style.opacity = '';
+        imgWrap.style.transform = '';
+        unlockScroll();
     }
 
+    /* Ảnh mới chỉ gán vào <img> sau khi đã tải xong, trong lúc chờ thì khung mờ
+       đi — thay cho cú nháy trắng khi bấm next trên mạng chậm. Tải sẵn ảnh
+       trước/sau để lần chuyển kế tiếp là tức thì. */
     function updateLightbox() {
-        lightboxImg.src = images[currentIndex];
-        counter.textContent = `${currentIndex + 1} / ${totalImages}`;
+        const src = images[currentIndex];
+        counter.textContent = (currentIndex + 1) + ' / ' + totalImages;
+        lightboxImg.classList.add('gal-lightbox__img--loading');
+
+        const loader = new Image();
+        let applied = false;
+        const apply = function () {
+            if (applied) return;
+            applied = true;
+            lightboxImg.src = src;
+            lightboxImg.classList.remove('gal-lightbox__img--loading');
+        };
+        loader.onload  = apply;
+        loader.onerror = apply;
+        loader.src = src;
+        if (loader.complete) apply();
+
+        preload((currentIndex + 1) % totalImages);
+        preload((currentIndex - 1 + totalImages) % totalImages);
     }
 
     function nextImage() {
@@ -154,27 +230,92 @@
         updateLightbox();
     }
 
-    galleryItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const index = parseInt(item.dataset.index, 10);
-            openLightbox(index);
+    galleryItems.forEach(function (item) {
+        item.addEventListener('click', function () {
+            openLightbox(parseInt(item.dataset.index, 10));
         });
     });
 
     closeBtn.addEventListener('click', closeLightbox);
-    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
-    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+    nextBtn.addEventListener('click', function (e) { e.stopPropagation(); nextImage(); });
+    prevBtn.addEventListener('click', function (e) { e.stopPropagation(); prevImage(); });
 
-    lightbox.addEventListener('click', (e) => {
+    lightbox.addEventListener('click', function (e) {
         if (e.target === lightbox) closeLightbox();
     });
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', function (e) {
         if (!lightbox.classList.contains('gal-lightbox--open')) return;
-        if (e.key === 'Escape')    closeLightbox();
+        if (e.key === 'Escape')     closeLightbox();
         if (e.key === 'ArrowRight') nextImage();
         if (e.key === 'ArrowLeft')  prevImage();
     });
+
+    /* ─── Cử chỉ chạm ────────────────────────────────────────────────────────
+       Vuốt ngang đổi ảnh, vuốt xuống để đóng. Ảnh đi theo ngón tay trong lúc
+       kéo rồi bật lại nếu chưa đủ ngưỡng. Chốt trục ngay ở 8px đầu tiên để
+       thao tác không lưỡng lự giữa chừng. Bỏ qua khi có 2 ngón (pinch zoom). */
+    let startX = 0, startY = 0, dragX = 0, dragY = 0;
+    let dragging = false, axis = null;
+
+    imgWrap.addEventListener('touchstart', function (e) {
+        if (e.touches.length > 1) { dragging = false; return; }
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        dragX = 0;
+        dragY = 0;
+        axis = null;
+        dragging = true;
+        imgWrap.classList.add('gal-lightbox__img-wrap--dragging');
+    }, { passive: true });
+
+    imgWrap.addEventListener('touchmove', function (e) {
+        if (!dragging || e.touches.length > 1) return;
+        dragX = e.touches[0].clientX - startX;
+        dragY = e.touches[0].clientY - startY;
+
+        if (!axis && (Math.abs(dragX) > 8 || Math.abs(dragY) > 8)) {
+            axis = Math.abs(dragX) > Math.abs(dragY) ? 'x' : 'y';
+        }
+        if (!axis) return;
+        e.preventDefault();
+
+        if (axis === 'x') {
+            // hệ số 0.5 tạo cảm giác có lực cản, ảnh không trôi tuột theo tay
+            imgWrap.style.transform = 'translateX(' + (dragX * 0.5) + 'px)';
+        } else {
+            const d = Math.max(dragY, 0);   // chỉ nhận kéo xuống
+            imgWrap.style.transform = 'translateY(' + d + 'px) scale(' + Math.max(1 - d / 900, 0.86) + ')';
+            lightbox.style.opacity = Math.max(1 - d / 420, 0.25);
+        }
+    }, { passive: false });
+
+    imgWrap.addEventListener('touchend', function () {
+        if (!dragging) return;
+        dragging = false;
+        imgWrap.classList.remove('gal-lightbox__img-wrap--dragging');
+        imgWrap.style.transform = '';
+        lightbox.style.opacity = '';
+
+        if (axis === 'x' && Math.abs(dragX) > 55) {
+            if (dragX < 0) nextImage(); else prevImage();
+        } else if (axis === 'y' && dragY > 100) {
+            closeLightbox();
+        }
+        axis = null;
+    }, { passive: true });
+})();
+
+(function () {
+    const bar  = document.querySelector('.mobile-book-bar');
+    const hero = document.querySelector('.gal-hero');
+    if (!bar || !hero || !('IntersectionObserver' in window)) return;
+
+    const io = new IntersectionObserver(function (entries) {
+        bar.classList.toggle('mobile-book-bar--visible', !entries[0].isIntersecting);
+    }, { threshold: 0 });
+
+    io.observe(hero);
 })();
 </script>
 

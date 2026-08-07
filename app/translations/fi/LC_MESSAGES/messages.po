@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-05 00:10+0700\n"
+"POT-Creation-Date: 2026-08-06 01:02+0700\n"
 "PO-Revision-Date: 2026-07-10 19:40+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fi\n"
@@ -18,20 +18,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes.py:38
+#: app/routes.py:45
 msgid "Chờ xác nhận"
 msgstr "Odottaa vahvistusta"
 
-#: app/routes.py:38 app/templates/staff/staff_bookings.html:311
+#: app/routes.py:45 app/templates/staff/staff_bookings.html:311
 msgid "Đã xác nhận"
 msgstr "Vahvistettu"
 
-#: app/routes.py:38 app/templates/staff/staff_bookings.html:312
+#: app/routes.py:45 app/templates/staff/staff_bookings.html:312
 #: app/templates/staff/staff_bookings.html:338
 msgid "Đang thực hiện"
 msgstr "Käynnissä"
 
-#: app/routes.py:39 app/templates/staff/staff_bookings.html:312
+#: app/routes.py:46 app/templates/staff/staff_bookings.html:312
 #: app/templates/staff/staff_bookings.html:342
 #: app/templates/staff/staff_bookings.html:409
 #: app/templates/staff/staff_bookings.html:487
@@ -41,55 +41,55 @@ msgstr "Käynnissä"
 msgid "Hoàn thành"
 msgstr "Valmis"
 
-#: app/routes.py:39 app/templates/staff/staff_history.html:260
+#: app/routes.py:46 app/templates/staff/staff_history.html:260
 #: app/templates/staff/staff_history.html:283
 #: app/templates/staff/staff_history.html:339
 #: app/templates/staff/staff_history.html:425
 msgid "Đã hủy"
 msgstr "Peruttu"
 
-#: app/routes.py:39
+#: app/routes.py:46
 msgid "Không đến"
 msgstr "Ei saapunut"
 
-#: app/routes.py:40
+#: app/routes.py:47
 msgid "hôm nay"
 msgstr "tänään"
 
-#: app/routes.py:40
+#: app/routes.py:47
 msgid "trong tuần này"
 msgstr "tällä viikolla"
 
-#: app/routes.py:40
+#: app/routes.py:47
 msgid "trong tháng này"
 msgstr "tässä kuussa"
 
-#: app/routes.py:41
+#: app/routes.py:48
 msgid "trong tháng trước"
 msgstr "viime kuussa"
 
-#: app/routes.py:42 app/routes.py:1591
+#: app/routes.py:49 app/routes.py:1802
 msgid "✓ Claimed"
 msgstr "✓ Lunastettu"
 
-#: app/routes.py:42 app/routes.py:1593
+#: app/routes.py:49 app/routes.py:1804
 msgid "✓ All Reviewed"
 msgstr "✓ Kaikki arvosteltu"
 
-#: app/routes.py:42
+#: app/routes.py:49
 msgid "Start"
 msgstr "Aloita"
 
-#: app/routes.py:42
+#: app/routes.py:49
 msgid "Claim"
 msgstr "Lunasta"
 
-#: app/routes.py:1875
+#: app/routes.py:2086
 #, python-format
 msgid "vào ngày %(date)s"
 msgstr "päivänä %(date)s"
 
-#: app/routes.py:1876
+#: app/routes.py:2087
 #, python-format
 msgid "từ %(start)s đến %(end)s"
 msgstr "%(start)s – %(end)s"
@@ -258,7 +258,8 @@ msgstr "Rekisteröidy"
 
 #: app/templates/base.html:40 app/templates/base.html:49
 #: app/templates/base.html:72 app/templates/base.html:81
-#: app/templates/customer_base.html:93 app/templates/public/index.html:339
+#: app/templates/customer_base.html:93 app/templates/public/gallery.html:87
+#: app/templates/public/index.html:339
 msgid "Book Now"
 msgstr "Varaa nyt"
 
@@ -1267,7 +1268,7 @@ msgstr "Vaihda sähköpostiosoite"
 #: app/templates/customer/customer_setting.html:921
 #: app/templates/customer/customer_setting.html:990
 #: app/templates/customer/my_bookings.html:328
-#: app/templates/public/gallery.html:94 app/templates/public/services.html:203
+#: app/templates/public/gallery.html:102 app/templates/public/services.html:198
 msgid "Close"
 msgstr "Sulje"
 
@@ -1857,8 +1858,8 @@ msgstr "Käynnin kesto:"
 
 #: app/templates/customer/reschedule.html:149
 #: app/templates/customer/view_booking_details.html:42
-#: app/templates/public/services.html:113
-#: app/templates/public/services.html:143
+#: app/templates/public/services.html:108
+#: app/templates/public/services.html:138
 msgid "mins"
 msgstr "min"
 
@@ -2016,7 +2017,7 @@ msgstr "Palveltua asiakasta"
 msgid "Master Artists"
 msgstr "Mestariartistia"
 
-#: app/templates/public/about.html:80 app/templates/public/services.html:167
+#: app/templates/public/about.html:80 app/templates/public/services.html:162
 msgid "Average Rating"
 msgstr "Keskiarvosana"
 
@@ -2096,23 +2097,31 @@ msgstr "Työmme"
 msgid "A glimpse into the artistry and precision behind every visit."
 msgstr "Katsaus jokaisen käynnin taiteeseen ja tarkkuuteen."
 
-#: app/templates/public/gallery.html:72
+#: app/templates/public/gallery.html:53
+msgid "No photos yet"
+msgstr "Ei vielä kuvia"
+
+#: app/templates/public/gallery.html:54
+msgid "Our latest work will appear here soon."
+msgstr "Uusimmat työmme ilmestyvät tänne pian."
+
+#: app/templates/public/gallery.html:67
 msgid "Like what you see?"
 msgstr "Pidätkö näkemästäsi?"
 
-#: app/templates/public/gallery.html:74
+#: app/templates/public/gallery.html:69
 msgid "Book your session"
 msgstr "Varaa aikasi"
 
-#: app/templates/public/gallery.html:101
+#: app/templates/public/gallery.html:109
 msgid "Previous image"
 msgstr "Edellinen kuva"
 
-#: app/templates/public/gallery.html:105
+#: app/templates/public/gallery.html:113
 msgid "Enlarged gallery image"
 msgstr "Suurennettu galleriakuva"
 
-#: app/templates/public/gallery.html:107
+#: app/templates/public/gallery.html:115
 msgid "Next image"
 msgstr "Seuraava kuva"
 
@@ -2324,41 +2333,39 @@ msgstr ""
 "hoitoja, jotka on suunniteltu modernille yksilölle. Tarkkuus ja rauha "
 "kohtaavat jokaisella kerralla."
 
-#: app/templates/public/services.html:101
-#: app/templates/public/services.html:135
+#: app/templates/public/services.html:96 app/templates/public/services.html:130
 msgid "Popular"
 msgstr "Suosittu"
 
-#: app/templates/public/services.html:103
-#: app/templates/public/services.html:137
+#: app/templates/public/services.html:98 app/templates/public/services.html:132
 msgid "New"
 msgstr "Uusi"
 
-#: app/templates/public/services.html:118
+#: app/templates/public/services.html:113
 msgid "View details"
 msgstr "Näytä tiedot"
 
-#: app/templates/public/services.html:147
+#: app/templates/public/services.html:142
 msgid "Book now"
 msgstr "Varaa nyt"
 
-#: app/templates/public/services.html:153
+#: app/templates/public/services.html:148
 msgid "No services in this category yet."
 msgstr "Tässä kategoriassa ei ole vielä palveluita."
 
-#: app/templates/public/services.html:171
+#: app/templates/public/services.html:166
 msgid "Satisfied Clients"
 msgstr "Tyytyväistä asiakasta"
 
-#: app/templates/public/services.html:175
+#: app/templates/public/services.html:170
 msgid "Quality Assurance"
 msgstr "Laadun takuu"
 
-#: app/templates/public/services.html:188
+#: app/templates/public/services.html:183
 msgid "Ready to define your signature look?"
 msgstr "Valmis luomaan tunnusomaisen tyylisi?"
 
-#: app/templates/public/services.html:190
+#: app/templates/public/services.html:185
 msgid "Book a consultation"
 msgstr "Varaa konsultaatio"
 

@@ -149,17 +149,28 @@
 /* ─── LIGHTBOX OVERLAY ────────────────────────────────────────────────────────
    Fixed fullscreen, ẩn mặc định, toggle bằng class .gal-lightbox--open (JS)
    ─────────────────────────────────────────────────────────────────────────── */
+/* overflow:hidden một mình không chặn được scroll nền trên iOS Safari — phải
+   position:fixed. JS gán body.style.top = -scrollY rồi khôi phục lúc đóng,
+   nếu không trang sẽ nhảy về đầu mỗi lần tắt lightbox. */
 body.gal-lightbox-active {
+    position: fixed;
+    left: 0;
+    right: 0;
+    width: 100%;
     overflow: hidden;
 }
 
 .gal-lightbox {
     position: fixed;
     inset: 0;
-    z-index: 200;
+    /* phải cao hơn .site-header (z-index 1000 trong base.css), nếu không navbar
+       đè lên overlay và che mất nút close — thấy rõ nhất trên mobile vì navbar
+       chiếm đúng vùng đặt nút. Vẫn thấp hơn .flash-wrapper (9999). */
+    z-index: 1100;
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    overscroll-behavior: contain;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -173,16 +184,18 @@ body.gal-lightbox-active {
     visibility: visible;
 }
 
+/* max() với env() — trên iPhone có notch/Dynamic Island, 24px cứng làm nút
+   close và counter chui vào vùng bị che */
 .gal-lightbox__close-wrap {
     position: absolute;
-    top: 24px;
-    right: 24px;
+    top: max(24px, env(safe-area-inset-top));
+    right: max(24px, env(safe-area-inset-right));
     z-index: 210;
 }
 
 .gal-lightbox__counter-wrap {
     position: absolute;
-    top: 24px;
+    top: max(24px, env(safe-area-inset-top));
     left: 50%;
     transform: translateX(-50%);
     z-index: 210;
@@ -235,23 +248,85 @@ body.gal-lightbox-active {
     right: 16px;
 }
 
+/* dvh thay vh — thanh địa chỉ iOS Safari co giãn làm 80vh cắt mất đáy ảnh.
+   transform transition dùng cho cử chỉ vuốt (JS gỡ tạm khi đang kéo tay). */
 .gal-lightbox__img-wrap {
     position: relative;
     width: 100%;
     max-width: 960px;
-    max-height: 80vh;
+    max-height: 80dvh;
     padding: 0 16px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gal-lightbox__img-wrap--dragging {
+    transition: none;
 }
 
 .gal-lightbox__img {
     max-width: 100%;
-    max-height: 80vh;
+    max-height: 80dvh;
     object-fit: contain;
     border-radius: var(--radius-md);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    transition: opacity 0.22s ease;
+}
+
+/* Ảnh mới chỉ được gán src sau khi đã tải xong — class này giữ khung mờ đi
+   trong lúc chờ, thay cho cú nháy trắng khi đổi ảnh trên mạng chậm */
+.gal-lightbox__img--loading {
+    opacity: 0;
+}
+
+
+/* ─── EMPTY STATE ─────────────────────────────────────────────────────────────
+   Hiện khi admin chưa upload ảnh nào — trước đây section chỉ là khoảng trắng
+   ─────────────────────────────────────────────────────────────────────────── */
+.gal-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 64px 24px;
+    border: 1px dashed var(--color-border-subtle);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+}
+
+.gal-empty .material-symbols-outlined {
+    font-size: 40px;
+    color: var(--color-text-tertiary);
+}
+
+.gal-empty__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-deep-plum);
+    margin: 12px 0 6px;
+}
+
+.gal-empty__text {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+
+/* ─── SCROLL REVEAL ───────────────────────────────────────────────────────────
+   Class .gal-grid--reveal do JS gắn vào grid, không phải viết sẵn trong HTML:
+   nếu JS lỗi hoặc bị chặn thì ảnh hiện bình thường thay vì kẹt ở opacity 0.
+   JS cũng bỏ qua hoàn toàn khối này khi prefers-reduced-motion: reduce.
+   ─────────────────────────────────────────────────────────────────────────── */
+.gal-grid--reveal .gal-item {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gal-grid--reveal .gal-item--in {
+    opacity: 1;
+    transform: none;
 }
 
 
@@ -262,14 +337,23 @@ body.gal-lightbox-active {
     }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE (≤768px)
+   ═══════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
     .gal-hero {
         padding: 40px 24px 0;
-        margin-bottom: 40px;
+        margin-bottom: 32px;
     }
 
     .gal-hero__title {
-        font-size: 32px;
+        font-size: clamp(28px, 7.6vw, 34px);
+    }
+
+    .gal-hero__subtitle {
+        font-size: 15px;
+        max-width: 36ch;
     }
 
     .gal-grid-section {
@@ -277,24 +361,106 @@ body.gal-lightbox-active {
         margin-bottom: 64px;
     }
 
+    /* ─── GRID: masonry 2 cột ─────────────────────────────────────────────────
+       1 cột ô vuông full-width bắt khách cuộn 1 màn cho mỗi tấm ảnh. Masonry 2
+       cột giữ đúng nhịp đã chốt ở gallery frontpage: cứ 3 ảnh thì ảnh đầu cao
+       gấp đôi ở cột trái, 2 ảnh sau xếp chồng ở cột phải.
+       aspect-ratio phải trả về auto — chiều cao giờ do row track quyết định.
+       ─────────────────────────────────────────────────────────────────────── */
     .gal-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 152px;
+        gap: 10px;
+    }
+
+    .gal-item {
+        aspect-ratio: auto;
+        border-radius: 14px;
+        transition: transform 0.12s ease;
+    }
+
+    .gal-item:nth-child(3n + 1) {
+        grid-row: span 2;
+    }
+
+    /* Xử lý đuôi lẻ để không hở ô trống ở hàng cuối:
+       - Còn dư 2 ảnh (N%3==2): ảnh cuối cao gấp đôi cho bằng ảnh kề bên
+       - Còn dư 1 ảnh (N%3==1): ảnh cuối trải ngang cả 2 cột */
+    .gal-item:last-child:nth-child(3n + 2) {
+        grid-row: span 2;
+    }
+
+    .gal-item:last-child:nth-child(3n + 1) {
+        grid-row: auto;
+        grid-column: span 2;
     }
 
     .gal-cta {
         margin-bottom: 64px;
+        padding: 0 24px;
     }
 
-    .gal-lightbox__nav {
-        width: 40px;
-        height: 40px;
+    .gal-cta__title {
+        font-size: 20px;
     }
 
-    .gal-lightbox__nav--prev {
-        left: 8px;
+    .gal-cta__btn {
+        width: 100%;
+        justify-content: center;
     }
 
-    .gal-lightbox__nav--next {
-        right: 8px;
+    /* ─── LIGHTBOX: bỏ hết chrome, chỉ còn ảnh ───────────────────────────────
+       Trên mobile lightbox điều khiển hoàn toàn bằng cử chỉ (xem gallery.html):
+         vuốt ngang  → đổi ảnh
+         vuốt xuống  → đóng
+         chạm ra ngoài ảnh → đóng
+       Các nút vẫn nằm trong DOM và giữ nguyên listener, chỉ ẩn bằng CSS —
+       desktop dùng lại đúng chúng, JS không cần rẽ nhánh theo kích thước màn.
+       ─────────────────────────────────────────────────────────────────────── */
+    .gal-lightbox__nav,
+    .gal-lightbox__counter-wrap,
+    .gal-lightbox__close-wrap {
+        display: none;
+    }
+}
+
+
+/* ─── TOUCH DEVICES ───────────────────────────────────────────────────────────
+   Toàn bộ lớp affordance của .gal-item trước đây gate sau :hover — trên màn
+   cảm ứng không tồn tại hover nên icon zoom, gradient và scale không bao giờ
+   chạy. Thay bằng gradient tĩnh (tạo chiều sâu) + phản hồi :active khi chạm.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (hover: none) {
+    .gal-item__hover-icon {
+        display: none;
+    }
+
+    .gal-item::after {
+        opacity: 1;
+        background: linear-gradient(to top, rgba(62, 31, 71, 0.26), transparent 48%);
+    }
+
+    .gal-item:hover .gal-item__img {
+        transform: none;
+    }
+
+    .gal-item:active {
+        transform: scale(0.98);
+    }
+
+    .gal-cta__btn:active {
+        transform: scale(0.98);
+    }
+}
+
+
+/* ─── REDUCED MOTION ─────────────────────────────────────────────────────────*/
+@media (prefers-reduced-motion: reduce) {
+    .gal-item,
+    .gal-item__img,
+    .gal-item::after,
+    .gal-lightbox__img-wrap,
+    .gal-lightbox__img {
+        transition: none;
     }
 }

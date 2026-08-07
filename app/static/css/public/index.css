@@ -866,12 +866,8 @@
 }
 
 
-/* ─── STICKY BOOK BAR (mobile only) ───────────────────────────────────────────
-   Ẩn hoàn toàn trên desktop. Hiện khi hero đã cuộn khỏi viewport (IntersectionObserver)
-   ─────────────────────────────────────────────────────────────────────────── */
-.mobile-book-bar {
-    display: none;
-}
+/* Sticky book bar đã được chuyển sang base.css (.mobile-book-bar) để dùng chung
+   với các public page khác. Ở đây chỉ còn phần JS toggle nằm trong index.html. */
 
 
 /* ─── RESPONSIVE ─────────────────────────────────────────────────────────────*/
@@ -1240,44 +1236,6 @@
         transform: scale(0.98);
     }
 
-    /* ─── STICKY BOOK BAR ─────────────────────────────────────────────────── */
-    .mobile-book-bar {
-        display: flex;
-        position: fixed;
-        left: 16px;
-        right: 16px;
-        bottom: 16px;
-        z-index: 900;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 54px;
-        border-radius: var(--radius-full);
-        background: var(--color-primary);
-        color: #fff;
-        font-size: 16px;
-        font-weight: 700;
-        box-shadow: 0 10px 28px rgba(62, 31, 71, 0.32);
-        opacity: 0;
-        transform: translateY(130%);
-        pointer-events: none;
-        transition: opacity 0.25s ease, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .mobile-book-bar--visible {
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: auto;
-    }
-
-    .mobile-book-bar:active {
-        transform: translateY(0) scale(0.98);
-    }
-
-    /* chừa chỗ để bar không che dòng cuối footer */
-    .site-footer {
-        padding-bottom: 96px;
-    }
 }
 
 
@@ -1293,9 +1251,5 @@
     .hero__slide--active .hero__subtitle,
     .hero__slide--active .hero__cta-group {
         animation: none;
-    }
-
-    .mobile-book-bar {
-        transition: none;
     }
 }
