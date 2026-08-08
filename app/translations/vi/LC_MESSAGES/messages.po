@@ -2999,3 +2999,43 @@ msgstr "Chưa có hoá đơn nào."
 #: app/templates/customer/view_booking_details.html
 msgid "Demo video"
 msgstr "Video minh họa"
+
+#: app/templates/customer/loyalty_points.html
+msgid "Rewards"
+msgstr "Phần thưởng"
+
+#: app/routes.py
+msgid "Earned on"
+msgstr "Nhận ngày"
+
+#: app/routes.py
+msgid "All rewards unlocked!"
+msgstr "Đã mở hết phần thưởng!"
+
+#: app/routes.py
+msgid "Booking"
+msgstr "Lịch hẹn"
+
+#: app/routes.py
+msgid "Double points"
+msgstr "Điểm nhân đôi"
+
+#: app/routes.py
+msgid "First booking"
+msgstr "Lịch hẹn đầu tiên"
+
+#: app/routes.py
+msgid "Streak bonus"
+msgstr "Thưởng chuỗi"
+
+#: app/routes.py
+msgid "Manual adjustment"
+msgstr "Điều chỉnh thủ công"
+
+#: app/routes.py
+msgid "Reward redemption"
+msgstr "Đổi phần thưởng"
+
+#: app/templates/customer/loyalty_points.html
+msgid "No rewards available"
+msgstr "Chưa có phần thưởng nào"

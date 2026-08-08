@@ -1718,6 +1718,29 @@ def customer_loyalty_points():
     else:
         tier_name, tier_class, badge_class, fill_class = "Silver", "tier-silver", "badge-silver", ""
 
+    # Ngày hết hạn chỉ có với gói trả tiền; Silver mặc định thì không có.
+    tier_expiry = None
+    if active_tier and active_tier.get("expires_at"):
+        try:
+            tier_expiry = datetime.strptime(
+                active_tier["expires_at"], "%Y-%m-%d %H:%M:%S"
+            ).strftime("%d.%m.%Y")
+        except (ValueError, TypeError):
+            tier_expiry = None
+
+    #  Thang tier cho .lp-rail. Tier KHÔNG dựa trên điểm: membership_tiers là
+    #  gói trả tiền, nên thang này chỉ nói "bạn đang ở đâu" và "mỗi bậc cho gì"
+    #  (point_multiplier), không có ngưỡng điểm nào. get_active_membership_tiers
+    #  đã ORDER BY point_multiplier ASC nên thứ tự Silver -> Gold -> Diamond.
+    tier_stops = [
+        {
+            "name":       t["name"],
+            "multiplier": t["point_multiplier"],
+            "is_now":     t["name"].lower() == tier_name.lower(),
+        }
+        for t in get_active_membership_tiers()
+    ]
+
     raw_rewards = get_active_rewards()
     rewards = []
     for r in raw_rewards:
@@ -1785,9 +1808,22 @@ def customer_loyalty_points():
         next_reward_pts  = next_locked["pts"] or 1
         progress_pct = min(100, int(balance / next_reward_pts * 100))
     else:
-        next_reward_name = "All rewards unlocked!"
+        next_reward_name = gettext("All rewards unlocked!")
         next_reward_pts  = balance or 1
         progress_pct = 100
+
+    #  Nguồn điểm là tập hữu hạn, trace hết từ award_points(): booking /
+    #  double_points / first_booking / streak (booking_service.py),
+    #  admin_adjustment (admin_loyalty), reward_redemption (db.redeem_reward).
+    #  Nên map được trọn sang msgid thay vì in source thô như bản cũ.
+    source_labels = {
+        "booking":           gettext("Booking"),
+        "double_points":     gettext("Double points"),
+        "first_booking":     gettext("First booking"),
+        "streak":            gettext("Streak bonus"),
+        "admin_adjustment":  gettext("Manual adjustment"),
+        "reward_redemption": gettext("Reward redemption"),
+    }
 
     raw_history = get_loyalty_history(customer_id)
     history = []
@@ -1795,16 +1831,23 @@ def customer_loyalty_points():
         pts = row["points"]
         try:
             dt = datetime.strptime(row["created_at"], "%Y-%m-%d %H:%M:%S")
-            date_str = dt.strftime("%b %d, %Y")
+            date_str = dt.strftime("%d.%m.%Y")
         except (ValueError, TypeError):
             date_str = row["created_at"]
         h_type = "earn" if pts > 0 else "redeem"
+        src_label = source_labels.get(
+            row["source"], row["source"].replace("_", " ").title()
+        )
         history.append({
-            "desc": row["note"] or row["source"].replace("_", " ").title(),
-            "date": f"{'Earned on' if h_type == 'earn' else 'Redeemed on'} {date_str}",
-            "pts": f"+{pts} pts" if pts > 0 else f"{pts} pts",
-            "type": h_type,
-            "ref": row["source"].replace("_", " ").title(),
+            #  `note` được ghi cứng vào DB lúc cộng điểm (có chỗ tiếng Anh, có
+            #  chỗ tiếng Việt) nên không dịch lại được ở đây. Khi note rỗng thì
+            #  fallback về nhãn nguồn ĐÃ DỊCH thay vì source.title() thô.
+            "desc":   row["note"] or src_label,
+            "when":   gettext("Earned on") if h_type == "earn" else gettext("Redeemed on"),
+            "date":   date_str,
+            "pts":    pts,
+            "type":   h_type,
+            "source": src_label,
         })
 
     first_booking_claimed = has_source_award(customer_id, "first_booking")
@@ -1835,19 +1878,19 @@ def customer_loyalty_points():
     for v in raw_vouchers:
         try:
             dt = datetime.strptime(v["redeemed_at"], "%Y-%m-%d %H:%M:%S")
-            date_str = dt.strftime("%b %d, %Y")
+            date_str = dt.strftime("%d.%m.%Y")
         except (ValueError, TypeError):
-            date_str = v["redeemed_at"] or "—"
+            date_str = v["redeemed_at"] or ""
         vouchers.append({
             "name":        v["name"],
             "desc":        v["description"] or "",
-            "date":        f"Redeemed on {date_str}",
             "redeemed_at": date_str,
             "code":        v["voucher_code"],
+            #  TỒN ĐỌNG: hardcode "active" cho mọi voucher. Cần quy tắc hết hạn
+            #  và cột đánh dấu đã dùng trước khi tính được used/expired.
             "status":      "active",
-            "icon":        "💅",
             "pts":         v["points_spent"],
-            "expires_at":  "—",
+            "expires_at":  None,
         })
 
     return render_template(
@@ -1857,6 +1900,8 @@ def customer_loyalty_points():
         tier_class=tier_class,
         badge_class=badge_class,
         fill_class=fill_class,
+        tier_expiry=tier_expiry,
+        tier_stops=tier_stops,
         next_reward_name=next_reward_name,
         next_reward_pts=next_reward_pts,
         progress_pct=progress_pct,

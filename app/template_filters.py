@@ -135,9 +135,16 @@ def payment_icon(value):
     
 
 def format_number(value):
-    """1250 → '1,250'"""
+    """
+    1250 -> '1 250'
+
+    Khoảng trắng ngăn hàng nghìn, cùng quy ước Phần Lan với
+    format_currency(): ở fi/vi dấu phẩy là dấu THẬP PHÂN, nên '1,250'
+    đọc ra thành "một phẩy hai lăm". Khoảng trắng là nbsp (U+00A0) để
+    số không bị ngắt dòng giữa chừng.
+    """
     try:
-        return f"{int(value):,}"
+        return f"{int(value):,}".replace(",", " ")
     except (ValueError, TypeError):
         return value
 

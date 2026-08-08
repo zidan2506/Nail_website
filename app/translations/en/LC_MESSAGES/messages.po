@@ -2902,3 +2902,43 @@ msgstr ""
 #: app/templates/customer/view_booking_details.html
 msgid "Demo video"
 msgstr ""
+
+#: app/templates/customer/loyalty_points.html
+msgid "Rewards"
+msgstr ""
+
+#: app/routes.py
+msgid "Earned on"
+msgstr ""
+
+#: app/routes.py
+msgid "All rewards unlocked!"
+msgstr ""
+
+#: app/routes.py
+msgid "Booking"
+msgstr ""
+
+#: app/routes.py
+msgid "Double points"
+msgstr ""
+
+#: app/routes.py
+msgid "First booking"
+msgstr ""
+
+#: app/routes.py
+msgid "Streak bonus"
+msgstr ""
+
+#: app/routes.py
+msgid "Manual adjustment"
+msgstr ""
+
+#: app/routes.py
+msgid "Reward redemption"
+msgstr ""
+
+#: app/templates/customer/loyalty_points.html
+msgid "No rewards available"
+msgstr ""

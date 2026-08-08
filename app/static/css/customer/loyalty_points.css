@@ -1,0 +1,1521 @@
+/* =========================================================
+   CUSTOMER LOYALTY POINTS  (prefix: lp-)
+   ---------------------------------------------------------
+   Trang duy nhất trong portal mà thứ quan trọng nhất là MỘT
+   CON SỐ ĐANG TĂNG, và là trang duy nhất có một trạng thái
+   tiến triển thật (tier). Nét riêng dựng từ đúng hai thứ đó.
+
+   THẺ THÀNH VIÊN nền plum là bản đầy đủ của .loyalty-card trên
+   Dashboard, giống quan hệ Next Visit card -> Booking details.
+   Nên plum ở đây là nối tiếp có ý, không phải trùng lặp.
+
+   TIER KHÔNG DỰA TRÊN ĐIỂM. membership_tiers có price /
+   duration_days / stripe_price_id: tier là GÓI TRẢ TIỀN, và
+   quyền lợi thật của nó là point_multiplier (Silver x1.0,
+   Gold x1.5, Diamond x2.0). Bản cũ đặt .tier-badge cạnh một
+   progress bar tính theo balance/next_reward_pts, nên nó nói
+   sai: khách đọc ra là tích đủ điểm sẽ tự lên tier. Nay tier
+   là một THANG ba mốc, không có ngưỡng điểm nào.
+
+   MỘT PATTERN CUỘN NGANG (.lp-strip) dùng cho cả ba dải: ví
+   voucher, nhiệm vụ, phần thưởng. Ở desktop mỗi dải nở ra theo
+   cách riêng của nó. Cùng markup, không phân nhánh JS.
+
+   THANG ĐO - lấy đúng giá trị của bk- / bd-, không phát minh lại
+     bo góc   surface 20 · media 14 · control 12 · pill 999
+     accent   #ab2261 trên nền sáng
+              trên plum đổi sang pearl (hồng trên plum ~1.7:1)
+
+   Bản cũ mang màu hồng thứ tư (#d64682), một dải tím
+   (#8a2be2 / #7c3aed / #c084fc) và 8 màu tag ngoài palette.
+   Tất cả đã bỏ.
+   ========================================================= */
+
+/* Token khai cho CẢ BA gốc: .lp (trang), .rdm (modal xác nhận đổi thưởng),
+   .lp-vd (modal chi tiết voucher). Hai modal là SIBLING của .lp trong DOM,
+   không phải con của nó, nên nếu chỉ khai trên .lp thì mọi var() bên trong
+   modal là undefined: nền biến mất và modal trong suốt. Layout riêng của
+   trang nằm ở block .lp bên dưới. */
+.lp,
+.rdm,
+.lp-vd {
+  --lp-ink:        #2A1520;
+  --lp-ink-2:      #6B5560;
+  --lp-ink-3:      #9C8A93;
+
+  --lp-accent:     #ab2261;
+  --lp-accent-2:   #8d1a4f;
+  --lp-wash:       #FBEEF4;
+  --lp-wash-2:     #F6E4EC;
+
+  --lp-plum:       #3E1F47;
+  --lp-pearl:      #FBF4F8;
+  --lp-pearl-2:    #D9C7D2;
+
+  --lp-surface:    #ffffff;
+  --lp-line:       #EDE3E8;
+  --lp-line-2:     #E2D4DB;
+
+  --lp-flag-bg:    #FBF0D8;
+  --lp-flag-ink:   #7A5A11;
+
+  /* Xanh "đã hoàn thành". Là màu thứ ba MANG THÔNG TIN của portal, cùng loại
+     với hổ phách (pending) và đỏ (cancelled), không phải màu trang trí.
+     Chọn tông pastel cùng độ sáng với hổ phách #F4DFA8 vốn đã dùng trên
+     plum, không phải mint sáng: đợt Dashboard đã bỏ mint vì nó lạc khỏi
+     palette hồng/plum. */
+  --lp-done:       #A7E0C0;
+
+  --lp-r-surface:  20px;
+  --lp-r-media:    14px;
+  --lp-r-control:  12px;
+
+  --lp-ease:       cubic-bezier(0.16, 1, 0.3, 1);
+
+  font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+  color: var(--lp-ink);
+}
+
+.lp {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 32px 56px;
+}
+
+/* Codebase không có reset box-sizing toàn cục, khai trong phạm vi */
+.lp *,
+.lp *::before,
+.lp *::after,
+.rdm,
+.rdm *,
+.rdm *::before,
+.rdm *::after,
+.lp-vd *,
+.lp-vd *::before,
+.lp-vd *::after { box-sizing: border-box; }
+
+/* Không set `color: inherit` chung cho .lp a: specificity (0,1,1) cao hơn
+   mọi .lp-btn--* (0,1,0) nên nút sẽ nuốt màu chữ của khối cha. */
+.lp a { text-decoration: none; }
+.lp button { font: inherit; }
+.lp form { margin: 0; }
+
+
+/* =========================================================
+   BUTTONS - một hình dạng, khác nhau ở lớp áo
+   ========================================================= */
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: var(--lp-r-control);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+              color 0.2s ease, box-shadow 0.2s ease, transform 0.14s ease;
+}
+
+.lp-btn:active { transform: scale(0.98); }
+
+.lp-btn--solid {
+  background: var(--lp-accent);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(171, 34, 97, 0.20);
+}
+.lp-btn--solid:hover {
+  background: var(--lp-accent-2);
+  box-shadow: 0 10px 26px rgba(171, 34, 97, 0.26);
+}
+
+.lp-btn--outline {
+  background: var(--lp-surface);
+  color: var(--lp-ink);
+  border-color: var(--lp-line-2);
+}
+.lp-btn--outline:hover { background: #FCF8FA; border-color: var(--lp-ink-3); }
+
+.lp-btn--quiet {
+  min-height: 38px;
+  padding: 0 14px;
+  background: transparent;
+  color: var(--lp-ink-2);
+  border-color: var(--lp-line-2);
+  font-size: 0.85rem;
+}
+.lp-btn--quiet:hover {
+  background: var(--lp-wash);
+  border-color: var(--lp-accent);
+  color: var(--lp-accent);
+}
+
+/* Trên nền plum: pearl thay cho hồng */
+.lp-btn--pearl {
+  background: var(--lp-pearl);
+  color: var(--lp-plum);
+}
+.lp-btn--pearl:hover { background: #ffffff; }
+
+.lp-btn--outline-light {
+  background: transparent;
+  color: var(--lp-pearl);
+  border-color: rgba(251, 244, 248, 0.34);
+}
+.lp-btn--outline-light:hover {
+  background: rgba(251, 244, 248, 0.10);
+  border-color: rgba(251, 244, 248, 0.62);
+}
+
+/* Nút trên slide nhiệm vụ: nằm trên ảnh nền nên cần lớp kính, và
+   LUÔN HIỆN. Bản cũ để opacity:0 rồi chỉ hiện khi :hover, tức là ở
+   mobile nút vô hình mà vẫn nhận tap. */
+.lp-btn--glass {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #ffffff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.lp-btn--glass:hover { background: rgba(255, 255, 255, 0.34); }
+
+.lp-btn[disabled] {
+  cursor: default;
+  opacity: 0.85;
+}
+.lp-btn[disabled]:active { transform: none; }
+
+.lp-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(171, 34, 97, 0.28);
+}
+.lp-btn--pearl:focus-visible,
+.lp-btn--outline-light:focus-visible,
+.lp-btn--glass:focus-visible {
+  box-shadow: 0 0 0 3px rgba(251, 244, 248, 0.45);
+}
+
+
+/* =========================================================
+   HEADER
+   Bỏ eyebrow "Rewards Club" của bản cũ: trang đã có h1 và nav
+   item đang active, nhãn đó không trả lời câu hỏi nào. Khác với
+   "Next Visit" ở My bookings, vốn là nhãn CHỨC NĂNG.
+   ========================================================= */
+.lp-intro {
+  margin-bottom: 24px;
+}
+
+.lp-intro__title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.lp-intro__sub {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--lp-ink-2);
+}
+
+
+/* =========================================================
+   SECTION
+   Khoảng cách giữa các khối đặt ở .lp-sec, KHÔNG ở .lp-head:
+   nếu gắn vào heading thì section nào không có heading sẽ dính
+   sát khối trên nó. Đúng lỗi đó đã xảy ra khi khối sổ điểm mở
+   đầu bằng tabs thay vì bằng .lp-head.
+   ========================================================= */
+.lp-sec { margin-top: 34px; }
+
+
+/* Heading: nhãn trái, link phải, hairline nối */
+.lp-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 14px;
+}
+
+.lp-head__title {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.lp-head__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--lp-line);
+}
+
+.lp-head__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  color: var(--lp-accent);
+  font-size: 0.88rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+.lp-head__link:hover {
+  color: var(--lp-accent-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.lp-head__n {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--lp-ink-3);
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   MEMBERSHIP CARD - bề mặt tối duy nhất của trang
+   ========================================================= */
+.lp-card {
+  padding: 28px 30px 30px;
+  border-radius: var(--lp-r-surface);
+  background:
+    radial-gradient(120% 140% at 88% 6%, rgba(171, 34, 97, 0.42) 0%, transparent 58%),
+    linear-gradient(135deg, #46224F 0%, #3E1F47 46%, #2C1433 100%);
+  color: var(--lp-pearl);
+  box-shadow: 0 18px 44px rgba(44, 20, 51, 0.26);
+}
+
+.lp-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.lp-card__label {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lp-pearl-2);
+}
+
+/* Con số là vật lớn nhất của trang. tabular-nums để nó không
+   nhảy ngang khi số điểm đổi sau khi đổi thưởng. */
+.lp-balance {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 3.2rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  color: var(--lp-pearl);
+}
+
+.lp-balance__unit {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--lp-pearl-2);
+}
+
+/* Badge tier: cùng công thức với .bd-status
+   nền hue @ 12% · viền hue @ 34% · chữ cùng hue */
+.lp-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 12px;
+  border: 1px solid rgba(251, 244, 248, 0.34);
+  border-radius: 999px;
+  background: rgba(251, 244, 248, 0.12);
+  color: var(--lp-pearl);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.lp-tier .material-symbols-outlined { font-size: 15px; }
+
+.lp-card__expiry {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--lp-pearl-2);
+  text-align: right;
+}
+
+
+/* =========================================================
+   TIER RAIL - ba mốc trên một trục
+   Đường nối chạy từ TÂM mốc đầu tới TÂM mốc cuối: ba cột đều
+   nhau nên tâm cột 1 nằm ở 1/6 chiều rộng, tâm cột 3 ở 5/6.
+   Vẽ nó bằng inset 16.667% hai bên, không bằng số px ước lượng.
+   ========================================================= */
+.lp-rail {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(217, 199, 210, 0.24);
+}
+
+.lp-rail::before {
+  content: "";
+  position: absolute;
+  top: 28px;                       /* padding-top 22 + nửa dot 6 */
+  left: 16.667%;
+  right: 16.667%;
+  height: 1px;
+  background: rgba(217, 199, 210, 0.30);
+}
+
+.lp-rail__stop {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 9px;
+  text-align: center;
+  min-width: 0;
+}
+
+.lp-rail__dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 244, 248, 0.45);
+  background: #3E1F47;             /* đục để che đường nối phía sau */
+}
+
+.lp-rail__name {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--lp-pearl-2);
+  overflow-wrap: anywhere;
+}
+
+/* Hệ số điểm là quyền lợi THẬT của tier, khác với bản cũ chỉ
+   đổi màu viền thẻ theo tier mà không nói tier cho gì. */
+.lp-rail__perk {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--lp-pearl-2);
+  opacity: 0.72;
+  font-variant-numeric: tabular-nums;
+}
+
+.lp-rail__stop--now .lp-rail__dot {
+  background: var(--lp-pearl);
+  border-color: var(--lp-pearl);
+  box-shadow: 0 0 0 4px rgba(251, 244, 248, 0.16);
+}
+.lp-rail__stop--now .lp-rail__name { color: var(--lp-pearl); }
+.lp-rail__stop--now .lp-rail__perk { opacity: 1; color: var(--lp-pearl); }
+
+.lp-card__cta { padding-top: 24px; }
+
+
+/* =========================================================
+   STRIP - một pattern cuộn ngang cho ba dải
+   Cuộn tràn ra mép ở mobile để card thứ hai hé ra, người dùng
+   thấy ngay là còn nữa mà không cần dot hay mũi tên.
+   ========================================================= */
+.lp-strip {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 32px;
+  margin: 0 -32px;
+}
+.lp-strip::-webkit-scrollbar { display: none; }
+
+.lp-strip > * {
+  flex: 0 0 min(78%, 290px);
+  scroll-snap-align: start;
+}
+
+
+/* =========================================================
+   WALLET - voucher dùng được ngay
+   Bản cũ nhét voucher làm TAB 2 của khối cuối trang. Voucher
+   active là tài sản dùng được, history là sổ ghi đã xong: hai
+   loại vật khác nhau, và tài sản phải nằm trong tầm mắt.
+   Voucher đã dùng / hết hạn vẫn ở lại tab.
+   ========================================================= */
+.lp-vou {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-r-media);
+  background: var(--lp-surface);
+  color: var(--lp-ink);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.14s ease;
+}
+.lp-vou:hover {
+  border-color: rgba(171, 34, 97, 0.38);
+  box-shadow: 0 8px 22px rgba(44, 20, 51, 0.08);
+}
+.lp-vou:active { transform: scale(0.99); }
+.lp-vou:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(171, 34, 97, 0.28);
+}
+
+.lp-vou__top {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.lp-vou__glyph {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--lp-r-control);
+  background: var(--lp-wash);
+  color: var(--lp-accent);
+}
+.lp-vou__glyph .material-symbols-outlined { font-size: 21px; }
+
+.lp-vou__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+/* Badge trạng thái neo mép phải của hàng trên */
+.lp-vou__top .lp-state { flex-shrink: 0; }
+
+/* Mã voucher: viền gạch rời là quy ước "cắt ra để dùng", và mono
+   giữ các ký tự cùng bề rộng nên mã dễ đọc to tiếng cho nhân viên. */
+.lp-vou__code {
+  display: block;
+  padding: 9px 12px;
+  border: 1px dashed rgba(171, 34, 97, 0.40);
+  border-radius: var(--lp-r-control);
+  background: var(--lp-wash);
+  color: var(--lp-accent);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   MISSION - scroll-snap native, KHÔNG carousel tự chạy
+   Bản cũ: autoplay 3s pause bằng onmouseenter (mobile không
+   pause được), mũi tên và nút CTA đều chỉ hiện khi :hover (mobile
+   không bao giờ thấy), dot 6px. Cuộn ngang native giải quyết cả
+   ba, và bỏ được ~60 dòng JS.
+   ========================================================= */
+.lp-mis {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  min-height: 210px;
+  padding: 18px;
+  border-radius: var(--lp-r-media);
+  overflow: hidden;
+  background: var(--lp-plum);
+  color: #ffffff;
+}
+
+.lp-mis__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* Chữ trắng trên ảnh admin tải lên: không thể trông cậy vào ảnh
+   sáng hay tối, nên luôn có scrim. */
+.lp-mis__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(30, 12, 22, 0.82) 0%, rgba(30, 12, 22, 0.28) 62%, rgba(30, 12, 22, 0.12) 100%);
+}
+
+/* Hai dòng chữ trắng xếp dọc không có trọng lượng khác nhau thì đọc ra
+   như một khối xám. Nay: số điểm là một CHIP kính (nó là phần thưởng,
+   đáng có hình dạng riêng), tên nhiệm vụ là dòng chính bên dưới. */
+.lp-mis__body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+/* Icon nhiệm vụ là EMOJI lưu trong carousel_slides.icon, admin nhập qua
+   /admin/carousels. Không đổi sang Material Symbols được mà không đụng form
+   admin + dữ liệu, nên giữ nguyên. Chỉ hiện khi slide không có ảnh. */
+.lp-mis__glyph {
+  display: inline-flex;
+  font-size: 24px;
+  line-height: 1;
+  color: #ffffff;
+  opacity: 0.88;
+}
+
+/* Chip điểm. Là DỮ LIỆU (số điểm thưởng), không phải nhãn phân loại, nên
+   nó không vi phạm quy tắc tiết chế eyebrow. pts_label do admin nhập nên
+   giữ nguyên chuỗi, chỉ đổi cách vẽ. */
+.lp-mis__pts {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.lp-mis__name {
+  /* Cắt ở 2 dòng: tên nhiệm vụ do admin nhập dài ngắn khác nhau
+     ("Book Your First Appointment" vs "Write a Review"), và hai card cạnh
+     nhau lệch chiều cao thì dải cuộn trông như lỗi. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 1.06rem;
+  font-weight: 800;
+  line-height: 1.28;
+  letter-spacing: -0.022em;
+  color: #ffffff;
+  /* Scrim lo phần lớn độ đọc, shadow lo phần còn lại khi ảnh admin tải
+     lên là ảnh sáng. */
+  text-shadow: 0 1px 14px rgba(30, 12, 22, 0.55);
+}
+
+/* Nút ẩn, trồi từ dưới lên khi card được kích hoạt.
+
+   `pointer-events: none` lúc ẩn là phần BẮT BUỘC: bản cũ chỉ đặt
+   opacity: 0 nên nút vẫn nhận tap, khách bấm trúng một vật không nhìn
+   thấy. Ẩn thị giác mà vẫn bấm được là tệ hơn cả hai lựa chọn.
+
+   Ba đường kích hoạt, phủ hết ba cách dùng:
+     :hover        - chuột, chỉ bật ở thiết bị có hover thật
+     :focus-within - bàn phím tab tới nút. Không có nhánh này thì nút
+                     nhận focus mà vẫn vô hình, tức là focus mù.
+     .is-open      - cảm ứng, JS gắn khi chạm vào card
+   ========================================================= */
+.lp-mis__cta {
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.26s ease, transform 0.32s var(--lp-ease);
+}
+.lp-mis__cta .lp-btn { width: 100%; }
+
+.lp-mis:focus-within .lp-mis__cta,
+.lp-mis.is-open .lp-mis__cta {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Hover chỉ trên thiết bị có con trỏ thật. Trên cảm ứng, :hover dính lại
+   sau khi tap và nhả ra tuỳ trình duyệt, nên không dùng nó làm cơ chế
+   chính ở đó. */
+@media (hover: hover) and (pointer: fine) {
+  .lp-mis:hover .lp-mis__cta {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
+/* Nhiệm vụ đã xong: nút là nhãn trạng thái nên không ẩn theo cơ chế trên */
+.lp-mis__cta--static {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+
+/* =========================================================
+   MISSION ĐÃ HOÀN THÀNH  (.lp-mis--done)
+   ---------------------------------------------------------
+   Card đổi hẳn bố cục: nhãn trạng thái về GIỮA làm tâm điểm, tên
+   nhiệm vụ tụt xuống đáy làm chú thích. Nó không còn là lời mời
+   nên không cần cấu trúc của một lời mời.
+
+   Chip điểm bị bỏ ở trạng thái này (xem template): điểm đã vào ví
+   rồi, in lại "+50 pts" là mời gọi một việc không còn làm được.
+   ========================================================= */
+.lp-mis--done {
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tên nhiệm vụ neo đáy, chìm xuống để không cạnh tranh với nhãn giữa */
+.lp-mis--done .lp-mis__body {
+  position: absolute;
+  inset: auto 18px 16px;
+  z-index: 2;
+  align-items: flex-start;
+}
+.lp-mis--done .lp-mis__name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Ảnh mờ nhẹ + bớt bão hoà: việc đã xong thì lùi về sau.
+   scale(1.06) là BẮT BUỘC khi blur một ảnh phủ kín: blur lấy mẫu cả vùng
+   ngoài biên nên mép ảnh nhoè thành viền sáng nếu không phóng bù. */
+.lp-mis--done .lp-mis__bg {
+  filter: blur(3px) saturate(0.8) brightness(0.92);
+  transform: scale(1.06);
+}
+.lp-mis--done:hover .lp-mis__bg,
+.lp-mis--done.is-open .lp-mis__bg { transform: scale(1.06); }
+
+/* Scrim nhạt hơn: ảnh đã mờ nên không cần lớp tối dày để chữ đọc được,
+   và scrim dày cộng ảnh mờ thì card thành một mảng xám. */
+.lp-mis--done .lp-mis__scrim {
+  background: linear-gradient(to top,
+    rgba(30, 12, 22, 0.68) 0%,
+    rgba(30, 12, 22, 0.34) 58%,
+    rgba(30, 12, 22, 0.30) 100%);
+}
+
+/* Nhãn giữa co theo nội dung thay vì kéo hết chiều ngang */
+.lp-mis--done .lp-mis__cta { width: auto; }
+.lp-mis--done .lp-mis__cta .lp-btn { width: auto; }
+
+/* Nút "đã xong": viền xanh mang nghĩa hoàn thành.
+   Vẫn là lớp kính (cùng họ .lp-btn--glass) chứ không phải một hình dạng
+   nút mới, nên hai trạng thái đọc ra là cùng một vật ở hai tình huống. */
+.lp-mis--done .lp-btn--glass[disabled] {
+  border-color: rgba(167, 224, 192, 0.52);
+  background: rgba(167, 224, 192, 0.16);
+  color: var(--lp-done);
+  opacity: 1;
+  box-shadow: inset 0 0 0 1px rgba(167, 224, 192, 0.10);
+}
+
+/* Card đang mở nhấc nhẹ ảnh nền lên để việc chạm có phản hồi thị giác,
+   nếu không thì chỉ có nút xuất hiện mà không rõ vì sao. */
+/* `:not(.lp-mis--done)` là cần thiết, không phải phòng xa: rule này nằm SAU
+   khối .lp-mis--done và có cùng specificity, nên không loại trừ thì nó ghi
+   đè scale(1.06) mà bản done cần để bù blur. */
+.lp-mis__bg { transition: transform 0.5s var(--lp-ease); }
+.lp-mis:not(.lp-mis--done):hover .lp-mis__bg,
+.lp-mis:not(.lp-mis--done).is-open .lp-mis__bg { transform: scale(1.04); }
+
+
+/* =========================================================
+   REWARD
+   ========================================================= */
+.lp-rw {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-r-media);
+  background: var(--lp-surface);
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.lp-rw:hover {
+  border-color: rgba(171, 34, 97, 0.30);
+  box-shadow: 0 10px 26px rgba(44, 20, 51, 0.08);
+}
+
+.lp-rw__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--lp-wash);
+}
+.lp-rw__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Không có ảnh: một glyph trên nền wash, không phải ảnh giả */
+.lp-rw__ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--lp-accent);
+  opacity: 0.45;
+}
+.lp-rw__ph .material-symbols-outlined { font-size: 40px; }
+
+.lp-rw__body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 15px 16px 0;
+}
+
+.lp-rw__name {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.lp-rw__desc {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--lp-ink-2);
+}
+
+.lp-rw__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding: 14px 16px 16px;
+}
+
+.lp-rw__pts {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--lp-accent);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Khoá: cả thẻ chìm màu và ảnh xám, đọc ra ngay bằng cách thẻ
+   được vẽ. Cùng quy ước với .bk-row--cancelled. */
+.lp-rw--locked { background: #FDFAFB; }
+.lp-rw--locked:hover { border-color: var(--lp-line); box-shadow: none; }
+.lp-rw--locked .lp-rw__media img { filter: grayscale(1); opacity: 0.7; }
+.lp-rw--locked .lp-rw__name { color: var(--lp-ink-2); }
+.lp-rw--locked .lp-rw__pts  { color: var(--lp-ink-3); }
+
+/* Lý do khoá nói bằng CHỮ, không bằng emoji ổ khoá đè lên ảnh */
+.lp-rw__why {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--lp-ink-2);
+  text-align: right;
+}
+.lp-rw__why span {
+  display: block;
+  font-weight: 500;
+  color: var(--lp-ink-3);
+}
+
+/* Tag trên ảnh: một hệ màu duy nhất (hổ phách của portal) thay
+   cho 4 cặp xanh dương / xanh lá / vàng / đỏ của bản cũ. */
+.lp-rw__tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--lp-flag-bg);
+  color: var(--lp-flag-ink);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   LEDGER - sổ điểm
+   Không có tabs: voucher đã về hết dải ví nên khối này chỉ còn
+   MỘT danh sách, và một tab đơn độc là chrome không mang thông
+   tin. Bản cũ dùng underline tab, tức là hệ tab thứ ba của
+   portal (My bookings và History đều dùng segmented pill);
+   nay không cần hệ nào.
+
+   Hàng sổ điểm: motif .bk-row, hairline ngăn, không card.
+   ========================================================= */
+.lp-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0 14px;
+  padding: 16px 4px;
+}
+.lp-row + .lp-row { box-shadow: inset 0 1px 0 var(--lp-line); }
+
+.lp-row__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--lp-wash);
+  color: var(--lp-accent);
+}
+.lp-row__glyph .material-symbols-outlined { font-size: 20px; }
+
+/* Điểm trừ là việc bình thường, không phải lỗi: glyph chuyển sang
+   trung tính thay vì đổi sang một hue mới. */
+.lp-row--out .lp-row__glyph {
+  background: #F4F0F2;
+  color: var(--lp-ink-2);
+}
+
+.lp-row__main { min-width: 0; }
+
+.lp-row__desc {
+  margin: 0 0 3px;
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+.lp-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--lp-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.lp-row__meta span + span {
+  margin-left: 11px;
+  padding-left: 11px;
+  border-left: 1px solid var(--lp-line-2);
+}
+
+/* Dấu +/- đã phân biệt chiều, nên không cần thêm một hue thứ hai.
+   Bản cũ dùng xanh #228b5d cho earn, lạc khỏi palette. */
+.lp-row__pts {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--lp-accent);
+}
+.lp-row--out .lp-row__pts { color: var(--lp-ink-3); }
+
+
+/* Cùng công thức badge của .bd-status / .inv-status:
+   nền hue @ 10% · viền hue @ 30% · chữ cùng hue.
+   Trạng thái trung tính (đã dùng / hết hạn) là mặc định. */
+.lp-state {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--lp-line-2);
+  border-radius: 999px;
+  background: #F4F0F2;
+  color: var(--lp-ink-2);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Voucher không còn dùng được: chìm cả thẻ, mã hết mời gọi nhưng vẫn đọc
+   được để tra. Cùng quy ước với .lp-rw--locked và .bk-row--cancelled. */
+.lp-vou--off { background: #FDFAFB; }
+.lp-vou--off:hover { border-color: var(--lp-line); box-shadow: none; }
+.lp-vou--off .lp-vou__glyph {
+  background: #F4F0F2;
+  color: var(--lp-ink-3);
+}
+.lp-vou--off .lp-vou__name { color: var(--lp-ink-2); }
+.lp-vou--off .lp-vou__code {
+  border-style: solid;
+  border-color: var(--lp-line-2);
+  background: #F7F4F5;
+  color: var(--lp-ink-3);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   loyalty_points_log đang rỗng trên DB thật, nên đây là trạng
+   thái khách gặp đầu tiên, không phải trường hợp biên.
+   ========================================================= */
+.lp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 24px;
+  text-align: center;
+  border-radius: var(--lp-r-media);
+  background: var(--lp-wash);
+}
+.lp-empty .material-symbols-outlined {
+  font-size: 38px;
+  color: var(--lp-accent);
+  opacity: 0.55;
+}
+.lp-empty h3 {
+  margin: 4px 0 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.lp-empty p {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--lp-ink-2);
+}
+.lp-empty .lp-btn { margin-top: 10px; }
+
+
+/* =========================================================
+   MOTION
+   Ba chuyển động, mỗi cái trả lời một câu hỏi:
+     thẻ + dải dâng lên  -> "trang vừa mở"
+     marker tab trượt    -> "bạn vừa đổi sang danh sách khác"
+     scale khi ấn        -> phản hồi chạm
+   Không có gì tự chạy: bản cũ trượt slide mỗi 3 giây kể cả khi
+   khách đang đọc.
+   ========================================================= */
+.lp-card,
+.lp-sec {
+  animation: lp-rise 0.46s var(--lp-ease) backwards;
+  animation-delay: calc(var(--lp-i, 0) * 60ms);
+}
+
+@keyframes lp-rise {
+  from { opacity: 0; transform: translateY(9px); }
+}
+
+
+/* =========================================================
+   RESPONSIVE - DESKTOP  (≥ 769px)
+   Mỗi dải nở ra theo cách riêng: ví và nhiệm vụ chia đều chiều
+   ngang, phần thưởng thì wrap thành lưới vì số lượng do DB quyết
+   định và có thể nhiều hơn 3.
+   ========================================================= */
+@media (min-width: 769px) {
+  .lp-strip {
+    overflow: visible;
+    padding: 4px 0;
+    margin: 0;
+  }
+
+  .lp-strip--wallet > *,
+  .lp-strip--mission > * { flex: 1 1 0; }
+
+  .lp-strip--reward {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  .lp-strip--reward > * { flex: none; }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE  (≤ 768px)
+   ========================================================= */
+@media (max-width: 768px) {
+  .lp { padding: 20px 18px 40px; }
+
+  .lp-intro { margin-bottom: 18px; }
+  .lp-intro__title { font-size: 1.7rem; }
+  .lp-intro__sub { font-size: 0.92rem; }
+
+  .lp-sec { margin-top: 28px; }
+  .lp-head { margin-bottom: 12px; gap: 12px; }
+  .lp-head__title { font-size: 1rem; }
+
+  .lp-card { padding: 22px 20px 24px; }
+  .lp-card__top { flex-direction: column; gap: 12px; }
+  .lp-balance { font-size: 2.7rem; }
+  .lp-card__expiry { text-align: left; }
+
+  .lp-rail { margin-top: 20px; padding-top: 18px; }
+  .lp-rail::before { top: 24px; }
+  .lp-rail__name { font-size: 0.8rem; }
+  .lp-rail__perk { font-size: 0.72rem; }
+
+  .lp-card__cta { padding-top: 20px; }
+  .lp-card__cta .lp-btn { width: 100%; min-height: 50px; }
+
+  /* Cuộn tràn ra đúng padding của .lp ở breakpoint này */
+  .lp-strip { padding: 4px 18px; margin: 0 -18px; }
+
+  .lp-mis { min-height: 190px; }
+
+  .lp-row { padding: 14px 2px; gap: 0 12px; }
+  .lp-row__desc { font-size: 0.9rem; }
+
+  /* Không có hover trên cảm ứng: đổi sang phản hồi khi ấn */
+  .lp-btn:hover { background: none; }
+  .lp-btn--solid:hover { background: var(--lp-accent); }
+  .lp-btn--pearl:hover { background: var(--lp-pearl); }
+  .lp-btn--outline:hover { background: var(--lp-surface); }
+  .lp-btn--glass:hover { background: rgba(255, 255, 255, 0.22); }
+  .lp-vou:hover,
+  .lp-rw:hover {
+    border-color: var(--lp-line);
+    box-shadow: none;
+  }
+  .lp-vou:active { background: var(--lp-wash); }
+}
+
+
+/* Trong suốt bị tắt: mọi lớp kính phải đục hẳn, không thì chữ trắng
+   nằm trên ảnh nền mà không có lớp nào đỡ. */
+@media (prefers-reduced-transparency: reduce) {
+  .lp-btn--glass,
+  .lp-mis__pts {
+    background: rgba(30, 12, 22, 0.80);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* Nút done giữ hue xanh của nó, chỉ đục lại */
+  .lp-mis--done .lp-btn--glass[disabled] {
+    background: rgba(24, 48, 36, 0.88);
+  }
+}
+
+
+/* =========================================================
+   VOUCHER DETAIL MODAL  (lp-vd-)
+   ---------------------------------------------------------
+   Prefix đổi từ `vd-` sang `lp-vd-`: JS của modal này nằm trong
+   chính template loyalty_points, không dùng chung với trang nào,
+   nên đổi tên được mà không phải fork JS (khác với modal cancel
+   ở Booking details, vốn phải giữ tên `bk-` để dùng lại
+   my_booking.js).
+
+   Ở mobile nó là sheet trượt lên từ đáy, cùng quy ước với
+   .bk-modal và .ch-panel-menu.
+   ========================================================= */
+.lp-vd {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(30, 12, 22, 0.52);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.lp-vd.is-open { display: flex; }
+
+.lp-vd__card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 430px;
+  padding: 26px;
+  border-radius: var(--lp-r-surface);
+  background: var(--lp-surface);
+  box-shadow: 0 28px 64px rgba(30, 12, 22, 0.24);
+  animation: lp-vd-in 0.3s var(--lp-ease);
+}
+
+@keyframes lp-vd-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+}
+
+.lp-vd__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.lp-vd__name {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.lp-vd__desc {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--lp-ink-2);
+}
+
+.lp-vd__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--lp-r-control);
+  background: var(--lp-wash);
+  color: var(--lp-ink-2);
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+.lp-vd__close:hover { background: var(--lp-wash-2); color: var(--lp-ink); }
+.lp-vd__close .material-symbols-outlined { font-size: 20px; }
+
+/* Hàng nhãn/giá trị: một grid duy nhất nên cột giá trị thẳng một
+   mép, cùng cách làm với <dl> của Invoice detail. */
+.lp-vd__rows {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: 0;
+  padding: 2px 0;
+}
+.lp-vd__rows dt,
+.lp-vd__rows dd {
+  margin: 0;
+  padding: 9px 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.lp-vd__rows dt {
+  color: var(--lp-ink-2);
+  padding-right: 18px;
+}
+.lp-vd__rows dd {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.lp-vd__code {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px dashed rgba(171, 34, 97, 0.40);
+  border-radius: var(--lp-r-media);
+  background: var(--lp-wash);
+}
+
+.lp-vd__code-label {
+  margin: 0 0 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lp-ink-3);
+}
+
+.lp-vd__code-value {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  color: var(--lp-accent);
+  overflow-wrap: anywhere;
+}
+
+/* Voucher đã dùng / hết hạn: mã còn đó để tra, nhưng thôi mời gọi */
+.lp-vd__code--dead {
+  border-style: solid;
+  border-color: var(--lp-line-2);
+  background: #F7F4F5;
+}
+.lp-vd__code--dead .lp-vd__code-value { color: var(--lp-ink-3); }
+
+.lp-vd__note {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--lp-ink-3);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .lp-vd { align-items: flex-end; padding: 0; }
+  .lp-vd__card {
+    max-width: none;
+    gap: 16px;
+    padding: 22px 18px 18px;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+    animation-name: lp-vd-sheet-in;
+  }
+  .lp-vd__code { padding: 14px 16px; }
+  .lp-vd__code-value { font-size: 1.1rem; }
+
+  @keyframes lp-vd-sheet-in {
+    from { opacity: 0; transform: translateY(14%); }
+  }
+}
+
+
+/* =========================================================
+   REDEEM CONFIRM MODAL  (rdm-)
+   ---------------------------------------------------------
+   CSS của partial customer/redeem_confirm_modal.html, chuyển vào
+   đây từ khối <style> inline của chính partial đó. Partial chỉ
+   được include ở loyalty_points.html nên đặt ở đây là đủ.
+
+   Palette cũ của partial là một bộ riêng (#ef3976 primary,
+   #221016 secondary, #5a4045, font Manrope) tức là màu hồng THỨ
+   NĂM của codebase, và Manrope thì base không hề nạp nên nó vẫn
+   rơi về font mặc định. Nay dùng token portal, nút dùng .lp-btn.
+   ========================================================= */
+.rdm {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(30, 12, 22, 0.52);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.rdm.is-open { display: flex; }
+
+.rdm__card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 430px;
+  padding: 26px;
+  border-radius: var(--lp-r-surface);
+  background: var(--lp-surface);
+  box-shadow: 0 28px 64px rgba(30, 12, 22, 0.24);
+  animation: lp-vd-in 0.3s var(--lp-ease);
+}
+
+.rdm__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.rdm__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: var(--lp-wash);
+  color: var(--lp-accent);
+}
+.rdm__badge .material-symbols-outlined { font-size: 27px; }
+
+/* Bỏ eyebrow "CONFIRM REDEEM" của bản cũ: tiêu đề modal đã là câu hỏi,
+   và hai nút ở đáy đã nói rõ đây là bước xác nhận. */
+.rdm__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+
+/* Cùng cách làm với .lp-vd__rows và <dl> của Invoice detail: một grid
+   duy nhất nên cột giá trị thẳng một mép. */
+.rdm__rows {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: var(--lp-r-media);
+  background: var(--lp-wash);
+}
+
+.rdm__rows dt,
+.rdm__rows dd {
+  margin: 0;
+  padding: 9px 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.rdm__rows dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 18px;
+  color: var(--lp-ink-2);
+}
+.rdm__rows dt .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--lp-accent);
+  opacity: 0.8;
+}
+
+.rdm__rows dd {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.rdm__cost { color: var(--lp-accent); }
+
+.rdm__was {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  color: var(--lp-ink-3);
+  font-weight: 600;
+}
+
+.rdm__to {
+  font-size: 14px !important;
+  color: var(--lp-ink-3);
+  vertical-align: middle;
+}
+
+.rdm__note {
+  margin: 0;
+  padding: 0 4px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--lp-ink-2);
+}
+
+.rdm__terms {
+  color: var(--lp-accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.rdm__terms:hover { color: var(--lp-accent-2); }
+
+.rdm__foot {
+  display: flex;
+  gap: 10px;
+}
+.rdm__foot .lp-btn { flex: 1 1 0; }
+
+@media (max-width: 768px) {
+  .rdm { align-items: flex-end; padding: 0; }
+  .rdm__card {
+    max-width: none;
+    gap: 16px;
+    padding: 22px 18px 18px;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+    animation-name: lp-vd-sheet-in;
+  }
+  .rdm__foot { flex-direction: column-reverse; }
+  .rdm__foot .lp-btn { flex: 0 0 auto; min-height: 50px; }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .lp-card,
+  .lp-sec,
+  .lp-vd__card,
+  .rdm__card { animation: none; }
+
+  .lp-btn:active,
+  .lp-vou:active { transform: none; }
+
+  /* Nút mission vẫn ẩn / hiện, nhưng bằng opacity thôi: không trồi, không
+     phóng ảnh. Giữ pointer-events để việc bấm vẫn đúng. */
+  .lp-mis__cta { transform: none; transition: opacity 0.01ms linear; }
+  .lp-mis:focus-within .lp-mis__cta,
+  .lp-mis.is-open .lp-mis__cta { transform: none; }
+  /* Card done PHẢI giữ scale(1.06): nó bù cho blur(3px), bỏ transform là
+     mép ảnh nhoè thành viền sáng. Đây là transform tĩnh, không phải
+     chuyển động, nên reduced-motion không có lý do tắt nó. */
+  .lp-mis__bg { transition: none; }
+  .lp-mis:not(.lp-mis--done):hover .lp-mis__bg,
+  .lp-mis:not(.lp-mis--done).is-open .lp-mis__bg { transform: none; }
+
+  .lp-strip { scroll-behavior: auto; }
+}

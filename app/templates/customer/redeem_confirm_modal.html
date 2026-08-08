@@ -1,520 +1,168 @@
 {# ============================================================
-   PARTIAL: Redeem Reward Confirmation Modal
-   FILE: templates/customer/redeem_confirm_modal.html
+   PARTIAL: Xác nhận đổi phần thưởng
+   FILE: app/templates/customer/redeem_confirm_modal.html
 
-   USAGE:
-     Include ở cuối loyalty_points.html (trước </body>):
-     {% include 'customer/partials/redeem_confirm_modal.html' %}
+   Include ở cuối loyalty_points.html. Đó là nơi DUY NHẤT dùng
+   partial này (đã grep), nên CSS của nó nằm trong
+   app/static/css/customer/loyalty_points.css thay vì một khối
+   <style> inline như trước. Nếu sau này trang khác include nó,
+   tách CSS ra file riêng nạp ở cả hai chỗ.
 
-   TRIGGER:
-     Gọi openRedeemModal() từ nút "Redeem" trên mỗi reward card.
-     Modal ẩn mặc định (display:none), hiện lên khi JS gọi.
-
-   JS API:
+   JS API (giữ nguyên, các trang gọi vào không phải sửa):
      openRedeemModal(rewardId, rewardName, pointsCost, currentBalance, expiryDate)
-       - rewardId       : reward.id (int) từ DB
-       - rewardName     : reward.name (string)
-       - pointsCost     : reward.points_required (int)
-       - currentBalance : customer points hiện tại (int) — truyền từ Jinja {{ loyalty.points }}
-       - expiryDate     : string ngày hết hạn voucher, e.g. "Jul 15, 2026"
-                          truyền "" nếu không có expiry cố định
 
-   BACKEND:
-     Confirm button POST tới route: customer.redeem_reward
-     Payload JSON: { "reward_id": <int> }
-     Response JSON: { "success": true } hoặc { "success": false, "message": "..." }
-     Sau khi success → trang reload để cập nhật points balance + My Vouchers
+   Backend: POST JSON { reward_id } tới main.redeem_reward_route,
+   trả { success: true } hoặc { success: false, message }.
+   Thành công thì reload để cập nhật số điểm và ví voucher.
 
-   FONT / ICONS:
-     - Font: Manrope (loaded từ customer_base.html)
-     - Icons: Material Symbols Outlined với FILL=1 (loaded từ customer_base.html)
-     - Nếu base chưa load thì thêm vào <head> của base:
-         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
-   CSS:
-     Tất cả class dùng prefix rdm- để tránh conflict với customer_base.html
-     Không dùng Tailwind — plain CSS để kiểm soát hoàn toàn
-     Colors bám sát Velvet Petal palette từ Stitch config:
-       primary        #ef3976  (Velvet Petal Pink — nút confirm, points cost, icon)
-       secondary      #221016  (dark plum — text chính)
-       on-surface-variant  #5a4045  (text phụ, labels)
-       surface-bright      #ffffff  (nền modal card)
-       surface-container-low  #fcf9f9  (nền info block)
-       outline-variant     #e2bdc3  (border, divider)
-       primary-container   #fdf2f5  (nền icon badge)
+   Tên class giữ prefix rdm-. Palette đã đổi từ bộ riêng của
+   partial (#ef3976 / #221016 / #5a4045 / Manrope) sang token
+   portal, xem loyalty_points.css.
 ============================================================ #}
 
-
 <div id="rdm-backdrop"
-     class="rdm-backdrop"
+     class="rdm"
      role="dialog"
      aria-modal="true"
-     aria-labelledby="rdm-title"
-     style="display: none;">
+     aria-labelledby="rdm-title">
 
-  <div class="rdm-card">
+  <div class="rdm__card">
 
-    <div class="rdm-header">
+    <div class="rdm__head">
+      <span class="rdm__badge">
+        <span class="material-symbols-outlined" aria-hidden="true">redeem</span>
+      </span>
 
-      <div class="rdm-icon-badge">
-        <span class="material-symbols-outlined rdm-icon"
-              aria-hidden="true"
-              style="font-variation-settings: 'FILL' 1;">redeem</span>
-      </div>
-
-      <span class="rdm-eyebrow">{{ _('CONFIRM REDEEM') }}</span>
-
-      <h2 class="rdm-reward-name" id="rdm-title">
-        <span id="rdm-reward-name-text">—</span>
+      <h2 class="rdm__title" id="rdm-title">
+        <span id="rdm-reward-name-text"></span>
       </h2>
-
     </div>
 
+    <dl class="rdm__rows">
+      <dt>
+        <span class="material-symbols-outlined" aria-hidden="true">toll</span>
+        {{ _('Points cost') }}
+      </dt>
+      <dd class="rdm__cost">-<span id="rdm-points-cost">0</span> {{ _('pts') }}</dd>
 
-    <div class="rdm-info-block">
+      <dt>
+        <span class="material-symbols-outlined" aria-hidden="true">account_balance_wallet</span>
+        {{ _('Your balance') }}
+      </dt>
+      <dd>
+        <span id="rdm-balance-before" class="rdm__was">0</span>
+        <span class="material-symbols-outlined rdm__to" aria-hidden="true">arrow_forward</span>
+        <span id="rdm-balance-after">0</span> {{ _('pts') }}
+      </dd>
 
-      <div class="rdm-info-row">
-        <div class="rdm-info-label">
-          <span class="material-symbols-outlined rdm-row-icon" aria-hidden="true">toll</span>
-          {{ _('Points cost') }}
-        </div>
-        <span class="rdm-info-value rdm-value-pink">
-          − <span id="rdm-points-cost">0</span> {{ _('pts') }}
-        </span>
-      </div>
+      <dt>
+        <span class="material-symbols-outlined" aria-hidden="true">event</span>
+        {{ _('Voucher valid until') }}
+      </dt>
+      <dd id="rdm-voucher-expiry"></dd>
+    </dl>
 
-      <div class="rdm-divider"></div>
-
-      <div class="rdm-info-row">
-        <div class="rdm-info-label">
-          <span class="material-symbols-outlined rdm-row-icon" aria-hidden="true">account_balance_wallet</span>
-          {{ _('Your balance') }}
-        </div>
-        <div class="rdm-balance-value">
-          <span id="rdm-balance-before" class="rdm-strike">0</span>
-          <span class="material-symbols-outlined rdm-arrow-icon" aria-hidden="true">arrow_forward</span>
-          <span id="rdm-balance-after">0</span> {{ _('pts') }}
-        </div>
-      </div>
-
-      <div class="rdm-divider"></div>
-
-      <div class="rdm-info-row">
-        <div class="rdm-info-label">
-          <span class="material-symbols-outlined rdm-row-icon" aria-hidden="true">event</span>
-          {{ _('Voucher valid until') }}
-        </div>
-        <span class="rdm-info-value" id="rdm-voucher-expiry">—</span>
-      </div>
-
-    </div>
-
-
-    <p class="rdm-disclaimer" id="rdm-disclaimer-text">
+    <p class="rdm__note" id="rdm-disclaimer-text">
       {{ _('Once redeemed, points cannot be refunded.') }}
-      <a href="#" class="rdm-terms-link">{{ _('Terms apply.') }}</a>
+      <a href="{{ url_for('main.redeem_terms') }}" class="rdm__terms">{{ _('Terms apply.') }}</a>
     </p>
 
-
-    <div class="rdm-actions">
-
-      <button type="button"
-              class="rdm-btn-cancel"
-              onclick="closeRedeemModal()">
+    <div class="rdm__foot">
+      <button type="button" class="lp-btn lp-btn--outline" onclick="closeRedeemModal()">
         {{ _('Cancel') }}
       </button>
-
-      <button type="button"
-              class="rdm-btn-confirm"
-              id="rdm-confirm-btn"
-              data-reward-id=""
-              onclick="submitRedeem()">
+      <button type="button" class="lp-btn lp-btn--solid"
+              id="rdm-confirm-btn" data-reward-id="" onclick="submitRedeem()">
         {{ _('Confirm Redeem') }}
       </button>
-
     </div>
 
   </div>
-
 </div>
 
 
-<style>
-  /* BACKDROP
-     fixed inset-0 = phủ toàn màn hình
-     bg-secondary/40 + backdrop-blur-sm = tối + mờ nền — y hệt Stitch */
-  .rdm-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(34, 16, 22, 0.40); /* secondary = #221016 @ 40% */
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    animation: rdmFadeIn 0.18s ease;
-  }
-
-  @keyframes rdmFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-
-  /* MODAL CARD
-     bg-surface-bright = #ffffff
-     rounded-3xl = 1.5rem (Stitch borderRadius.3xl)
-     p-8 = 2rem, gap-6 = 1.5rem
-     shadow-xl shadow-primary/10 */
-  .rdm-card {
-    background: #ffffff;
-    border-radius: 1.5rem;
-    padding: 2rem;
-    width: 100%;
-    max-width: 400px;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    box-shadow: 0 20px 40px rgba(239, 57, 118, 0.10);
-    animation: rdmSlideUp 0.22s ease;
-  }
-
-  @keyframes rdmSlideUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* HEADER
-     flex flex-col items-center text-center gap-4 */
-  .rdm-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.5rem;
-  }
-
-  /* ICON BADGE
-     w-16 h-16 = 64px, rounded-full, bg-primary-container = #fdf2f5 */
-  .rdm-icon-badge {
-    width: 64px;
-    height: 64px;
-    border-radius: 9999px;
-    background: #fdf2f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.25rem;
-  }
-
-  /* Icon bên trong badge — text-3xl = 30px, text-primary = #ef3976 */
-  .rdm-icon {
-    font-size: 30px;
-    color: #ef3976;
-  }
-
-  /* EYEBROW
-     text-xs = 12px, font-bold, tracking-[0.15em], text-primary/70, uppercase */
-  .rdm-eyebrow {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: rgba(239, 57, 118, 0.70); /* primary/70 */
-  }
-
-  /* REWARD NAME
-     text-2xl = 24px, font-black = 900, tracking-tight, text-secondary = #221016 */
-  .rdm-reward-name {
-    font-size: 24px;
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    color: #221016;
-    margin: 0;
-    font-family: 'Manrope', sans-serif;
-  }
-
-  /* INFO BLOCK
-     bg-surface-container-low = #fcf9f9
-     rounded-2xl = 1rem, p-5 = 1.25rem, gap-4 = 1rem
-     border border-outline-variant/10 */
-  .rdm-info-block {
-    background: #fcf9f9;
-    border-radius: 1rem;
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    border: 1px solid rgba(226, 189, 195, 0.10); /* outline-variant/10 */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  }
-
-  /* INFO ROW — flex justify-between items-center text-sm */
-  .rdm-info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-  }
-
-  /* LABEL (trái) — flex items-center gap-2, text-on-surface-variant, font-medium */
-  .rdm-info-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #5a4045; /* on-surface-variant */
-    font-weight: 500;
-  }
-
-  /* Icon nhỏ trong label — text-lg = 18px, opacity-70 */
-  .rdm-row-icon {
-    font-size: 18px;
-    opacity: 0.70;
-  }
-
-  /* VALUE (phải) — font-bold, text-secondary mặc định */
-  .rdm-info-value {
-    font-weight: 700;
-    color: #221016; /* secondary */
-  }
-
-  /* Value màu primary cho points cost */
-  .rdm-value-pink {
-    color: #ef3976; /* primary */
-  }
-
-  /* BALANCE VALUE wrapper — flex items-center gap-2 */
-  .rdm-balance-value {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-weight: 700;
-    color: #221016;
-  }
-
-  /* Gạch ngang số cũ — line-through, text-on-surface-variant/50 */
-  .rdm-strike {
-    text-decoration: line-through;
-    color: rgba(90, 64, 69, 0.50); /* on-surface-variant/50 */
-  }
-
-  /* Mũi tên giữa 2 số balance — text-xs, text-primary/50 */
-  .rdm-arrow-icon {
-    font-size: 12px;
-    color: rgba(239, 57, 118, 0.50); /* primary/50 */
-  }
-
-  /* DIVIDER — h-px, bg-outline-variant/20 */
-  .rdm-divider {
-    height: 1px;
-    background: rgba(226, 189, 195, 0.20); /* outline-variant/20 */
-  }
-
-  /* DISCLAIMER
-     text-xs, text-center, text-on-surface-variant/70, leading-relaxed */
-  .rdm-disclaimer {
-    font-size: 12px;
-    text-align: center;
-    color: rgba(90, 64, 69, 0.70); /* on-surface-variant/70 */
-    line-height: 1.6;
-    padding: 0 0.5rem;
-  }
-
-  /* Terms link trong disclaimer */
-  .rdm-terms-link {
-    color: #ef3976; /* primary */
-    font-weight: 600;
-    text-decoration: underline;
-    text-decoration-color: rgba(239, 57, 118, 0.30);
-    text-underline-offset: 2px;
-    transition: color 0.15s;
-  }
-
-  .rdm-terms-link:hover {
-    color: rgba(239, 57, 118, 0.80);
-  }
-
-  /* ACTIONS ROW — flex gap-3, mt-2 */
-  .rdm-actions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
-  }
-
-  /* CANCEL BUTTON
-     ghost style: bg-transparent, border-2 border-outline-variant/30
-     rounded-xl = 0.75rem, py-3.5 px-4, text-sm font-bold, text-on-surface-variant */
-  .rdm-btn-cancel {
-    flex: 1;
-    padding: 0.875rem 1rem;
-    border-radius: 0.75rem;
-    border: 2px solid rgba(226, 189, 195, 0.30); /* outline-variant/30 */
-    background: transparent;
-    color: #5a4045; /* on-surface-variant */
-    font-size: 14px;
-    font-weight: 700;
-    font-family: 'Manrope', sans-serif;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-  }
-
-  .rdm-btn-cancel:hover {
-    background: #f8f6f6; /* surface-container */
-    color: #221016;      /* secondary */
-  }
-
-  /* CONFIRM BUTTON
-     filled pink: bg-primary, text-on-primary = white
-     rounded-xl, shadow-xl shadow-primary/20
-     hover: bg-primary/90 + translateY(-2px) */
-  .rdm-btn-confirm {
-    flex: 1;
-    padding: 0.875rem 1rem;
-    border-radius: 0.75rem;
-    border: none;
-    background: #ef3976; /* primary */
-    color: #ffffff;       /* on-primary */
-    font-size: 14px;
-    font-weight: 700;
-    font-family: 'Manrope', sans-serif;
-    cursor: pointer;
-    box-shadow: 0 8px 24px rgba(239, 57, 118, 0.20);
-    transition: background 0.2s, transform 0.15s;
-  }
-
-  .rdm-btn-confirm:hover {
-    background: rgba(239, 57, 118, 0.90);
-    transform: translateY(-2px);
-  }
-
-  .rdm-btn-confirm:disabled {
-    background: rgba(239, 57, 118, 0.50);
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-</style>
-
-
 <script>
-  /**
-   * openRedeemModal()
-   * Gọi từ nút "Redeem" trên mỗi reward card trong loyalty_points.html.
-   *
-   * Ví dụ gọi trong Jinja template:
-   *   <button onclick="openRedeemModal(
-   *     [reward.id],
-   *     '[reward.name]',
-   *     [reward.points_required],
-   *     [loyalty.points],
-   *     '[reward.expiry_date | format_date]'
-   *   )">Redeem</button>
-   *
-   * @param {number} rewardId        - reward.id từ DB
-   * @param {string} rewardName      - reward.name
-   * @param {number} pointsCost      - reward.points_required
-   * @param {number} currentBalance  - điểm hiện tại của customer
-   * @param {string} expiryDate      - ngày hết hạn voucher dạng string, e.g. "Jul 15, 2026"
-   *                                   truyền "" nếu không có expiry
-   */
+  /* Nhãn dịch lấy qua tojson để chuỗi có dấu nháy (vd tiếng Phần Lan)
+     không phá cú pháp JS. Bản cũ nội suy thẳng vào string literal. */
+  var RDM_TEXT = {
+    confirm:   {{ _('Confirm Redeem')                          | tojson }},
+    working:   {{ _('Processing...')                           | tojson }},
+    uponUse:   {{ _('Upon use')                                | tojson }},
+    failed:    {{ _('Something went wrong. Please try again.') | tojson }},
+    offline:   {{ _('Connection error. Please try again.')     | tojson }}
+  };
+  var RDM_URL  = {{ url_for('main.redeem_reward_route') | tojson }};
+  var RDM_CSRF = {{ csrf_token()                        | tojson }};
+
+  /* Disclaimer gốc được giữ lại nguyên khối lúc tải trang, nên khi
+     hiện lỗi rồi mở lại modal thì phục hồi được mà không phải dựng
+     lại chuỗi HTML có thẻ <a> bằng JS. */
+  var RDM_NOTE_HTML = null;
+
   function openRedeemModal(rewardId, rewardName, pointsCost, currentBalance, expiryDate) {
-    // Điền reward name vào tiêu đề modal
+    var note = document.getElementById('rdm-disclaimer-text');
+    if (RDM_NOTE_HTML === null) RDM_NOTE_HTML = note.innerHTML;
+
     document.getElementById('rdm-reward-name-text').textContent = rewardName;
+    document.getElementById('rdm-points-cost').textContent      = pointsCost.toLocaleString();
+    document.getElementById('rdm-balance-before').textContent   = currentBalance.toLocaleString();
+    document.getElementById('rdm-balance-after').textContent    = (currentBalance - pointsCost).toLocaleString();
+    document.getElementById('rdm-voucher-expiry').textContent   = expiryDate || RDM_TEXT.uponUse;
 
-    // Điền points cost
-    document.getElementById('rdm-points-cost').textContent = pointsCost.toLocaleString();
+    note.innerHTML = RDM_NOTE_HTML;
 
-    // Điền balance trước và tính balance sau
-    document.getElementById('rdm-balance-before').textContent = currentBalance.toLocaleString();
-    document.getElementById('rdm-balance-after').textContent  = (currentBalance - pointsCost).toLocaleString();
+    var btn = document.getElementById('rdm-confirm-btn');
+    btn.dataset.rewardId = rewardId;
+    btn.disabled    = false;
+    btn.textContent = RDM_TEXT.confirm;
 
-    // Điền ngày hết hạn voucher (fallback nếu không có)
-    document.getElementById('rdm-voucher-expiry').textContent = expiryDate || '{{ _("Upon use") }}';
-
-    // Set reward ID lên confirm button để submitRedeem() lấy
-    document.getElementById('rdm-confirm-btn').dataset.rewardId = rewardId;
-
-    // Reset disclaimer về text mặc định (phòng trường hợp lần trước bị lỗi)
-    document.getElementById('rdm-disclaimer-text').innerHTML =
-      '{{ _("Once redeemed, points cannot be refunded.") }} <a href="{{ url_for("""main.redeem_terms""") }}" class="rdm-terms-link">{{ _("Terms apply.") }}</a>';
-
-    // Reset confirm button về trạng thái bình thường
-    const confirmBtn = document.getElementById('rdm-confirm-btn');
-    confirmBtn.disabled    = false;
-    confirmBtn.textContent = '{{ _("Confirm Redeem") }}';
-
-    // Hiện backdrop
-    document.getElementById('rdm-backdrop').style.display = 'flex';
-
-    // Khoá scroll của trang nền
+    document.getElementById('rdm-backdrop').classList.add('is-open');
     document.body.style.overflow = 'hidden';
   }
 
-  /**
-   * closeRedeemModal()
-   * Ẩn modal, trả scroll lại bình thường.
-   * Gọi từ: Cancel button, click backdrop, phím Escape.
-   */
   function closeRedeemModal() {
-    document.getElementById('rdm-backdrop').style.display = 'none';
+    document.getElementById('rdm-backdrop').classList.remove('is-open');
     document.body.style.overflow = '';
   }
 
-  /**
-   * submitRedeem()
-   * POST reward_id lên route customer.redeem_reward.
-   * Disable button để tránh double-submit.
-   * Reload trang nếu success để cập nhật points + My Vouchers.
-   * Hiện lỗi inline trong disclaimer nếu thất bại.
-   */
   function submitRedeem() {
-    const confirmBtn = document.getElementById('rdm-confirm-btn');
-    const rewardId   = confirmBtn.dataset.rewardId;
+    var btn = document.getElementById('rdm-confirm-btn');
+    var id  = btn.dataset.rewardId;
+    if (!id) return;
 
-    if (!rewardId) return;
+    btn.disabled    = true;
+    btn.textContent = RDM_TEXT.working;
 
-    // Disable button, đổi text thành loading state
-    confirmBtn.disabled    = true;
-    confirmBtn.textContent = '{{ _("Processing...") }}';
+    function fail(msg) {
+      document.getElementById('rdm-disclaimer-text').textContent = msg;
+      btn.disabled    = false;
+      btn.textContent = RDM_TEXT.confirm;
+    }
 
-    fetch("{{ url_for('main.redeem_reward_route') }}", {
+    fetch(RDM_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token() }}'
-      },
-      body: JSON.stringify({ reward_id: parseInt(rewardId) })
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': RDM_CSRF },
+      body: JSON.stringify({ reward_id: parseInt(id, 10) })
     })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        // Reload để refresh points balance + hiển thị voucher mới trong My Vouchers
-        window.location.reload();
-      } else {
-        // Hiện error message thay thế disclaimer text
-        document.getElementById('rdm-disclaimer-text').textContent =
-          data.message || '{{ _("Something went wrong. Please try again.") }}';
-        // Cho phép thử lại
-        confirmBtn.disabled    = false;
-        confirmBtn.textContent = '{{ _("Confirm Redeem") }}';
-      }
-    })
-    .catch(() => {
-      document.getElementById('rdm-disclaimer-text').textContent =
-        '{{ _("Connection error. Please try again.") }}';
-      confirmBtn.disabled    = false;
-      confirmBtn.textContent = '{{ _("Confirm Redeem") }}';
-    });
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.success) {
+          window.location.reload();
+        } else {
+          fail(data.message || RDM_TEXT.failed);
+        }
+      })
+      .catch(function () { fail(RDM_TEXT.offline); });
   }
 
-  // Đóng modal khi click vào backdrop (không phải card)
-  document.getElementById('rdm-backdrop').addEventListener('click', function(e) {
+  document.getElementById('rdm-backdrop').addEventListener('click', function (e) {
     if (e.target === this) closeRedeemModal();
   });
 
-  // Đóng modal khi nhấn phím Escape
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeRedeemModal();
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' &&
+        document.getElementById('rdm-backdrop').classList.contains('is-open')) {
+      closeRedeemModal();
+    }
   });
 </script>
