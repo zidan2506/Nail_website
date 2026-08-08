@@ -10,347 +10,288 @@
 
 {% block customer_content %}
 
-<main class="customer-appointments-page">
-  <section class="page-header">
-    <div class="page-header__left">
-      <h1 class="page-title">{{ _('Appointments') }}</h1>
-      <p class="page-subtitle">{{ _('Manage your upcoming visits and booking history.') }}</p>
+{#  Lịch hẹn gần nhất được kéo lên focus card, nên loại nó khỏi danh sách bên dưới
+    để không hiển thị hai lần. next_visit lấy từ upcoming trước, không có mới lấy pending,
+    nên chỉ một trong hai danh sách thực sự mất một phần tử. #}
+{% set upcoming_rows = (upcoming_bookings | rejectattr('booking.id', 'equalto', next_visit['id']) | list) if next_visit else upcoming_bookings %}
+{% set pending_rows  = (pending_bookings  | rejectattr('booking.id', 'equalto', next_visit['id']) | list) if next_visit else pending_bookings %}
+
+{#  Một hàng sổ hẹn = một component, dùng lại cho cả bốn trạng thái.
+    raw_date phải là chuỗi 'YYYY-MM-DD' thô để tách được ngày / tháng cho khối lịch bên trái.
+    Nội dung nút hành động do phía gọi truyền vào qua caller(). #}
+{% macro ledger_row(i, raw_date, time, service, staff, price, detail_url, state, note='') %}
+<article class="bk-row bk-row--{{ state }}" style="--row-i: {{ i }}">
+
+  <p class="bk-row__date">
+    <span class="bk-row__day">{{ raw_date | format_date('%d') }}</span>
+    <span class="bk-row__mon">{{ raw_date | format_date('%b') }}</span>
+  </p>
+
+  <div class="bk-row__main">
+    <h3 class="bk-row__service">
+      <a class="bk-row__link" href="{{ detail_url }}">{{ service }}</a>
+      {% if state == 'pending' %}<span class="bk-flag">{{ _('Pending') }}</span>{% endif %}
+    </h3>
+
+    <p class="bk-row__meta">
+      {% if time %}<span>{{ time }}</span>{% endif %}
+      {% if staff %}<span>{{ staff }}</span>{% endif %}
+      {% if note %}<span>{{ note }}</span>{% endif %}
+    </p>
+  </div>
+
+  {% if price is not none %}
+  <p class="bk-row__price">{{ price | format_currency }}</p>
+  {% else %}
+  <p class="bk-row__price bk-row__price--none" aria-hidden="true"></p>
+  {% endif %}
+
+  <div class="bk-row__actions">{{ caller() }}</div>
+
+</article>
+{% endmacro %}
+
+
+<div class="bk">
+
+  <header class="bk-intro">
+    <div>
+      <h1 class="bk-intro__title">{{ _('Appointments') }}</h1>
+      <p class="bk-intro__sub">{{ _('Manage your upcoming visits and booking history.') }}</p>
     </div>
+    <a href="{{ url_for('main.customer_booking') }}" class="bk-btn bk-btn--solid">{{ _('Book appointment') }}</a>
+  </header>
 
-  </section>
 
-  <section class="appointments-overview">
-<div class="next-visit-card">
+  {# ── Lịch hẹn kế tiếp: vật thể duy nhất có ảnh và có chiều sâu trên trang.
+        Tiêu đề nằm ngoài card để một nhãn phục vụ được cả hai trạng thái,
+        và để card giữ nguyên bố cục bên trong. ── #}
+  <section class="bk-next">
+    <h2 class="bk-next__heading">{{ _('Next Visit') }}</h2>
+
   {% if next_visit %}
-    <div class="appointment-card__image">
+  <div class="bk-focus">
+
+    <div class="bk-focus__media">
       {% if nevi_service_image %}
-      <img src="{{ nevi_service_image | img_src('services') }}" alt="{{ nevi_service }}" />
+      <img src="{{ nevi_service_image | img_src('services') }}" alt="{{ nevi_service }}">
       {% else %}
-      <div class="appointment-card__image-fallback">
-        <span class="material-symbols-outlined">spa</span>
-      </div>
+      <span class="material-symbols-outlined bk-focus__glyph">spa</span>
       {% endif %}
     </div>
 
-    <div class="next-visit-card__content">
-      <div class="next-visit-card__top">
-        <p class="section-label">{{ _('Next Visit') }}</p>
-        <span class="appointment-status-badge appointment-status-badge--{{ nevi_status }}">{{ nevi_status }}</span>
-      </div>
+    <div class="bk-focus__body">
+      <h3 class="bk-focus__service">
+        {{ nevi_service }}
+        {% if nevi_status != 'confirmed' %}<span class="bk-flag bk-flag--onplum">{{ _('Pending') }}</span>{% endif %}
+      </h3>
 
-      <h2 class="next-visit-card__title">{{ nevi_service }}</h2>
-
-      <div class="appointment-card__details">
-        <p class="appointment-card__detail">
-          <span class="material-symbols-outlined detail-icon">calendar_today</span>
-          <span class="detail-value">{{ nevi_date }} • {{ nevi_start }}</span>
-        </p>
-        <p class="appointment-card__detail">
-          <span class="material-symbols-outlined detail-icon">person</span>
-          <span class="detail-value">{{ nevi_staff }}</span>
-        </p>
-        <p class="appointment-card__detail">
-          <span class="material-symbols-outlined detail-icon">sell</span>
-          <span class="detail-value">{{ nevi_price | format_currency }}</span>
-        </p>
-      </div>
-
-      <div class="next-visit-card__actions">
-        <a href="{{ calendar_url }}" class="btn btn-primary" target="{{ url_target }}">{{ _('Add to Calendar') }}</a>
-        <a href="{{ url_for('main.view_booking_details', booking_id=next_visit['id']) }}" class="btn btn-secondary">{{ _('View Details') }}</a>
-      </div>
-    </div>
-
-  {% else %}
-    <div class="next-visit-card__content">
-      <p class="section-label">{{ _('Next Visit') }}</p>
-
-      <h2 class="next-visit-card__title">{{ _('No upcoming visits scheduled') }}</h2>
-
-      <p class="next-visit-card__meta">
-        {{ _('Ready for a new look? Book your next treatment today.') }}
+      <p class="bk-focus__when">
+        {{ next_visit['booking_date'] | format_date('%A') }}, {{ nevi_start }}
       </p>
 
-      <div class="next-visit-card__actions">
-        <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">{{ _('Book new appointment') }}</a>
+      <p class="bk-focus__facts">
+        <span>{{ next_visit['booking_date'] | format_date('%d %B') }}</span>
+        <span>{{ nevi_staff }}</span>
+        <span>{{ nevi_price | format_currency }}</span>
+      </p>
+
+      <div class="bk-focus__actions">
+        <a href="{{ calendar_url }}" target="{{ url_target }}" class="bk-btn bk-btn--pearl">{{ _('Add to Calendar') }}</a>
+        <a href="{{ url_for('main.view_booking_details', booking_id=next_visit['id']) }}" class="bk-btn bk-btn--outline-light">{{ _('View Details') }}</a>
       </div>
     </div>
+
+  </div>
+  {% else %}
+  <div class="bk-focus bk-focus--empty">
+    <span class="material-symbols-outlined bk-focus__glyph">event_available</span>
+    <h3 class="bk-focus__service">{{ _('No upcoming visits scheduled') }}</h3>
+    <p class="bk-focus__when">{{ _('Ready for a new look? Book your next treatment today.') }}</p>
+    <div class="bk-focus__actions">
+      <a href="{{ url_for('main.customer_booking') }}" class="bk-btn bk-btn--solid">{{ _('Book appointment') }}</a>
+    </div>
+  </div>
   {% endif %}
-</div>
-    <aside class="loyalty-reward-card">
-      <p class="section-label section-label--light">{{ _('Loyalty Reward') }}</p>
 
-      {% if next_reward %}
-      <h3 class="loyalty-reward-card__title">
-        {{ _('%(points)s points to %(reward)s', points=points_needed, reward=next_reward.name) }}
-      </h3>
-      <div class="reward-progress">
-        <div class="reward-progress__bar">
-          <div class="reward-progress__fill" style="width: {{ progress_pct }}%;"></div>
-        </div>
-        <div class="reward-progress__meta">
-          <span>{{ loyalty_points }} {{ _('pts') }}</span>
-          <span>{{ progress_pct }}% {{ _('Complete') }}</span>
-        </div>
-      </div>
+  </section>
+
+
+  {# ── Sổ hẹn: một danh sách, bốn trạng thái ── #}
+  <section class="bk-ledger">
+
+    <div class="bk-tabs" role="tablist" style="--tab-i: 0">
+      <span class="bk-tabs__marker" aria-hidden="true"></span>
+
+      <button type="button" role="tab" aria-selected="true" aria-controls="upcoming"
+              class="bk-tab bk-tab--active" data-tab-target="upcoming">
+        {{ _('Upcoming') }}<span class="bk-tab__n">{{ upcoming_rows|length }}</span>
+      </button>
+
+      <button type="button" role="tab" aria-selected="false" aria-controls="pending"
+              class="bk-tab" data-tab-target="pending">
+        {{ _('Pending') }}<span class="bk-tab__n">{{ pending_rows|length }}</span>
+      </button>
+
+      <button type="button" role="tab" aria-selected="false" aria-controls="cancelled"
+              class="bk-tab" data-tab-target="cancelled">
+        {{ _('Cancelled') }}<span class="bk-tab__n">{{ cancelled_bookings|length }}</span>
+      </button>
+
+      <button type="button" role="tab" aria-selected="false" aria-controls="history"
+              class="bk-tab" data-tab-target="history">
+        {{ _('History') }}<span class="bk-tab__n">{{ recent_history|length }}</span>
+      </button>
+    </div>
+
+
+    <div class="bk-panel bk-panel--active" id="upcoming" role="tabpanel">
+      {% for b in upcoming_rows %}
+        {% call ledger_row(loop.index0,
+                           b['booking']['booking_date'],
+                           b['booking_time'],
+                           b['booking']['service_name'],
+                           b['booking']['staff_name'],
+                           b['booking']['service_price'],
+                           url_for('main.view_booking_details', booking_id=b['booking']['id']),
+                           'confirmed') %}
+          <a href="{{ url_for('main.customer_reschedule', booking_id=b['booking']['id']) }}" class="bk-btn bk-btn--quiet">{{ _('Reschedule') }}</a>
+          <form action="{{ url_for('main.cancel_booking', booking_id=b['booking']['id']) }}" method="post"
+                class="bk-cancel-form"
+                data-service="{{ b['booking']['service_name'] }}"
+                data-when="{{ b['booking_date'] }}, {{ b['booking_time'] }}"
+                data-staff="{{ b['booking']['staff_name'] }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="bk-btn bk-btn--quiet bk-btn--danger">{{ _('Cancel') }}</button>
+          </form>
+        {% endcall %}
       {% else %}
-      <h3 class="loyalty-reward-card__title">{{ _("You've unlocked all rewards!") }}</h3>
-      <div class="reward-progress">
-        <div class="reward-progress__bar">
-          <div class="reward-progress__fill" style="width: 100%;"></div>
+        <div class="bk-empty">
+          <span class="material-symbols-outlined">event_available</span>
+          <h3>{{ _('No upcoming appointments') }}</h3>
+          <p>{{ _('Book your next treatment to see it here.') }}</p>
+          <a href="{{ url_for('main.customer_booking') }}" class="bk-btn bk-btn--solid">{{ _('Book appointment') }}</a>
         </div>
-        <div class="reward-progress__meta">
-          <span>{{ loyalty_points }} {{ _('pts') }}</span>
-          <span>100% {{ _('Complete') }}</span>
+      {% endfor %}
+    </div>
+
+
+    <div class="bk-panel" id="pending" role="tabpanel">
+      {% for b in pending_rows %}
+        {% call ledger_row(loop.index0,
+                           b['booking']['booking_date'],
+                           b['booking_time'],
+                           b['booking']['service_name'],
+                           b['booking']['staff_name'],
+                           b['booking']['service_price'],
+                           url_for('main.view_booking_details', booking_id=b['booking']['id']),
+                           'pending') %}
+          <form action="{{ url_for('main.cancel_booking', booking_id=b['booking']['id']) }}" method="post"
+                class="bk-cancel-form"
+                data-service="{{ b['booking']['service_name'] }}"
+                data-when="{{ b['booking_date'] }}, {{ b['booking_time'] }}"
+                data-staff="{{ b['booking']['staff_name'] }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="bk-btn bk-btn--quiet bk-btn--danger">{{ _('Cancel') }}</button>
+          </form>
+        {% endcall %}
+      {% else %}
+        <div class="bk-empty">
+          <span class="material-symbols-outlined">hourglass_empty</span>
+          <h3>{{ _('No pending requests') }}</h3>
+          <p>{{ _('Bookings awaiting confirmation will appear here.') }}</p>
         </div>
-      </div>
+      {% endfor %}
+    </div>
+
+
+    <div class="bk-panel" id="cancelled" role="tabpanel">
+      {% for b in cancelled_bookings %}
+        {% call ledger_row(loop.index0,
+                           b['booking']['booking_date'],
+                           b['booking_time'],
+                           b['booking']['service_name'],
+                           b['booking']['staff_name'],
+                           none,
+                           url_for('main.view_booking_details', booking_id=b['booking']['id']),
+                           'cancelled',
+                           _('Cancelled on %(date)s', date=b['cancelled_date'])) %}
+          <a href="{{ url_for('main.customer_booking') }}" class="bk-btn bk-btn--quiet">{{ _('Rebook') }}</a>
+        {% endcall %}
+      {% else %}
+        <div class="bk-empty">
+          <span class="material-symbols-outlined">event_busy</span>
+          <h3>{{ _('No cancelled appointments') }}</h3>
+          <p>{{ _('Any bookings you cancel will show up here.') }}</p>
+        </div>
+      {% endfor %}
+    </div>
+
+
+    <div class="bk-panel" id="history" role="tabpanel">
+      {% for appt in recent_history %}
+        {% call ledger_row(loop.index0,
+                           appt['booking_date'],
+                           none,
+                           appt['service_name'],
+                           appt['stylist_name'] | short_name if appt['stylist_name'] else none,
+                           appt['service_price'] if appt['status'] == 'completed' else none,
+                           url_for('main.view_booking_details', booking_id=appt['booking_id']),
+                           appt['status']) %}
+          <a href="{{ url_for('main.customer_booking') }}" class="bk-btn bk-btn--quiet">{{ _('Rebook') }}</a>
+          {% if appt['status'] == 'completed' and appt['invoice_id'] %}
+          <a href="{{ url_for('main.invoice_detail', invoice_id=appt['invoice_id']) }}" class="bk-btn bk-btn--quiet">{{ _('Invoice') }}</a>
+          {% endif %}
+        {% endcall %}
+      {% else %}
+        <div class="bk-empty">
+          <span class="material-symbols-outlined">history</span>
+          <h3>{{ _('No history yet.') }}</h3>
+          <p>{{ _('Your completed appointments will appear here.') }}</p>
+        </div>
+      {% endfor %}
+
+      {% if recent_history %}
+      <a href="{{ url_for('main.customer_history') }}" class="bk-ledger__more">{{ _('View All History') }}</a>
       {% endif %}
-    </aside>
+    </div>
+
   </section>
 
-  <section class="appointment-manager">
-    <div class="section-heading">
-      <div>
-        <h2 class="section-title">{{ _('Manage Appointments') }}</h2>
-        <p class="section-description">{{ _('View your confirmed, pending, and cancelled bookings.') }}</p>
+
+  {# ── Xác nhận huỷ ── #}
+  <div id="cancel-modal" class="bk-modal-overlay">
+    <div class="bk-modal" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title">
+
+      <div class="bk-modal__head">
+        <h3 class="bk-modal__title" id="cancel-modal-title">{{ _('Cancel appointment?') }}</h3>
+        <button type="button" class="bk-modal__close" id="cancel-modal-close" aria-label="{{ _('Close') }}">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
 
-      <a href=" {{url_for('main.customer_booking')}}" class="btn btn-primary">{{ _('Book New Appointment') }}</a>
-    </div>
-
-    <div class="appointment-tabs">
-      <button
-        type="button"
-        class="appointment-tab appointment-tab--active"
-        data-tab-target="upcoming"
-      >
-        {{ _('Upcoming') }} <span class="tab-count">({{ upcoming_bookings|length }})</span>
-      </button>
-
-      <button
-        type="button"
-        class="appointment-tab"
-        data-tab-target="pending"
-      >
-        {{ _('Pending') }} <span class="tab-count">({{ pending_bookings|length }})</span>
-      </button>
-
-      <button
-        type="button"
-        class="appointment-tab"
-        data-tab-target="cancelled"
-      >
-        {{ _('Cancelled') }} <span class="tab-count">({{ cancelled_bookings|length }})</span>
-      </button>
-    </div>
-
-    <div class="appointment-tab-panels">
-
-      <div
-        class="appointment-tab-panel appointment-tab-panel--active"
-        id="upcoming"
-      >
-        <div class="appointment-card-list">
-        {% for booking in upcoming_bookings %}
-          <article class="appointment-card">
-            <div class="appointment-card__image">
-              {% if booking['booking']['service_image'] %}
-              <img src="{{ booking['booking']['service_image'] | img_src('services') }}" alt="{{ booking['booking']['service_name'] }}" />
-              {% else %}
-              <div class="appointment-card__image-fallback">
-                <span class="material-symbols-outlined">spa</span>
-              </div>
-              {% endif %}
-            </div>
-
-            <div class="appointment-card__body">
-              <div class="appointment-card__top">
-                <span class="appointment-status-badge appointment-status-badge--confirmed">{{ _('Confirmed') }}</span>
-              </div>
-
-              <h3 class="appointment-card__title">{{ booking['booking']['service_name'] }}</h3>
-
-              <div class="appointment-card__details">
-                <p class="appointment-card__detail">
-                  <span class="material-symbols-outlined detail-icon">calendar_today</span>
-                  <span class="detail-value">{{ booking["booking_date"] }} • {{ booking["booking_time"] }}</span>
-                </p>
-
-                <p class="appointment-card__detail">
-                  <span class="material-symbols-outlined detail-icon">person</span>
-                  <span class="detail-value">{{ booking['booking']['staff_name'] }}</span>
-                </p>
-
-                <p class="appointment-card__detail">
-                  <span class="material-symbols-outlined detail-icon">sell</span>
-                  <span class="detail-value">{{ booking['booking']['service_price'] | format_currency }}</span>
-                </p>
-              </div>
-
-              <div class="appointment-card__actions">
-                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">{{ _('View Details') }}</a>
-                <a href="{{ url_for('main.customer_reschedule', booking_id=booking['booking']['id']) }}" class="btn btn-ghost">{{ _('Reschedule') }}</a>
-                <form action=" {{ url_for('main.cancel_booking', booking_id=booking['booking']['id']) }}" method="post" class="inline-form">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="btn btn-danger-ghost">{{ _('Cancel') }}</button>
-                </form>
-              </div>
-            </div>
-          </article>
-        {% else %}
-          <div class="appointment-empty">
-            <span class="material-symbols-outlined">event_available</span>
-            <h3>{{ _('No upcoming appointments') }}</h3>
-            <p>{{ _('Book your next treatment to see it here.') }}</p>
-            <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">{{ _('Book New Appointment') }}</a>
-          </div>
-        {% endfor %}
-        </div>
-      </div>
-
-      <div class="appointment-tab-panel" id="pending">
-        <div class="appointment-card-list">
-{% for booking in pending_bookings %}
-          <article class="appointment-card">
-            <div class="appointment-card__image">
-              {% if booking['booking']['service_image'] %}
-              <img src="{{ booking['booking']['service_image'] | img_src('services') }}" alt="{{ booking['booking']['service_name'] }}" />
-              {% else %}
-              <div class="appointment-card__image-fallback">
-                <span class="material-symbols-outlined">spa</span>
-              </div>
-              {% endif %}
-            </div>
-
-            <div class="appointment-card__body">
-              <div class="appointment-card__top">
-                <span class="appointment-status-badge appointment-status-badge--pending">{{ _('Pending') }}</span>
-              </div>
-
-              <h3 class="appointment-card__title">{{ booking['booking']['service_name'] }}</h3>
-
-              <div class="appointment-card__details">
-                <p class="appointment-card__detail">
-                  <span class="material-symbols-outlined detail-icon">calendar_today</span>
-                  <span class="detail-value">{{ booking['booking_date']}} • {{ booking['booking_time'] }}</span>
-                </p>
-
-                <p class="appointment-card__detail">
-                  <span class="material-symbols-outlined detail-icon">person</span>
-                  <span class="detail-value">{{ booking['booking']['staff_name']}}</span>
-                </p>
-
-                <p class="appointment-card__detail">
-                  <span class="material-symbols-outlined detail-icon">sell</span>
-                  <span class="detail-value">{{ booking['booking']['service_price'] | format_currency }}</span>
-                </p>
-              </div>
-
-              <div class="appointment-card__actions">
-                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">{{ _('View Details') }}</a>
-                <form action="{{ url_for('main.cancel_booking', booking_id=booking['booking']['id']) }}" method="post" class="inline-form">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="btn btn-danger-ghost">{{ _('Cancel') }}</button>
-                </form>
-              </div>
-            </div>
-          </article>
-{% else %}
-          <div class="appointment-empty">
-            <span class="material-symbols-outlined">hourglass_empty</span>
-            <h3>{{ _('No pending requests') }}</h3>
-            <p>{{ _('Bookings awaiting confirmation will appear here.') }}</p>
-          </div>
-{% endfor %}
-        </div>
-      </div>
-
-      <div class="appointment-tab-panel" id="cancelled">
-        <div class="appointment-card-list">
-{% for booking in cancelled_bookings %}
-          <article class="appointment-card appointment-card--cancelled">
-            <div class="appointment-card__image">
-              {% if booking['booking']['service_image'] %}
-              <img src="{{ booking['booking']['service_image'] | img_src('services') }}" alt="{{ booking['booking']['service_name'] }}" />
-              {% else %}
-              <div class="appointment-card__image-fallback">
-                <span class="material-symbols-outlined">spa</span>
-              </div>
-              {% endif %}
-            </div>
-
-            <div class="appointment-card__body">
-              <div class="appointment-card__top">
-                <span class="appointment-status-badge appointment-status-badge--cancelled">{{ _('Cancelled') }}</span>
-              </div>
-
-              <h3 class="appointment-card__title">{{ booking['booking']['service_name'] }}</h3>
-
-              <div class="appointment-card__details">
-                <p class="appointment-card__detail">
-                  <span class="material-symbols-outlined detail-icon">calendar_today</span>
-                  <span class="detail-value">{{ booking['booking_date'] }} • {{ booking['booking_time'] }}</span>
-                </p>
-
-                <p class="appointment-card__detail">
-                  <span class="material-symbols-outlined detail-icon">event_busy</span>
-                  <span class="detail-value">{{ _('Cancelled on %(date)s', date=booking['cancelled_date']) }}</span>
-                </p>
-              </div>
-
-              <div class="appointment-card__actions">
-                <a href="{{ url_for('main.view_booking_details', booking_id=booking['booking']['id']) }}" class="btn btn-soft">{{ _('View Details') }}</a>
-                <a href=" {{ url_for('main.customer_booking')}}" class="btn btn-primary">{{ _('Rebook') }}</a>
-              </div>
-            </div>
-          </article>
-{% else %}
-          <div class="appointment-empty">
-            <span class="material-symbols-outlined">event_busy</span>
-            <h3>{{ _('No cancelled appointments') }}</h3>
-            <p>{{ _('Any bookings you cancel will show up here.') }}</p>
-          </div>
-{% endfor %}
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <div id="cancel-modal" class="cancel-modal-overlay">
-    <div class="cancel-modal">
-
-      <div class="cancel-modal__header">
-        <div class="cancel-modal__header-left">
-          <span class="cancel-modal__icon-badge">✕</span>
-          <h3 class="cancel-modal__title">{{ _('Cancel appointment?') }}</h3>
-        </div>
-        <button type="button" class="cancel-modal__close" id="cancel-modal-close" aria-label="{{ _('Close') }}">✕</button>
-      </div>
-
-      <div class="cancel-modal__details">
-        <p class="cancel-modal__details-eyebrow">{{ _('Appointment details') }}</p>
-        <p class="cancel-modal__service" id="cancel-modal-service"></p>
-        <div class="cancel-modal__detail-row">
-          <span class="cancel-modal__row-icon">📅</span>
+      <div class="bk-modal__recap">
+        <p class="bk-modal__service" id="cancel-modal-service"></p>
+        <p class="bk-modal__line">
+          <span class="material-symbols-outlined">calendar_today</span>
           <span id="cancel-modal-date"></span>
-        </div>
-        <div class="cancel-modal__detail-row">
-          <span class="cancel-modal__row-icon">👤</span>
+        </p>
+        <p class="bk-modal__line">
+          <span class="material-symbols-outlined">person</span>
           <span id="cancel-modal-stylist"></span>
-        </div>
+        </p>
       </div>
 
-      <div class="cancel-modal__warning">
-        <span class="cancel-modal__warning-icon">⚠</span>
-        <p>{{ _('Cancellation Policy') }}</p>
-      </div>
+      <p class="bk-modal__warning">
+        <span class="material-symbols-outlined">info</span>
+        <span>{{ _('Cancellation Policy') }}</span>
+      </p>
 
-      <div class="cancel-modal__reason-group">
-        <label class="cancel-modal__reason-label" for="cancel-modal-reason">
-          {{ _('Reason for cancellation') }} <span class="cancel-modal__optional">{{ _('(optional)') }}</span>
+      <div class="bk-modal__field">
+        <label class="bk-modal__label" for="cancel-modal-reason">
+          {{ _('Reason for cancellation') }} <span class="bk-modal__optional">{{ _('(optional)') }}</span>
         </label>
-        <select class="cancel-modal__reason-select" id="cancel-modal-reason">
+        <select class="bk-modal__select" id="cancel-modal-reason">
           <option value="">{{ _('Select a reason...') }}</option>
           <option value="change_of_plans">{{ _('Change of plans') }}</option>
           <option value="feeling_unwell">{{ _('Feeling unwell') }}</option>
@@ -359,74 +300,18 @@
         </select>
       </div>
 
-      <div class="cancel-modal__footer">
-        <button type="button" id="cancel-modal-keep" class="btn btn-secondary">{{ _('Keep appointment') }}</button>
-        <button type="button" id="cancel-modal-confirm" class="btn cancel-modal__confirm-btn">{{ _('Yes, cancel') }}</button>
+      <div class="bk-modal__foot">
+        <button type="button" id="cancel-modal-keep" class="bk-btn bk-btn--outline">{{ _('Keep appointment') }}</button>
+        <button type="button" id="cancel-modal-confirm" class="bk-btn bk-btn--destructive">{{ _('Yes, cancel') }}</button>
       </div>
 
     </div>
   </div>
 
-  <section class="recent-history">
-    <div class="section-heading">
-      <div>
-        <h2 class="section-title">{{ _('Recent History') }}</h2>
-        <p class="section-description">{{ _('Your completed appointments.') }}</p>
-      </div>
-
-      <a href="{{ url_for('main.customer_history') }}" class="section-link">{{ _('View All History') }}</a>
-    </div>
-
-    <div class="history-list">
-      {% if recent_history %}
-        {% for appt in recent_history %}
-        <article class="history-row history-row--{{ appt['status'] }}"
-                 onclick="window.location.href='{{ url_for('main.view_booking_details', booking_id=appt['booking_id']) }}'"
-                 style="cursor: pointer;">
-          <div class="history-row__status">
-            <span class="status-icon">
-              <span class="material-symbols-outlined">{{ 'check' if appt['status'] == 'completed' else 'close' }}</span>
-            </span>
-          </div>
-
-          <div class="history-row__service">
-            <h3 class="history-row__title">{{ appt['service_name'] }}</h3>
-            <p class="history-row__meta">
-              {{ _('%(status)s on %(date)s', status=appt['status']|capitalize, date=appt['booking_date']|format_date) }}
-            </p>
-          </div>
-
-          <div class="history-row__stylist">
-            <span class="history-label">{{ _('Stylist') }}</span>
-            <span class="history-value">{{ appt['stylist_name'] | short_name if appt['stylist_name'] else '-' }}</span>
-          </div>
-
-          <div class="history-row__amount">
-            <span class="history-label">{{ _('Amount') }}</span>
-            <span class="history-value">{{ appt['service_price'] | format_currency if appt['status'] == 'completed' else 0 | format_currency }}</span>
-          </div>
-
-          <div class="history-row__actions" onclick="event.stopPropagation()">
-            <a href="{{ url_for('main.customer_booking') }}" class="btn btn-dark">{{ _('Rebook') }}</a>
-            {% if appt['status'] == 'completed' and appt['invoice_id'] %}
-            <a href="{{ url_for('main.invoice_detail', invoice_id=appt['invoice_id']) }}" class="text-link">{{ _('Invoice') }}</a>
-            {% endif %}
-          </div>
-        </article>
-        {% endfor %}
-      {% else %}
-        <div class="appointment-empty">
-          <span class="material-symbols-outlined">history</span>
-          <h3>{{ _('No history yet.') }}</h3>
-          <p>{{ _('Your completed appointments will appear here.') }}</p>
-        </div>
-      {% endif %}
-    </div>
-  </section>
-</main>
+</div>
 
 {% endblock %}
 
 {% block script%}
-<script src=" {{ url_for('static', filename='js/my_booking.js') }}"></script>
+<script src="{{ url_for('static', filename='js/my_booking.js') }}"></script>
 {% endblock %}

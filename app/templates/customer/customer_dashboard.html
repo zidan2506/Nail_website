@@ -240,38 +240,59 @@
 .hero__dot--active { width: 32px; background: #ef3976; }
 
 /* ── ROW 2 GRID ─────────────────────────────────────── */
+/* Tiêu đề chiếm một hàng riêng chỉ ở cột trái, nhờ vậy loyalty-card
+   căn đỉnh với upcoming-CARD chứ không phải với tiêu đề. Dùng grid rows
+   thay vì bù margin bằng số ước lượng. */
 .dashboard-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 24px;
+    grid-template-areas:
+        "heading ."
+        "upcoming loyalty";
+    column-gap: 24px;
+    row-gap: 14px;
     align-items: start;
 }
 
-/* ── UPCOMING CARD ──────────────────────────────────── */
-/* upcoming-card: layout giống appointment-card, giữ nền hồng nhạt */
-.upcoming-card {
-    position: relative;
-    display: flex;
-    gap: 22px;
-    min-height: 232px;
-    padding: 22px;
-    border: 1px solid rgba(239, 230, 234, 0.9);
-    border-radius: 26px;
-    overflow: hidden;
-    background: linear-gradient(180deg, #fff3f7 0%, #fdeef4 100%);
-    box-shadow: 0 8px 24px rgba(34,21,27,0.03);
+.upcoming-section__heading {
+    grid-area: heading;
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.3;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #23141a;
 }
 
-/* Ảnh service bên trái */
-.upcoming-card__image {
-    flex: 0 0 132px;
-    width: 132px;
-    /* Giãn theo chiều cao cột chữ, tránh khoảng trống dưới ảnh */
-    align-self: stretch;
-    min-height: 168px;
-    border-radius: 18px;
+.loyalty-card { grid-area: loyalty; }
+
+/* ── UPCOMING CARD ──────────────────────────────────── */
+/* Mượn ngôn ngữ của .bk-focus bên my_bookings: grid 2 cột, ảnh chiếm
+   trọn một cột và tràn sát mép card thay vì trôi trong padding, nền
+   plum + chữ pearl, cột chữ căn giữa theo trục dọc.
+   Bo góc giữ 26px theo thang của dashboard, không lấy 20px của bk-focus. */
+.upcoming-card {
+    grid-area: upcoming;
+    position: relative;
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
     overflow: hidden;
-    background: #f2e8ec;
+    border-radius: 26px;
+    background:
+        radial-gradient(120% 140% at 88% 6%, rgba(171,34,97,0.42) 0%, transparent 58%),
+        linear-gradient(135deg, #46224F 0%, #3E1F47 46%, #2C1433 100%);
+    color: #FBF4F8;
+    box-shadow: 0 18px 44px rgba(44,20,51,0.26);
+}
+
+/* Ảnh service: lấp đầy ô grid, không bo góc riêng, không padding */
+.upcoming-card__image {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    background: rgba(251,244,248,0.06);
 }
 .upcoming-card__image img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .upcoming-card__image-fallback {
@@ -280,16 +301,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ab2261;
-    opacity: 0.4;
+    color: #FBF4F8;
+    opacity: 0.34;
 }
 .upcoming-card__image-fallback .material-symbols-outlined { font-size: 52px; }
 
 .upcoming-card__content {
-    flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    padding: 30px 32px;
 }
 
 /* Phân tầng: dịch vụ gì > khi nào > chi tiết > hành động.
@@ -304,20 +326,22 @@
 
 .upcoming-card__title {
     margin: 0;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     line-height: 1.2;
     font-weight: 800;
-    letter-spacing: -0.025em;
-    color: #23141a;
+    letter-spacing: -0.03em;
+    color: #FBF4F8;
 }
 
-/* Thời gian: tín hiệu mạnh nhất, trả lời thẳng câu "khi nào" */
+/* Thời gian: tín hiệu mạnh nhất, trả lời thẳng câu "khi nào".
+   Trên plum không dùng được hồng #ab2261 (tương phản ~1.7:1), đổi sang pearl. */
 .upcoming-card__when {
-    margin: 0 0 12px;
+    margin: 0 0 14px;
     font-size: 1.05rem;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.35;
-    color: #ab2261;
+    color: #FBF4F8;
+    opacity: 0.92;
 }
 
 /* Ngày + staff + giá: 1 dòng nhạt, ngăn bằng gạch mảnh thay vì dấu chấm */
@@ -328,15 +352,16 @@
     margin: 0;
     font-size: 0.95rem;
     line-height: 1.4;
-    color: #7a6970;
+    color: #D9C7D2;
+    font-variant-numeric: tabular-nums;
 }
 .upcoming-card__facts span + span {
     margin-left: 14px;
     padding-left: 14px;
-    border-left: 1px solid rgba(122, 105, 112, 0.28);
+    border-left: 1px solid rgba(217, 199, 210, 0.30);
 }
 
-/* meta: chỉ dùng cho trạng thái rỗng */
+/* meta: chỉ dùng cho trạng thái rỗng (nền sáng) */
 .upcoming-card__meta {
     margin: 0;
     font-size: 0.98rem;
@@ -349,9 +374,51 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
-    margin-top: auto;
-    padding-top: 22px;
+    padding-top: 24px;
 }
+
+/* Nút trên nền plum. Hai class này chỉ xuất hiện trong card này nên
+   override có phạm vi hẹp, không ảnh hưởng chỗ khác của dashboard. */
+.upcoming-card:not(.upcoming-card--empty) .btn-primary {
+    background: #FBF4F8;
+    color: #3E1F47;
+    box-shadow: none;
+}
+.upcoming-card:not(.upcoming-card--empty) .btn-primary:hover {
+    background: #ffffff;
+    color: #3E1F47;
+}
+.upcoming-card:not(.upcoming-card--empty) .btn-secondary {
+    background: transparent;
+    color: #FBF4F8;
+    border-color: rgba(251, 244, 248, 0.34);
+}
+.upcoming-card:not(.upcoming-card--empty) .btn-secondary:hover {
+    background: rgba(251, 244, 248, 0.10);
+    border-color: rgba(251, 244, 248, 0.62);
+}
+
+/* "confirmed" là trạng thái mặc định, không cần hét lên: trên plum đổi
+   chip xanh mint (lạc khỏi palette hồng/plum của trang) thành pearl mờ.
+   pending và cancelled giữ màu vì màu đó mang thông tin thật. */
+.upcoming-card:not(.upcoming-card--empty) .appointment-status-badge--confirmed {
+    background: rgba(251, 244, 248, 0.16);
+    color: #FBF4F8;
+}
+
+/* Trạng thái rỗng không dùng plum: một khối tối to chỉ để báo
+   "chưa có gì" là sai trọng lượng. Giống .bk-focus--empty. */
+.upcoming-card--empty {
+    display: block;
+    padding: 44px 32px;
+    text-align: center;
+    background: #FBEEF4;
+    color: #23141a;
+    box-shadow: none;
+}
+.upcoming-card--empty .upcoming-card__content { padding: 0; align-items: center; }
+.upcoming-card--empty .upcoming-card__title { color: #23141a; }
+.upcoming-card--empty .upcoming-card__actions { justify-content: center; padding-top: 18px; }
 
 /* Button system */
 .btn {
@@ -536,7 +603,14 @@
 
 /* ── RESPONSIVE ─────────────────────────────────────── */
 @media (max-width: 1100px) {
-    .dashboard-grid { grid-template-columns: 1fr; }
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "heading"
+            "upcoming"
+            "loyalty";
+        row-gap: 20px;
+    }
     .db-heading { font-size: 2rem; }
 }
 
@@ -642,21 +716,21 @@
 
     .dashboard-grid { gap: 18px; }
 
-    /* Upcoming card: flex ngang → xếp dọc, ảnh full-width */
+    .upcoming-section__heading { font-size: 1rem; }
+
+    /* Upcoming card: grid 2 cột → 1 cột, ảnh full-width vẫn tràn sát mép */
     .upcoming-card {
-        flex-direction: column;
-        min-height: 0;
-        gap: 18px;
-        padding: 18px;
+        grid-template-columns: 1fr;
         border-radius: 22px;
-        box-shadow: 0 10px 30px rgba(34,21,27,0.05);
     }
     .upcoming-card__image {
-        flex: 0 0 auto;
-        width: 100%;
+        min-height: 0;
         height: 190px;
-        border-radius: 16px;
     }
+    .upcoming-card__content { padding: 22px 20px 24px; }
+    .upcoming-card--empty   { padding: 38px 20px; }
+    /* align-items:center của desktop làm hộp co lại nên nút không full-width */
+    .upcoming-card--empty .upcoming-card__content { align-items: stretch; }
 
     .appointment-status-badge { min-height: 26px; padding: 0 12px; font-size: 0.75rem; }
 
@@ -777,7 +851,9 @@
 
 <div class="dashboard-grid">
 
-    <div class="upcoming-card">
+    <h2 class="upcoming-section__heading">{{ _('Upcoming Appointment') }}</h2>
+
+    <div class="upcoming-card{% if not upcoming_booking %} upcoming-card--empty{% endif %}">
         {% if upcoming_booking %}
             <div class="upcoming-card__image">
                 {% if upcoming_booking.service_img %}
@@ -789,7 +865,7 @@
 
             <div class="upcoming-card__content">
                 <div class="upcoming-card__title-row">
-                    <h2 class="upcoming-card__title">{{ upcoming_booking.service_name }}</h2>
+                    <h3 class="upcoming-card__title">{{ upcoming_booking.service_name }}</h3>
                     <span class="appointment-status-badge appointment-status-badge--{{ upcoming_booking.status }}">{{ upcoming_booking.status }}</span>
                 </div>
 
@@ -808,7 +884,7 @@
             </div>
         {% else %}
             <div class="upcoming-card__content">
-                <h2 class="upcoming-card__title">{{ _('No upcoming visits scheduled') }}</h2>
+                <h3 class="upcoming-card__title">{{ _('No upcoming visits scheduled') }}</h3>
                 <p class="upcoming-card__meta">{{ _('Ready for a new look? Book your next treatment today.') }}</p>
                 <div class="upcoming-card__actions">
                     <a href="{{ url_for('main.customer_booking') }}" class="btn btn-primary">{{ _('Book new appointment') }}</a>
