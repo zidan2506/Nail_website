@@ -1,306 +1,464 @@
-/* invoice_detail.css — match Daha Care customer portal style */
+/* =========================================================
+   CUSTOMER INVOICE DETAIL  (prefix: inv-)
+   ---------------------------------------------------------
+   Trang này là CHỨNG TỪ, không phải một màn hình dashboard.
+   Ba trang kia của portal (Dashboard, My bookings, History) và
+   trang Booking details đều mở đầu bằng một băng plum tối. Trang
+   này CỐ Ý không:
 
-.invoice-detail-page {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2rem 2.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
+     1. Bốn trang liên tiếp cùng một nhịp mở đầu thì thành template.
+     2. Nền tối in ra là tốn mực, và phần lớn trình duyệt bỏ nền
+        khi in nên chữ pearl trên plum thành pearl trên trắng.
 
-/* ── Back link ── */
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--primary, #e8185a);
-    text-decoration: none;
-    transition: transform 0.2s;
-    width: fit-content;
-}
-.back-link:hover { transform: translateX(-4px); }
+   Nên nó là một tờ giấy: bề mặt trắng duy nhất, khổ hẹp hơn ba
+   trang kia (760px thay vì 1180px), số căn phải thẳng hàng bằng
+   tabular-nums. Đó là nét riêng của trang, và mọi lựa chọn ở đây
+   đều quy về "in ra phải đọc được".
 
-/* ── Header ── */
-.invoice-number {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #1a1a1a;
-    margin: 0 0 0.5rem;
-    letter-spacing: -0.02em;
-}
-.invoice-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.service-badge {
-    background: rgba(232, 24, 90, 0.1);
-    color: #e8185a;
-    font-size: 0.7rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 4px 12px;
-    border-radius: 999px;
-}
-.meta-dot {
-    width: 4px;
-    height: 4px;
-    background: #999;
-    border-radius: 50%;
-}
-.invoice-date-meta {
-    font-size: 0.9rem;
-    color: #666;
-    font-weight: 500;
+   Palette vẫn là palette của portal, không đổi một token nào.
+   ========================================================= */
+
+.inv {
+  --inv-ink:      #2A1520;
+  --inv-ink-2:    #6B5560;
+  --inv-ink-3:    #9C8A93;
+
+  --inv-accent:   #ab2261;
+  --inv-accent-2: #8d1a4f;
+  --inv-wash:     #FBEEF4;
+
+  --inv-surface:  #ffffff;
+  --inv-line:     #EDE3E8;
+  --inv-line-2:   #E2D4DB;
+
+  --inv-flag-bg:  #FBF0D8;
+  --inv-flag-ink: #7A5A11;
+  --inv-danger:   #B03A4A;
+
+  --inv-r-surface: 20px;
+  --inv-r-control: 12px;
+
+  --inv-ease:     cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Mã hoá đơn là một mã, không phải chữ: mono giữ các ký tự
+     cùng bề rộng nên hai mã khác nhau vẫn thẳng hàng. Dùng stack
+     hệ thống, không nạp thêm webfont. */
+  --inv-mono: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Mono",
+              Menlo, Consolas, "Liberation Mono", monospace;
+
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 36px 32px 56px;
+  font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+  color: var(--inv-ink);
 }
 
-/* ── Stat cards ── */
-.stat-cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+/* Codebase không có reset box-sizing toàn cục, khai trong phạm vi */
+.inv *,
+.inv *::before,
+.inv *::after { box-sizing: border-box; }
+
+.inv a { text-decoration: none; }
+.inv button { font: inherit; }
+
+
+/* =========================================================
+   BACK LINK
+   ========================================================= */
+.inv-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  margin-bottom: 14px;
+  color: var(--inv-ink-2);
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: color 0.2s ease;
 }
-.stat-card {
-    background: #fff;
-    border-radius: 1.25rem;
-    padding: 1.25rem;
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    box-shadow: 0 2px 12px rgba(232, 24, 90, 0.05);
-}
-.stat-icon {
-    width: 44px;
-    height: 44px;
-    background: rgba(232, 24, 90, 0.08);
-    border-radius: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-}
-.stat-icon--status {
-    background: rgba(34, 197, 94, 0.1);
-    color: #16a34a;
-}
-.stat-label {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 800;
-    color: #999;
-    margin: 0 0 4px;
-}
-.stat-value {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
+.inv-back:hover { color: var(--inv-accent); }
+.inv-back .material-symbols-outlined { font-size: 19px; }
+
+
+/* =========================================================
+   SHEET - tờ giấy, bề mặt duy nhất của trang
+   ========================================================= */
+.inv-sheet {
+  padding: 30px 32px 8px;
+  border-radius: var(--inv-r-surface);
+  background: var(--inv-surface);
+  border: 1px solid var(--inv-line);
+  box-shadow: 0 12px 32px rgba(44, 20, 51, 0.06);
+  animation: inv-rise 0.46s var(--inv-ease) backwards;
 }
 
-/* ── Status badge ── */
-.status-badge {
-    display: inline-block;
-    font-size: 0.65rem;
-    font-weight: 800;
-    padding: 4px 12px;
-    border-radius: 999px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-.status-badge--paid {
-    background: #dcfce7;
-    color: #15803d;
-}
-.status-badge--refunded {
-    background: #fce7f3;
-    color: #be185d;
-}
-.status-badge--pending {
-    background: #fef9c3;
-    color: #854d0e;
+@keyframes inv-rise {
+  from { opacity: 0; transform: translateY(9px); }
 }
 
-/* ── Details grid ── */
-.details-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-.detail-card {
-    background: #fff;
-    border-radius: 1.5rem;
-    padding: 2rem;
-    box-shadow: 0 2px 12px rgba(232, 24, 90, 0.05);
-    border: 1px solid rgba(232, 24, 90, 0.05);
-}
-.detail-card__header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 1.75rem;
-}
-.detail-card__icon {
-    color: #e8185a;
-    font-size: 1.1rem;
-}
-.detail-card__title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0;
-}
-.detail-rows { display: flex; flex-direction: column; gap: 1rem; }
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #f3f3f3;
-}
-.detail-row--last { border-bottom: none; padding-bottom: 0; }
-.detail-row__label {
-    font-size: 0.85rem;
-    color: #888;
-    font-weight: 500;
-}
-.detail-row__value {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #1a1a1a;
-}
-.detail-row__value--price {
-    color: #e8185a;
-    font-size: 1.05rem;
-}
-.category-tag {
-    background: #f3f3f3;
-    color: #333;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 6px;
-}
-.stylist-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.stylist-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #1a1a1a;
-    color: #fff;
-    font-size: 0.65rem;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+
+/* =========================================================
+   HEAD - mã hoá đơn + số tiền + trạng thái
+   Số tiền là thứ khách mở trang để xem, nên nó là vật lớn nhất.
+   Bản cũ chia thông tin này thành 4 stat-card rồi lặp lại đúng
+   bốn giá trị đó ở hai khối bên dưới.
+   ========================================================= */
+.inv-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--inv-line);
 }
 
-.stylist-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
+.inv-num {
+  margin: 0;
+  font-family: var(--inv-mono);
+  font-size: 0.94rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--inv-ink-2);
 }
 
-/* ── Payment Summary ── */
-.payment-summary {
-    background: #fff;
-    border-radius: 1.5rem;
-    padding: 2.5rem;
-    box-shadow: 0 4px 24px rgba(232, 24, 90, 0.06);
+.inv-head__money {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
 }
-.payment-summary__title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0 0 1.5rem;
-}
-.payment-rows { display: flex; flex-direction: column; gap: 1rem; }
-.payment-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-}
-.payment-row__label { color: #888; }
-.payment-row__value { font-weight: 700; color: #1a1a1a; }
-.payment-divider {
-    height: 1px;
-    background: #f3f3f3;
-    margin: 0.5rem 0;
-}
-.payment-total-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-.payment-total-label {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 800;
-    color: #999;
-    margin: 0 0 4px;
-}
-.payment-total-amount {
-    font-size: 2.25rem;
-    font-weight: 800;
-    color: #e8185a;
-    letter-spacing: -0.03em;
-    margin: 0;
-}
-.payment-total-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-}
-.payment-method-tag {
-    background: #f8f8f8;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #1a1a1a;
-}
-.payment-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 1.5rem;
-    border-top: 1px solid #f3f3f3;
-    margin-top: 1.5rem;
-}
-.btn-download {
-    background: #1a1a1a;
-    color: #fff;
-    border: none;
-    padding: 0.875rem 2rem;
-    border-radius: 0.75rem;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background 0.2s, transform 0.1s;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-.btn-download:hover { background: #333; }
-.btn-download:active { transform: scale(0.97); }
 
-/* ── Responsive ── */
+.inv-amount {
+  margin: 0;
+  font-size: 2.5rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--inv-ink);
+}
+
+
+/* =========================================================
+   STATUS
+   Cùng công thức với .bd-status ở Booking details:
+     nền = hue @ 10% · viền = hue @ 30% · chữ = cùng hue
+   Ở đây cả ba trạng thái đều nằm trên nền trắng nên dùng được
+   sắc đậm, không cần bản sáng như trên plum.
+   ========================================================= */
+.inv-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.inv-status--paid {
+  background: rgba(171, 34, 97, 0.10);
+  border-color: rgba(171, 34, 97, 0.30);
+  color: var(--inv-accent);
+}
+.inv-status--refunded {
+  background: rgba(176, 58, 74, 0.10);
+  border-color: rgba(176, 58, 74, 0.30);
+  color: var(--inv-danger);
+}
+.inv-status--pending {
+  background: rgba(122, 90, 17, 0.10);
+  border-color: rgba(122, 90, 17, 0.30);
+  color: var(--inv-flag-ink);
+}
+
+
+/* =========================================================
+   SERVICE - hoá đơn này cho cái gì
+   ========================================================= */
+.inv-service {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--inv-line);
+}
+
+.inv-service__name {
+  margin: 0 0 6px;
+  font-size: 1.32rem;
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+/* Gạch mảnh ngăn hai fact, cùng motif .bd-slot__facts */
+.inv-service__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--inv-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.inv-service__meta span + span {
+  margin-left: 13px;
+  padding-left: 13px;
+  border-left: 1px solid var(--inv-line-2);
+}
+
+
+/* =========================================================
+   ROWS - nhãn bên trái, giá trị căn PHẢI và thẳng hàng
+   Đây là thứ trang này có mà ba trang kia không: cột giá trị
+   neo vào một mép, tabular-nums nên ngày và giờ xếp thẳng cột.
+   History ghi "cột giá không thẳng hàng" vào tồn đọng vì mỗi
+   hàng ở đó là một grid riêng; ở đây <dl> là MỘT grid duy nhất
+   nên mọi hàng dùng chung track.
+   ========================================================= */
+.inv-rows {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: 0;
+  padding: 8px 0;
+}
+
+.inv-rows dt,
+.inv-rows dd {
+  margin: 0;
+  padding: 11px 0;
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.inv-rows dt {
+  color: var(--inv-ink-2);
+  padding-right: 20px;
+}
+
+.inv-rows dd {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* Stylist: avatar đi kèm tên, vẫn neo mép phải */
+.inv-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.inv-who__avatar {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--inv-wash);
+}
+.inv-who__avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+/* =========================================================
+   SUM - dòng tổng, gạch đôi để đọc ra "đây là điểm dừng"
+   ========================================================= */
+.inv-sum {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 8px;
+  padding: 20px 0 26px;
+  border-top: 3px double var(--inv-line-2);
+}
+
+.inv-sum__label {
+  margin: 0;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.inv-sum__value {
+  margin: 0;
+  font-size: 1.32rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   FOOT - nút in nằm NGOÀI tờ giấy
+   Nút không phải nội dung của chứng từ, nên nó không ở trong đó.
+   ========================================================= */
+.inv-foot {
+  display: flex;
+  justify-content: center;
+  padding-top: 22px;
+}
+
+.inv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 22px;
+  border: 1px solid var(--inv-line-2);
+  border-radius: var(--inv-r-control);
+  background: var(--inv-surface);
+  color: var(--inv-ink);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+              color 0.2s ease, transform 0.14s ease;
+}
+.inv-btn:hover {
+  background: var(--inv-wash);
+  border-color: var(--inv-accent);
+  color: var(--inv-accent);
+}
+.inv-btn:active { transform: scale(0.98); }
+.inv-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(171, 34, 97, 0.28);
+}
+.inv-btn .material-symbols-outlined { font-size: 19px; }
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE  (≤ 768px)
+   Hàng nhãn/giá trị GIỮ hai cột. Đổ thành hai dòng là mất đúng
+   cái làm nó đọc được: nhãn và giá trị nằm cùng tầm mắt.
+   ========================================================= */
 @media (max-width: 768px) {
-    .stat-cards { grid-template-columns: repeat(2, 1fr); }
-    .details-grid { grid-template-columns: 1fr; }
-    .invoice-number { font-size: 1.75rem; }
+  .inv { padding: 20px 18px 40px; }
+
+  .inv-sheet { padding: 22px 20px 6px; }
+
+  .inv-head {
+    /* Số tiền xuống dòng riêng và căn trái: ở 360px nó không đủ
+       chỗ nằm cạnh mã hoá đơn mà vẫn giữ cỡ chữ 2.2rem. */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding-bottom: 18px;
+  }
+
+  .inv-amount { font-size: 2.2rem; }
+
+  .inv-service { padding: 18px 0; }
+  .inv-service__name { font-size: 1.2rem; }
+  .inv-service__meta { font-size: 0.86rem; }
+  .inv-service__meta span + span { margin-left: 10px; padding-left: 10px; }
+
+  .inv-rows dt,
+  .inv-rows dd { padding: 10px 0; font-size: 0.9rem; }
+  .inv-rows dt { padding-right: 14px; }
+
+  .inv-sum { padding: 18px 0 22px; }
+  .inv-sum__value { font-size: 1.2rem; }
+
+  .inv-foot { padding-top: 18px; }
+  .inv-btn { width: 100%; min-height: 50px; }
+
+  /* Không có hover trên cảm ứng */
+  .inv-btn:hover {
+    background: var(--inv-surface);
+    border-color: var(--inv-line-2);
+    color: var(--inv-ink);
+  }
+  .inv-btn:active { background: var(--inv-wash); }
+}
+
+
+/* =========================================================
+   PRINT
+   ---------------------------------------------------------
+   Nút "Download PDF Invoice" gọi window.print() từ trước, nhưng
+   repo không có một dòng @media print nào, nên bản in ra gồm cả
+   hamburger, sidebar và toàn bộ nav.
+
+   Các selector .dashboard-* / .customer-* dưới đây thuộc
+   customer_base.css. Chỉ đụng chúng TRONG @media print, và chỉ
+   file này nạp khối này, nên không rò sang trang khác. Dùng
+   !important vì customer_base.css cũng khai .customer-topbar
+   trong một media query và lỗi print rất khó phát hiện.
+   ========================================================= */
+@media print {
+  @page { margin: 16mm; }
+
+  .customer-topbar,
+  .customer-navbg,
+  .dashboard-sidebar { display: none !important; }
+
+  .customer-dashboard {
+    display: block !important;
+    background: #ffffff !important;
+    min-height: 0 !important;
+  }
+  .dashboard-main { padding: 0 !important; }
+
+  .inv-back,
+  .inv-foot { display: none; }
+
+  .inv {
+    max-width: none;
+    padding: 0;
+    color: #000000;
+  }
+
+  /* Tờ giấy in ra là tờ giấy thật: không bo góc, không đổ bóng,
+     không viền kép với khung trang. */
+  .inv-sheet {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    animation: none;
+  }
+
+  .inv-num,
+  .inv-rows dt { color: #333333; }
+  .inv-amount,
+  .inv-service__name,
+  .inv-sum__value { color: #000000; }
+
+  .inv-head,
+  .inv-service { border-bottom-color: #cccccc; }
+  .inv-sum { border-top-color: #666666; }
+  .inv-service__meta span + span { border-left-color: #cccccc; }
+
+  /* Viền pill giữ được nghĩa khi trình duyệt bỏ màu nền */
+  .inv-status {
+    background: none !important;
+    border-color: #666666 !important;
+    color: #000000 !important;
+  }
+
+  /* Avatar không mang thông tin trên bản in, tên đã có ngay cạnh */
+  .inv-who__avatar { display: none; }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .inv-sheet { animation: none; }
+  .inv-btn:active { transform: none; }
 }

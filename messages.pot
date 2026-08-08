@@ -2846,3 +2846,18 @@ msgstr ""
 msgid "Lỗi mạng. Vui lòng thử lại."
 msgstr ""
 
+#: app/templates/customer/customer_history.html
+msgid "Load more"
+msgstr ""
+
+#: app/templates/customer/customer_history.html
+msgid "Sort"
+msgstr ""
+
+#: app/templates/customer/customer_history.html
+msgid "No invoices yet."
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html
+msgid "Demo video"
+msgstr ""

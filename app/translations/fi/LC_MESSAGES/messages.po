@@ -2927,3 +2927,19 @@ msgstr "Tänään"
 #: app/routes.py
 msgid "Tomorrow"
 msgstr "Huomenna"
+
+#: app/templates/customer/customer_history.html
+msgid "Load more"
+msgstr "Näytä lisää"
+
+#: app/templates/customer/customer_history.html
+msgid "Sort"
+msgstr "Järjestä"
+
+#: app/templates/customer/customer_history.html
+msgid "No invoices yet."
+msgstr "Ei vielä laskuja."
+
+#: app/templates/customer/view_booking_details.html
+msgid "Demo video"
+msgstr "Esittelyvideo"

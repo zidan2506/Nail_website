@@ -1,6 +1,6 @@
 {% extends "customer_base.html" %}
 
-{% block title %}{{ invoice.invoice_number }} — {{ _('Invoice Detail') }}{% endblock %}
+{% block title %}{{ invoice.invoice_number }} - {{ _('Invoice Detail') }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/customer/invoice_detail.css') }}">
@@ -9,142 +9,85 @@
 {% block nav_history %}active{% endblock %}
 
 {% block customer_content %}
-<div class="invoice-detail-page">
 
-    <a href="{{ url_for('main.customer_history') }}" class="back-link">
-        ← {{ _('Back to Invoices') }}
-    </a>
+{#  Trạng thái từ DB là chuỗi thô. Bản cũ in `invoice.status | upper` nên
+    luôn ra tiếng Anh kể cả khi UI là FI/VI. #}
+{% set status_labels = {
+     'paid':     _('Paid'),
+     'refunded': _('Refunded'),
+     'pending':  _('Pending')
+   } %}
 
-    <div class="invoice-header">
-        <h1 class="invoice-number">{{ invoice.invoice_number }}</h1>
-        <div class="invoice-meta">
-            <span class="service-badge">{{ invoice.service_name }}</span>
-            <span class="meta-dot"></span>
-            <span class="invoice-date-meta">{{ booking_date_display }}</span>
-        </div>
+<div class="inv">
+
+  <a href="{{ url_for('main.customer_history') }}" class="inv-back">
+    <span class="material-symbols-outlined">arrow_back</span>
+    {{ _('Back to Invoices') }}
+  </a>
+
+  {# ── Tờ giấy. Nút in nằm NGOÀI khối này vì nó không phải nội
+         dung của chứng từ. ── #}
+  <article class="inv-sheet">
+
+    <header class="inv-head">
+      <h1 class="inv-num">{{ invoice.invoice_number }}</h1>
+
+      <div class="inv-head__money">
+        <p class="inv-amount">{{ invoice.amount | format_currency }}</p>
+        <span class="inv-status inv-status--{{ invoice.status }}">
+          {{ status_labels.get(invoice.status, invoice.status) }}
+        </span>
+      </div>
+    </header>
+
+    <div class="inv-service">
+      <h2 class="inv-service__name">{{ invoice.service_name }}</h2>
+      <p class="inv-service__meta">
+        <span>{{ invoice.category_name }}</span>
+        <span>{{ invoice.service_duration }} {{ _('min') }}</span>
+      </p>
     </div>
 
-    <div class="stat-cards">
-        <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-info">
-                <p class="stat-label">{{ _('Invoice Date') }}</p>
-                <p class="stat-value">{{ issued_at_display }}</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">💰</div>
-            <div class="stat-info">
-                <p class="stat-label">{{ _('Total Amount') }}</p>
-                <p class="stat-value">${{ "%.2f"|format(invoice.amount) }}</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">💳</div>
-            <div class="stat-info">
-                <p class="stat-label">{{ _('Payment Method') }}</p>
-                <p class="stat-value">{{ invoice.payment_method | title }}</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon stat-icon--status">✓</div>
-            <div class="stat-info">
-                <p class="stat-label">{{ _('Status') }}</p>
-                <span class="status-badge status-badge--{{ invoice.status }}">
-                    {{ invoice.status | upper }}
-                </span>
-            </div>
-        </div>
+    {#  Một <dl> duy nhất làm grid, nên mọi hàng dùng chung track và cột
+        giá trị thẳng một mép. Năm hàng này không lặp lại gì: số tiền,
+        trạng thái, tên dịch vụ, hạng mục và thời lượng đã nói ở trên. #}
+    <dl class="inv-rows">
+      <dt>{{ _('Date') }}</dt>
+      <dd>{{ booking_date_display }}</dd>
+
+      <dt>{{ _('Time Window') }}</dt>
+      <dd>{{ start_time_display }} - {{ end_time_display }}</dd>
+
+      <dt>{{ _('Assigned Stylist') }}</dt>
+      <dd>
+        <span class="inv-who">
+          <span class="inv-who__avatar">
+            <img src="{{ invoice.staff_photo | staff_avatar }}" alt="{{ invoice.staff_name }}">
+          </span>
+          {{ invoice.staff_name }}
+        </span>
+      </dd>
+
+      <dt>{{ _('Invoice Date') }}</dt>
+      <dd>{{ issued_at_display }}</dd>
+
+      <dt>{{ _('Payment Method') }}</dt>
+      <dd>{{ invoice.payment_method | title }}</dd>
+    </dl>
+
+    <div class="inv-sum">
+      <p class="inv-sum__label">{{ _('Total Paid Amount') }}</p>
+      <p class="inv-sum__value">{{ invoice.amount | format_currency }}</p>
     </div>
 
-    <div class="details-grid">
+  </article>
 
-        <div class="detail-card">
-            <div class="detail-card__header">
-                <span class="detail-card__icon">✦</span>
-                <h3 class="detail-card__title">{{ _('Service Details') }}</h3>
-            </div>
-            <div class="detail-rows">
-                <div class="detail-row">
-                    <span class="detail-row__label">{{ _('Service Name') }}</span>
-                    <span class="detail-row__value">{{ invoice.service_name }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-row__label">{{ _('Category') }}</span>
-                    <span class="category-tag">{{ invoice.category_name }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-row__label">{{ _('Duration') }}</span>
-                    <span class="detail-row__value">{{ invoice.service_duration }} {{ _('min') }}</span>
-                </div>
-                <div class="detail-row detail-row--last">
-                    <span class="detail-row__label">{{ _('Base Price') }}</span>
-                    <span class="detail-row__value detail-row__value--price">${{ "%.2f"|format(invoice.service_price) }}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="detail-card">
-            <div class="detail-card__header">
-                <span class="detail-card__icon">📆</span>
-                <h3 class="detail-card__title">{{ _('Appointment Details') }}</h3>
-            </div>
-            <div class="detail-rows">
-                <div class="detail-row">
-                    <span class="detail-row__label">{{ _('Date') }}</span>
-                    <span class="detail-row__value">{{ booking_date_display }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-row__label">{{ _('Time Window') }}</span>
-                    <span class="detail-row__value">{{ start_time_display }} – {{ end_time_display }}</span>
-                </div>
-                <div class="detail-row detail-row--last">
-                    <span class="detail-row__label">{{ _('Assigned Stylist') }}</span>
-                    <div class="stylist-info">
-                        <span class="detail-row__value">{{ invoice.staff_name }}</span>
-                        <div class="stylist-avatar">
-                            <img src="{{ invoice.staff_photo | staff_avatar }}" alt="{{ invoice.staff_name }}">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="payment-summary">
-        <h3 class="payment-summary__title">{{ _('Payment Summary') }}</h3>
-
-        <div class="payment-rows">
-            <div class="payment-row">
-                <span class="payment-row__label">{{ invoice.service_name }}</span>
-                <span class="payment-row__value">${{ "%.2f"|format(invoice.service_price) }}</span>
-            </div>
-            <div class="payment-divider"></div>
-            <div class="payment-total-row">
-                <div class="payment-total-left">
-                    <p class="payment-total-label">{{ _('Total Paid Amount') }}</p>
-                    <p class="payment-total-amount">${{ "%.2f"|format(invoice.amount) }}</p>
-                </div>
-                <div class="payment-total-right">
-                    <div class="payment-method-tag">
-                        💳 {{ invoice.payment_method | title }}
-                    </div>
-                    <span class="status-badge status-badge--{{ invoice.status }}">
-                        {% if invoice.status == 'paid' %}● {{ _('FULLY PAID') }}
-                        {% elif invoice.status == 'refunded' %}● {{ _('REFUNDED') }}
-                        {% else %}{{ invoice.status | upper }}{% endif %}
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <div class="payment-footer">
-            <button class="btn-download" onclick="window.print()">
-                ↓ {{ _('Download PDF Invoice') }}
-            </button>
-        </div>
-    </div>
+  <div class="inv-foot">
+    <button type="button" class="inv-btn" onclick="window.print()">
+      <span class="material-symbols-outlined">download</span>
+      {{ _('Download PDF Invoice') }}
+    </button>
+  </div>
 
 </div>
 {% endblock %}

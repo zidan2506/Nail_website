@@ -1,705 +1,971 @@
-/* =========================
-   HISTORY PAGE STYLES
-   Matches customer_base design system
-   ========================= */
-
-.ch-wrapper {
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-/* ===== Stats Summary ===== */
-.history-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 32px;
-}
-
-.stat-card {
-    background: #ffffff;
-    border-radius: 22px;
-    padding: 22px;
-    box-shadow: 0 10px 25px rgba(35, 22, 28, 0.06);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 140px;
-    transition: 0.2s ease;
-}
-
-.stat-card:hover {
-    box-shadow: 0 14px 32px rgba(214, 51, 132, 0.1);
-    transform: translateY(-2px);
-}
-
-.stat-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
-
-.stat-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #8d7a82;
-}
-
-.stat-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    font-weight: 700;
-}
-
-.stat-icon-pink {
-    background: #fdebf2;
-    color: #d63384;
-}
-
-.stat-icon-avatar {
-    background: linear-gradient(135deg, #f3387a, #d63384);
-    color: #ffffff;
-    font-size: 0.95rem;
-}
-
-.stat-value {
-    margin: 0 0 4px;
-    font-size: 1.9rem;
-    font-weight: 800;
-    color: #24161c;
-    line-height: 1.1;
-}
-
-.stat-value-md {
-    font-size: 1.3rem;
-    font-weight: 700;
-}
-
-.stat-sublabel {
-    margin: 0;
-    font-size: 0.82rem;
-    color: #8d7a82;
-    font-weight: 500;
-}
-
-.stat-sublabel-accent {
-    color: #228b5d;
-    font-weight: 700;
-}
-
-/* ===== Tab Switcher ===== */
-.history-tabs {
-    display: flex;
-    gap: 32px;
-    border-bottom: 1px solid #ece3e7;
-    margin-bottom: 20px;
-}
-
-.history-tab {
-    background: none;
-    border: none;
-    padding: 14px 0;
-    font-family: inherit;
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: #8d7a82;
-    cursor: pointer;
-    position: relative;
-    transition: 0.2s ease;
-}
-
-.history-tab:hover {
-    color: #24161c;
-}
-
-.history-tab.active {
-    color: #d63384;
-    font-weight: 700;
-}
-
-.history-tab.active::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -1px;
-    height: 3px;
-    background: #d63384;
-    border-radius: 3px 3px 0 0;
-}
-
-/* ===== Filters Bar ===== */
-.history-filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-    background: #ffffff;
-    padding: 16px 18px;
-    border-radius: 18px;
-    box-shadow: 0 6px 18px rgba(35, 22, 28, 0.04);
-    margin-bottom: 20px;
-}
-
-.filter-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #faf4f7;
-    border: 1px solid #f0e4eb;
-    padding: 9px 14px;
-    border-radius: 12px;
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #24161c;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.filter-chip:hover {
-    background: #fdebf2;
-    border-color: #f5d3e3;
-}
-
-/* ===== Dropdown wrapper ===== */
-.filter-dropdown {
-    position: relative;
-}
-
-/* ===== Dropdown panel ===== */
-.filter-panel {
-    position: absolute;
-    top: calc(100% + 6px);  /* dưới button, cách 6px */
-    left: 0;
-    z-index: 100;            /* nổi lên trên các element khác */
-    
-    min-width: 180px;
-    max-height: 280px;       /* không quá cao */
-    overflow-y: auto;        /* scroll nếu nhiều options */
-    
-    background: #ffffff;
-    border: 1px solid #f0e4eb;
-    border-radius: 14px;
-    padding: 6px;
-    
-    box-shadow: 0 12px 32px rgba(35, 22, 28, 0.12);
-    
-    /* Animation khi mở */
-    animation: dropdownFadeIn 0.15s ease;
-}
-
-@keyframes dropdownFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ===== Dropdown options ===== */
-.filter-option {
-    display: block;
-    padding: 9px 12px;
-    border-radius: 9px;
-    
-    font-size: 0.88rem;
-    font-weight: 500;
-    color: #24161c;
-    
-    cursor: pointer;
-    user-select: none;
-    transition: 0.15s ease;
-    
-    white-space: nowrap;     /* không xuống dòng */
-}
-
-.filter-option:hover {
-    background: #fdebf2;
-    color: #d63384;
-}
-
-/* Option đang được chọn (sẽ thêm class .active bằng JS sau) */
-.filter-option.active {
-    background: #fdebf2;
-    color: #d63384;
-    font-weight: 700;
-}
-
-.filter-option.active::after {
-    content: "✓";
-    margin-left: 8px;
-    font-weight: 700;
-}
-
-/* ===== Active state cho chip khi dropdown đang mở ===== */
-.filter-chip.is-open {
-    background: #fdebf2;
-    border-color: #f5c2d8;
-    color: #d63384;
-}
-
-.filter-chip.is-open .filter-caret {
-    transform: rotate(180deg);
-    color: #d63384;
-}
-
-.filter-caret {
-    transition: transform 0.2s ease;
-}
-
-/* ===== Filter value styling ===== */
-.filter-value {
-    color: #24161c;
-    font-weight: 700;
-}
-
-.filter-label {
-    color: #8d7a82;
-    font-weight: 600;
-}
-
-.filter-icon {
-    font-size: 0.9rem;
-}
-
-.filter-caret {
-    font-size: 0.75rem;
-    color: #8d7a82;
-}
-
-.filter-spacer {
-    flex: 1;
-}
-
-.filter-sort {
-    background: none;
-    border: none;
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #534048;
-    cursor: pointer;
-    padding: 8px 10px;
-    border-radius: 10px;
-    transition: 0.2s ease;
-}
-
-.filter-sort:hover {
-    color: #24161c;
-    background: #faf4f7;
-}
-
-.filter-clear {
-    background: none;
-    border: none;
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #d63384;
-    cursor: pointer;
-    padding: 8px 10px;
-    border-radius: 10px;
-    transition: 0.2s ease;
-}
-
-.filter-clear:hover {
-    background: #fdebf2;
-}
-
-/* ===== Table ===== */
-.history-table-wrapper {
-    background: #ffffff;
-    border-radius: 22px;
-    box-shadow: 0 10px 25px rgba(35, 22, 28, 0.06);
-    overflow: hidden;
-}
-
-.history-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.history-table thead tr {
-    background: #faf4f7;
-}
-
-.history-table th {
-    padding: 18px 22px;
-    text-align: left;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #8d7a82;
-}
-
-.history-table th.th-right {
-    text-align: right;
-}
-
-.history-table tbody tr {
-    border-top: 1px solid #f3eaee;
-    transition: 0.15s ease;
-}
-
-.history-table tbody tr:hover {
-    background: #fcf8fa;
-}
-
-.history-table td {
-    padding: 20px 22px;
-    vertical-align: middle;
-}
-
-.cell-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #24161c;
-    margin-bottom: 4px;
-}
-
-.cell-sub {
-    font-size: 0.85rem;
-    color: #8d7a82;
-}
-
-.cell-medium {
-    font-weight: 500;
-    color: #534048;
-}
-
-.cell-bold {
-    font-weight: 700;
-    color: #24161c;
-}
-
-.cell-dim {
-    opacity: 0.5;
-}
-
-.cell-strike {
-    text-decoration: line-through;
-    text-decoration-color: rgba(214, 51, 132, 0.4);
-}
-
-.cell-actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 10px;
-}
-
-/* Cancelled row tint */
-.row-cancelled {
-    background: #fef5f8;
-}
-
-.row-cancelled:hover {
-    background: #fceaf0 !important;
-}
-
-/* ===== Status Badges ===== */
-.badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.badge-completed {
-    background: #dff3e7;
-    color: #228b5d;
-}
-
-.badge-cancelled {
-    background: #fde2e6;
-    color: #c43147;
-}
-
-.badge-paid {
-    background: #dff3e7;
-    color: #228b5d;
-}
-
-.badge-pending {
-    background: #fef3cd;
-    color: #b8860b;
-}
-
-.badge-refunded {
-    background: #fdebf2;
-    color: #d63384;
-}
-
-/* ===== Action Buttons ===== */
-.btn-rebook {
-    display: inline-block;
-    background: #24161c;
-    color: #ffffff;
-    text-decoration: none;
-    padding: 9px 18px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.btn-rebook:hover {
-    background: #3b1226;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 14px rgba(36, 22, 28, 0.18);
-}
-
-.btn-review {
-    background: transparent;
-    color: #d63384;
-    border: 1.5px solid #f5c2d8;
-    padding: 8px 14px;
-    border-radius: 12px;
-    font-family: inherit;
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.btn-review:hover {
-    background: #fdebf2;
-    border-color: #d63384;
-}
-
-.btn-download {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #24161c;
-    color: #ffffff;
-    text-decoration: none;
-    padding: 9px 16px;
-    border-radius: 12px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.btn-download:hover {
-    background: #3b1226;
-    transform: translateY(-1px);
-}
-
-.btn-more {
-    background: none;
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    color: #8d7a82;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: 0.2s ease;
-}
-
-.btn-more:hover {
-    background: #faf4f7;
-    color: #24161c;
-}
-
-.reviewed-tag {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #228b5d;
-}
-
-/* ===== Invoice-specific cells ===== */
-.invoice-cell {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.invoice-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: #fdebf2;
-    color: #d63384;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-}
-
-.payment-cell {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
-    color: #534048;
-}
-
-.payment-icon {
-    font-size: 1.05rem;
-}
-
-/* ===== Pagination ===== */
-.history-pagination {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 22px;
-    border-top: 1px solid #f3eaee;
-    background: #fcfafb;
-}
-
-.pagination-info {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #8d7a82;
-}
-
-.pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.page-btn {
-    min-width: 36px;
-    height: 36px;
-    padding: 0 10px;
-    border: none;
-    border-radius: 10px;
-    background: transparent;
-    color: #534048;
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.15s ease;
-}
-
-.page-btn:hover:not(:disabled):not(.active) {
-    background: #faf4f7;
-    color: #24161c;
-}
-
-.page-btn.active {
-    background: #d63384;
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(214, 51, 132, 0.3);
-}
-
-.page-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-.page-ellipsis {
-    color: #8d7a82;
-    padding: 0 4px;
-    font-weight: 700;
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 1200px) {
-    .history-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
+/* =========================================================
+   CUSTOMER HISTORY PAGE  (prefix: ch-)
+   ---------------------------------------------------------
+   Cùng ngôn ngữ với my_bookings.css (bk-) và upcoming-card của
+   dashboard. Token lấy đúng giá trị, không lấy đúng class: hai
+   trang nạp hai file CSS rời nhau nên không import chéo được.
+
+   Trang này khác my_bookings ở một điểm: nội dung là bản ghi đã
+   xong, xếp theo dòng thời gian. Nên thêm .ch-month dính đỉnh khi
+   cuộn để luôn biết đang ở tháng nào. Chỉ có nghĩa khi sắp xếp
+   theo ngày, JS tự gỡ khi sắp xếp theo số tiền.
+
+   THANG ĐO CỐ ĐỊNH  (giống bk-)
+     bo góc   surface 20 · media 14 · control 12 · pill 999
+     accent   #ab2261 trên mọi bề mặt sáng
+              trên nền plum accent đổi thành pearl, vì hồng trên
+              plum chỉ đạt ~1.7:1
+   ========================================================= */
+
+.ch {
+  --ch-ink:        #2A1520;
+  --ch-ink-2:      #6B5560;
+  --ch-ink-3:      #9C8A93;
+
+  --ch-accent:     #ab2261;
+  --ch-accent-2:   #8d1a4f;
+  --ch-wash:       #FBEEF4;
+  --ch-wash-2:     #F6E4EC;
+
+  --ch-plum:       #3E1F47;
+  --ch-pearl:      #FBF4F8;
+  --ch-pearl-2:    #D9C7D2;
+
+  --ch-surface:    #ffffff;
+  --ch-page:       #f8f4f6;   /* nền body của customer_base */
+  --ch-line:       #EDE3E8;
+  --ch-line-2:     #E2D4DB;
+
+  --ch-flag-bg:    #FBF0D8;
+  --ch-flag-ink:   #7A5A11;
+  --ch-good-bg:    #E4F1E9;
+  --ch-good-ink:   #1F6B48;
+
+  --ch-r-surface:  20px;
+  --ch-r-media:    14px;
+  --ch-r-control:  12px;
+
+  --ch-ease:       cubic-bezier(0.16, 1, 0.3, 1);
+
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 32px 56px;
+  font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+  color: var(--ch-ink);
+}
+
+.ch *,
+.ch *::before,
+.ch *::after { box-sizing: border-box; }
+
+/* Không set `color: inherit` chung cho .ch a: specificity (0,1,1) sẽ cao hơn
+   mọi .ch-btn--* (0,1,0) nên nút bị nuốt màu chữ của khối cha. */
+.ch a { text-decoration: none; }
+.ch button { font: inherit; }
+
+
+/* =========================================================
+   BUTTONS - một hình dạng, khác nhau ở lớp áo
+   ========================================================= */
+.ch-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: var(--ch-r-control);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+              color 0.2s ease, box-shadow 0.2s ease, transform 0.14s ease;
+}
+
+.ch-btn:active { transform: scale(0.98); }
+
+.ch-btn--solid {
+  background: var(--ch-accent);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(171, 34, 97, 0.20);
+}
+.ch-btn--solid:hover {
+  background: var(--ch-accent-2);
+  box-shadow: 0 10px 26px rgba(171, 34, 97, 0.26);
+}
+
+/* Hành động trong hàng sổ: nhẹ, không cạnh tranh với nội dung */
+.ch-btn--quiet {
+  min-height: 38px;
+  padding: 0 14px;
+  background: transparent;
+  color: var(--ch-ink-2);
+  border-color: var(--ch-line-2);
+  font-size: 0.85rem;
+}
+.ch-btn--quiet:hover {
+  background: var(--ch-wash);
+  border-color: var(--ch-accent);
+  color: var(--ch-accent);
+}
+
+.ch-btn--wide {
+  width: 100%;
+  min-height: 48px;
+  background: var(--ch-surface);
+  color: var(--ch-ink);
+  border-color: var(--ch-line-2);
+}
+.ch-btn--wide:hover { background: #FCF8FA; border-color: var(--ch-accent); color: var(--ch-accent); }
+
+.ch-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(171, 34, 97, 0.28);
+}
+
+.ch-btn .material-symbols-outlined { font-size: 18px; }
+
+
+/* =========================================================
+   INTRO
+   ========================================================= */
+.ch-intro { margin-bottom: 26px; }
+
+.ch-intro__title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.ch-intro__sub {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ch-ink-2);
+}
+
+
+/* =========================================================
+   SUMMARY BAND
+   Bốn stat-card cũ gộp thành một bề mặt plum duy nhất: hai con số
+   có trọng lượng chia đôi bằng hairline dọc, hai fact "ai / cái gì"
+   rơi xuống dải gạch mảnh bên dưới - đúng motif .bk-focus__facts.
+   ========================================================= */
+.ch-summary {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 34px;
+  padding: 26px 32px;
+  border-radius: var(--ch-r-surface);
+  background:
+    radial-gradient(120% 150% at 92% 4%, rgba(171, 34, 97, 0.42) 0%, transparent 58%),
+    linear-gradient(135deg, #46224F 0%, #3E1F47 46%, #2C1433 100%);
+  color: var(--ch-pearl);
+  box-shadow: 0 18px 44px rgba(44, 20, 51, 0.26);
+}
+
+.ch-summary__figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 520px;
+}
+
+.ch-figure { padding-right: 24px; }
+.ch-figure + .ch-figure {
+  padding-left: 32px;
+  padding-right: 0;
+  border-left: 1px solid rgba(217, 199, 210, 0.26);
+}
+
+.ch-figure__n {
+  display: block;
+  font-size: 2.1rem;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ch-pearl);
+}
+
+.ch-figure__k {
+  display: block;
+  margin-top: 7px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ch-pearl-2);
+}
+
+.ch-summary__facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 22px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(217, 199, 210, 0.22);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ch-pearl);
+}
+.ch-summary__facts > span + span {
+  margin-left: 18px;
+  padding-left: 18px;
+  border-left: 1px solid rgba(217, 199, 210, 0.30);
+}
+
+.ch-fact__k {
+  font-style: normal;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ch-pearl-2);
+}
+.ch-fact__v { font-weight: 700; }
+.ch-fact__n {
+  font-style: normal;
+  font-size: 0.85rem;
+  color: var(--ch-pearl-2);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================================
+   TABS - segmented control, marker trượt
+   Hai ô bằng nhau nên translateX(100%) của marker = nhảy đúng
+   một ô. JS chỉ cần set --tab-i.
+   ========================================================= */
+.ch-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 340px;
+  padding: 4px;
+  margin-bottom: 16px;
+  border-radius: 999px;
+  background: var(--ch-wash-2);
+}
+
+.ch-tabs__marker {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  bottom: 4px;
+  width: calc((100% - 8px) / 2);
+  border-radius: 999px;
+  background: var(--ch-plum);
+  box-shadow: 0 6px 16px rgba(44, 20, 51, 0.24);
+  transform: translateX(calc(var(--tab-i, 0) * 100%));
+  transition: transform 0.42s var(--ch-ease);
+}
+
+.ch-tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ch-ink-2);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.28s ease;
+}
+
+.ch-tab__n {
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+.ch-tab:hover { color: var(--ch-ink); }
+.ch-tab--active,
+.ch-tab--active:hover { color: var(--ch-pearl); }
+
+.ch-tab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(171, 34, 97, 0.30);
+}
+
+
+/* =========================================================
+   FILTERS
+   Desktop: chip + panel thả xuống.
+   Mobile : cùng markup, panel biến thành sheet đáy (xem @768).
+   ========================================================= */
+.ch-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.ch-filters__strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ch-filter { position: relative; }
+.ch-filter--sort { margin-left: auto; }
+
+.ch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--ch-line-2);
+  border-radius: 999px;
+  background: var(--ch-surface);
+  color: var(--ch-ink);
+  font-size: 0.86rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.ch-chip:hover { background: var(--ch-wash); border-color: var(--ch-accent); }
+
+.ch-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(171, 34, 97, 0.28);
+}
+
+.ch-chip__k {
+  font-weight: 600;
+  color: var(--ch-ink-3);
+}
+
+.ch-chip__caret {
+  font-size: 18px;
+  color: var(--ch-ink-3);
+  transition: transform 0.2s ease;
+}
+
+.ch-chip.is-open {
+  background: var(--ch-wash);
+  border-color: var(--ch-accent);
+  color: var(--ch-accent);
+}
+.ch-chip.is-open .ch-chip__caret { transform: rotate(180deg); color: var(--ch-accent); }
+
+/* Chip đang lọc thật sự (khác giá trị mặc định) */
+.ch-chip.is-set {
+  border-color: var(--ch-accent);
+  color: var(--ch-accent);
+}
+.ch-chip.is-set .ch-chip__k { color: var(--ch-accent); }
+
+.ch-clear {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--ch-r-control);
+  background: transparent;
+  color: var(--ch-accent);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.ch-clear:hover { background: var(--ch-wash); }
+.ch-clear:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(171, 34, 97, 0.28); }
+
+/* Panel thả xuống */
+.ch-panel-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 100;
+  min-width: 210px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--ch-line);
+  border-radius: var(--ch-r-media);
+  background: var(--ch-surface);
+  box-shadow: 0 18px 44px rgba(44, 20, 51, 0.16);
+  animation: ch-menu-in 0.18s var(--ch-ease);
+}
+.ch-filter--sort .ch-panel-menu { left: auto; right: 0; }
+
+@keyframes ch-menu-in {
+  from { opacity: 0; transform: translateY(-5px); }
+}
+
+.ch-panel-menu__head { display: none; }
+
+.ch-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 9px;
+  color: var(--ch-ink);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.ch-opt:hover { background: var(--ch-wash); color: var(--ch-accent); }
+
+.ch-opt.is-active { color: var(--ch-accent); font-weight: 700; }
+.ch-opt.is-active::after {
+  content: "check";
+  font-family: "Material Symbols Outlined";
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Lớp phủ chỉ dùng cho sheet mobile, desktop không bao giờ hiện */
+.ch-scrim { display: none; }
+
+
+/* =========================================================
+   LEDGER
+   ========================================================= */
+.ch-panel { display: none; }
+.ch-panel--active { display: block; }
+
+.ch-list { position: relative; }
+
+/* Dải tháng: dính đỉnh cho tới khi nhóm sau đẩy nó đi.
+   Cần .ch-group bọc từng tháng, nếu để phẳng thì nhãn sẽ dính suốt
+   chiều dài danh sách chứ không dừng ở cuối tháng của nó. */
+.ch-group { position: relative; }
+
+.ch-month {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  margin: 0;
+  padding: 14px 4px 9px;
+  background: var(--ch-page);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ch-ink-3);
+}
+.ch-month::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 9px;
+  background: var(--ch-line-2);
+}
+
+.ch-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0 22px;
+  padding: 18px 18px 18px 14px;
+  border-radius: var(--ch-r-media);
+  transition: background-color 0.22s ease;
+}
+
+.ch-row + .ch-row { box-shadow: inset 0 1px 0 var(--ch-line); }
+.ch-row:hover { background: var(--ch-wash); }
+.ch-row:hover + .ch-row,
+.ch-row:hover { box-shadow: none; }
+
+/* Khối ngày: mỏ neo thị giác của cả hàng */
+.ch-row__date {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  margin: 0;
+}
+
+.ch-row__day {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ch-ink);
+  transition: color 0.22s ease;
+}
+.ch-row:hover .ch-row__day { color: var(--ch-accent); }
+
+.ch-row__mon {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--ch-ink-3);
+}
+
+.ch-row__main { min-width: 0; }
+
+.ch-row__title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 5px;
+  font-size: 1.02rem;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+/* Toàn hàng bấm được, nhưng phần tử focus được vẫn là một <a> thật.
+   Thay cho onclick trên <tr> trước đây, vốn không tab tới được. */
+.ch-row__link { color: inherit; }
+.ch-row__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.ch-row__link:focus-visible {
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--ch-accent);
+}
+
+.ch-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ch-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.ch-row__meta span + span {
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid var(--ch-line-2);
+}
+
+.ch-row__price {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--ch-ink);
+}
+
+.ch-row__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Đã huỷ / đã hoàn tiền: đọc ra ngay bằng cách hàng được vẽ.
+   Trên trang History thì "completed" và "paid" là chuẩn, nên chúng
+   KHÔNG có nhãn - chỉ cái lệch chuẩn mới được dán nhãn. */
+.ch-row--cancelled .ch-row__day,
+.ch-row--cancelled .ch-row__mon,
+.ch-row--cancelled .ch-row__title { color: var(--ch-ink-3); }
+.ch-row--cancelled .ch-row__link {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(156, 138, 147, 0.7);
+}
+.ch-row--cancelled:hover .ch-row__day { color: var(--ch-ink-3); }
+
+.ch-flag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--ch-flag-bg);
+  color: var(--ch-flag-ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.ch-flag--muted { background: var(--ch-wash-2); color: var(--ch-ink-2); }
+
+/* "Đã đánh giá" là trạng thái, không phải hành động: không làm nút */
+.ch-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ch-good-ink);
+  white-space: nowrap;
+}
+.ch-done .material-symbols-outlined { font-size: 17px; }
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+.ch-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 56px 28px;
+  margin-top: 8px;
+  text-align: center;
+  border-radius: var(--ch-r-media);
+  background: var(--ch-wash);
+}
+
+/* display:flex ở trên có specificity cao hơn [hidden] của UA stylesheet */
+.ch-empty[hidden] { display: none; }
+
+.ch-empty .material-symbols-outlined {
+  font-size: 40px;
+  color: var(--ch-accent);
+  opacity: 0.55;
+}
+
+.ch-empty h3 {
+  margin: 4px 0 0;
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ch-empty p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--ch-ink-2);
+}
+
+.ch-empty .ch-btn { margin-top: 10px; }
+
+
+/* =========================================================
+   FOOT - đếm kết quả + phân trang
+   ========================================================= */
+.ch-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ch-line);
+}
+.ch-foot:empty,
+.ch-foot.is-hidden { display: none; }
+
+.ch-foot__info {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ch-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.ch-pager {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ch-page {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--ch-r-control);
+  background: transparent;
+  color: var(--ch-ink-2);
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.ch-page:hover:not(:disabled):not(.is-active) { background: var(--ch-wash); color: var(--ch-ink); }
+.ch-page.is-active {
+  background: var(--ch-plum);
+  color: var(--ch-pearl);
+}
+.ch-page:disabled { opacity: 0.35; cursor: not-allowed; }
+.ch-page:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(171, 34, 97, 0.28); }
+.ch-page .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
+
+.ch-gap {
+  padding: 0 2px;
+  color: var(--ch-ink-3);
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   MOTION
+   Ba chuyển động, mỗi cái trả lời một câu hỏi:
+     marker trượt   -> "bạn vừa đổi sang danh sách khác"
+     hàng dâng lên  -> "danh sách này vừa được nạp"
+     summary dâng   -> điểm nhìn đầu tiên khi vào trang
+
+   Hàng chỉ dâng ở lần dựng ĐẦU TIÊN của mỗi danh sách. JS gỡ
+   .ch-list--enter ngay sau đó, vì mọi lần lọc / phân trang / gom
+   tháng về sau đều phải chuyển chỗ <article> trong DOM, mà chuyển
+   chỗ là animation chạy lại: bấm "Load more" mà cả danh sách đang
+   đọc dở nhấp nháy lại từ đầu thì đó là lỗi, không phải hiệu ứng.
+   ========================================================= */
+.ch-summary { animation: ch-rise 0.5s var(--ch-ease) backwards; }
+
+.ch-list--enter .ch-row {
+  animation: ch-rise 0.42s var(--ch-ease) backwards;
+  animation-delay: calc(var(--row-i, 0) * 45ms);
+}
+
+@keyframes ch-rise {
+  from { opacity: 0; transform: translateY(9px); }
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET  (≤ 900px)
+   ========================================================= */
 @media (max-width: 900px) {
-    .history-table th,
-    .history-table td {
-        padding: 14px 12px;
-    }
+  .ch { padding: 28px 22px 44px; }
 
-    .history-filters {
-        padding: 12px;
-    }
+  .ch-summary { padding: 22px 24px; }
+  .ch-figure__n { font-size: 1.9rem; }
 
-    .filter-spacer {
-        display: none;
-    }
+  /* Hành động rơi xuống dòng riêng, giá vẫn giữ mép phải cùng hàng tiêu đề */
+  .ch-row {
+    grid-template-columns: 50px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "date main price"
+      ".    act  act";
+    align-items: start;
+    gap: 0 18px;
+  }
+  .ch-row__date    { grid-area: date; align-self: center; }
+  .ch-row__main    { grid-area: main; }
+  .ch-row__price   { grid-area: price; justify-self: end; }
+  .ch-row__actions { grid-area: act; padding-top: 12px; }
 }
 
-@media (max-width: 700px) {
-    .history-stats {
-        grid-template-columns: 1fr;
-    }
 
-    /* Bảng → card xếp dọc: không cuộn ngang, không mất thông tin */
-    .history-table-wrapper {
-        overflow-x: visible;
-    }
+/* =========================================================
+   RESPONSIVE - TOPBAR XUẤT HIỆN  (≤ 860px)
+   customer_base đổi sang layout off-canvas và dựng .customer-topbar
+   cao 56px, sticky. Nhãn tháng phải dính DƯỚI nó, không thì nó trượt
+   ra sau topbar và biến mất.
+   ========================================================= */
+@media (max-width: 860px) {
+  .ch-month { top: 56px; }
+}
 
-    .history-table,
-    .history-table tbody,
-    .history-table tr,
-    .history-table td {
-        display: block;
-        width: 100%;
-    }
 
-    .history-table thead {
-        display: none;
-    }
+/* =========================================================
+   RESPONSIVE - MOBILE  (≤ 768px)
+   Ba thay đổi có thật, không chỉ thu nhỏ:
+     1. chip lọc thành dải cuộn ngang bleed ra mép, panel thả xuống
+        đổi thành sheet đáy. Panel cũ là position:absolute rộng
+        210px nên chip bên phải mở ra là tràn khỏi viewport.
+     2. phân trang số đổi thành "Load more" dồn: ngón tay không
+        nhắm được nút 40px xếp cạnh nhau, và trên danh sách dọc thì
+        đọc tiếp tự nhiên hơn là nhảy trang.
+     3. .ch-month dính dưới topbar 56px của customer_base, không
+        dính đỉnh viewport.
+   ========================================================= */
+@media (max-width: 768px) {
+  .ch { padding: 22px 18px 40px; }
 
-    .history-table tr {
-        background: #ffffff;
-        border: 1px solid #efe6ea;
-        border-radius: 16px;
-        padding: 16px 18px;
-        margin-bottom: 14px;
-    }
+  .ch-intro { margin-bottom: 20px; }
+  .ch-intro__title { font-size: 1.7rem; }
+  .ch-intro__sub   { font-size: 0.92rem; }
 
-    .history-table td {
-        padding: 6px 0;
-        border: none;
-    }
+  .ch-summary {
+    margin-bottom: 26px;
+    padding: 20px;
+    border-radius: 22px;
+  }
+  .ch-summary__figures { max-width: none; }
+  .ch-figure { padding-right: 16px; }
+  .ch-figure + .ch-figure { padding-left: 20px; }
+  .ch-figure__n { font-size: 1.6rem; }
+  .ch-figure__k { margin-top: 6px; font-size: 0.68rem; letter-spacing: 0.12em; }
 
-    .history-table td[data-label]::before {
-        content: attr(data-label);
-        display: block;
-        margin-bottom: 3px;
-        font-size: 0.68rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: #a9979f;
-    }
+  /* Hai fact xếp dọc: gạch dọc giữa chúng không còn nghĩa khi đã xuống dòng */
+  .ch-summary__facts {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    font-size: 0.92rem;
+  }
+  .ch-summary__facts > span + span {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
+  }
+  .ch-fact__k { display: block; margin-bottom: 3px; }
 
-    .history-table .cell-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding-top: 12px;
-    }
+  .ch-tabs { max-width: none; margin-bottom: 14px; }
 
-    .history-pagination {
-        flex-direction: column;
-        gap: 12px;
-        align-items: stretch;
-    }
+  /* Chip: một hàng cuộn ngang, tràn sát mép để lộ ra là còn cuộn được */
+  .ch-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 16px;
+  }
+  .ch-filters__strip {
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 2px 18px;
+    margin: -2px -18px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .ch-filters__strip::-webkit-scrollbar { display: none; }
 
-    .pagination-controls {
-        justify-content: center;
-    }
+  .ch-filter { flex: 0 0 auto; scroll-snap-align: start; }
+  .ch-filter--sort { margin-left: 0; }
+  .ch-chip { min-height: 42px; }
+
+  /* "Clear all" rời khỏi hàng cuộn: nút phá huỷ trạng thái không nên
+     nằm chỗ ngón tay quét qua. JS chỉ hiện nó khi có bộ lọc đang bật. */
+  .ch-clear {
+    display: none;
+    align-self: flex-start;
+    margin-top: 10px;
+    padding-left: 0;
+  }
+  .ch-filters.has-filters .ch-clear { display: block; }
+
+  /* Panel -> sheet đáy */
+  .ch-panel-menu {
+    position: fixed;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    min-width: 0;
+    max-height: 72vh;
+    padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
+    border: 0;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -18px 48px rgba(30, 12, 22, 0.28);
+    animation-name: ch-sheet-in;
+    animation-duration: 0.3s;
+  }
+  .ch-filter--sort .ch-panel-menu { right: 0; left: 0; }
+
+  @keyframes ch-sheet-in {
+    from { opacity: 0; transform: translateY(14%); }
+  }
+
+  /* Sheet cần tiêu đề: mở từ chip nào thì đang lọc theo cái gì */
+  .ch-panel-menu__head {
+    display: block;
+    margin: 0;
+    padding: 12px 12px 14px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ch-ink-3);
+  }
+
+  .ch-opt { min-height: 50px; font-size: 0.95rem; }
+
+  .ch-scrim.is-open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(30, 12, 22, 0.52);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: ch-scrim-in 0.24s ease;
+  }
+
+  @keyframes ch-scrim-in { from { opacity: 0; } }
+
+  /* Sheet mở thì nền không cuộn theo ngón tay nữa */
+  body.ch-sheet-open { overflow: hidden; }
+
+  /* Ledger */
+  .ch-month { padding: 16px 2px 9px; font-size: 0.72rem; }
+
+  .ch-row {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "date main price"
+      "act  act  act";
+    gap: 0 16px;
+    padding: 16px 12px;
+  }
+  .ch-row__actions { padding-top: 14px; }
+  .ch-row__actions .ch-btn { flex: 1 1 0; min-height: 44px; }
+
+  .ch-row__day   { font-size: 1.4rem; }
+  .ch-row__title { font-size: 0.98rem; }
+
+  /* Không có hover trên cảm ứng: đổi sang phản hồi khi ấn */
+  .ch-row:hover { background: transparent; }
+  .ch-row:hover .ch-row__day { color: var(--ch-ink); }
+  .ch-row:active { background: var(--ch-wash); }
+  .ch-chip:hover { background: var(--ch-surface); border-color: var(--ch-line-2); }
+  .ch-chip.is-set:hover { border-color: var(--ch-accent); }
+  .ch-opt:hover { background: transparent; color: var(--ch-ink); }
+  .ch-opt.is-active:hover { color: var(--ch-accent); }
+  .ch-btn--quiet:hover { background: transparent; border-color: var(--ch-line-2); color: var(--ch-ink-2); }
+
+  /* Foot: đếm kết quả nằm trên, nút dồn thêm nằm dưới, cả hai full-width */
+  .ch-foot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    text-align: center;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .ch-summary,
+  .ch-list--enter .ch-row,
+  .ch-panel-menu,
+  .ch-scrim.is-open { animation: none; }
+
+  .ch-tabs__marker { transition: none; }
+
+  .ch-btn:active,
+  .ch-row:active { transform: none; }
 }

@@ -9,713 +9,733 @@
 {% endblock %}
 
 {% block customer_content %}
-<div class="ch-wrapper">
-<div class="dashboard-header">
-    <p class="dashboard-label">{{ _('Your records') }}</p>
-    <h1>{{ _('History') }}</h1>
-    <p class="dashboard-subtitle">{{ _('Review your past visits and invoices.') }}</p>
-</div>
+<div class="ch">
 
-<div class="history-stats">
-    <div class="stat-card">
-        <div class="stat-card-top">
-            <span class="stat-label">{{ _('Total Visits') }}</span>
-            <div class="stat-icon stat-icon-pink">📅</div>
-        </div>
-        <h3 class="stat-value">{{ total_visits }}</h3>
-        <p class="stat-sublabel"></p>
+  <header class="ch-intro">
+    <h1 class="ch-intro__title">{{ _('History') }}</h1>
+    <p class="ch-intro__sub">{{ _('Review your past visits and invoices.') }}</p>
+  </header>
+
+
+  {# ── Tổng kết: bốn stat-card cũ gộp vào một bề mặt plum.
+        Hai con số có trọng lượng ở trên, hai fact "ai / cái gì" ở dải dưới. ── #}
+  <section class="ch-summary">
+    <div class="ch-summary__figures">
+      <div class="ch-figure">
+        <span class="ch-figure__n">{{ total_visits }}</span>
+        <span class="ch-figure__k">{{ _('Total Visits') }}</span>
+      </div>
+      <div class="ch-figure">
+        <span class="ch-figure__n">{{ total_spent | format_currency }}</span>
+        <span class="ch-figure__k">{{ _('Total Spent') }}</span>
+      </div>
     </div>
 
-    <div class="stat-card">
-        <div class="stat-card-top">
-            <span class="stat-label">{{ _('Total Spent') }}</span>
-            <div class="stat-icon stat-icon-pink">€</div>
-        </div>
-        <h3 class="stat-value">{{ total_spent | format_currency }}</h3>
-        <p class="stat-sublabel stat-sublabel-accent"></p>
+    <p class="ch-summary__facts">
+      <span>
+        <i class="ch-fact__k">{{ _('Favorite Stylist') }}</i>
+        <span class="ch-fact__v">{{ fav_stylist['name'] }}</span>
+        {% if fav_stylist['count'] %}<i class="ch-fact__n">{{ fav_stylist['count'] }} {{ _('visits') }}</i>{% endif %}
+      </span>
+      <span>
+        <i class="ch-fact__k">{{ _('Top Service') }}</i>
+        <span class="ch-fact__v">{{ top_service['name'] }}</span>
+        {% if top_service['count'] %}<i class="ch-fact__n">{{ top_service['count'] }} {{ _('times') }}</i>{% endif %}
+      </span>
+    </p>
+  </section>
+
+
+  <section class="ch-ledger">
+
+    <div class="ch-tabs" role="tablist" style="--tab-i: 0">
+      <span class="ch-tabs__marker" aria-hidden="true"></span>
+
+      <button type="button" role="tab" aria-selected="true" aria-controls="panel-appointments"
+              class="ch-tab ch-tab--active" data-tab-target="appointments">
+        {{ _('Appointments') }}<span class="ch-tab__n">{{ appointments|length }}</span>
+      </button>
+
+      <button type="button" role="tab" aria-selected="false" aria-controls="panel-invoices"
+              class="ch-tab" data-tab-target="invoices">
+        {{ _('Invoices') }}<span class="ch-tab__n">{{ invoices|length }}</span>
+      </button>
     </div>
 
-    <div class="stat-card">
-        <div class="stat-card-top">
-            <span class="stat-label">{{ _('Favorite Stylist') }}</span>
-            <div class="stat-icon stat-icon-avatar"></div>
+
+    {# ── Bộ lọc. Cùng markup cho cả hai breakpoint: desktop là menu thả
+          xuống, mobile là sheet đáy (chuyển bằng CSS, JS không phân nhánh). ── #}
+    <div class="ch-filters">
+      <div class="ch-filters__strip">
+
+        <div class="ch-filter" data-filter="date">
+          <button type="button" class="ch-chip">
+            <span class="ch-chip__k">{{ _('Date') }}</span>
+            <span class="ch-chip__v">{{ _('All') }}</span>
+            <span class="material-symbols-outlined ch-chip__caret">expand_more</span>
+          </button>
+          <div class="ch-panel-menu" hidden>
+            <p class="ch-panel-menu__head">{{ _('Date') }}</p>
+            <div class="ch-opt" data-value="">{{ _('All') }}</div>
+            <div class="ch-opt" data-value="30_days">{{ _('Last 30 days') }}</div>
+            <div class="ch-opt" data-value="3_months">{{ _('Last 3 months') }}</div>
+            <div class="ch-opt" data-value="year">{{ _('Last year') }}</div>
+          </div>
         </div>
-        <h3 class="stat-value stat-value-md">{{ fav_stylist['name'] }}</h3>
-        <p class="stat-sublabel">{{fav_stylist['count']}} {{ _('visits') }}</p>
-    </div>
 
-    <div class="stat-card">
-        <div class="stat-card-top">
-            <span class="stat-label">{{ _('Top Service') }}</span>
-            <div class="stat-icon stat-icon-pink">✦</div>
+        <div class="ch-filter" data-filter="status">
+          <button type="button" class="ch-chip">
+            <span class="ch-chip__k">{{ _('Status') }}</span>
+            <span class="ch-chip__v">{{ _('All') }}</span>
+            <span class="material-symbols-outlined ch-chip__caret">expand_more</span>
+          </button>
+          <div class="ch-panel-menu" hidden>
+            <p class="ch-panel-menu__head">{{ _('Status') }}</p>
+          </div>
         </div>
-        <h3 class="stat-value stat-value-md">{{ top_service['name'] }}</h3>
-        <p class="stat-sublabel">{{ top_service['count'] }} {{ _('times') }}</p>
-    </div>
-</div>
 
-<div class="history-tabs">
-    <button class="history-tab active" data-tab="appointments">{{ _('Appointments') }}</button>
-    <button class="history-tab" data-tab="invoices">{{ _('Invoices') }}</button>
-</div>
-
-<div class="history-filters">
-
-    <div class="filter-dropdown" data-filter="date">
-        <button class="filter-chip">
-            <span class="filter-icon">📅</span>
-            <span class="filter-value">{{ _('All times') }}</span>
-            <span class="filter-caret">▾</span>
-        </button>
-        <div class="filter-panel" hidden>
-            <div class="filter-option" data-value="">{{ _('All') }}</div>
-            <div class="filter-option" data-value="30_days">{{ _('Last 30 days') }}</div>
-            <div class="filter-option" data-value="3_months">{{ _('Last 3 months') }}</div>
-            <div class="filter-option" data-value="year">{{ _('Last year') }}</div>
-        </div>
-    </div>
-
-    <div class="filter-dropdown" data-filter="status">
-        <button class="filter-chip">
-            <span class="filter-label">{{ _('Status:') }}</span>
-            <span class="filter-value">{{ _('All') }}</span>
-            <span class="filter-caret">▾</span>
-        </button>
-        <div class="filter-panel" hidden>
-        </div>
-    </div>
-
-    <div class="filter-dropdown" data-filter="stylist">
-        <button class="filter-chip filter-chip-appointments">
-            <span class="filter-label">{{ _('Stylist:') }}</span>
-            <span class="filter-value">{{ _('All') }}</span>
-            <span class="filter-caret">▾</span>
-        </button>
-        <div class="filter-panel" hidden>
-        <div class="filter-option" data-value="">{{ _('All') }}</div>
-        {% for stylist in stylists %}
-            <div class="filter-option" data-value="{{ stylist.id }}">{{ stylist.full_name }}</div>
-        {% endfor %}
-        </div>
-    </div>
-
-    <div class="filter-dropdown" data-filter="service">
-        <button class="filter-chip filter-chip-appointments">
-            <span class="filter-label">{{ _('Service:') }}</span>
-            <span class="filter-value">{{ _('All') }}</span>
-            <span class="filter-caret">▾</span>
-        </button>
-        <div class="filter-panel" hidden>
-            <div class="filter-option" data-value="">{{ _('All') }}</div>
-            {% for service in services %}
-            <div class="filter-option" data-value="{{ service.id }}">{{ service.name }}</div>
+        <div class="ch-filter ch-filter--appt" data-filter="stylist">
+          <button type="button" class="ch-chip">
+            <span class="ch-chip__k">{{ _('Stylist') }}</span>
+            <span class="ch-chip__v">{{ _('All') }}</span>
+            <span class="material-symbols-outlined ch-chip__caret">expand_more</span>
+          </button>
+          <div class="ch-panel-menu" hidden>
+            <p class="ch-panel-menu__head">{{ _('Stylist') }}</p>
+            <div class="ch-opt" data-value="">{{ _('All') }}</div>
+            {% for stylist in stylists %}
+            <div class="ch-opt" data-value="{{ stylist.id }}">{{ stylist.full_name }}</div>
             {% endfor %}
+          </div>
         </div>
+
+        <div class="ch-filter ch-filter--appt" data-filter="service">
+          <button type="button" class="ch-chip">
+            <span class="ch-chip__k">{{ _('Service') }}</span>
+            <span class="ch-chip__v">{{ _('All') }}</span>
+            <span class="material-symbols-outlined ch-chip__caret">expand_more</span>
+          </button>
+          <div class="ch-panel-menu" hidden>
+            <p class="ch-panel-menu__head">{{ _('Service') }}</p>
+            <div class="ch-opt" data-value="">{{ _('All') }}</div>
+            {% for service in services %}
+            <div class="ch-opt" data-value="{{ service.id }}">{{ service.name }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="ch-filter ch-filter--inv" data-filter="payment_method" hidden>
+          <button type="button" class="ch-chip">
+            <span class="ch-chip__k">{{ _('Payment') }}</span>
+            <span class="ch-chip__v">{{ _('All') }}</span>
+            <span class="material-symbols-outlined ch-chip__caret">expand_more</span>
+          </button>
+          <div class="ch-panel-menu" hidden>
+            <p class="ch-panel-menu__head">{{ _('Payment') }}</p>
+            <div class="ch-opt" data-value="">{{ _('All') }}</div>
+            <div class="ch-opt" data-value="visa">Visa</div>
+            <div class="ch-opt" data-value="mastercard">Mastercard</div>
+            <div class="ch-opt" data-value="mobile_pay">Mobile Pay</div>
+            <div class="ch-opt" data-value="apple_pay">Apple Pay</div>
+            <div class="ch-opt" data-value="google_pay">Google Pay</div>
+            <div class="ch-opt" data-value="cash">{{ _('Cash') }}</div>
+            <div class="ch-opt" data-value="bank_transfer">{{ _('Bank Transfer') }}</div>
+          </div>
+        </div>
+
+        <div class="ch-filter ch-filter--sort" data-filter="sort">
+          <button type="button" class="ch-chip">
+            <span class="material-symbols-outlined ch-chip__caret">swap_vert</span>
+            <span class="ch-chip__v">{{ _('Newest first') }}</span>
+          </button>
+          <div class="ch-panel-menu" hidden>
+            <p class="ch-panel-menu__head">{{ _('Sort') }}</p>
+            <div class="ch-opt" data-value="date_desc">{{ _('Newest first') }}</div>
+            <div class="ch-opt" data-value="date_asc">{{ _('Oldest first') }}</div>
+            <div class="ch-opt" data-value="amount_desc">{{ _('Amount: High to Low') }}</div>
+            <div class="ch-opt" data-value="amount_asc">{{ _('Amount: Low to High') }}</div>
+          </div>
+        </div>
+
+      </div>
+
+      <button type="button" class="ch-clear">{{ _('Clear all') }}</button>
     </div>
 
-    <div class="filter-dropdown" data-filter="payment_method">
-        <button class="filter-chip filter-chip-invoices" style="display:none;">
-            <span class="filter-label">{{ _('Payment:') }}</span>
-            <span class="filter-value">{{ _('All') }}</span>
-            <span class="filter-caret">▾</span>
-        </button>
-        <div class="filter-panel" hidden>
-            <div class="filter-option" data-value="">{{ _('All') }}</div>
-            <div class="filter-option" data-value="visa">Visa</div>
-            <div class="filter-option" data-value="mastercard">Mastercard</div>
-            <div class="filter-option" data-value="mobile_pay">Mobile Pay</div>
-            <div class="filter-option" data-value="apple_pay">Apple Pay</div>
-            <div class="filter-option" data-value="google_pay">Google Pay</div>
-            <div class="filter-option" data-value="cash">{{ _('Cash') }}</div>
-            <div class="filter-option" data-value="bank_transfer">{{ _('Bank Transfer') }}</div>
+
+    {# ── Lịch hẹn ── #}
+    <div class="ch-panel ch-panel--active" id="panel-appointments" role="tabpanel">
+      <div class="ch-list ch-list--enter">
+        {% for appt in appointments %}
+        {% set is_cancelled = appt.display_type == 'cancelled' %}
+        <article class="ch-row{{ ' ch-row--cancelled' if is_cancelled }}"
+                 data-status="{{ 'cancelled' if is_cancelled else 'completed' }}"
+                 data-stylist-id="{{ appt.staff_id }}"
+                 data-service-id="{{ appt.service_id }}"
+                 data-date="{{ appt.booking_date }}"
+                 data-amount="{{ appt.service_price }}"
+                 data-month="{{ appt.booking_date | format_date('%B %Y') }}">
+
+          <p class="ch-row__date">
+            <span class="ch-row__day">{{ appt.booking_date | format_date('%d') }}</span>
+            <span class="ch-row__mon">{{ appt.booking_date | format_date('%b') }}</span>
+          </p>
+
+          <div class="ch-row__main">
+            <h3 class="ch-row__title">
+              {# Đã huỷ đọc ra bằng gạch ngang + cả hàng chìm màu, không dán thêm badge:
+                 trên trang này "completed" mới là chuẩn, chỉ cái lệch chuẩn cần đánh dấu. #}
+              <a class="ch-row__link" href="{{ url_for('main.view_booking_details', booking_id=appt.booking_id) }}">{{ appt.service_name }}</a>
+            </h3>
+            <p class="ch-row__meta">
+              <span>{{ appt.start_time | format_time }}</span>
+              {% if not is_cancelled %}<span>{{ appt.stylist_name | short_name }}</span>{% endif %}
+            </p>
+          </div>
+
+          {% if is_cancelled %}
+          <p class="ch-row__price" aria-hidden="true"></p>
+          {% else %}
+          <p class="ch-row__price">{{ appt.service_price | format_currency }}</p>
+          {% endif %}
+
+          <div class="ch-row__actions">
+            {% if appt.display_type == 'reviewed' %}
+            <span class="ch-done"><span class="material-symbols-outlined">check_circle</span>{{ _('Reviewed') }}</span>
+            {% elif appt.display_type == 'need_review' %}
+            <button type="button" class="ch-btn ch-btn--quiet btn-review">{{ _('Leave Review') }}</button>
+            {% endif %}
+            <a class="ch-btn ch-btn--quiet" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>
+          </div>
+
+        </article>
+        {% else %}
+        <div class="ch-empty">
+          <span class="material-symbols-outlined">history</span>
+          <h3>{{ _('No history yet.') }}</h3>
+          <p>{{ _('Your completed appointments will appear here.') }}</p>
+          <a href="{{ url_for('main.customer_booking') }}" class="ch-btn ch-btn--solid">{{ _('Book appointment') }}</a>
         </div>
+        {% endfor %}
+      </div>
+
+      <div class="ch-empty ch-empty--filtered" hidden>
+        <span class="material-symbols-outlined">filter_alt_off</span>
+        <h3>{{ _('No result') }}</h3>
+      </div>
+
+      <div class="ch-foot is-hidden">
+        <span class="ch-foot__info"></span>
+        <div class="ch-pager"></div>
+      </div>
     </div>
 
-        <div class="filter-spacer"></div>
 
-    <div class="filter-dropdown filter-sort-dropdown" data-filter="sort">
-        <button class="filter-chip filter-sort">
-            <span class="filter-label">⇅</span>
-            <span class="filter-value">{{ _('Newest first') }}</span>
-            <span class="filter-caret">▾</span>
-        </button>
+    {# ── Hoá đơn ── #}
+    <div class="ch-panel" id="panel-invoices" role="tabpanel">
+      <div class="ch-list ch-list--enter">
+        {% for invoice in invoices %}
+        <article class="ch-row"
+                 data-status="{{ invoice.invoice_status }}"
+                 data-payment-method="{{ invoice.payment_method }}"
+                 data-date="{{ invoice.booking_date }}"
+                 data-amount="{{ invoice.amount }}"
+                 data-month="{{ invoice.booking_date | format_date('%B %Y') }}">
 
-        <div class="filter-panel" hidden>
-            <div class="filter-option" data-value="date_desc">{{ _('Newest first') }}</div>
-            <div class="filter-option" data-value="date_asc">{{ _('Oldest first') }}</div>
-            <div class="filter-option" data-value="amount_desc">{{ _('Amount: High to Low') }}</div>
-            <div class="filter-option" data-value="amount_asc">{{ _('Amount: Low to High') }}</div>
+          <p class="ch-row__date">
+            <span class="ch-row__day">{{ invoice.booking_date | format_date('%d') }}</span>
+            <span class="ch-row__mon">{{ invoice.booking_date | format_date('%b') }}</span>
+          </p>
+
+          <div class="ch-row__main">
+            <h3 class="ch-row__title">
+              <a class="ch-row__link" href="{{ url_for('main.invoice_detail', invoice_id=invoice.invoice_id) }}">{{ invoice.invoice_number }}</a>
+              {% if invoice.invoice_status == 'pending' %}
+              <span class="ch-flag">{{ _('Pending') }}</span>
+              {% elif invoice.invoice_status == 'refunded' %}
+              <span class="ch-flag ch-flag--muted">{{ _('Refunded') }}</span>
+              {% endif %}
+            </h3>
+            <p class="ch-row__meta">
+              <span>{{ invoice.service_name }}</span>
+              <span>{{ invoice.payment_method | payment_label }}</span>
+            </p>
+          </div>
+
+          <p class="ch-row__price">{{ invoice.amount | format_currency }}</p>
+
+          <div class="ch-row__actions">
+            <a class="ch-btn ch-btn--quiet" href="{{ url_for('main.download_invoice', invoice_id=invoice.invoice_id) }}">
+              <span class="material-symbols-outlined">download</span>{{ _('Download PDF') }}
+            </a>
+          </div>
+
+        </article>
+        {% else %}
+        <div class="ch-empty">
+          <span class="material-symbols-outlined">receipt_long</span>
+          <h3>{{ _('No invoices yet.') }}</h3>
         </div>
+        {% endfor %}
+      </div>
+
+      <div class="ch-empty ch-empty--filtered" hidden>
+        <span class="material-symbols-outlined">filter_alt_off</span>
+        <h3>{{ _('No result') }}</h3>
+      </div>
+
+      <div class="ch-foot is-hidden">
+        <span class="ch-foot__info"></span>
+        <div class="ch-pager"></div>
+      </div>
     </div>
-        
-        <button class="filter-clear">{{ _('Clear all') }}</button>
+
+  </section>
 </div>
 
-<div class="history-panel" id="panel-appointments">
-    <div class="history-table-wrapper">
-        <table class="history-table">
-            <thead>
-                <tr>
-                    <th>{{ _('Service & Date') }}</th>
-                    <th>{{ _('Stylist') }}</th>
-                    <th>{{ _('Price') }}</th>
-                    <th>{{ _('Status') }}</th>
-                    <th class="th-right">{{ _('Action') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for appt in appointments %}
-                    {% if appt.display_type == 'cancelled' %}
-
-                <tr class="row-cancelled"
-                    data-status="cancelled"
-                    data-stylist-id="{{ appt.staff_id }}"
-                    data-service-id="{{ appt.service_id }}"
-                    data-date="{{ appt.booking_date}}"
-                    data-amount="{{ appt.service_price }}"
-                    onclick="window.location.href='{{ url_for('main.view_booking_details', booking_id=appt.booking_id) }}'"
-                    style="cursor: pointer;"
-                >
-                    <td>
-                        <div class="cell-title cell-strike">{{ appt.service_name }}</div>
-                        <div class="cell-sub">{{ appt.booking_date | format_date}} • {{ appt.start_time | format_time }}</div>
-                    </td>
-                    <td class="cell-medium cell-dim" data-label="{{ _('Stylist') }}">N/A</td>
-                    <td class="cell-bold cell-dim" data-label="{{ _('Price') }}">{{ 0 | format_currency }}</td>
-                    <td data-label="{{ _('Status') }}"><span class="badge badge-cancelled">{{ _('Cancelled') }}</span></td>
-                    <td class="cell-actions" onclick="event.stopPropagation()">
-                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>
-                    </td>
-                </tr>
-                    {% elif appt.display_type == 'reviewed' %}
-                <tr
-                    data-status="completed"
-                    data-stylist-id="{{ appt.staff_id }}"
-                    data-service-id="{{ appt.service_id }}"
-                    data-date="{{ appt.booking_date}}"
-                    data-amount="{{ appt.service_price }}"
-                    onclick="window.location.href='{{ url_for('main.view_booking_details', booking_id=appt.booking_id) }}'"
-                    style="cursor: pointer;"
-                >
-                    <td>
-                        <div class="cell-title">{{ appt.service_name }}</div>
-                        <div class="cell-sub">{{ appt.booking_date | format_date }} • {{ appt.start_time | format_time }}</div>
-                    </td>
-                    <td class="cell-medium" data-label="{{ _('Stylist') }}">{{ appt.stylist_name | short_name }}</td>
-                    <td class="cell-bold" data-label="{{ _('Price') }}">{{ appt.service_price | format_currency }}</td>
-                    <td data-label="{{ _('Status') }}"><span class="badge badge-completed">{{ _('Completed') }}</span></td>
-                    <td class="cell-actions" onclick="event.stopPropagation()">
-                        <span class="reviewed-tag">✓ {{ _('Reviewed') }}</span>
-                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>
-                    </td>
-                </tr>
-                    {% else %}
-                <tr
-                    data-status="completed"
-                    data-stylist-id="{{ appt.staff_id }}"
-                    data-service-id="{{ appt.service_id }}"
-                    data-date="{{ appt.booking_date}}"
-                    data-amount="{{ appt.service_price }}"
-                    onclick="window.location.href='{{ url_for('main.view_booking_details', booking_id=appt.booking_id) }}'"
-                    style="cursor: pointer;"
-                >
-                    <td>
-                        <div class="cell-title">{{ appt.service_name }}</div>
-                        <div class="cell-sub">{{ appt.booking_date | format_date }} • {{ appt.start_time | format_time }}</div>
-                    </td>
-                    <td class="cell-medium" data-label="{{ _('Stylist') }}">{{ appt.stylist_name | short_name }}</td>
-                    <td class="cell-bold" data-label="{{ _('Price') }}">{{ appt.service_price | format_currency }}</td>
-                    <td data-label="{{ _('Status') }}"><span class="badge badge-completed">{{ _('Completed') }}</span></td>
-                    <td class="cell-actions" onclick="event.stopPropagation()">
-                        <button class="btn-review">{{ _('Leave Review') }}</button>
-                        <a class="btn-rebook" href="{{ url_for('main.customer_booking', service_id=appt.service_id) }}">{{ _('Rebook') }}</a>
-                    </td>
-                </tr>
-                    {% endif %}
-                {% endfor %}
-                
-            </tbody>
-        </table>
-
-        <div class="history-pagination">
-            <span class="pagination-info">-</span>
-            <div class="pagination-controls">-</div>
-        </div>
-    </div>
-</div>
-
-<div class="history-panel" id="panel-invoices" style="display:none;">
-    <div class="history-table-wrapper">
-        <table class="history-table">
-            <thead>
-                <tr>
-                    <th>{{ _('Invoice & Service') }}</th>
-                    <th>{{ _('Payment') }}</th>
-                    <th>{{ _('Amount') }}</th>
-                    <th>{{ _('Status') }}</th>
-                    <th class="th-right">{{ _('Action') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for invoice in invoices%}
-                <tr
-                    data-status="{{ invoice.invoice_status}}"
-                    data-payment-method="{{ invoice.payment_method }}"
-                    data-date="{{ invoice.booking_date }}"
-                    data-amount="{{ invoice.amount }}"
-                    onclick="window.location.href='{{ url_for('main.invoice_detail', invoice_id=invoice.invoice_id) }}'"
-                    style="cursor: pointer;"
-                >
-                    <td>
-                        <div class="invoice-cell">
-                            <div class="invoice-icon">🧾</div>
-                            <div>
-                                <div class="cell-title">{{ invoice.invoice_number }}</div>
-                                <div class="cell-sub">{{ invoice.service_name }} • {{ invoice.booking_date | format_date }}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td data-label="{{ _('Payment') }}">
-                        <div class="payment-cell">
-                            <span class="payment-icon">{{ invoice.payment_method | payment_icon}}</span>
-                            <span>{{ invoice.payment_method | payment_label }}</span>
-                        </div>
-                    </td>
-                    <td class="cell-bold" data-label="{{ _('Amount') }}">{{ invoice.amount | format_currency }}</td>
-                    <td data-label="{{ _('Status') }}"><span class="badge badge-{{ invoice.invoice_status }}">{{ invoice.invoice_status}}</span></td>
-                    <td class="cell-actions" onclick="event.stopPropagation()">
-                        <a class="btn-download" href="{{ url_for('main.download_invoice', invoice_id=invoice.invoice_id) }}">⤓ {{ _('Download PDF') }}</a>
-                        <button class="btn-more">⋮</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="history-pagination">
-            <span class="pagination-info"></span>
-            <div class="pagination-controls"></div>
-        </div>
-    </div>
-</div>
-</div>{# end ch-wrapper #}
+<div class="ch-scrim" id="chScrim"></div>
 {% endblock %}
+
 
 {% block script %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    
-    // ============== HELPER ===============
-    function resetFilters() {
 
-        document.querySelectorAll('.filter-dropdown').forEach(wrapper =>{
+    const root = document.querySelector(".ch");
+    if (!root) return;
 
-            const chip = wrapper.querySelector('.filter-chip');
-            const panel = wrapper.querySelector('.filter-panel');
-            
-            const firstOption = panel.querySelector('.filter-option')
+    const PER_PAGE = 8;
+    const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
 
-            chip.querySelector('.filter-value').textContent = firstOption.textContent;
+    // Chuỗi đã dịch phía server, JS không tự ghép từ
+    const T = {
+        showing:  "{{ _('Showing') }}",
+        of:       "{{ _('of') }}",
+        loadMore: "{{ _('Load more') }}",
+        all:      "{{ _('All') }}"
+    };
 
-            panel.querySelectorAll('.filter-option').forEach(option =>{
-                option.classList.remove('active')
-            });
+    const STATUS_OPTIONS = {
+        appointments: [
+            { value: "",          label: T.all },
+            { value: "completed", label: "{{ _('Completed') }}" },
+            { value: "cancelled", label: "{{ _('Cancelled') }}" }
+        ],
+        invoices: [
+            { value: "",         label: T.all },
+            { value: "paid",     label: "{{ _('Paid') }}" },
+            { value: "refunded", label: "{{ _('Refunded') }}" },
+            { value: "pending",  label: "{{ _('Pending') }}" }
+        ]
+    };
 
-            firstOption.classList.add('active');
-            panel.hidden = true;
-            chip.classList.remove('is-open');
-            })
+    const DEFAULT_STATE = {
+        date: "", status: "", stylist: "", service: "",
+        payment_method: "", sort: "date_desc"
+    };
 
-        //Reset filter state
-        filterState.date = '';
-        filterState.status = '';
-        filterState.stylist = '';
-        filterState.service = '';
-        filterState.payment_method = '';
-        filterState.sort = 'date_desc';
+    const filterState = Object.assign({}, DEFAULT_STATE);
+    const pageState = { appointments: 1, invoices: 1 };
 
-        //Reset pagination to page 1 for current tab
-        const activeTab = document.querySelector('.history-tab.active').dataset.tab;
-        paginationState[activeTab].currentPage = 1;
-        
-        applyFilter()
-    }
+    const tabsWrap = root.querySelector(".ch-tabs");
+    const tabs = Array.from(root.querySelectorAll(".ch-tab"));
+    const filtersBar = root.querySelector(".ch-filters");
+    const clearBtn = root.querySelector(".ch-clear");
+    const scrim = document.getElementById("chScrim");
 
-    function matchDateFilter(row, dateFilterValue) {
-        const rowDate = new Date(row.dataset.date);
-        const now  = new Date();
-
-        let cutoff;
-        if (dateFilterValue === '30_days') {
-            cutoff = new Date(now.getTime() - 30*24*60*60*1000);
-        } else if (dateFilterValue === '3_months') {
-            cutoff = new Date(now);
-            cutoff.setMonth(cutoff.getMonth() - 3);
-        } else if (dateFilterValue === 'year' ) {
-            cutoff = new Date(now)
-            cutoff.setFullYear(cutoff.getFullYear() - 1);
-        } else {
-            return true;
-        }
-
-        return rowDate >= cutoff;
-    }
-
-    function sortRow(tabPanel) {
-        const tbody = tabPanel.querySelector('tbody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-
-        rows.sort((a,b) => {
-            if (filterState.sort === 'date_desc') {
-                return new Date(b.dataset.date) - new Date(a.dataset.date);
-            }
-            if (filterState.sort === 'date_asc') {
-                return new Date(a.dataset.date) - new Date(b.dataset.date);
-            }
-            if (filterState.sort === 'amount_desc') {
-                return parseFloat(b.dataset.amount) - parseFloat(a.dataset.amount);
-            }
-            if (filterState.sort === 'amount_asc') {
-                return parseFloat(a.dataset.amount) - parseFloat(b.dataset.amount);
-            }
-            return 0;
-        });
-
-        rows.forEach(row => {
-            tbody.appendChild(row); 
-        });
-    }
-    function updateStatusOptions(activeTab) {
-        const panel = document.querySelector("[data-filter='status'] .filter-panel");
-        panel.innerHTML = statusOptionByTab[activeTab].map(opt => `<div class="filter-option" data-value="${opt.value}">${opt.label}</div>`).join('');
-    }
-
-    function applyPagination(activeTab, visibleRows) {
-        const totalPages = Math.ceil(visibleRows.length / ROW_PER_PAGE);
-
-        if (paginationState[activeTab].currentPage > totalPages && totalPages > 0) {
-            paginationState[activeTab].currentPage = 1;
-        }
-
-        const currentPage = paginationState[activeTab].currentPage;
-
-        const startIdx = (currentPage - 1) * ROW_PER_PAGE;
-        const endIdx = currentPage * ROW_PER_PAGE;
-
-        visibleRows.forEach((row, idx) => {
-            if (idx >= startIdx && idx <  endIdx) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none'; 
-            }
-        });
-        
-        updatePaginationUI(activeTab, visibleRows.length, currentPage, totalPages)
-    
-    }
-
-
-    function updatePaginationUI(activeTab, totalRows, currentPage, totalPages) {
-        const tabPanel = document.getElementById(`panel-${activeTab}`);
-        const info = tabPanel.querySelector('.pagination-info');
-        const controls = tabPanel.querySelector('.pagination-controls');
-
-        const startIdx = (currentPage -1) * ROW_PER_PAGE +1;
-        const endIdx = Math.min(currentPage* ROW_PER_PAGE, totalRows);
-
-        info.textContent = totalRows === 0
-            ? '{{ _("No result") }}'
-            : `{{ _('Showing') }} ${startIdx}-${endIdx} {{ _('of') }} ${totalRows}`;
-        
-        controls.innerHTML = buildPageButtons(currentPage, totalPages)
-    }
-
-function buildPageButtons(current, total) {
-    if (total === 0) return '';
-    
-    let html = '';
-    
-    // Prev button
-    html += `<button class="page-btn" data-page="${current - 1}" ${current === 1 ? 'disabled' : ''}>‹</button>`;
-    
-    // Page numbers - logic: hiển thị 1, current-1, current, current+1, total + ellipsis
-    const pages = getPageNumbers(current, total);
-    
-    pages.forEach(p => {
-        if (p === '...') {
-            html += `<span class="page-ellipsis">…</span>`;
-        } else {
-            const active = p === current ? 'active' : '';
-            html += `<button class="page-btn ${active}" data-page="${p}">${p}</button>`;
-        }
-    });
-    
-    // Next button
-    html += `<button class="page-btn" data-page="${current + 1}" ${current === total ? 'disabled' : ''}>›</button>`;
-    
-    return html;
-}
-
-
-function getPageNumbers(current, total) {
-    // Nếu ≤ 7 pages, show hết
-    if (total <= 7) {
-        return Array.from({length: total}, (_, i) => i + 1);
-    }
-    
-    const pages = [];
-    
-    // Luôn show page 1
-    pages.push(1);
-    
-    // Ellipsis trái nếu current xa page 1
-    if (current > 4) {
-        pages.push('...');
-    }
-    
-    // Pages quanh current
-    const start = Math.max(2, current - 1);
-    const end = Math.min(total - 1, current + 1);
-    for (let i = start; i <= end; i++) {
-        pages.push(i);
-    }
-    
-    // Ellipsis phải nếu current xa page cuối
-    if (current < total - 3) {
-        pages.push('...');
-    }
-    
-    // Luôn show page cuối
-    pages.push(total);
-    
-    return pages;
-}
-    //Filter logic
-    function applyFilter(){
-        const activeTab = document.querySelector('.history-tab.active').dataset.tab;
-        const tabPanel = document.getElementById(`panel-${activeTab}`);
-        const rows = tabPanel.querySelectorAll('tbody tr');
-
-
-        const matchedRowsSet = new Set();
-
-
-        rows.forEach(row => {
-            let show = true;
-
-
-            //check date filter
-            if (filterState.date && !matchDateFilter(row, filterState.date)) {
-                show = false;
-            }
-
-            //check status
-            if (filterState.status && row.dataset.status !== filterState.status) {
-                show = false;
-            }
-
-            //check stylist
-            if (filterState.stylist && row.dataset.stylistId !== filterState.stylist) {
-                show = false;
-            }
-
-            //check service
-            if (filterState.service && row.dataset.serviceId !== filterState.service) {
-                show = false;
-            }
-
-            if (filterState.payment_method && row.dataset.paymentMethod !== filterState.payment_method) {
-                show = false;
-            }
-
-            if (show) {
-                matchedRowsSet.add(row);
-            }
-
-            row.style.display = show ? '' : 'none';
-        })
-            sortRow(tabPanel);
-
-            const visibleRows = Array.from(tabPanel.querySelectorAll('tbody tr')).filter(row => matchedRowsSet.has(row));
-
-            applyPagination(activeTab, visibleRows);
-    }   
-    
-    //================== VARIABLE ======================    
-    const filterState = {
-        date: '',
-        status: '',
-        stylist: '',
-        service: '',
-        payment_method: '',
-        sort: 'date_desc',
-}
-
-    const tabs = document.querySelectorAll(".history-tab");
     const panels = {
         appointments: document.getElementById("panel-appointments"),
         invoices: document.getElementById("panel-invoices")
     };
 
-    const filterAppointments = document.querySelectorAll(".filter-chip-appointments");
-    const filterInvoices = document.querySelectorAll(".filter-chip-invoices");
+    const activeTab = () =>
+        (root.querySelector(".ch-tab--active") || tabs[0]).dataset.tabTarget;
 
-    const statusOptionByTab = {
-        appointments: [
-            {value: '', label: '{{ _("All") }}'},
-            {value: 'completed', label: '{{ _("Completed") }}'},
-            {value: 'cancelled', label: '{{ _("Cancelled") }}'},
-        ],
-        invoices: [
-            {value: '', label: '{{ _("All") }}'},
-            {value: 'paid', label: '{{ _("Paid") }}'},
-            {value: 'refunded', label: '{{ _("Refunded") }}'},
-            {value: 'pending', label: '{{ _("Pending") }}'},
-        ]
-    };
 
-    // Pagination page render
-    const paginationState = {
-        appointments: {currentPage: 1},
-        invoices: {currentPage: 1}
+    /* ============ SHEET / MENU ============ */
+
+    function closeMenus() {
+        root.querySelectorAll(".ch-panel-menu").forEach(m => { m.hidden = true; });
+        root.querySelectorAll(".ch-chip").forEach(c => c.classList.remove("is-open"));
+        scrim.classList.remove("is-open");
+        document.body.classList.remove("ch-sheet-open");
     }
-    
-    const ROW_PER_PAGE = 8;
-    
-    const clearBtn = document.querySelector('.filter-clear');
 
-    const filterChips = document.querySelectorAll('.filter-chip');
+    function openMenu(wrap) {
+        closeMenus();
+        wrap.querySelector(".ch-panel-menu").hidden = false;
+        wrap.querySelector(".ch-chip").classList.add("is-open");
+        if (isMobile()) {
+            scrim.classList.add("is-open");
+            document.body.classList.add("ch-sheet-open");
+        }
+    }
 
-    //================== INIT ======================    
-    
-    updateStatusOptions("appointments");
-    resetFilters();
 
-    //================== Pagination Bar ======================    
-    document.addEventListener('click', (e)=>{
-        const pageBtn = e.target.closest('.page-btn');
-        
+    /* ============ FILTER STATE -> UI ============ */
+
+    // Chip nào đang lọc thật thì viền hồng. Nút "Clear all" ở mobile chỉ hiện
+    // khi có ít nhất một bộ lọc bật, để không chiếm chỗ khi chưa cần.
+    function syncChips() {
+        let active = 0;
+        root.querySelectorAll(".ch-filter").forEach(wrap => {
+            const key = wrap.dataset.filter;
+            const on = key === "sort"
+                ? filterState.sort !== DEFAULT_STATE.sort
+                : Boolean(filterState[key]);
+            wrap.querySelector(".ch-chip").classList.toggle("is-set", on);
+            if (on && key !== "sort") active++;
+        });
+        filtersBar.classList.toggle("has-filters", active > 0);
+    }
+
+    function rebuildStatusOptions(tab) {
+        const menu = root.querySelector('[data-filter="status"] .ch-panel-menu');
+        const head = menu.querySelector(".ch-panel-menu__head");
+        menu.innerHTML = "";
+        if (head) menu.appendChild(head);
+        STATUS_OPTIONS[tab].forEach(opt => {
+            const el = document.createElement("div");
+            el.className = "ch-opt";
+            el.dataset.value = opt.value;
+            el.textContent = opt.label;
+            menu.appendChild(el);
+        });
+    }
+
+    function resetFilters() {
+        root.querySelectorAll(".ch-filter").forEach(wrap => {
+            const menu = wrap.querySelector(".ch-panel-menu");
+            const first = menu.querySelector(".ch-opt");
+            menu.querySelectorAll(".ch-opt").forEach(o => o.classList.remove("is-active"));
+            if (first) {
+                first.classList.add("is-active");
+                wrap.querySelector(".ch-chip__v").textContent = first.textContent;
+            }
+        });
+        closeMenus();
+        Object.assign(filterState, DEFAULT_STATE);
+        pageState[activeTab()] = 1;
+        apply();
+    }
+
+
+    /* ============ LỌC / SẮP XẾP / PHÂN TRANG ============ */
+
+    function matchDate(row, value) {
+        if (!value) return true;
+        const rowDate = new Date(row.dataset.date);
+        const now = new Date();
+        let cutoff;
+
+        if (value === "30_days") {
+            cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        } else if (value === "3_months") {
+            cutoff = new Date(now);
+            cutoff.setMonth(cutoff.getMonth() - 3);
+        } else if (value === "year") {
+            cutoff = new Date(now);
+            cutoff.setFullYear(cutoff.getFullYear() - 1);
+        } else {
+            return true;
+        }
+        return rowDate >= cutoff;
+    }
+
+    function matches(row) {
+        if (!matchDate(row, filterState.date)) return false;
+        if (filterState.status && row.dataset.status !== filterState.status) return false;
+        if (filterState.stylist && row.dataset.stylistId !== filterState.stylist) return false;
+        if (filterState.service && row.dataset.serviceId !== filterState.service) return false;
+        if (filterState.payment_method && row.dataset.paymentMethod !== filterState.payment_method) return false;
+        return true;
+    }
+
+    function sortRows(list) {
+        const rows = Array.from(list.querySelectorAll(".ch-row"));
+        rows.sort((a, b) => {
+            if (filterState.sort === "date_asc")    return new Date(a.dataset.date) - new Date(b.dataset.date);
+            if (filterState.sort === "amount_desc") return parseFloat(b.dataset.amount) - parseFloat(a.dataset.amount);
+            if (filterState.sort === "amount_asc")  return parseFloat(a.dataset.amount) - parseFloat(b.dataset.amount);
+            return new Date(b.dataset.date) - new Date(a.dataset.date);
+        });
+        rows.forEach(row => list.appendChild(row));
+        return rows;
+    }
+
+    // Desktop nhảy trang, mobile dồn thêm: startIdx = 0 nên bấm "Load more"
+    // là danh sách dài ra chứ không thay nội dung dưới ngón tay.
+    function paginate(tab, rows) {
+        const totalPages = Math.ceil(rows.length / PER_PAGE);
+        if (pageState[tab] > totalPages && totalPages > 0) pageState[tab] = 1;
+
+        const page = pageState[tab];
+        const from = isMobile() ? 0 : (page - 1) * PER_PAGE;
+        const to = page * PER_PAGE;
+
+        let shown = 0;
+        rows.forEach((row, i) => {
+            const visible = i >= from && i < to;
+            row.style.display = visible ? "" : "none";
+            if (visible) {
+                row.style.setProperty("--row-i", Math.min(shown, 9));
+                shown++;
+            }
+        });
+        return { page: page, totalPages: totalPages, shown: shown };
+    }
+
+
+    /* ============ DẢI THÁNG DÍNH ============ */
+    // Mỗi tháng cần một .ch-group bọc riêng, vì position:sticky chỉ dừng lại ở
+    // biên của phần tử cha. Để phẳng thì nhãn tháng đầu sẽ dính suốt danh sách.
+    // Chỉ có nghĩa khi đang sắp xếp theo ngày.
+
+    function ungroup(list) {
+        list.querySelectorAll(".ch-group").forEach(group => {
+            const head = group.querySelector(".ch-month");
+            if (head) head.remove();
+            while (group.firstChild) list.insertBefore(group.firstChild, group);
+            group.remove();
+        });
+    }
+
+    function regroup(list) {
+        if (filterState.sort.indexOf("date") !== 0) return;
+
+        let group = null;
+        let current = null;
+
+        Array.from(list.children).forEach(row => {
+            if (!row.classList.contains("ch-row") || row.style.display === "none") return;
+
+            const month = row.dataset.month || "";
+            if (month !== current) {
+                current = month;
+                group = document.createElement("section");
+                group.className = "ch-group";
+
+                const head = document.createElement("p");
+                head.className = "ch-month";
+                head.textContent = month;
+                group.appendChild(head);
+
+                list.insertBefore(group, row);
+            }
+            group.appendChild(row);
+        });
+    }
+
+
+    /* ============ CHÂN DANH SÁCH ============ */
+
+    function pageNumbers(current, total) {
+        if (total <= 7) {
+            return Array.from({ length: total }, (_, i) => i + 1);
+        }
+        const pages = [1];
+        if (current > 4) pages.push("gap");
+
+        const start = Math.max(2, current - 1);
+        const end = Math.min(total - 1, current + 1);
+        for (let i = start; i <= end; i++) pages.push(i);
+
+        if (current < total - 3) pages.push("gap");
+        pages.push(total);
+        return pages;
+    }
+
+    function renderFoot(tab, total, page, totalPages, shown) {
+        const foot = panels[tab].querySelector(".ch-foot");
+        const info = foot.querySelector(".ch-foot__info");
+        const pager = foot.querySelector(".ch-pager");
+
+        if (total === 0) {
+            foot.classList.add("is-hidden");
+            info.textContent = "";
+            pager.innerHTML = "";
+            return;
+        }
+        foot.classList.remove("is-hidden");
+
+        if (isMobile()) {
+            info.textContent = T.showing + " " + shown + " " + T.of + " " + total;
+            pager.innerHTML = page < totalPages
+                ? '<button type="button" class="ch-btn ch-btn--wide" data-more="1">' + T.loadMore + "</button>"
+                : "";
+            return;
+        }
+
+        const from = (page - 1) * PER_PAGE + 1;
+        const to = Math.min(page * PER_PAGE, total);
+        info.textContent = T.showing + " " + from + "-" + to + " " + T.of + " " + total;
+
+        let html = '<button type="button" class="ch-page" data-page="' + (page - 1) + '"' +
+                   (page === 1 ? " disabled" : "") +
+                   '><span class="material-symbols-outlined">chevron_left</span></button>';
+
+        pageNumbers(page, totalPages).forEach(p => {
+            if (p === "gap") {
+                html += '<span class="ch-gap">...</span>';
+            } else {
+                html += '<button type="button" class="ch-page' + (p === page ? " is-active" : "") +
+                        '" data-page="' + p + '">' + p + "</button>";
+            }
+        });
+
+        html += '<button type="button" class="ch-page" data-page="' + (page + 1) + '"' +
+                (page === totalPages ? " disabled" : "") +
+                '><span class="material-symbols-outlined">chevron_right</span></button>';
+
+        pager.innerHTML = html;
+    }
+
+
+    /* ============ VÒNG CHÍNH ============ */
+
+    function apply() {
+        const tab = activeTab();
+        const panel = panels[tab];
+        const list = panel.querySelector(".ch-list");
+
+        ungroup(list);
+        const rows = sortRows(list);
+
+        const visible = rows.filter(matches);
+        rows.forEach(row => { if (visible.indexOf(row) === -1) row.style.display = "none"; });
+
+        const result = paginate(tab, visible);
+        regroup(list);
+        renderFoot(tab, visible.length, result.page, result.totalPages, result.shown);
+
+        const emptyFiltered = panel.querySelector(".ch-empty--filtered");
+        emptyFiltered.hidden = !(rows.length > 0 && visible.length === 0);
+
+        syncChips();
+
+        // Hiệu ứng dâng chỉ chạy ở lần dựng đầu tiên của danh sách này.
+        // Mọi lần sau đều có chuyển chỗ <article> trong DOM, mà chuyển chỗ là
+        // animation chạy lại từ đầu - không phải thứ ta muốn khi bấm Load more.
+        if (list.classList.contains("ch-list--enter")) {
+            setTimeout(() => list.classList.remove("ch-list--enter"), 900);
+        }
+    }
+
+
+    /* ============ SỰ KIỆN ============ */
+
+    // Mở / đóng menu
+    root.addEventListener("click", function (e) {
+        const chip = e.target.closest(".ch-chip");
+        if (!chip) return;
+        const wrap = chip.closest(".ch-filter");
+        if (wrap.querySelector(".ch-panel-menu").hidden) openMenu(wrap);
+        else closeMenus();
+    });
+
+    // Chọn một lựa chọn
+    root.addEventListener("click", function (e) {
+        const opt = e.target.closest(".ch-opt");
+        if (!opt) return;
+
+        const wrap = opt.closest(".ch-filter");
+        wrap.querySelectorAll(".ch-opt").forEach(o => o.classList.remove("is-active"));
+        opt.classList.add("is-active");
+        wrap.querySelector(".ch-chip__v").textContent = opt.textContent;
+
+        filterState[wrap.dataset.filter] = opt.dataset.value;
+        pageState[activeTab()] = 1;
+
+        closeMenus();
+        apply();
+    });
+
+    // Phân trang / dồn thêm
+    root.addEventListener("click", function (e) {
+        const more = e.target.closest("[data-more]");
+        if (more) {
+            pageState[activeTab()] += 1;
+            apply();
+            return;
+        }
+
+        const pageBtn = e.target.closest(".ch-page");
         if (!pageBtn || pageBtn.disabled) return;
 
-        e.stopPropagation();
+        const target = parseInt(pageBtn.dataset.page, 10);
+        if (isNaN(target)) return;
 
-        const targetPage = parseInt(pageBtn.dataset.page);
-        if (isNaN(targetPage)) return;
+        pageState[activeTab()] = target;
+        apply();
+    });
 
-        const activeTab = document.querySelector('.history-tab.active').dataset.tab;
-        paginationState[activeTab].currentPage = targetPage;
+    // Đổi tab
+    tabs.forEach((tab, index) => {
+        tab.addEventListener("click", function () {
+            const target = tab.dataset.tabTarget;
 
-        applyFilter()
-    })
-    //================== Tab switcher ======================    
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            const target = tab.dataset.tab;
-
-            updateStatusOptions(target)
-            tabs.forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
+            tabs.forEach(t => {
+                t.classList.remove("ch-tab--active");
+                t.setAttribute("aria-selected", "false");
+            });
+            tab.classList.add("ch-tab--active");
+            tab.setAttribute("aria-selected", "true");
+            tabsWrap.style.setProperty("--tab-i", index);
 
             Object.keys(panels).forEach(key => {
-                panels[key].style.display = (key === target) ? "block" : "none";
+                panels[key].classList.toggle("ch-panel--active", key === target);
             });
 
-            // Swap context-specific filter chips
-            if (target === "appointments") {
-                filterAppointments.forEach(f => f.style.display = "");
-                filterInvoices.forEach(f => f.style.display = "none");
-            } else {
-                filterAppointments.forEach(f => f.style.display = "none");
-                filterInvoices.forEach(f => f.style.display = "");
-            }
+            root.querySelectorAll(".ch-filter--appt").forEach(f => { f.hidden = target !== "appointments"; });
+            root.querySelectorAll(".ch-filter--inv").forEach(f => { f.hidden = target !== "invoices"; });
 
-            resetFilters()
+            rebuildStatusOptions(target);
+            resetFilters();
         });
     });
 
-    // =========== Filter dropdown toggle ===============
-    filterChips.forEach(chip => {
-        chip.addEventListener("click", (e) => {
-            e.stopPropagation();
-            
-            const wrapper = chip.closest('.filter-dropdown');
-            const panel = wrapper.querySelector('.filter-panel');
+    clearBtn.addEventListener("click", resetFilters);
 
-            const willOpen = panel.hidden;
+    scrim.addEventListener("click", closeMenus);
 
-            // reset others
-            document.querySelectorAll('.filter-panel').forEach(p => p.hidden = true);
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('is-open'));
-
-            if (willOpen) {
-                panel.hidden = false;
-                chip.classList.add('is-open');
-            }
-        })
+    document.addEventListener("click", function (e) {
+        if (!e.target.closest(".ch-filter")) closeMenus();
     });
 
-    document.addEventListener("click", (e) =>{
-        
-        if(e.target.closest('.filter-dropdown')) {
-                return;
-        }
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") closeMenus();
+    });
 
-        document.querySelectorAll('.filter-panel').forEach(p => p.hidden = true);
-        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('is-open'));
-    
-    })
+    // Đổi hướng máy / xoay ngang: desktop và mobile phân trang khác nhau
+    window.matchMedia("(max-width: 768px)").addEventListener("change", function () {
+        pageState.appointments = 1;
+        pageState.invoices = 1;
+        apply();
+    });
 
-    // ========== Choose filter option ==============
-    document.addEventListener('click', (e)=>{
-        const option = e.target.closest('.filter-option');
-        if (!option) {return};
 
-        e.stopPropagation();
+    /* ============ KHỞI TẠO ============ */
 
-        const wrapper = option.closest('.filter-dropdown');
-        const chip = wrapper.querySelector('.filter-chip');
-        const valueSpan = chip.querySelector('.filter-value');
-        const panel = wrapper.querySelector('.filter-panel');
+    const hash = window.location.hash.replace("#", "");
+    const startTab = panels[hash] ? hash : "appointments";
+    const startIndex = startTab === "invoices" ? 1 : 0;
 
-        panel.querySelectorAll('.filter-option').forEach(opt =>{
-            opt.classList.remove('active');
-            
-        });
+    tabs.forEach((t, i) => {
+        const on = i === startIndex;
+        t.classList.toggle("ch-tab--active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    tabsWrap.style.setProperty("--tab-i", startIndex);
 
-        option.classList.add('active');
-        valueSpan.textContent = option.textContent;
-        panel.hidden = true;
-        chip.classList.remove('is-open');
+    Object.keys(panels).forEach(key => {
+        panels[key].classList.toggle("ch-panel--active", key === startTab);
+    });
 
-        const filterKey = wrapper.dataset.filter;
-        const filterValue = option.dataset.value;
-        filterState[filterKey] = filterValue;
+    root.querySelectorAll(".ch-filter--appt").forEach(f => { f.hidden = startTab !== "appointments"; });
+    root.querySelectorAll(".ch-filter--inv").forEach(f => { f.hidden = startTab !== "invoices"; });
 
-        applyFilter()
-    })
-    // ========== filter clear ==============
-    clearBtn.addEventListener('click', resetFilters)
-
-    // ========== Auto-activate tab from URL hash ==============
-    const hash = window.location.hash.replace('#', '');
-    if (hash && panels[hash]) {
-        tabs.forEach(t => t.classList.remove('active'));
-        const targetTab = document.querySelector(`.history-tab[data-tab="${hash}"]`);
-        if (targetTab) targetTab.classList.add('active');
-
-        Object.keys(panels).forEach(key => {
-            panels[key].style.display = (key === hash) ? 'block' : 'none';
-        });
-
-        updateStatusOptions(hash);
-
-        if (hash === 'invoices') {
-            filterAppointments.forEach(f => f.style.display = 'none');
-            filterInvoices.forEach(f => f.style.display = '');
-        }
-        resetFilters();
-    }
-
+    rebuildStatusOptions(startTab);
+    resetFilters();
 });
 </script>
 {% endblock %}

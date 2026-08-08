@@ -785,11 +785,10 @@ def view_booking_details(booking_id):
     )
     
     booking_date_obj = datetime.strptime(booking["booking_date"], "%Y-%m-%d")
-    booking_date1 = booking_date_obj.strftime("%b %d")
     booking_date2 = booking_date_obj.strftime("%a")
-    
+
     booking_time = format_booking_time(booking["start_time"])
-    
+
     address = "Kyyhkysmäki 9, 02650 Espoo"
     ggmap_url = build_gg_map_url(address)
 
@@ -800,13 +799,17 @@ def view_booking_details(booking_id):
         service=service["name"],
         duration=service["duration_minutes"],
         price=service["price"],
-        date1=booking_date1,
         date2=booking_date2,
         time=booking_time,
         staff=staff["full_name"],
         staff_photo=staff["photo"],
         map_url=ggmap_url,
         service_description=service["description"],
+        # Video minh hoạ dùng lại hệ sẵn có của trang /services:
+        # video_url chỉ có giá trị khi transcode xong, nên template chỉ
+        # cần kiểm nó có hay không, không phải đọc video_status.
+        service_image=service["image"],
+        service_video=service["video_url"],
         booking=booking,
     )
 

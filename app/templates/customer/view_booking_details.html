@@ -1,153 +1,247 @@
 {% extends "customer_base.html" %}
 
-{% block title %}{{ _('Book Details') }}{% endblock %}
+{% block title %}{{ _('Booking Details') }}{% endblock %}
 
 {% block nav_bookings %}active{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/customer/booking_details.css') }}">
 {% endblock %}
+
 {% block customer_content %}
 
-<div class="booking-details-page">
-  <section class="booking-details-header">
-    <div class="booking-details-header__left">
-      <a href="{{ url_for('main.my_bookings') }}" class="back-link">
-        ← {{ _('Back to Appointments') }}
-      </a>
-      <h1 class="booking-details-title">{{ _('Booking Details') }}</h1>
-    </div>
+{#  Trạng thái từ DB là chuỗi thô, phải map sang msgid mới dịch được.
+    Bản cũ in thẳng `{{ status }}` nên luôn ra tiếng Anh kể cả UI là FI/VI. #}
+{% set status_labels = {
+     'confirmed': _('Confirmed'),
+     'pending':   _('Pending'),
+     'cancelled': _('Cancelled'),
+     'completed': _('Completed')
+   } %}
 
-    <div class="booking-details-header__right">
-      {% if status == 'confirmed' or status == 'pending' %}
-      <a href="{{ calendar_url }}" target="_blank" class="btn btn-outline-pink">
-        <span class="btn-icon">📅</span>
-        {{ _('Add to Calendar') }}
-      </a>
-      {% endif %}
-    </div>
-  </section>
+{#  Lịch còn hiệu lực = còn hành động để làm, và là thứ duy nhất được
+    mang bề mặt plum. Đã huỷ / đã xong thì chuyển sang nền sáng. #}
+{% set is_live = status in ('confirmed', 'pending') %}
 
-  <section class="booking-details-layout">
-    <div class="booking-main-column">
-      <article class="booking-summary-card">
-        <div class="booking-summary-card__top">
-          <span class="status-badge status-badge--{{status}}">{{ status }}</span>
+<div class="bd{% if not is_live %} bd--nobar{% endif %}">
 
-          <h2 class="booking-service-title">{{ service }}</h2>
+  <a href="{{ url_for('main.my_bookings') }}" class="bd-back">
+    <span class="material-symbols-outlined">arrow_back</span>
+    {{ _('Back to Appointments') }}
+  </a>
 
-          <div class="booking-meta-inline">
-            <div class="booking-meta-inline__item">
-              <span class="meta-icon">🕒</span>
+  <h1 class="bd-title">{{ _('Booking Details') }}</h1>
+
+  <div class="bd-layout">
+
+    <div class="bd-main">
+
+      {# ── Lịch hẹn. Trạng thái nói bằng chữ vì đây là lý do chính
+             khách mở trang, và vì chỉ có một object nên không có
+             nguy cơ lặp nhãn như trong danh sách. ── #}
+      <section class="bd-focus{% if not is_live %} bd-focus--past{% endif %}{% if status == 'cancelled' %} bd-focus--cancelled{% endif %}"
+               style="--bd-i: 0">
+
+        <h2 class="bd-focus__service">
+          <span class="bd-focus__name">{{ service }}</span>
+          <span class="bd-status bd-status--{{ status }}">{{ status_labels.get(status, status) }}</span>
+        </h2>
+
+        <div class="bd-slot">
+          <p class="bd-slot__date">
+            <span class="bd-slot__day">{{ booking['booking_date'] | format_date('%d') }}</span>
+            <span class="bd-slot__mon">{{ booking['booking_date'] | format_date('%b') }}</span>
+          </p>
+
+          <div class="bd-slot__main">
+            <p class="bd-slot__when">{{ date2 }}, {{ time }}</p>
+            <p class="bd-slot__facts">
               <span>{{ duration }} {{ _('mins') }}</span>
-            </div>
-
-            <div class="booking-meta-inline__item">
-              <span class="meta-icon">💳</span>
               <span>{{ price | format_currency }}</span>
-            </div>
+            </p>
           </div>
         </div>
 
-        <div class="booking-summary-card__middle">
-          <div class="date-tile">
-            <div class="date-tile__monthday">{{ date1 }}</div>
-            <div class="date-tile__time">{{ date2 }} • {{ time }}</div>
-          </div>
-
-          <div class="service-description-box">
-            <p class="service-description-box__label">{{ _('Service Description') }}</p>
-            <p class="service-description-box__text">{{ service_description }}</p>
-          </div>
+        {% if is_live %}
+        <div class="bd-focus__cta">
+          <a href="{{ calendar_url }}" target="_blank" rel="noopener" class="bd-btn bd-btn--pearl">
+            <span class="material-symbols-outlined">calendar_add_on</span>
+            {{ _('Add to Calendar') }}
+          </a>
         </div>
+        {% endif %}
 
-        <div class="booking-summary-card__bottom">
-          <div class="technician-box">
-            <div class="technician-box__avatar">
-              <img src="{{ staff_photo | staff_avatar }}" alt="{{ _('Technician avatar') }}">
-            </div>
-
-            <div class="technician-box__info">
-              <p class="technician-box__label">{{ _('Artist') }}</p>
-              <h3 class="technician-box__name">{{ staff }}</h3>
-              <p class="technician-box__role">{{ _('Senior Artist') }} • ★ 4.9</p>
-            </div>
-          </div>
-
-          <div class="booking-actions">
-            {% if status == 'confirmed' %}
-            <a href="{{ url_for('main.customer_reschedule', booking_id=booking['id']) }}" class="btn btn-dark">{{ _('Reschedule') }}</a>
-            <form action="{{ url_for('main.cancel_booking', booking_id=booking['id']) }}" method="post" class="inline-form">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="btn btn-text-danger">{{ _('Cancel') }}</button>
-            </form>
-            {% elif status == 'pending' %}
-            <form action="{{ url_for('main.cancel_booking', booking_id=booking['id']) }}" method="post" class="inline-form">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="btn btn-text-danger">{{ _('Cancel') }}</button>
-            </form>
-            {% endif %}
-          </div>
-        </div>
-      </article>
-
-      <section class="booking-notes-section">
-        <div class="section-title-row">
-          <span class="section-title-row__icon">🗒️</span>
-          <h2 class="section-title-row__title">{{ _('Appointment Notes') }}</h2>
-        </div>
-
-        <div class="notes-card">
-          <p>{{ _('Please arrive 5 minutes early to select your polish color. Soak-off for previous gel application is included in your service time. Refreshments are available at the lounge area.') }}</p>
-        </div>
       </section>
+
+
+      {# ── Hàng phẳng ngăn bằng hairline, không phải card xếp dọc ── #}
+      <section class="bd-rail" style="--bd-i: 1">
+
+        <div class="bd-rail__item">
+          <p class="bd-label">{{ _('Artist') }}</p>
+          <div class="bd-artist">
+            <div class="bd-artist__avatar">
+              <img src="{{ staff_photo | staff_avatar }}" alt="{{ staff }}">
+            </div>
+            <h3 class="bd-artist__name">{{ staff }}</h3>
+          </div>
+        </div>
+
+        {% if service_description %}
+        <div class="bd-rail__item">
+          <p class="bd-label">{{ _('Service Description') }}</p>
+          <p class="bd-text">{{ service_description }}</p>
+        </div>
+        {% endif %}
+
+        {#  Dùng lại hệ video của trang /services: filter `video_src` lo cả
+            tên file trần và URL đầy đủ, `video_url` chỉ có giá trị khi
+            transcode xong nên không cần đọc `video_status`.
+            preload="none" để mở trang không tải video; ảnh service làm
+            poster nên khung không nhảy trước khi bấm play. #}
+        {% set video = service_video | video_src %}
+        {% if video %}
+        <div class="bd-rail__item">
+          <p class="bd-label">{{ _('Demo video') }}</p>
+          <div class="bd-video">
+            <video class="bd-video__el"
+                   src="{{ video }}"
+                   poster="{{ service_image | img_src('services') }}"
+                   controls preload="none" playsinline></video>
+          </div>
+        </div>
+        {% endif %}
+
+      </section>
+
+
+      {# ── Hành động. Ở mobile khối này dính đáy màn hình (CSS),
+             cùng một markup cho cả hai breakpoint. ── #}
+      {% if is_live %}
+      <div class="bd-actionbar">
+        {% if status == 'confirmed' %}
+        <a href="{{ url_for('main.customer_reschedule', booking_id=booking['id']) }}"
+           class="bd-btn bd-btn--outline">{{ _('Reschedule') }}</a>
+        {% endif %}
+
+        <form action="{{ url_for('main.cancel_booking', booking_id=booking['id']) }}" method="post"
+              class="bk-cancel-form"
+              data-service="{{ service }}"
+              data-when="{{ date2 }}, {{ time }}"
+              data-staff="{{ staff }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="bd-btn bd-btn--danger">{{ _('Cancel') }}</button>
+        </form>
+      </div>
+      {% endif %}
+
     </div>
 
-    <aside class="booking-side-column">
-      <article class="location-card">
-        <div class="location-card__map">
-          <img src="{{ url_for('static', filename='images/public/nail_studio.jpg') }}" alt="{{ _('Salon location map') }}">
-          <div class="location-card__overlay">
-            <h3>DahaCare</h3>
-            <p>Espoo</p>
+
+    <aside class="bd-side">
+
+      <section class="bd-place" style="--bd-i: 2">
+        <div class="bd-place__map">
+          <img src="{{ url_for('static', filename='images/public/nail_studio.jpg') }}"
+               alt="{{ _('Salon location map') }}">
+          <div class="bd-place__stamp">
+            <p class="bd-place__salon">DahaCare</p>
           </div>
         </div>
 
-        <div class="location-card__body">
-          <div class="address-block">
-            <div class="address-block__icon">📍</div>
-
-            <div class="address-block__content">
-              <p class="address-block__label">{{ _('Address') }}</p>
-              <p class="address-block__text">
-                Kyykysmäki 9 A,<br>
-                02650 Espoo, Finland
-              </p>
-            </div>
-          </div>
-
-          <a href="{{ map_url }}" target="_blank" class="btn btn-outline-dark btn-full">
+        <div class="bd-place__body">
+          <p class="bd-label">{{ _('Address') }}</p>
+          <p class="bd-place__addr">
+            Kyykysmäki 9 A,<br>
+            02650 Espoo, Finland
+          </p>
+          <a href="{{ map_url }}" target="_blank" rel="noopener" class="bd-btn bd-btn--outline">
             {{ _('Get Directions') }}
           </a>
         </div>
-      </article>
+      </section>
 
-      <article class="contact-card">
-        <h3 class="contact-card__title">{{ _('Salon Contact') }}</h3>
+      {# ── Số và email là hàng bấm được thật. Bản cũ in ra <span>
+             nên trên mobile không gọi / không gửi mail được. ── #}
+      <section class="bd-contact" style="--bd-i: 3">
+        <p class="bd-label">{{ _('Salon Contact') }}</p>
 
-        <div class="contact-list">
-          <div class="contact-item">
-            <span class="contact-item__icon">📞</span>
-            <span>+358 465 978 425</span>
-          </div>
+        <a href="tel:+358465978425" class="bd-contact__row">
+          <span class="material-symbols-outlined">call</span>
+          <span>+358 465 978 425</span>
+        </a>
 
-          <div class="contact-item">
-            <span class="contact-item__icon">✉️</span>
-            <span>dahacaree@gmail.com</span>
-          </div>
-        </div>
-      </article>
+        <a href="mailto:dahacaree@gmail.com" class="bd-contact__row">
+          <span class="material-symbols-outlined">mail</span>
+          <span>dahacaree@gmail.com</span>
+        </a>
+      </section>
+
     </aside>
-  </section>
+
+  </div>
+
+
+  {# ── Xác nhận huỷ.
+         Tên class và id giữ nguyên `bk-` / `cancel-modal-*` để dùng lại
+         `js/my_booking.js`, thay vì submit POST thẳng như bản cũ của
+         trang này. JS bind theo đúng các tên đó. ── #}
+  {% if is_live %}
+  <div id="cancel-modal" class="bk-modal-overlay">
+    <div class="bk-modal" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title">
+
+      <div class="bk-modal__head">
+        <h3 class="bk-modal__title" id="cancel-modal-title">{{ _('Cancel appointment?') }}</h3>
+        <button type="button" class="bk-modal__close" id="cancel-modal-close" aria-label="{{ _('Close') }}">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="bk-modal__recap">
+        <p class="bk-modal__service" id="cancel-modal-service"></p>
+        <p class="bk-modal__line">
+          <span class="material-symbols-outlined">calendar_today</span>
+          <span id="cancel-modal-date"></span>
+        </p>
+        <p class="bk-modal__line">
+          <span class="material-symbols-outlined">person</span>
+          <span id="cancel-modal-stylist"></span>
+        </p>
+      </div>
+
+      <p class="bk-modal__warning">
+        <span class="material-symbols-outlined">info</span>
+        <span>{{ _('Cancellation Policy') }}</span>
+      </p>
+
+      <div class="bk-modal__field">
+        <label class="bk-modal__label" for="cancel-modal-reason">
+          {{ _('Reason for cancellation') }} <span class="bk-modal__optional">{{ _('(optional)') }}</span>
+        </label>
+        <select class="bk-modal__select" id="cancel-modal-reason">
+          <option value="">{{ _('Select a reason...') }}</option>
+          <option value="change_of_plans">{{ _('Change of plans') }}</option>
+          <option value="feeling_unwell">{{ _('Feeling unwell') }}</option>
+          <option value="reschedule">{{ _('Want to reschedule instead') }}</option>
+          <option value="other">{{ _('Other') }}</option>
+        </select>
+      </div>
+
+      <div class="bk-modal__foot">
+        <button type="button" id="cancel-modal-keep" class="bd-btn bd-btn--outline">{{ _('Keep appointment') }}</button>
+        <button type="button" id="cancel-modal-confirm" class="bd-btn bd-btn--destructive">{{ _('Yes, cancel') }}</button>
+      </div>
+
+    </div>
+  </div>
+  {% endif %}
+
 </div>
+
+{% endblock %}
+
+{% block script %}
+{% if status in ('confirmed', 'pending') %}
+<script src="{{ url_for('static', filename='js/my_booking.js') }}"></script>
+{% endif %}
 {% endblock %}

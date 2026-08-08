@@ -2983,3 +2983,19 @@ msgstr "Hôm nay"
 #: app/routes.py
 msgid "Tomorrow"
 msgstr "Ngày mai"
+
+#: app/templates/customer/customer_history.html
+msgid "Load more"
+msgstr "Xem thêm"
+
+#: app/templates/customer/customer_history.html
+msgid "Sort"
+msgstr "Sắp xếp"
+
+#: app/templates/customer/customer_history.html
+msgid "No invoices yet."
+msgstr "Chưa có hoá đơn nào."
+
+#: app/templates/customer/view_booking_details.html
+msgid "Demo video"
+msgstr "Video minh họa"
