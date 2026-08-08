@@ -3039,3 +3039,39 @@ msgstr "Đổi phần thưởng"
 #: app/templates/customer/loyalty_points.html
 msgid "No rewards available"
 msgstr "Chưa có phần thưởng nào"
+
+#: app/templates/customer/customer_membership.html
+msgid "Free"
+msgstr "Miễn phí"
+
+#: app/templates/customer/customer_membership.html
+msgid "per year"
+msgstr "mỗi năm"
+
+#: app/templates/customer/customer_membership.html
+msgid "points on all services"
+msgstr "điểm cho mọi dịch vụ"
+
+#: app/templates/customer/customer_membership.html
+msgid "Switch to Silver"
+msgstr "Chuyển về Silver"
+
+#: app/templates/customer/customer_membership.html
+msgid "Renews on"
+msgstr "Gia hạn ngày"
+
+#: app/templates/customer/customer_membership.html
+msgid "Upgrade"
+msgstr "Nâng cấp"
+
+#: app/templates/customer/customer_membership.html
+msgid "Other plans"
+msgstr "Gói khác"
+
+#: app/templates/customer/customer_membership.html
+msgid "Switch to Gold"
+msgstr "Chuyển sang Gold"
+
+#: app/templates/customer/customer_membership.html
+msgid "Keep renewal"
+msgstr "Giữ gia hạn"

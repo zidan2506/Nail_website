@@ -1,0 +1,887 @@
+/* =========================================================
+   CUSTOMER MEMBERSHIP  (prefix: ms-)
+   ---------------------------------------------------------
+   Trang DUY NHẤT của portal là trang BÁN HÀNG. Sáu trang kia
+   (Dashboard, My bookings, History, Booking details, Invoice
+   detail, Loyalty Points) đều trả lời "dữ liệu của tôi thế nào".
+   Trang này hỏi "bạn có muốn trả tiền không". Nét riêng đến từ
+   đúng chỗ đó, không từ hiệu ứng thêm vào:
+
+     1. BỐ CỤC ĐỔI THEO TRẠNG THÁI. Khách đã có một gói, nên
+        trang không hỏi "chọn gói nào" mà hỏi "có muốn lên không".
+        Gói đang dùng được nhấc ra thành thẻ plum, phần còn lại
+        là card nâng cấp. Đang Diamond thì không còn card nào.
+        Không trang nào khác trong portal đổi bố cục theo dữ liệu.
+
+     2. GIÁ LÀ VẬT LỚN NHẤT trong card. Không trang nào khác có
+        giá. Bản cũ in "Entry level" / "Most chosen" vào đúng chỗ
+        đáng ra là giá, nên khách chỉ thấy số tiền sau khi đã bấm
+        và sang tới Stripe.
+
+   Bản cũ có BẢY màu ngoài palette (#d64682 hồng thứ tư, #e8820c
+   cam, #c49a3c vàng, #5b2d8e và #9b6fd4 tím, #7a5520, #dc2626),
+   một glow cam ba lớp trên card Gold, 15 emoji làm bullet và 27
+   inline style. Tất cả đã bỏ. Tier phân biệt nhau bằng GIÁ và
+   HỆ SỐ ĐIỂM, là thông tin thật, không bằng màu gán thêm.
+
+   THANG ĐO - lấy đúng giá trị của bk- / bd- / lp-
+     bo góc   surface 20 · media 14 · control 12 · pill 999
+     accent   #ab2261 trên nền sáng
+              trên plum đổi sang pearl (hồng trên plum ~1.7:1)
+   ========================================================= */
+
+.ms {
+  --ms-ink:        #2A1520;
+  --ms-ink-2:      #6B5560;
+  --ms-ink-3:      #9C8A93;
+
+  --ms-accent:     #ab2261;
+  --ms-accent-2:   #8d1a4f;
+  --ms-wash:       #FBEEF4;
+  --ms-wash-2:     #F6E4EC;
+
+  --ms-plum:       #3E1F47;
+  --ms-pearl:      #FBF4F8;
+  --ms-pearl-2:    #D9C7D2;
+
+  --ms-surface:    #ffffff;
+  --ms-line:       #EDE3E8;
+  --ms-line-2:     #E2D4DB;
+
+  --ms-flag-bg:    #FBF0D8;
+  --ms-flag-ink:   #7A5A11;
+  --ms-danger:     #B03A4A;
+
+  --ms-r-surface:  20px;
+  --ms-r-media:    14px;
+  --ms-r-control:  12px;
+
+  --ms-ease:       cubic-bezier(0.16, 1, 0.3, 1);
+
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 32px 56px;
+  font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+  color: var(--ms-ink);
+}
+
+/* Codebase không có reset box-sizing toàn cục, khai trong phạm vi */
+.ms *,
+.ms *::before,
+.ms *::after { box-sizing: border-box; }
+
+/* Không set `color: inherit` chung cho .ms a: specificity (0,1,1) cao hơn mọi
+   .ms-btn--* (0,1,0) nên nút sẽ nuốt màu chữ của khối cha. */
+.ms a { text-decoration: none; }
+.ms button { font: inherit; }
+.ms form { margin: 0; }
+
+
+/* =========================================================
+   BUTTONS - một hình dạng, khác nhau ở lớp áo
+   ========================================================= */
+.ms-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: var(--ms-r-control);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+              color 0.2s ease, box-shadow 0.2s ease, transform 0.14s ease;
+}
+
+.ms-btn:active { transform: scale(0.98); }
+
+.ms-btn--solid {
+  background: var(--ms-accent);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(171, 34, 97, 0.20);
+}
+.ms-btn--solid:hover {
+  background: var(--ms-accent-2);
+  box-shadow: 0 10px 26px rgba(171, 34, 97, 0.26);
+}
+
+.ms-btn--outline {
+  background: var(--ms-surface);
+  color: var(--ms-ink);
+  border-color: var(--ms-line-2);
+}
+.ms-btn--outline:hover { background: #FCF8FA; border-color: var(--ms-ink-3); }
+
+.ms-btn--quiet {
+  min-height: 40px;
+  padding: 0 14px;
+  background: transparent;
+  color: var(--ms-ink-2);
+  border-color: var(--ms-line-2);
+  font-size: 0.86rem;
+}
+.ms-btn--quiet:hover {
+  background: var(--ms-wash);
+  border-color: var(--ms-accent);
+  color: var(--ms-accent);
+}
+
+/* Trên nền plum: pearl thay cho hồng */
+.ms-btn--pearl {
+  background: var(--ms-pearl);
+  color: var(--ms-plum);
+}
+.ms-btn--pearl:hover { background: #ffffff; }
+
+.ms-btn--outline-light {
+  background: transparent;
+  color: var(--ms-pearl);
+  border-color: rgba(251, 244, 248, 0.34);
+}
+.ms-btn--outline-light:hover {
+  background: rgba(251, 244, 248, 0.10);
+  border-color: rgba(251, 244, 248, 0.62);
+}
+
+/* Gói chưa cấu hình Stripe Price. upgrade_plan chặn ở server rồi flash lỗi,
+   nên nút phải nói trước thay vì cho bấm vào ngõ cụt. */
+.ms-btn[disabled] {
+  background: #F4F0F2;
+  border-color: var(--ms-line-2);
+  color: var(--ms-ink-3);
+  box-shadow: none;
+  cursor: default;
+}
+.ms-btn[disabled]:active { transform: none; }
+
+.ms-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(171, 34, 97, 0.28);
+}
+.ms-btn--pearl:focus-visible,
+.ms-btn--outline-light:focus-visible {
+  box-shadow: 0 0 0 3px rgba(251, 244, 248, 0.45);
+}
+
+
+/* =========================================================
+   HEADER
+   Bỏ eyebrow "MEMBERSHIP" của bản cũ: h1 và nav item đang active
+   đã nói trang này là gì.
+   ========================================================= */
+.ms-intro {
+  margin-bottom: 22px;
+}
+
+.ms-intro__title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.ms-intro__sub {
+  margin: 8px 0 0;
+  max-width: 56ch;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ms-ink-2);
+}
+
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+.ms-sec { margin-top: 32px; }
+
+.ms-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 14px;
+}
+
+.ms-head__title {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.ms-head__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--ms-line);
+}
+
+
+/* =========================================================
+   NOTICE - hai băng thông báo
+   Bản cũ viết cả hai bằng inline style, gồm cả màu đỏ #dc2626
+   không thuộc palette.
+   ========================================================= */
+.ms-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 15px 18px;
+  margin-bottom: 14px;
+  border: 1px solid var(--ms-line-2);
+  border-radius: var(--ms-r-media);
+  background: var(--ms-surface);
+}
+
+.ms-notice__glyph {
+  flex-shrink: 0;
+  display: inline-flex;
+  color: var(--ms-accent);
+}
+.ms-notice__glyph .material-symbols-outlined { font-size: 21px; }
+
+.ms-notice__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ms-notice__text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ms-ink-2);
+}
+.ms-notice__text strong { color: var(--ms-ink); font-weight: 700; }
+
+.ms-notice__act {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* Thanh toán lỗi: dùng danger của portal, không phải #dc2626 */
+.ms-notice--alert {
+  border-color: rgba(176, 58, 74, 0.34);
+  background: #FDF5F6;
+}
+.ms-notice--alert .ms-notice__glyph { color: var(--ms-danger); }
+.ms-notice--alert .ms-notice__text strong { color: var(--ms-danger); }
+
+
+/* =========================================================
+   PLAN GRID / STRIP
+   ---------------------------------------------------------
+   MỘT dải chứa MỌI gói, mỗi card luôn có đủ quyền lợi.
+
+   Bản trước chia ba khối rời (thẻ gói hiện tại / card nâng cấp /
+   hàng bậc thấp hơn) và hệ quả là khách ở bậc CAO NHẤT không đọc
+   được quyền lợi của gói nào: khối nâng cấp rỗng, còn hai khối kia
+   chỉ có tên + giá + hệ số. Người trả tiền nhiều nhất lại là người
+   duy nhất không biết mình đang có gì.
+
+   Desktop 3 cột vì 1180px đủ chỗ và thấy cả ba cùng lúc mới so
+   sánh được, vốn là việc chính của trang. Mobile cuộn ngang, dùng
+   lại đúng pattern .lp-strip của Loyalty.
+
+   Đây KHÔNG phải "ba card giống nhau" mà quy tắc thiết kế cấm: một
+   trong ba mang nền plum, và mỗi card có dải vật liệu riêng. Chúng
+   khác nhau theo dữ liệu thật.
+   ========================================================= */
+.ms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: stretch;
+  gap: 18px;
+}
+
+.ms-plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid var(--ms-line);
+  border-radius: var(--ms-r-surface);
+  background: var(--ms-surface);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.ms-plan:hover {
+  border-color: var(--tier-ink, rgba(171, 34, 97, 0.30));
+  box-shadow: 0 12px 30px rgba(44, 20, 51, 0.08);
+}
+
+.ms-plan__top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ms-plan__id {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.ms-plan__name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--tier-ink, var(--ms-ink));
+}
+
+
+/* =========================================================
+   TIER IDENTITY - màu vật liệu cho từng bậc
+   ---------------------------------------------------------
+   Silver / Gold / Diamond là TÊN VẬT LIỆU, nên chúng có màu vốn
+   có trong văn hoá. Bỏ sạch màu để giữ palette lock thì mất luôn
+   affordance: khách phải đọc chữ mới biết đang xem bậc nào.
+
+   Nhưng bản cũ làm sai cách: glow cam ba lớp (#e8820c + #dc3c14),
+   tím #8a2be2 cho Diamond, viền gradient bốn stop. Nay:
+
+     - màu vật liệu chỉ ở BỀ MẶT: dải đỉnh, glyph, tên, wash góc
+     - HÀNH ĐỘNG giữ accent portal #ab2261 ở mọi card
+
+   Nút không mang màu tier vì contrast: vàng #C9A24E với chữ trắng
+   chỉ đạt 2.2:1. Muốn vàng đủ contrast thì phải đậm thành nâu
+   #8A6A26, lúc đó hết "golden". Giữ nút hồng cũng để khách học
+   được một quy tắc duy nhất: hồng là bấm được.
+
+   HAI token mỗi tier, vì màu sáng đẹp trên bề mặt nhưng không đọc
+   được làm chữ:
+     --tier       dải đỉnh, glyph, viền hover, wash
+     --tier-ink   chữ, đủ WCAG AA trên nền trắng
+   ========================================================= */
+.ms-tier--silver {
+  --tier:      #A9A6AE;
+  --tier-ink:  #64616B;
+  --tier-wash: rgba(169, 166, 174, 0.14);
+  --tier-band: linear-gradient(90deg, #C7C4CB 0%, #8E8B93 34%, #DAD8DD 62%, #9B98A1 100%);
+}
+
+.ms-tier--gold {
+  --tier:      #C9A24E;
+  --tier-ink:  #8A6A26;
+  --tier-wash: rgba(201, 162, 78, 0.16);
+  --tier-band: linear-gradient(90deg, #E3C782 0%, #B08A3E 30%, #F0DFAE 58%, #C9A24E 100%);
+}
+
+/* Kim cương thật KHÔNG tím. "Blink blink" của nó là tán sắc trên nền
+   trắng lạnh, nên tông ở đây là băng, và độ lấp lánh nằm ở dải sáng
+   chạy qua (.ms-plan.ms-tier--diamond::after) chứ không ở màu violet. */
+.ms-tier--diamond {
+  --tier:      #8FB8CE;
+  --tier-ink:  #3F6B85;
+  --tier-wash: rgba(143, 184, 206, 0.16);
+  --tier-band: linear-gradient(90deg, #BFDCEC 0%, #FFFFFF 26%, #8FB8CE 52%, #EAF4F9 76%, #A8CBDD 100%);
+}
+
+/* Dải vật liệu ở đỉnh card: dấu hiệu nhận diện đọc được trong một
+   nhịp mắt, trước cả khi đọc tên. */
+.ms-plan::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--tier-band, var(--ms-accent));
+}
+
+/* Wash góc trên phải: cho bề mặt một chút "vật liệu" mà không nhuộm
+   cả card. Nằm dưới nội dung nhờ z-index của .ms-plan__top. */
+.ms-plan__sheen {
+  position: absolute;
+  inset: 0 0 auto auto;
+  z-index: 0;
+  width: 62%;
+  height: 46%;
+  background: radial-gradient(120% 120% at 100% 0%, var(--tier-wash, transparent) 0%, transparent 68%);
+  pointer-events: none;
+}
+
+/* Glyph dung --tier-ink chu khong --tier: tong vat lieu SANG chi dat
+   2.1-2.4:1 tren nen trang, duoi nguong 3:1 cua WCAG 1.4.11 cho non-text.
+   Tong dam van doc ra la "vang" nho dai champagne sang ngay phia tren. */
+.ms-plan__glyph {
+  flex-shrink: 0;
+  display: inline-flex;
+  color: var(--tier-ink, var(--ms-accent));
+}
+.ms-plan__glyph .material-symbols-outlined { font-size: 22px; }
+
+/* Diamond: dải sáng chạy qua thanh vật liệu. Đây là chuyển động DUY
+   NHẤT tự chạy trên trang, và nó trả lời được câu "vật liệu này lấp
+   lánh", tức là nó mang nghĩa chứ không trang trí. Chỉ đi qua dải 3px
+   nên không kéo mắt khỏi giá. */
+.ms-plan.ms-tier--diamond::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 38%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.15) 62%,
+    transparent 100%);
+  transform: translateX(-100%);
+  animation: ms-shine 4.5s var(--ms-ease) infinite;
+  pointer-events: none;
+}
+
+@keyframes ms-shine {
+  0%   { transform: translateX(-100%); }
+  55%  { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Nhãn "Popular": cùng công thức badge của .bd-status / .inv-status
+   nền hue @ 10% · viền hue @ 30% · chữ cùng hue */
+.ms-flag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border: 1px solid rgba(171, 34, 97, 0.30);
+  border-radius: 999px;
+  background: rgba(171, 34, 97, 0.10);
+  color: var(--ms-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* GIÁ là vật lớn nhất của card. Đây là thứ trang này có mà sáu
+   trang kia không, nên nó được mang trọng lượng lớn nhất. */
+.ms-plan__price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  font-size: 2.1rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ms-ink);
+}
+
+.ms-plan__per {
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ms-ink-3);
+}
+
+.ms-plan__tag {
+  margin: 8px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ms-ink-2);
+}
+
+
+/* =========================================================
+   PERKS - quyền lợi
+   Bản cũ dùng 15 emoji ✦ làm bullet trong khi cả portal dùng
+   Material Symbols.
+   ========================================================= */
+.ms-perks {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--ms-line);
+}
+
+.ms-perks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ms-ink-2);
+}
+
+/* Tick mang màu vật liệu của bậc, nhưng dùng --tier-ink: tông sáng chỉ
+   đạt 2.4:1 trên trắng, dưới ngưỡng 3:1 cho non-text. */
+.ms-perks .material-symbols-outlined {
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 18px;
+  color: var(--tier-ink, var(--ms-accent));
+}
+
+/* Dòng "Tất cả của Silver" là bản lề giữa hai bậc, nên nó đậm hơn */
+.ms-perks li:first-child { color: var(--ms-ink); font-weight: 700; }
+
+/* Hệ số điểm lấy từ point_multiplier trong DB, không hardcode trong msgid */
+.ms-perks__mult {
+  font-weight: 700;
+  color: var(--ms-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ms-plan__cta {
+  padding-top: 20px;
+  margin-top: auto;
+}
+.ms-plan__cta .ms-btn { width: 100%; }
+
+
+/* =========================================================
+   CURRENT PLAN - card đang sở hữu
+   ---------------------------------------------------------
+   Nền plum, cùng motif .lp-card ở Loyalty và .bk-focus ở My bookings.
+
+   KHÔNG có viền. Bề mặt plum nằm giữa các card nền trắng đã là tương
+   phản mạnh nhất trên trang, nên thêm viền là lớp thứ hai nói lại đúng
+   một điều. Chiều sâu đến từ box-shadow, cùng cách hai trang kia làm.
+
+   Dấu hiệu "của bạn" nằm ở ba chỗ, đủ mà không lặp:
+     bề mặt plum · nút "Gói hiện tại" ở đáy · vị trí đầu dải
+   ========================================================= */
+.ms-plan--now {
+  background:
+    radial-gradient(120% 140% at 88% 6%, rgba(171, 34, 97, 0.42) 0%, transparent 58%),
+    linear-gradient(135deg, #46224F 0%, #3E1F47 46%, #2C1433 100%);
+  color: var(--ms-pearl);
+  border-color: transparent;
+  box-shadow: 0 18px 44px rgba(44, 20, 51, 0.26);
+}
+/* Hover không đổi gì: card này không phải thứ để bấm mua, nên nó không
+   nhận phản hồi hover của .ms-plan */
+.ms-plan--now:hover {
+  border-color: transparent;
+  box-shadow: 0 18px 44px rgba(44, 20, 51, 0.26);
+}
+
+/* Trên plum, glyph và chữ dùng tông SÁNG của vật liệu. --tier-ink
+   (#8A6A26 với Gold) trên plum chỉ đạt ~2.8:1, không đọc được. */
+.ms-plan--now .ms-plan__name { color: var(--ms-pearl); }
+.ms-plan--now .ms-plan__glyph { color: var(--tier, var(--ms-pearl)); }
+.ms-plan--now .ms-plan__price { color: var(--ms-pearl); }
+.ms-plan--now .ms-plan__per   { color: var(--ms-pearl-2); }
+.ms-plan--now .ms-plan__tag   { color: var(--ms-pearl-2); }
+
+.ms-plan--now .ms-perks {
+  border-top-color: rgba(217, 199, 210, 0.24);
+}
+.ms-plan--now .ms-perks li { color: var(--ms-pearl-2); }
+.ms-plan--now .ms-perks li:first-child { color: var(--ms-pearl); }
+.ms-plan--now .ms-perks .material-symbols-outlined { color: var(--tier, var(--ms-pearl)); }
+.ms-plan--now .ms-perks__mult { color: var(--ms-pearl); }
+
+/* Badge "gói hiện tại" trên plum: pearl mờ, cùng công thức .bd-status */
+.ms-plan--now .ms-flag {
+  border-color: rgba(251, 244, 248, 0.34);
+  background: rgba(251, 244, 248, 0.12);
+  color: var(--ms-pearl);
+}
+
+/* Wash góc bị tắt: nền plum đã có radial glow riêng, thêm lớp nữa
+   là hai gradient đè nhau thành mảng đục. */
+.ms-plan--now .ms-plan__sheen { display: none; }
+
+/* Nút "gói hiện tại" trên plum.
+   Selector phải có `.ms-plan--now` phía trước: `.ms-btn[disabled]`
+   có specificity (0,2,0), cao hơn mọi `.ms-btn--*` (0,1,0), nên nếu
+   chỉ dựa vào biến thể thì nút bị ghi đè thành nền xám #F4F0F2 chữ
+   xám nhạt, đặt trên card plum trông như lỗi render.
+
+   Đây là nhãn trạng thái, không phải nút bấm được, nên nó cố tình
+   PHẲNG hơn các CTA thật: không nền đặc, không đổ bóng. */
+.ms-plan--now .ms-btn[disabled] {
+  background: rgba(251, 244, 248, 0.12);
+  border-color: rgba(251, 244, 248, 0.34);
+  color: var(--ms-pearl);
+  box-shadow: none;
+}
+
+/* Lý do không mua được nói bằng chữ, dưới nút, không phải tooltip */
+.ms-plan__why {
+  margin: 9px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--ms-ink-3);
+  text-align: center;
+}
+
+
+/* =========================================================
+   CONFIRM MODAL - xác nhận huỷ gia hạn  (ms-modal)
+   ---------------------------------------------------------
+   Huỷ gia hạn là hành động không đảo được từ phía khách (mở lại
+   phải mua lại qua Stripe), nên nó cần một bước xác nhận, cùng
+   quy ước với modal huỷ lịch hẹn ở My bookings.
+
+   Markup nằm TRONG `.ms` để thấy token: hai modal ở Loyalty từng
+   là sibling của wrapper trang và mọi var() trong đó là undefined,
+   nền biến mất. `position: fixed` vẫn neo theo viewport vì `.ms`
+   không có transform hay filter tạo containing block.
+
+   Ở mobile là sheet trượt lên từ đáy, cùng quy ước .bk-modal,
+   .lp-vd và .rdm.
+   ========================================================= */
+.ms-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(30, 12, 22, 0.52);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.ms-modal.is-open { display: flex; }
+
+.ms-modal__card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 430px;
+  padding: 26px;
+  border-radius: var(--ms-r-surface);
+  background: var(--ms-surface);
+  box-shadow: 0 28px 64px rgba(30, 12, 22, 0.24);
+  animation: ms-modal-in 0.3s var(--ms-ease);
+}
+
+@keyframes ms-modal-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+}
+
+.ms-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.ms-modal__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ms-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--ms-r-control);
+  background: var(--ms-wash);
+  color: var(--ms-ink-2);
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+.ms-modal__close:hover { background: var(--ms-wash-2); color: var(--ms-ink); }
+.ms-modal__close .material-symbols-outlined { font-size: 20px; }
+
+/* Nhắc lại gói đang huỷ: khách phải thấy mình đang huỷ CÁI GÌ */
+.ms-modal__recap {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 15px 16px;
+  border-radius: var(--ms-r-control);
+  background: var(--ms-wash);
+}
+
+.ms-modal__glyph {
+  flex-shrink: 0;
+  display: inline-flex;
+  color: var(--tier-ink, var(--ms-accent));
+}
+.ms-modal__glyph .material-symbols-outlined { font-size: 22px; }
+
+.ms-modal__plan {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  color: var(--tier-ink, var(--ms-ink));
+}
+
+.ms-modal__when {
+  margin: 2px 0 0;
+  font-size: 0.86rem;
+  color: var(--ms-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hệ quả nói bằng chữ, dùng hổ phách của portal: đây là cảnh báo
+   chứ không phải lỗi, nên không dùng danger. */
+.ms-modal__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 13px 15px;
+  border-radius: var(--ms-r-control);
+  background: var(--ms-flag-bg);
+  color: var(--ms-flag-ink);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+.ms-modal__note .material-symbols-outlined { font-size: 18px; flex-shrink: 0; }
+
+.ms-modal__foot {
+  display: flex;
+  gap: 10px;
+}
+.ms-modal__foot .ms-btn { flex: 1 1 0; }
+
+/* Nút phá huỷ: đặc màu danger, và nó là nút DUY NHẤT trên trang mang
+   màu đó, nên không lẫn với CTA mua. */
+.ms-btn--destructive {
+  background: var(--ms-danger);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(176, 58, 74, 0.22);
+}
+.ms-btn--destructive:hover { background: #96303e; }
+.ms-btn--destructive:focus-visible {
+  box-shadow: 0 0 0 3px rgba(176, 58, 74, 0.34);
+}
+
+@media (max-width: 768px) {
+  .ms-modal { align-items: flex-end; padding: 0; }
+  .ms-modal__card {
+    max-width: none;
+    gap: 16px;
+    padding: 22px 18px 18px;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+    animation-name: ms-sheet-in;
+  }
+  /* Nút giữ nguyên gia hạn xuống dưới: ở sheet đáy, ngón tay chạm vùng
+     thấp nhất trước, nên hành động AN TOÀN nằm ở đó. */
+  .ms-modal__foot { flex-direction: column-reverse; }
+  .ms-modal__foot .ms-btn { flex: 0 0 auto; min-height: 50px; }
+
+  @keyframes ms-sheet-in {
+    from { opacity: 0; transform: translateY(14%); }
+  }
+}
+
+
+/* =========================================================
+   MOTION
+   Hai chuyển động, mỗi cái trả lời một câu hỏi:
+     thẻ + khối dâng lên -> "trang vừa mở"
+     scale khi ấn        -> phản hồi chạm
+   Bản cũ nhấc card Gold lên 10px kèm glow cam ba lớp, và nhấc
+   thêm 14px khi hover: chuyển động đó không trả lời câu gì.
+   ========================================================= */
+.ms-sec,
+.ms-notice {
+  animation: ms-rise 0.46s var(--ms-ease) backwards;
+  animation-delay: calc(var(--ms-i, 0) * 60ms);
+}
+
+@keyframes ms-rise {
+  from { opacity: 0; transform: translateY(9px); }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE  (≤ 768px)
+   Bản cũ đặt min-height 560px cho card thường và 600px cho Gold,
+   nên ở một cột là ~1700px scroll cho ba card. Nay card cao theo
+   nội dung, và số card giảm theo trạng thái.
+   ========================================================= */
+@media (max-width: 768px) {
+  .ms { padding: 20px 18px 40px; }
+
+  .ms-intro { margin-bottom: 18px; }
+  .ms-intro__title { font-size: 1.7rem; }
+  .ms-intro__sub { font-size: 0.92rem; }
+
+  .ms-sec { margin-top: 26px; }
+  .ms-head { margin-bottom: 12px; gap: 12px; }
+  .ms-head__title { font-size: 1rem; }
+
+  /* Nút hành động của banner xuống dòng riêng, full width: ở 360px nó không
+     đủ chỗ nằm cạnh hai dòng chữ mà vẫn giữ vùng chạm 46px. */
+  .ms-notice {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+  }
+  .ms-notice__act { width: 100%; }
+  .ms-notice__act .ms-btn { width: 100%; }
+
+  /* Dải cuộn ngang thay một cột dọc: ba card đầy quyền lợi xếp dọc là
+     ~1800px scroll. Cuộn tràn ra mép để card thứ hai hé ra, người dùng
+     thấy ngay là còn nữa mà không cần dot hay mũi tên.
+     padding dọc 6px để đổ bóng của card plum không bị overflow-x cắt
+     phẳng ngay sát mép. */
+  .ms-grid {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 6px 18px;
+    margin: 0 -18px;
+  }
+  .ms-grid::-webkit-scrollbar { display: none; }
+  .ms-grid > * {
+    flex: 0 0 min(82%, 300px);
+    scroll-snap-align: start;
+  }
+
+  .ms-plan { padding: 20px; }
+  .ms-plan__price { font-size: 1.9rem; }
+  .ms-plan__cta .ms-btn { min-height: 50px; }
+
+  /* Không có hover trên cảm ứng: đổi sang phản hồi khi ấn */
+  .ms-btn:hover { background: none; }
+  .ms-btn--solid:hover { background: var(--ms-accent); }
+  .ms-btn--pearl:hover { background: var(--ms-pearl); }
+  .ms-btn--outline:hover { background: var(--ms-surface); }
+  .ms-btn[disabled]:hover { background: #F4F0F2; }
+  .ms-plan:hover { border-color: var(--ms-line); box-shadow: none; }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .ms-sec,
+  .ms-notice,
+  .ms-modal__card { animation: none; }
+
+  /* Dải sáng Diamond dừng ở giữa dải vật liệu thay vì biến mất: nó vẫn
+     phải nói được "vật liệu này lấp lánh", chỉ là không chạy nữa. */
+  .ms-plan.ms-tier--diamond::after {
+    animation: none;
+    transform: translateX(0);
+  }
+
+  .ms-btn:active { transform: none; }
+}

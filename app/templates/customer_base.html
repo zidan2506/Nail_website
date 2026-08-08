@@ -77,6 +77,21 @@
                     {{ _('Loyalty Points') }}
                 </a>
 
+                {#  Membership. Trước đây trang này chỉ vào được từ nút "Xem quyền lợi"
+                    trên thẻ thành viên ở Loyalty Points, và nó khai
+                    `{% block nav_membership %}` mà base không có block đó, nên sidebar
+                    không sáng item nào khi đang ở đó.
+                    Icon là path `card_membership` của Material Icons, cùng family với
+                    font Material Symbols base đã nạp; dùng inline SVG để khớp
+                    `.nav-icon` (18x18) như sáu item kia. #}
+                <a href="{{ url_for('main.tier_benefits') }}"
+                   class="nav-item {% block nav_membership %}{% endblock %}">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h4v5l4-2 4 2v-5h4c1.11 0 2-.89 2-2V4c0-1.11-.89-2-2-2zm0 13H4v-2h16v2zm0-5H4V4h16v6z"/>
+                    </svg>
+                    {{ _('Membership') }}
+                </a>
+
                 <a href="{{ url_for('main.customer_setting') }}"
                    class="nav-item {% block nav_setting %}{% endblock %}">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

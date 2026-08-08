@@ -1641,9 +1641,59 @@ def tier_benefits():
         sub_tier = get_tier_by_id(sub_row["tier_id"])
         sub_plan = sub_tier["name"] if sub_tier else None
         try:
-            sub_expires = datetime.strptime(sub_row["expires_at"], "%Y-%m-%d %H:%M:%S").strftime("%b %d, %Y")
+            sub_expires = datetime.strptime(sub_row["expires_at"], "%Y-%m-%d %H:%M:%S").strftime("%d.%m.%Y")
         except (ValueError, TypeError):
             sub_expires = sub_row["expires_at"]
+
+    #  Giá và hệ số điểm lấy từ DB thay vì hardcode trong template. Bản cũ in
+    #  "Entry level" / "Most chosen" vào đúng chỗ đáng ra là giá, nên khách chỉ
+    #  thấy số tiền sau khi đã bấm và sang tới Stripe.
+    #
+    #  MỘT danh sách duy nhất, không chia upgrade / downgrade. Bản trước chia
+    #  ra ba khối rời và hệ quả là khách đang ở bậc cao nhất không đọc được
+    #  quyền lợi của gói nào cả: khối nâng cấp rỗng, còn thẻ gói hiện tại và
+    #  hàng bậc thấp hơn đều chỉ có tên + giá + hệ số.
+    all_tiers = get_active_membership_tiers()
+    _current = next((t for t in all_tiers if t["name"].lower() == current_plan), None)
+    current_mult = _current["point_multiplier"] if _current else 1.0
+
+    tiers = []
+    for t in all_tiers:
+        is_current = t["name"].lower() == current_plan
+        if is_current:
+            direction = "current"
+        elif t["point_multiplier"] > current_mult:
+            direction = "up"
+        else:
+            direction = "down"
+
+        tiers.append({
+            "name":       t["name"],
+            "price":      t["price"],
+            "multiplier": t["point_multiplier"],
+            "days":       t["duration_days"],
+            #  Gói trả phí mà thiếu stripe_price_id thì KHÔNG mua được:
+            #  upgrade_plan chặn ở đó rồi flash lỗi. Cho UI biết trước để nó
+            #  không dẫn khách vào ngõ cụt. Gói miễn phí không qua Stripe nên
+            #  luôn chọn được.
+            "buyable":    (not t["price"]) or bool(t["stripe_price_id"]),
+            "is_current": is_current,
+            #  Nhãn nút đọc theo hướng, nên template hết phải so sánh hệ số.
+            "direction":  direction,
+        })
+
+    #  Thứ tự đọc: gói của bạn, rồi gói lên được (tăng dần), rồi gói xuống được
+    #  (giảm dần). Gói đang sở hữu luôn đứng đầu vì nó là mốc để so sánh phần
+    #  còn lại. Không sort theo hệ số thuần: khi đang ở Gold thì Diamond (nâng
+    #  cấp) quan trọng hơn Silver (hạ bậc), nên nó phải lên trước.
+    def _order(t):
+        if t["is_current"]:
+            return (0, 0)
+        if t["direction"] == "up":
+            return (1, t["multiplier"])
+        return (2, -t["multiplier"])
+
+    tiers.sort(key=_order)
 
     return render_template(
         "customer/customer_membership.html",
@@ -1653,6 +1703,7 @@ def tier_benefits():
         is_past_due=is_past_due,
         sub_plan=sub_plan,
         sub_expires=sub_expires,
+        tiers=tiers,
     )
 
 

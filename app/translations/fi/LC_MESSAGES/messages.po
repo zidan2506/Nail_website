@@ -2983,3 +2983,39 @@ msgstr "Palkinnon lunastus"
 #: app/templates/customer/loyalty_points.html
 msgid "No rewards available"
 msgstr "Ei palkintoja saatavilla"
+
+#: app/templates/customer/customer_membership.html
+msgid "Free"
+msgstr "Ilmainen"
+
+#: app/templates/customer/customer_membership.html
+msgid "per year"
+msgstr "vuodessa"
+
+#: app/templates/customer/customer_membership.html
+msgid "points on all services"
+msgstr "pistettä kaikista palveluista"
+
+#: app/templates/customer/customer_membership.html
+msgid "Switch to Silver"
+msgstr "Vaihda Silveriin"
+
+#: app/templates/customer/customer_membership.html
+msgid "Renews on"
+msgstr "Uusiutuu"
+
+#: app/templates/customer/customer_membership.html
+msgid "Upgrade"
+msgstr "Päivitä"
+
+#: app/templates/customer/customer_membership.html
+msgid "Other plans"
+msgstr "Muut paketit"
+
+#: app/templates/customer/customer_membership.html
+msgid "Switch to Gold"
+msgstr "Vaihda Goldiin"
+
+#: app/templates/customer/customer_membership.html
+msgid "Keep renewal"
+msgstr "Säilytä uusiutuminen"

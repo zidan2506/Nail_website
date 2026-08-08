@@ -1,402 +1,331 @@
 {% extends "customer_base.html" %}
 
-{% block title %}{{ _('Membership Plans') }} – Daha Care{% endblock %}
+{% block title %}{{ _('Membership Plans') }}{% endblock %}
 
 {% block nav_membership %}active{% endblock %}
 
+{#  Không nạp lại Material Symbols ở đây: customer_base.html đã nạp nó (cùng
+    Plus Jakarta Sans) trong <head>. Bản cũ nạp lần thứ hai. #}
 {% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<style>
-  .mp-wrapper {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  /* PAGE HEADER */
-  .mp-page-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    color: #d64682;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 14px;
-  }
-
-  .mp-page-h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    color: #24161c;
-    line-height: 1.1;
-    margin: 0 0 14px;
-  }
-
-  .mp-page-sub {
-    font-size: 1.05rem;
-    color: #73636a;
-    line-height: 1.6;
-    margin: 0 0 3rem;
-    max-width: 480px;
-  }
-
-  /* GRID */
-  .mp-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    align-items: end;
-    padding-bottom: 2rem;
-  }
-
-  /* CARD BASE */
-  .mp-card {
-    border-radius: 26px;
-    padding: 1.75rem 1.5rem;
-    border: 1.5px solid transparent;
-    display: flex;
-    flex-direction: column;
-    min-height: 560px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-  }
-
-  /* SILVER */
-  .mp-card-silver {
-    background: #f8f7f8;
-    border: 1.5px solid #e8e2e6;
-  }
-
-  /* GOLD */
-  .mp-card-gold {
-    background: #fdf8f0;
-    border: 2px solid #e8820c;
-    box-shadow: 0 0 0 4px rgba(232,130,12,0.20), 0 0 18px 6px rgba(232,130,12,0.18), 0 0 36px 10px rgba(220,60,20,0.10);
-    transform: translateY(-10px);
-    min-height: 600px;
-    z-index: 2;
-  }
-
-  /* DIAMOND */
-  .mp-card-diamond {
-    background: #f5f0fa;
-    border: 1.5px solid #ddd0ed;
-  }
-
-  /* CURRENT PLAN — applies to whichever tier is active */
-  .mp-card.current-plan {
-    border: 2px solid #d64682 !important;
-    box-shadow: 0 0 0 5px rgba(214,70,130,0.15), 0 0 20px 4px rgba(214,70,130,0.10) !important;
-  }
-
-  .mp-card:hover:not(.mp-card-gold) {
-    transform: translateY(-4px);
-  }
-
-  .mp-card-gold:hover {
-    transform: translateY(-14px);
-  }
-
-  /* BADGE ROW */
-  .mp-badge-row {
-    min-height: 28px;
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 1.25rem;
-  }
-
-  .mp-badge-current {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: rgba(214,70,130,0.10);
-    color: #d64682;
-    border: 1px solid rgba(214,70,130,0.30);
-  }
-
-  .mp-badge-popular {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    color: #fff;
-    background: linear-gradient(135deg, #e8820c, #d64682);
-  }
-
-  /* TIER NAME */
-  .mp-tier {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1.9rem;
-    font-weight: 800;
-    line-height: 1;
-    margin: 0 0 4px;
-  }
-
-  .mp-tier-silver  { color: #4a3840; }
-  .mp-tier-gold    { color: #7a5520; }
-  .mp-tier-diamond { color: #5b2d8e; }
-
-  .mp-price-hint {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    color: #b09aa4;
-    margin: 0 0 10px;
-  }
-
-  .mp-tagline {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #24161c;
-    margin: 0 0 1.5rem;
-  }
-
-  /* BUTTONS */
-  .mp-btn {
-    display: block;
-    width: 100%;
-    padding: 13px 0;
-    border-radius: 14px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-    text-align: center;
-    border: none;
-    cursor: pointer;
-    margin-bottom: 1.5rem;
-    transition: opacity 0.2s, background 0.2s, transform 0.1s;
-  }
-
-  .mp-btn:active { transform: scale(0.98); }
-
-  .mp-btn-current {
-    background: rgba(214,70,130,0.10);
-    color: #d64682;
-    border: 1.5px solid rgba(214,70,130,0.30);
-    cursor: default;
-  }
-
-  .mp-btn-gold {
-    background: #c49a3c;
-    color: #fff;
-    box-shadow: 0 4px 14px rgba(196,154,60,0.30);
-  }
-  .mp-btn-gold:hover { opacity: 0.88; }
-
-  .mp-btn-diamond {
-    background: #5b2d8e;
-    color: #fff;
-    box-shadow: 0 4px 14px rgba(91,45,142,0.25);
-  }
-  .mp-btn-diamond:hover { opacity: 0.88; }
-
-  /* DIVIDER */
-  .mp-divider {
-    height: 0.5px;
-    margin-bottom: 1.25rem;
-  }
-  .mp-divider-silver  { background: #e8e2e6; }
-  .mp-divider-gold    { background: #eddfc8; }
-  .mp-divider-diamond { background: #ddd0ed; }
-
-  /* FEATURES */
-  .mp-features {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    flex: 1;
-  }
-
-  .mp-features li {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 0.85rem;
-    font-weight: 400;
-    color: #55434a;
-    line-height: 1.45;
-  }
-
-  .mp-features .material-symbols-outlined {
-    font-size: 20px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  .mp-feat-highlight-gold    { font-weight: 700; color: #c49a3c; }
-  .mp-feat-highlight-diamond { font-weight: 700; color: #9b6fd4; }
-
-  .mp-check-silver  { color: #9e8a96; }
-  .mp-check-gold    { color: #c49a3c; }
-  .mp-check-diamond { color: #9b6fd4; }
-
-  /* FOOTER DECORATION */
-  .mp-footer-deco {
-    display: flex;
-    justify-content: center;
-    margin-top: 2rem;
-    opacity: 0.35;
-  }
-
-  .mp-footer-deco .material-symbols-outlined {
-    font-size: 2.5rem;
-    color: #d64682;
-  }
-
-  @media (max-width: 1100px) {
-    .mp-grid { grid-template-columns: 1fr; }
-    .mp-card-gold { transform: none; }
-    .mp-card-gold:hover { transform: translateY(-4px); }
-    .mp-page-h1 { font-size: 2.2rem; }
-  }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer/membership.css') }}">
 {% endblock %}
 
 {% block customer_content %}
-<div class="mp-wrapper">
 
-  <span class="mp-page-label">{{ _('Membership') }}</span>
-  <h1 class="mp-page-h1">{{ _('Choose your plan') }}</h1>
-  <p class="mp-page-sub">{{ _('Unlock exclusive perks, rewards, and priority care tailored to your loyalty.') }}</p>
+{#  Glyph vật liệu cho từng bậc. Material Symbols, cùng family với sáu trang
+    kia. Dùng glyph KHÁC NHAU chứ không cùng một glyph đổi màu: nhận diện
+    được cả khi khách không phân biệt được màu (~8% nam giới mù màu đỏ/lục,
+    và tông bạc/băng vốn gần nhau). #}
+{% set tier_glyph = {'silver': 'shield', 'gold': 'workspace_premium', 'diamond': 'diamond'} %}
 
+{#  Tagline theo bậc, giữ đúng copy của bản cũ. #}
+{% set tier_tag = {
+     'silver':  _('Start your loyalty journey'),
+     'gold':    _('For our dedicated guests'),
+     'diamond': _('For our most valued guests')
+   } %}
+
+{#  Quyền lợi theo bậc. Vẫn ở template chứ không ở DB: membership_tiers chỉ có
+    một câu `description` và không có cột bản dịch, nên đưa 14 dòng copy này
+    vào đó sẽ mất i18n. Nhưng HỆ SỐ ĐIỂM đã thoát ra khỏi chuỗi: nó lấy từ
+    point_multiplier, nên admin đổi DB thì UI đúng theo ở cả ba ngôn ngữ.
+    Bản cũ hardcode "1.5×" và "2×" ngay trong msgid. #}
+{% set perks = {
+     'silver': [
+       _('Earn base loyalty points on every visit'),
+       _('Birthday bonus points'),
+       _('Access to member-only promotions'),
+       _('Monthly reward voucher'),
+       _('Priority booking (standard)')
+     ],
+     'gold': [
+       _('Everything in Silver'),
+       _('Early access to new services & seasonal offers'),
+       _('Complimentary nail care kit (quarterly)'),
+       _('Dedicated booking slot on weekends')
+     ],
+     'diamond': [
+       _('Everything in Gold'),
+       _('Free add-on service every visit'),
+       _('Personal nail stylist assignment'),
+       _('VIP lounge access & complimentary drinks')
+     ]
+   } %}
+
+<div class="ms">
+
+  <header class="ms-intro">
+    <h1 class="ms-intro__title">{{ _('Choose your plan') }}</h1>
+    <p class="ms-intro__sub">{{ _('Unlock exclusive perks, rewards, and priority care tailored to your loyalty.') }}</p>
+  </header>
+
+
+  {# ── Thanh toán lỗi. Dùng danger của portal, không phải #dc2626. ── #}
   {% if is_past_due %}
-  <div style="display:flex;align-items:center;gap:0.85rem;max-width:640px;margin:0 auto 1rem;padding:14px 20px;border-radius:16px;background:rgba(220,38,38,0.07);border:1px solid rgba(220,38,38,0.30);">
-    <span class="material-symbols-outlined" style="color:#dc2626;">error</span>
-    <div style="flex:1;font-size:0.9rem;color:#7f1d1d;line-height:1.5;">
-      {{ _('Your last payment failed.') }} <strong>{{ _('Update your card') }}</strong> {{ _('to keep your membership active.') }}
+  <div class="ms-notice ms-notice--alert" style="--ms-i: 0">
+    <span class="ms-notice__glyph">
+      <span class="material-symbols-outlined" aria-hidden="true">error</span>
+    </span>
+    <div class="ms-notice__body">
+      <p class="ms-notice__text">
+        {{ _('Your last payment failed.') }}
+        <strong>{{ _('Update your card') }}</strong>
+        {{ _('to keep your membership active.') }}
+      </p>
     </div>
-    <form method="POST" action="{{ url_for('main.billing_portal') }}" style="flex-shrink:0;">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button type="submit" style="background:#dc2626;border:none;color:#fff;border-radius:12px;padding:9px 18px;font-size:0.82rem;font-weight:700;cursor:pointer;">{{ _('Update payment method') }}</button>
-    </form>
+    <div class="ms-notice__act">
+      <form method="POST" action="{{ url_for('main.billing_portal') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="ms-btn ms-btn--solid">{{ _('Update payment method') }}</button>
+      </form>
+    </div>
   </div>
   {% endif %}
 
+
+  {#  ── Chu kỳ thanh toán. Là banner riêng chứ không gộp vào card gói: nó nói
+         về CHU KỲ, còn card nói "gói này có gì". Hai thông tin khác nhau, và
+         tách ra thì card không bị lệch chiều cao vì phải chứa thêm hai nút. ── #}
   {% if has_subscription %}
-  <div style="display:flex;align-items:center;gap:0.85rem;max-width:640px;margin:0 auto 2rem;padding:14px 20px;border-radius:16px;background:rgba(214,70,130,0.06);border:1px solid rgba(214,70,130,0.18);">
-    <span class="material-symbols-outlined" style="color:#d64682;">card_membership</span>
-    <div style="flex:1;font-size:0.9rem;color:#5a4a52;line-height:1.5;">
+  <div class="ms-notice" style="--ms-i: 1">
+    <span class="ms-notice__glyph">
+      <span class="material-symbols-outlined" aria-hidden="true">card_membership</span>
+    </span>
+    <div class="ms-notice__body">
+      <p class="ms-notice__text">
+        {% if will_cancel %}
+          {{ _('Your %(plan)s membership will not renew · active until %(date)s.', plan=sub_plan, date=sub_expires) }}
+        {% else %}
+          {{ _('Your %(plan)s membership renews on %(date)s.', plan=sub_plan, date=sub_expires) }}
+        {% endif %}
+      </p>
+    </div>
+    <div class="ms-notice__act">
       {% if will_cancel %}
-        {{ _('Your %(plan)s membership will not renew · active until %(date)s.', plan=sub_plan, date=sub_expires) }}
+      <form method="POST" action="{{ url_for('main.billing_portal') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="ms-btn ms-btn--quiet">{{ _('Update payment method') }}</button>
+      </form>
       {% else %}
-        {{ _('Your %(plan)s membership renews on %(date)s.', plan=sub_plan, date=sub_expires) }}
+      {#  Form có class `ms-cancel-form`: JS bắt submit và mở modal xác nhận
+          trước, vì huỷ gia hạn không đảo được từ phía khách (mở lại phải mua
+          lại qua Stripe). Không có JS thì form vẫn submit bình thường, nên
+          luồng không phụ thuộc vào script. #}
+      <form method="POST" action="{{ url_for('main.cancel_membership') }}" class="ms-cancel-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="ms-btn ms-btn--quiet">{{ _('Cancel renewal') }}</button>
+      </form>
       {% endif %}
     </div>
-    {% if not will_cancel %}
-    <form method="POST" action="{{ url_for('main.cancel_membership') }}" style="flex-shrink:0;">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button type="submit" style="background:transparent;border:1px solid rgba(214,70,130,0.4);color:#d64682;border-radius:12px;padding:9px 18px;font-size:0.82rem;font-weight:700;cursor:pointer;">{{ _('Cancel renewal') }}</button>
-    </form>
-    {% endif %}
   </div>
   {% endif %}
 
-  <div class="mp-grid">
 
-    <div class="mp-card mp-card-silver {% if current_plan == "silver" %}current-plan{% endif %}">
-      <div class="mp-badge-row">
-        {% if current_plan == 'silver' %}
-        <span class="mp-badge-current">{{ _('Your current plan') }}</span>
-        {% endif %}
-      </div>
-      <h2 class="mp-tier mp-tier-silver">Silver</h2>
-      <p class="mp-price-hint">{{ _('Entry level') }}</p>
-      <p class="mp-tagline">{{ _('Start your loyalty journey') }}</p>
-      {% if current_plan == 'silver' %}
-      <button class="mp-btn mp-btn-current" disabled>{{ _('Current plan') }}</button>
-      {% else %}
-      <form method="POST" action="{{ url_for('main.upgrade_plan') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="tier_name" value="Silver">
-        <button type="submit" class="mp-btn" style="background:transparent; border:1.5px solid rgba(74,56,64,0.35); color:#4a3840;" onmouseover="this.style.background='#4a3840';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='#4a3840';">{{ _('Upgrade to Silver') }}</button>
-      </form>
-      {% endif %}
-      <div class="mp-divider mp-divider-silver"></div>
-      <ul class="mp-features">
-        <li><span style="color:#9e8a96; flex-shrink:0; margin-top:2px;">✦</span>{{ _("Earn base loyalty points on every visit") }}</li>
-        <li><span style="color:#9e8a96; flex-shrink:0; margin-top:2px;">✦</span>{{ _("Birthday bonus points") }}</li>
-        <li><span style="color:#9e8a96; flex-shrink:0; margin-top:2px;">✦</span>{{ _("Access to member-only promotions") }}</li>
-        <li><span style="color:#9e8a96; flex-shrink:0; margin-top:2px;">✦</span>{{ _("Monthly reward voucher") }}</li>
-        <li><span style="color:#9e8a96; flex-shrink:0; margin-top:2px;">✦</span>{{ _("Priority booking (standard)") }}</li>
-      </ul>
+  {# ── Mọi gói trong MỘT dải, mỗi card luôn có đủ quyền lợi.
+         Gói đang dùng là card nền plum có ring, không phải một thẻ riêng ở
+         trên: như vậy nó xuất hiện đúng một lần và vẫn đọc được quyền lợi. ── #}
+  <section class="ms-sec" style="--ms-i: 2">
+    <div class="ms-head">
+      <h2 class="ms-head__title">{{ _('Membership Plans') }}</h2>
+      <div class="ms-head__rule"></div>
     </div>
 
-    <div class="mp-card mp-card-gold {% if current_plan == "gold" %}current-plan{% endif %}">
-      <div class="mp-badge-row">
-        {% if current_plan == 'gold' %}
-          <span class="mp-badge-current">{{ _('Your current plan') }}</span>
-          <span class="mp-badge-popular" style="margin-left: auto;">Popular</span>
-        {% else %}
-          <span class="mp-badge-popular">Popular</span>
-        {% endif %}
-      </div>
-      <h2 class="mp-tier mp-tier-gold">Gold</h2>
-      <p class="mp-price-hint">{{ _('Most chosen') }}</p>
-      <p class="mp-tagline">{{ _('For our dedicated guests') }}</p>
-      {% if current_plan == 'gold' %}
-      <button class="mp-btn mp-btn-current" disabled>{{ _('Current plan') }}</button>
-      {% else %}
-      <form method="POST" action="{{ url_for('main.upgrade_plan') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="tier_name" value="Gold">
-        <button type="submit" class="mp-btn mp-btn-gold">{{ _('Upgrade to Gold') }}</button>
-      </form>
-      {% endif %}
-      <div class="mp-divider mp-divider-gold"></div>
-      <ul class="mp-features">
-        <li><span style="color:#c49a3c; flex-shrink:0; margin-top:2px;">✦</span><span class="mp-feat-highlight-gold">{{ _('Everything in Silver') }}</span></li>
-        <li><span style="color:#c49a3c; flex-shrink:0; margin-top:2px;">✦</span>{{ _("1.5× point multiplier on all services") }}</li>
-        <li><span style="color:#c49a3c; flex-shrink:0; margin-top:2px;">✦</span>{{ _("Early access to new services & seasonal offers") }}</li>
-        <li><span style="color:#c49a3c; flex-shrink:0; margin-top:2px;">✦</span>{{ _("Complimentary nail care kit (quarterly)") }}</li>
-        <li><span style="color:#c49a3c; flex-shrink:0; margin-top:2px;">✦</span>{{ _("Dedicated booking slot on weekends") }}</li>
-      </ul>
-    </div>
+    <div class="ms-grid">
+      {% for t in tiers %}
+      {% set key = t.name | lower %}
+      <article class="ms-plan ms-tier--{{ key }}{% if t.is_current %} ms-plan--now{% endif %}">
 
-    <div class="mp-card mp-card-diamond {% if current_plan == "diamond" %}current-plan{% endif %}">
-      <div class="mp-badge-row">
-        {% if current_plan == 'diamond' %}
-        <span class="mp-badge-current">{{ _('Your current plan') }}</span>
-        {% endif %}
-      </div>
-      <h2 class="mp-tier mp-tier-diamond">Diamond</h2>
-      <p class="mp-price-hint">{{ _('Ultimate luxury') }}</p>
-      <p class="mp-tagline">{{ _('For our most valued guests') }}</p>
-      {% if current_plan == 'diamond' %}
-      <button class="mp-btn mp-btn-current" disabled>{{ _('Current plan') }}</button>
-      {% else %}
-      <form method="POST" action="{{ url_for('main.upgrade_plan') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="tier_name" value="Diamond">
-        <button type="submit" class="mp-btn mp-btn-diamond">{{ _('Upgrade to Diamond') }}</button>
-      </form>
-      {% endif %}
-      <div class="mp-divider mp-divider-diamond"></div>
-      <ul class="mp-features">
-        <li><span style="color:#9b6fd4; flex-shrink:0; margin-top:2px;">✦</span><span class="mp-feat-highlight-diamond">{{ _('Everything in Gold') }}</span></li>
-        <li><span style="color:#9b6fd4; flex-shrink:0; margin-top:2px;">✦</span>{{ _("2× point multiplier on all services") }}</li>
-        <li><span style="color:#9b6fd4; flex-shrink:0; margin-top:2px;">✦</span>{{ _("Free add-on service every visit") }}</li>
-        <li><span style="color:#9b6fd4; flex-shrink:0; margin-top:2px;">✦</span>{{ _("Personal nail stylist assignment") }}</li>
-        <li><span style="color:#9b6fd4; flex-shrink:0; margin-top:2px;">✦</span>{{ _("VIP lounge access & complimentary drinks") }}</li>
-      </ul>
-    </div>
+        <span class="ms-plan__sheen" aria-hidden="true"></span>
 
+        <div class="ms-plan__top">
+          <span class="ms-plan__id">
+            <span class="ms-plan__glyph">
+              <span class="material-symbols-outlined" aria-hidden="true">{{ tier_glyph.get(key, 'shield') }}</span>
+            </span>
+            <h3 class="ms-plan__name">{{ t.name }}</h3>
+          </span>
+
+          {#  Không có badge "gói hiện tại": nút ở đáy card đã nói đúng câu đó,
+              cộng ring và nền plum. Ba dấu hiệu cho một thông tin là dư.
+              Bỏ nó ra còn giải phóng chỗ cho "Phổ biến" hiện được cả khi Gold
+              chính là gói đang dùng, việc mà bản trước không làm được.
+
+              TỒN ĐỌNG: "Popular" hardcode theo tên tier vì membership_tiers
+              không có cột nào đánh dấu gói được chọn nhiều nhất. #}
+          {% if t.name == 'Gold' %}
+          <span class="ms-flag">{{ _('Popular') }}</span>
+          {% endif %}
+        </div>
+
+        <p class="ms-plan__price">
+          {% if t.price %}
+            {{ t.price | format_currency }}
+            <span class="ms-plan__per">/ {{ _('per year') }}</span>
+          {% else %}
+            {{ _('Free') }}
+          {% endif %}
+        </p>
+
+        <p class="ms-plan__tag">{{ tier_tag.get(key, '') }}</p>
+
+        <ul class="ms-perks">
+          <li>
+            <span class="material-symbols-outlined" aria-hidden="true">check</span>
+            <span class="ms-perks__mult">×{{ t.multiplier }}</span> {{ _('points on all services') }}
+          </li>
+          {% for p in perks.get(key, []) %}
+          <li>
+            <span class="material-symbols-outlined" aria-hidden="true">check</span>
+            {{ p }}
+          </li>
+          {% endfor %}
+        </ul>
+
+        <div class="ms-plan__cta">
+          {% if t.is_current %}
+          <button type="button" class="ms-btn ms-btn--outline-light" disabled>{{ _('Current plan') }}</button>
+
+          {% elif not t.buyable %}
+          {#  Thiếu stripe_price_id. upgrade_plan chặn ở server rồi flash lỗi,
+              nên nút nói trước thay vì dẫn khách vào ngõ cụt. #}
+          <button type="button" class="ms-btn" disabled>{{ _('Coming soon') }}</button>
+
+          {% else %}
+          <form method="POST" action="{{ url_for('main.upgrade_plan') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="tier_name" value="{{ t.name }}">
+            {#  Nhãn theo HƯỚNG, không theo tên: "Upgrade to Silver" khi đang
+                ở Gold là sai nghĩa. routes.py tính sẵn direction. #}
+            <button type="submit"
+                    class="ms-btn {% if t.direction == 'up' %}ms-btn--solid{% else %}ms-btn--outline{% endif %}">
+              {% if t.direction == 'up' %}
+                {% if t.name == 'Gold' %}{{ _('Upgrade to Gold') }}{% else %}{{ _('Upgrade to Diamond') }}{% endif %}
+              {% else %}
+                {% if t.name == 'Gold' %}{{ _('Switch to Gold') }}{% else %}{{ _('Switch to Silver') }}{% endif %}
+              {% endif %}
+            </button>
+          </form>
+          {% endif %}
+        </div>
+
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+
+  {#  ── Xác nhận huỷ gia hạn.
+         Đặt TRONG `.ms` để thấy CSS variables: hai modal ở Loyalty từng là
+         sibling của wrapper trang, nên mọi var() bên trong là undefined và
+         nền biến mất. `position: fixed` vẫn neo theo viewport vì `.ms` không
+         có transform hay filter tạo containing block.
+
+         Chỉ render khi thật sự có gói đang gia hạn. ── #}
+  {% if has_subscription and not will_cancel %}
+  <div class="ms-modal ms-tier--{{ current_plan }}" id="ms-cancel-modal"
+       role="dialog" aria-modal="true" aria-labelledby="ms-cancel-title">
+    <div class="ms-modal__card">
+
+      <div class="ms-modal__head">
+        <h2 class="ms-modal__title" id="ms-cancel-title">{{ _('Cancel renewal') }}</h2>
+        <button type="button" class="ms-modal__close" id="ms-cancel-close" aria-label="{{ _('Close') }}">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      {#  Nhắc lại gói đang huỷ: khách phải thấy mình đang huỷ CÁI GÌ. #}
+      <div class="ms-modal__recap">
+        <span class="ms-modal__glyph">
+          <span class="material-symbols-outlined" aria-hidden="true">{{ tier_glyph.get(current_plan, 'shield') }}</span>
+        </span>
+        <div>
+          <p class="ms-modal__plan">{{ sub_plan }}</p>
+          <p class="ms-modal__when">{{ _('Renews on') }} {{ sub_expires }}</p>
+        </div>
+      </div>
+
+      {#  Hệ quả nói bằng chính chuỗi đã có cho banner sau khi huỷ, nên khách
+          đọc trước đúng câu mình sẽ thấy sau đó. #}
+      <p class="ms-modal__note">
+        <span class="material-symbols-outlined" aria-hidden="true">info</span>
+        <span>{{ _('Your %(plan)s membership will not renew · active until %(date)s.', plan=sub_plan, date=sub_expires) }}</span>
+      </p>
+
+      <div class="ms-modal__foot">
+        <button type="button" class="ms-btn ms-btn--outline" id="ms-cancel-keep">{{ _('Keep renewal') }}</button>
+        <button type="button" class="ms-btn ms-btn--destructive" id="ms-cancel-confirm">{{ _('Yes, cancel') }}</button>
+      </div>
+
+    </div>
   </div>
-
-  <div class="mp-footer-deco">
-    <span class="material-symbols-outlined">spa</span>
-  </div>
+  {% endif %}
 
 </div>
+{% endblock %}
+
+
+{#  Chỉ nạp script khi thật sự có modal để lo. Cùng cách Booking details chỉ
+    nạp my_booking.js khi lịch hẹn còn huỷ được. #}
+{% block script %}
+{% if has_subscription and not will_cancel %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  var modal = document.getElementById("ms-cancel-modal");
+  if (!modal) return;
+
+  var forms   = Array.prototype.slice.call(document.querySelectorAll(".ms-cancel-form"));
+  var btnKeep = document.getElementById("ms-cancel-keep");
+  var btnGo   = document.getElementById("ms-cancel-confirm");
+  var btnX    = document.getElementById("ms-cancel-close");
+  var pending = null;
+  var opener  = null;
+
+  function open(form, trigger) {
+    pending = form;
+    opener  = trigger;
+    modal.classList.add("is-open");
+    document.body.style.overflow = "hidden";
+    /* Focus vào hành động AN TOÀN, không vào nút phá huỷ: bấm Enter theo
+       phản xạ ngay khi modal mở thì không mất gói. */
+    btnKeep.focus();
+  }
+
+  function close() {
+    modal.classList.remove("is-open");
+    document.body.style.overflow = "";
+    pending = null;
+    if (opener) opener.focus();
+  }
+
+  forms.forEach(function (form) {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      open(form, form.querySelector("button[type=submit]"));
+    });
+  });
+
+  btnKeep.addEventListener("click", close);
+  btnX.addEventListener("click", close);
+
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal) close();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && modal.classList.contains("is-open")) close();
+  });
+
+  btnGo.addEventListener("click", function () {
+    var form = pending;
+    if (!form) return;
+    /* Chặn double-submit: Stripe cancel là một lần, bấm hai lần thì lần thứ
+       hai trả lỗi và khách thấy flash đỏ dù việc đã xong. */
+    btnGo.disabled = true;
+    form.submit();
+  });
+
+});
+</script>
+{% endif %}
 {% endblock %}

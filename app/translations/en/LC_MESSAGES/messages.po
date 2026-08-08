@@ -2942,3 +2942,39 @@ msgstr ""
 #: app/templates/customer/loyalty_points.html
 msgid "No rewards available"
 msgstr ""
+
+#: app/templates/customer/customer_membership.html
+msgid "Free"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html
+msgid "per year"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html
+msgid "points on all services"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html
+msgid "Switch to Silver"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html
+msgid "Renews on"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html
+msgid "Upgrade"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html
+msgid "Other plans"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html
+msgid "Switch to Gold"
+msgstr ""
+
+#: app/templates/customer/customer_membership.html
+msgid "Keep renewal"
+msgstr ""
