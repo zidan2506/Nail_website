@@ -57,7 +57,7 @@ VALUES
 -- ============================================
 -- CAROUSEL SLIDES
 -- homepage: slide mặc định trang chủ
--- dashboard_offers: offer mặc định (nội dung theo 3 reward rẻ nhất)
+-- dashboard_offers: 3 slide theo 3 mục đích (đặt lịch / nâng hạng / đổi điểm)
 -- loyalty_missions: 3 slot cố định (slot_key) — khớp MISSION_KEYS trong db.py, BẮT BUỘC giữ
 -- ============================================
 INSERT INTO carousel_slides (
@@ -102,29 +102,57 @@ VALUES
  'View our work', 'Katso töitämme', 'Xem tác phẩm', '/gallery', 'outline',
  3, 1),
 
--- dashboard_offers (badge chung, nội dung theo 3 reward)
+-- dashboard_offers — 3 slide, 3 MỤC ĐÍCH KHÁC NHAU, không phải 3 biến thể của
+-- một câu. Bản cũ là ba lần "Free X / Redeem for N pts", cùng badge, cùng đích
+-- /customer/loyalty-points: carousel quay ba vòng để nói đúng một thứ. Nay là
+-- đặt lịch → nâng hạng → đổi điểm, ba route khác nhau.
+--
+-- Slide 1 hardcode tên service: admin tự quyết định service nào là "được đặt
+-- nhiều nhất" thay vì để hệ thống tự tính. Đổi service = sửa title + số trong
+-- cta_url. ID: 1 Classic Manicure · 2 Gel Manicure · 3 Spa Manicure
+--             4 Classic Pedicure · 5 Gel Pedicure · 6 Spa Pedicure
+--             7 Basic Nail Art   · 8 Nail Stamping · 9 Rhinestone
+-- Tham số đúng là service_id (routes.py:598), wizard sẽ chọn sẵn service đó.
+--
+-- Cảnh báo: subtitle ghi thời lượng bằng chữ chết. Đổi duration_minutes trong
+-- admin thì slide KHÔNG tự theo. Giá thì cố tình không ghi, vì giá đổi thường
+-- hơn và sai giá trên slide là mất lòng tin ngay.
 ('dashboard_offers', NULL, NULL,
- 'Free Nail Art (2 nails)', 'Ilmainen kynsitaide (2 kynttä)', 'Vẽ móng nghệ thuật miễn phí (2 móng)',
- 'Complimentary nail art on 2 nails of your choice', 'Ilmainen kynsitaide kahteen valitsemaasi kynteen', 'Vẽ nghệ thuật miễn phí trên 2 móng bạn chọn',
- '✦ Loyalty Reward', '✦ Kanta-asiakaspalkinto', '✦ Phần thưởng thành viên',
- NULL, NULL, NULL,
- 'Redeem for 300 pts', 'Lunasta 300 pisteellä', 'Đổi bằng 300 điểm', '/customer/loyalty-points', 'primary',
+ 'Gel Manicure', 'Gel Manicure', 'Gel Manicure',
+ '60 minutes. Long-lasting gel finish.', '60 minuuttia. Pitkäkestoinen geelipinta.', '60 phút. Lớp gel bền màu.',
+ 'Most booked', 'Suosituin', 'Được đặt nhiều nhất',
+ NULL, NULL, '/static/images/Default/Dashboard_Carousel_Slides/dashboard-slide-1.webp',
+ 'Book now', 'Varaa nyt', 'Đặt lịch ngay', '/customer/booking?service_id=2', 'primary',
  NULL, NULL, NULL, NULL, 'outline',
  1, 1),
+-- Ảnh nền: 1376x768 webp, cùng kích thước với bộ Homepage_Carousel_Slides.
+-- Ba tiêu chí khi thay ảnh mới, đọc thẳng từ CSS của .hero:
+--   1. TÔNG SÁNG. .hero__bg-img có opacity .6 + mix-blend-mode overlay trên
+--      nền #3E1F47. Overlay trên nền tối là phép nhân đôi -> vùng tối của ảnh
+--      bị dìm gần đen, tương phản nén mạnh. Ảnh high-key sống, ảnh trầm chết.
+--   2. GIỮA KHUNG PHẲNG, ÍT CHI TIẾT. .hero__overlay là vignette alpha .32 ở
+--      GIỮA, .72 ở RÌA: giữa là chỗ sáng nhất, cũng là chỗ chữ nằm. Chi tiết
+--      đặt ở rìa thì bị dìm mất, coi như phí công.
+--   3. BỐ CỤC ĐỐI XỨNG. object-fit: cover mà tỉ lệ khung đổi mạnh theo thiết
+--      bị: desktop ~2.6:1 cắt trên dưới (còn ~68% chiều cao), mobile ~1.06:1
+--      cắt hai bên (còn ~60% chiều rộng). Chủ thể lệch tâm sẽ mất trên mobile.
+-- Và không có chữ trong ảnh: đó đúng lỗi homepage-slide-3 đang mắc.
 ('dashboard_offers', NULL, NULL,
- 'Free Classic Manicure', 'Ilmainen klassinen manikyyri', 'Manicure cổ điển miễn phí',
- 'One free Classic Manicure session', 'Yksi ilmainen klassinen manikyyri', 'Một buổi Manicure cổ điển miễn phí',
- '✦ Loyalty Reward', '✦ Kanta-asiakaspalkinto', '✦ Phần thưởng thành viên',
- NULL, NULL, NULL,
- 'Redeem for 600 pts', 'Lunasta 600 pisteellä', 'Đổi bằng 600 điểm', '/customer/loyalty-points', 'primary',
+ 'Gold earns 1.5x points', 'Gold kerryttää 1,5x pisteet', 'Hạng Gold tích điểm 1.5x',
+ '€49.99 a year. Every visit earns more.', '49,99 € vuodessa. Jokainen käynti kerryttää enemmän.', '49,99 € mỗi năm. Mỗi lần ghé đều tích nhiều hơn.',
+ 'Membership', 'Jäsenyys', 'Hạng thành viên',
+ NULL, NULL, '/static/images/Default/Dashboard_Carousel_Slides/dashboard-slide-2.webp',
+ 'See membership', 'Katso jäsenyys', 'Xem hạng thành viên', '/customer/tier-benefits', 'primary',
  NULL, NULL, NULL, NULL, 'outline',
  2, 1),
+-- Cố ý không nêu tên phần thưởng cụ thể: bảng rewards do admin tự quản, nêu tên
+-- ở đây là hứa một thứ có thể đã bị xoá hoặc hết hàng.
 ('dashboard_offers', NULL, NULL,
- 'Free Gel Manicure', 'Ilmainen geelimanikyyri', 'Manicure gel miễn phí',
- 'One free Gel Manicure session', 'Yksi ilmainen geelimanikyyri', 'Một buổi Manicure gel miễn phí',
- '✦ Loyalty Reward', '✦ Kanta-asiakaspalkinto', '✦ Phần thưởng thành viên',
- NULL, NULL, NULL,
- 'Redeem for 1000 pts', 'Lunasta 1000 pisteellä', 'Đổi bằng 1000 điểm', '/customer/loyalty-points', 'primary',
+ 'Turn points into treatments', 'Vaihda pisteet hoitoihin', 'Đổi điểm lấy dịch vụ',
+ 'See what your points can get you.', 'Katso mitä pisteilläsi saa.', 'Xem điểm của bạn đổi được gì.',
+ 'Loyalty', 'Kanta-asiakas', 'Điểm thưởng',
+ NULL, NULL, '/static/images/Default/Dashboard_Carousel_Slides/dashboard-slide-3.webp',
+ 'View rewards', 'Katso palkinnot', 'Xem phần thưởng', '/customer/loyalty-points', 'primary',
  NULL, NULL, NULL, NULL, 'outline',
  3, 1),
 
