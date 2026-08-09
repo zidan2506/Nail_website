@@ -9,13 +9,16 @@
 
 {% block nav_book_appointment %}active{% endblock %}
 {% block customer_content %}
+
+{# CUSTOMER BOOKING — ĐÃ ĐĂNG NHẬP
+   4 bước: Service → Stylist → Date & Time → Checkout
+   Wizard nằm ở static/js/booking_wizard.js, dùng chung với public_booking.html.
+   Khác biệt duy nhất của luồng này: không có bước Your Details, và có ô
+   loyalty points. booking_wizard.js tự feature-detect, không cần cờ.
+   DB context cần: categories, services_by_category, staffs, today, max_date,
+   multiplier #}
+
 <div class="booking-wrapper">
-
-{# PUBLIC BOOKING — CUSTOMER FLOW — LOGGED IN
-   5 steps: Service → Stylist → Date & Time → Info → Checkout
-   JS wizard: 1 file, ẩn/hiện step bằng class .bk-step--active
-   DB context cần: categories, services_by_category, staffs, today, max_date #}
-
 <div class="bk-wrap">
 
   <div class="bk-indicator-bar">
@@ -23,22 +26,28 @@
       <div class="bk-progress-track">
         <div class="bk-progress-fill" id="progress-fill" style="width:0%"></div>
       </div>
-      <div class="bk-step-dot-wrap" data-step="1">
+      <div class="bk-step-dot-wrap" data-step="1" data-label="{{ _('Service') }}">
         <div class="bk-step-dot bk-step-dot--active" id="step-circle-1">1</div>
         <span class="bk-step-label bk-step-label--active">{{ _('Service') }}</span>
       </div>
-      <div class="bk-step-dot-wrap" data-step="2">
+      <div class="bk-step-dot-wrap" data-step="2" data-label="{{ _('Stylist') }}">
         <div class="bk-step-dot" id="step-circle-2">2</div>
         <span class="bk-step-label">{{ _('Stylist') }}</span>
       </div>
-      <div class="bk-step-dot-wrap" data-step="3">
+      <div class="bk-step-dot-wrap" data-step="3" data-label="{{ _('Date') }}">
         <div class="bk-step-dot" id="step-circle-3">3</div>
         <span class="bk-step-label">{{ _('Date') }}</span>
       </div>
-      <div class="bk-step-dot-wrap" data-step="4">
+      <div class="bk-step-dot-wrap" data-step="4" data-label="{{ _('Checkout') }}">
         <div class="bk-step-dot" id="step-circle-4">4</div>
         <span class="bk-step-label">{{ _('Checkout') }}</span>
       </div>
+    </div>
+
+    {# Bản mobile của thanh bước: dãy chấm bị ẩn dưới 860px vì nhãn không đủ chỗ #}
+    <div class="bk-step-mobile" id="bk-mobile-step"></div>
+    <div class="bk-step-mobile-track">
+      <div class="bk-step-mobile-fill" style="width:0%"></div>
     </div>
   </div>
 
@@ -49,11 +58,9 @@
 
     <div class="bk-content">
 
-      {# ── STEP 1: SERVICE ─────────────────────────────────────────────────────
-         DB: loop categories cho chips, loop services_by_category cho cards
-         Chip active toggle bằng JS class bk-chip--active
-         Card selected: JS toggle class bk-svc-card--selected trên .bk-svc-card
-         data-name, data-duration, data-price → JS update summary ở step 5 #}
+      {# ── BƯỚC 1: DỊCH VỤ ─────────────────────────────────────────────────
+         Lưới 3 cột (desktop) / 2 cột (mobile). Chip lọc bằng data-category.
+         data-points → JS nhân với multiplier của hạng thành viên #}
       <section class="bk-step bk-step--active" id="step-1">
         <div class="bk-step-head">
           <h1 class="bk-step-title">{{ _('Select a Service') }}</h1>
@@ -61,13 +68,20 @@
         </div>
 
         <div class="bk-chips">
-          <button type="button" class="bk-chip bk-chip--active" data-category="all">{{ _('All Services') }}</button>
-          {% for category in categories %}
-          <button type="button" class="bk-chip" data-category="{{ category['slug'] }}">{{ tr(category, 'name') }}</button>
-          {% endfor %}
+          <button type="button" class="bk-chip bk-chip--active" data-category="all">
+            {{ _('All Services') }}
+            <span class="bk-chip-count">{{ services_by_category.values() | map('length') | sum }}</span>
+          </button>
+          {# Category rỗng không ra chip: bấm vào sẽ chỉ dẫn tới một lưới trống #}
+          {% for category in categories %}{% if services_by_category[category['slug']] %}
+          <button type="button" class="bk-chip" data-category="{{ category['slug'] }}">
+            {{ tr(category, 'name') }}
+            <span class="bk-chip-count">{{ services_by_category[category['slug']] | length }}</span>
+          </button>
+          {% endif %}{% endfor %}
         </div>
 
-        <div class="bk-svc-list">
+        <div class="bk-svc-grid">
           {% set ns = namespace(first_service=true) %}
           {% for category in categories %}
             {% for service in services_by_category[category['slug']] %}
@@ -82,21 +96,21 @@
             {% set ns.first_service = false %}
             <div class="bk-svc-card">
               <div class="bk-svc-thumb">
-                <img src="{{ (service['image'] | img_src('services')) or url_for('static', filename='images/Default/Service/test.png') }}" alt="{{ tr(service, 'name') }}">
+                <img src="{{ (service['image'] | img_src('services')) or url_for('static', filename='images/Default/Service/test.png') }}"
+                     alt="{{ tr(service, 'name') }}" loading="lazy">
+                <span class="bk-radio-check">
+                  <span class="material-symbols-outlined bk-radio-check-icon">check</span>
+                </span>
               </div>
               <div class="bk-svc-body">
-                <div class="bk-svc-row">
-                  <h3 class="bk-svc-name">{{ tr(service, 'name') }}</h3>
+                <h3 class="bk-svc-name">{{ tr(service, 'name') }}</h3>
+                <div class="bk-svc-foot">
+                  <span class="bk-svc-dur">
+                    <span class="material-symbols-outlined">schedule</span>
+                    {{ service['duration_minutes'] }} {{ _('min') }}
+                  </span>
                   <span class="bk-svc-price">€{{ service['price'] }}</span>
                 </div>
-                <p class="bk-svc-desc">{{ tr(service, 'description') }}</p>
-                <div class="bk-svc-meta">
-                  <span class="material-symbols-outlined bk-svc-meta-icon">schedule</span>
-                  {{ service['duration_minutes'] }} {{ _('min') }}
-                </div>
-              </div>
-              <div class="bk-radio-check">
-                <span class="material-symbols-outlined bk-radio-check-icon">check</span>
               </div>
             </div>
           </label>
@@ -111,10 +125,10 @@
         </div>
       </section>
 
-      {# ── STEP 2: STYLIST ─────────────────────────────────────────────────────
-         value="0" = No Preference → backend auto-assign
-         DB: loop staffs cho các card còn lại
-         Selected: JS toggle bk-staff-card--selected #}
+      {# ── BƯỚC 2: CHUYÊN VIÊN ─────────────────────────────────────────────
+         value="0" = No Preference → backend tự phân công.
+         Card "No Preference" chiếm cả hàng ở desktop vì nó khác loại với
+         ba người thật; ở mobile nó về làm ô thường để lưới khép đúng 2x2 #}
       <section class="bk-step" id="step-2">
         <div class="bk-step-head">
           <h2 class="bk-step-title">{{ _('Choose a Professional') }}</h2>
@@ -123,14 +137,16 @@
 
         <div class="bk-staff-grid">
 
-          <label class="bk-staff-label">
-            <input checked class="bk-sr-only" type="radio" name="staff_id" value="0" data-name="No Preference">
-            <div class="bk-staff-card">
+          <label class="bk-staff-label bk-staff-label--any">
+            <input checked class="bk-sr-only" type="radio" name="staff_id" value="0" data-name="{{ _('No Preference') }}">
+            <div class="bk-staff-card bk-staff-card--any">
               <div class="bk-staff-avatar bk-staff-avatar--empty">
                 <span class="material-symbols-outlined">group</span>
               </div>
-              <h3 class="bk-staff-name">{{ _('No Preference') }}</h3>
-              <p class="bk-staff-role">{{ _('Any available specialist') }}</p>
+              <div class="bk-staff-body">
+                <h3 class="bk-staff-name">{{ _('No Preference') }}</h3>
+                <p class="bk-staff-role">{{ _('Any available specialist') }}</p>
+              </div>
             </div>
           </label>
 
@@ -141,8 +157,10 @@
             <div class="bk-staff-card">
               <div class="bk-staff-avatar"
                    style="background-image:url('{{ staff['photo'] | staff_avatar }}')"></div>
-              <h3 class="bk-staff-name">{{ staff['full_name'] }}</h3>
-              <p class="bk-staff-role">{{ staff['role'] or _('Nail Technician') }}</p>
+              <div class="bk-staff-body">
+                <h3 class="bk-staff-name">{{ staff['full_name'] }}</h3>
+                <p class="bk-staff-role">{{ staff['role'] or _('Nail Technician') }}</p>
+              </div>
             </div>
           </label>
           {% endfor %}
@@ -159,12 +177,10 @@
         </div>
       </section>
 
-      {# ── STEP 3: DATE & TIME ─────────────────────────────────────────────────
-         2 cột 1:1: calendar trái / time slots phải
-         Calendar nav: ‹ [Month Year căn giữa] ›
-         Time slots: phẳng 1 hàng wrap, slot đầy = strikethrough + disabled
-         JS gọi CALENDAR_CONFIG.availableSlotUrl khi chọn ngày
-         Chọn xong → cập nhật hidden-booking-date và hidden-start-time #}
+      {# ── BƯỚC 3: NGÀY VÀ GIỜ ─────────────────────────────────────────────
+         Lịch trái / khung giờ phải. JS gọi BOOKING_CONFIG.availableSlotUrl
+         khi đổi ngày, gom slot theo buổi rồi ghi vào hidden-booking-date và
+         hidden-start-time #}
       <section class="bk-step" id="step-3">
         <div class="bk-step-head">
           <h2 class="bk-step-title">{{ _('Select Date & Time') }}</h2>
@@ -193,9 +209,7 @@
           <div class="bk-time-panel">
             <h3 class="bk-time-heading" id="timeslot-heading">{{ _('Available Times') }}</h3>
             <p class="bk-time-sub" id="timeslot-sub">{{ _('Select a date to see available times') }}</p>
-            <div class="bk-time-grid" id="timeSlotGrid">
-              <p class="bk-time-placeholder" id="timeslot-placeholder">{{ _('Please select a date first') }}</p>
-            </div>
+            <div id="timeSlotGrid"></div>
           </div>
 
         </div>
@@ -210,11 +224,10 @@
         </div>
       </section>
 
-            {# ── STEP 5: CHECKOUT ────────────────────────────────────────────────────
-         2 cột: left payment / right summary
-         Summary fields update bằng JS khi chuyển đến step này
+      {# ── BƯỚC 4: XÁC NHẬN ────────────────────────────────────────────────
+         Ở một cột, .bk-summary-col được đẩy lên trước bằng order: -1
          VAT 25.5% tính trong JS
-         Confirm → form submit → main.create_booking → /verify-email #}
+         Confirm → submit → main.create_customer_booking #}
       <section class="bk-step" id="step-4">
         <div class="bk-step-head">
           <h2 class="bk-step-title">{{ _('Confirm & Pay') }}</h2>
@@ -314,276 +327,53 @@
 
     </div>
   </form>
+
+  {# Thanh hành động dính đáy — chỉ hiện dưới 860px, và chỉ khi .bk-nav thật
+     đang ở ngoài màn hình. Nút của nó bấm hộ nút thật, không có logic riêng #}
+  <div class="bk-sticky" id="bk-sticky">
+    <button type="button" class="bk-sticky-back" id="bk-sticky-back" aria-label="{{ _('Back') }}" hidden>
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="bk-sticky-body">
+      <span class="bk-sticky-caption" id="bk-sticky-caption"></span>
+      <span class="bk-sticky-value" id="bk-sticky-value"></span>
+    </div>
+    <button type="button" class="bk-sticky-next" id="bk-sticky-next">{{ _('Continue') }}</button>
+  </div>
+
+</div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const steps      = document.querySelectorAll('.bk-step');
-    const dotWraps   = document.querySelectorAll('.bk-step-dot-wrap');
-    const fill       = document.getElementById('progress-fill');
-    const nextBtns   = document.querySelectorAll('.bk-btn-next');
-    const prevBtns   = document.querySelectorAll('.bk-btn-back');
-    let cur          = 1;
-    const total      = steps.length;
-
-    function updateWizard() {
-        steps.forEach((s, i) => s.classList.toggle('bk-step--active', i + 1 === cur));
-        dotWraps.forEach(w => {
-            const n  = parseInt(w.dataset.step);
-            const d  = document.getElementById(`step-circle-${n}`);
-            const lb = w.querySelector('.bk-step-label');
-            d.className = 'bk-step-dot';
-            lb.className = 'bk-step-label';
-            if (n < cur) {
-                d.classList.add('bk-step-dot--done');
-                d.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">check</span>';
-                lb.classList.add('bk-step-label--done');
-            } else if (n === cur) {
-                d.classList.add('bk-step-dot--active');
-                d.textContent = n;
-                lb.classList.add('bk-step-label--active');
-            } else {
-                d.textContent = n;
-            }
-        });
-        fill.style.width = `${((cur - 1) / (total - 1)) * 100}%`;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    nextBtns.forEach(b => b.addEventListener('click', () => { if (cur < total) { cur++; updateWizard(); } }));
-    prevBtns.forEach(b => b.addEventListener('click', () => { if (cur > 1) { cur--; updateWizard(); } }));
-
-    const chips = document.querySelectorAll('.bk-chip');
-    chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            chips.forEach(c => c.classList.remove('bk-chip--active'));
-            chip.classList.add('bk-chip--active');
-            const filter = chip.dataset.category;
-            document.querySelectorAll('.service-item').forEach(item => {
-                item.style.display = (filter === 'all' || item.dataset.category === filter) ? '' : 'none';
-            });
-        });
-    });
-
-    document.querySelectorAll('.bk-svc-label').forEach(label => {
-        label.addEventListener('click', () => {
-            document.querySelectorAll('.bk-svc-card').forEach(c => c.classList.remove('bk-svc-card--selected'));
-            label.querySelector('.bk-svc-card').classList.add('bk-svc-card--selected');
-        });
-    });
-
-    document.querySelectorAll('.bk-staff-label').forEach(label => {
-        label.addEventListener('click', () => {
-            document.querySelectorAll('.bk-staff-card').forEach(c => c.classList.remove('bk-staff-card--selected'));
-            label.querySelector('.bk-staff-card').classList.add('bk-staff-card--selected');
-        });
-    });
-
-    document.querySelectorAll('.bk-payment-label').forEach(label => {
-        label.addEventListener('click', () => {
-            document.querySelectorAll('.bk-payment-card:not(.bk-payment-card--disabled)').forEach(c => c.classList.remove('bk-payment-card--selected'));
-            label.querySelector('.bk-payment-card').classList.add('bk-payment-card--selected');
-        });
-    });
-
-    const VAT = 0.255;
-    function updateSummary() {
-        const svc  = document.querySelector('.service-radio:checked');
-        const stf  = document.querySelector('input[name="staff_id"]:checked');
-        if (svc) {
-            const p   = parseFloat(svc.dataset.price) || 0;
-            const vat = p * VAT;
-            document.getElementById('summary-service-name').textContent = svc.dataset.name || '—';
-            document.getElementById('summary-duration').textContent     = svc.dataset.duration ? `${svc.dataset.duration} {{ _('min') }}` : '—';
-            document.getElementById('summary-subtotal').textContent     = `€${p.toFixed(2)}`;
-            document.getElementById('summary-vat').textContent          = `€${vat.toFixed(2)}`;
-            document.getElementById('summary-total').textContent        = `€${(p + vat).toFixed(2)}`;
-            const pts = Math.round((parseFloat(svc.dataset.points) || 0) * (CALENDAR_CONFIG.pointsMultiplier || 1));
-            const ptsEl = document.getElementById('summary-points');
-            if (ptsEl) ptsEl.textContent = pts > 0 ? `${pts} {{ _('pts') }}` : '—';
-        }
-        if (stf) document.getElementById('summary-staff').textContent = stf.dataset.name || '{{ _("No Preference") }}';
-    }
-    document.querySelectorAll('.service-radio, input[name="staff_id"]').forEach(r => r.addEventListener('change', updateSummary));
-    updateSummary();
-
-    document.getElementById('confirm-btn')?.closest('form').addEventListener('submit', () => {
-        const btn = document.getElementById('confirm-btn');
-        btn.disabled = true;
-        btn.textContent = '{{ _("Processing…") }}';
-    });
-
-    document.querySelectorAll('.bk-staff-label input:checked').forEach(r => {
-        r.closest('.bk-staff-label')?.querySelector('.bk-staff-card')?.classList.add('bk-staff-card--selected');
-    });
-    document.querySelectorAll('.service-radio:checked').forEach(r => {
-        r.closest('.bk-svc-label')?.querySelector('.bk-svc-card')?.classList.add('bk-svc-card--selected');
-    });
-    document.querySelectorAll('input[name="payment_method"]:checked').forEach(r => {
-        r.closest('.bk-payment-label')?.querySelector('.bk-payment-card')?.classList.add('bk-payment-card--selected');
-    });
-
-    // ── CALENDAR & TIME SLOTS ──────────────────────────────────────────
-    const calendarEl   = document.getElementById('calendar');
-    const timeGridEl   = document.getElementById('timeSlotGrid');
-    const monthLabelEl = document.getElementById('calendarMonthLabel');
-    const hiddenDate   = document.getElementById('hidden-booking-date');
-    const hiddenTime   = document.getElementById('hidden-start-time');
-    const dtNextBtn    = steps[2]?.querySelector('.bk-btn-next');
-
-    function syncContinueState() {
-        if (dtNextBtn) dtNextBtn.disabled = !hiddenTime.value;
-    }
-    syncContinueState();
-
-    function parseLocalDate(s) {
-        const [y, m, d] = s.split('-').map(Number);
-        return new Date(y, m - 1, d);
-    }
-    function fmtDate(d) {
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    }
-
-    const todayDate  = parseLocalDate(CALENDAR_CONFIG.today);
-    const maxDate    = parseLocalDate(CALENDAR_CONFIG.maxDate);
-    let selectedDate = todayDate;
-    let currentMonth = new Date(todayDate.getFullYear(), todayDate.getMonth(), 1);
-
-    document.getElementById('prevMonth').addEventListener('click', () => {
-        currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
-        renderCalendar();
-    });
-    document.getElementById('nextMonth').addEventListener('click', () => {
-        currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
-        renderCalendar();
-    });
-
-    function calGridDates(monthDate) {
-        const y = monthDate.getFullYear(), m = monthDate.getMonth();
-        const offset = (new Date(y, m, 1).getDay() + 6) % 7;
-        return Array.from({ length: 35 }, (_, i) => new Date(y, m, 1 - offset + i));
-    }
-
-    function renderCalendar() {
-        monthLabelEl.textContent = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        calendarEl.innerHTML = '';
-        calGridDates(currentMonth).forEach(dateObj => {
-            const isOther  = dateObj.getMonth() !== currentMonth.getMonth();
-            const isPast   = dateObj < todayDate;
-            const isFuture = dateObj > maxDate;
-            const isToday  = fmtDate(dateObj) === CALENDAR_CONFIG.today;
-            const disabled = isOther || isPast || isFuture;
-
-            const cell = document.createElement('div');
-            cell.className = 'bk-cal-day';
-            if (disabled) cell.classList.add('bk-cal-day--past');
-            if (isToday)  cell.classList.add('bk-cal-day--today');
-            if (selectedDate && fmtDate(dateObj) === fmtDate(selectedDate)) cell.classList.add('bk-cal-day--selected');
-            cell.textContent = dateObj.getDate();
-
-            if (!disabled) {
-                cell.addEventListener('click', () => {
-                    selectedDate     = dateObj;
-                    hiddenDate.value = fmtDate(dateObj);
-                    hiddenTime.value = '';
-                    syncContinueState();
-                    renderCalendar();
-                    updateDatetimeSummary();
-                    tryLoadSlots();
-                });
-            }
-            calendarEl.appendChild(cell);
-        });
-    }
-
-    function updateDatetimeSummary() {
-        const el = document.getElementById('summary-datetime');
-        if (!el) return;
-        const datePart = selectedDate
-            ? selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-            : '—';
-        el.textContent = hiddenTime.value ? `${datePart} · ${hiddenTime.value}` : datePart;
-    }
-
-    function tryLoadSlots() {
-        const svcEl = document.querySelector('.service-radio:checked');
-        if (!svcEl) {
-            timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('Please select a service first.') }}</p>';
-            return;
-        }
-        if (!selectedDate) {
-            timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('Please select a date first.') }}</p>';
-            return;
-        }
-        loadSlots(fmtDate(selectedDate), svcEl.value, document.querySelector('input[name="staff_id"]:checked')?.value || 0);
-    }
-
-    async function loadSlots(dateStr, svcId, stfId) {
-        timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('Loading...') }}</p>';
-        try {
-            const res  = await fetch(`${CALENDAR_CONFIG.availableSlotUrl}?booking_date=${dateStr}&staff_id=${stfId}&service_id=${svcId}`);
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Failed');
-            renderSlots(data.available_slots || []);
-        } catch {
-            timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('Could not load available times.') }}</p>';
-        }
-    }
-
-    function renderSlots(slots) {
-        timeGridEl.innerHTML = '';
-        hiddenTime.value = '';
-        updateDatetimeSummary();
-        syncContinueState();
-        if (!slots.length) {
-            timeGridEl.innerHTML = '<p class="bk-time-placeholder">{{ _('No available slots for this date.') }}</p>';
-            return;
-        }
-        slots.forEach(slot => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'slot-pill';
-            btn.textContent = slot.label;
-            if (slot.disabled) {
-                btn.disabled = true;
-            } else {
-                btn.addEventListener('click', () => {
-                    timeGridEl.querySelectorAll('.slot-pill').forEach(p => p.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    hiddenTime.value = slot.value;
-                    updateDatetimeSummary();
-                    syncContinueState();
-                });
-            }
-            timeGridEl.appendChild(btn);
-        });
-    }
-
-    renderCalendar();
-    hiddenDate.value = fmtDate(selectedDate);
-    updateDatetimeSummary();
-    tryLoadSlots();
-    document.querySelectorAll('.service-radio, input[name="staff_id"]').forEach(r =>
-        r.addEventListener('change', tryLoadSlots)
-    );
-    // ──────────────────────────────────────────────────────────────────
-});
-
-const CALENDAR_CONFIG = {
-    today:               "{{ today.isoformat() }}",
-    maxDate:             "{{ max_date.isoformat() }}",
-    availableSlotUrl:    "{{ url_for('main.check_available_slot') }}",
-    hiddenDateId:        "hidden-booking-date",
-    hiddenTimeId:        "hidden-start-time",
-    timeslotGridId:      "timeSlotGrid",
-    timeslotHeadingId:   "timeslot-heading",
-    timeslotSubId:       "timeslot-sub",
-    timeslotPlaceholderId: "timeslot-placeholder",
+window.BOOKING_CONFIG = {
+    today:            "{{ today.isoformat() }}",
+    maxDate:          "{{ max_date.isoformat() }}",
+    availableSlotUrl: "{{ url_for('main.check_available_slot') }}",
     pointsMultiplier: {{ multiplier }},
-    summaryPointsId:   "summary-points"
+    i18n: {
+        min:           "{{ _('min') }}",
+        pts:           "{{ _('pts') }}",
+        noPreference:  "{{ _('No Preference') }}",
+        selectService: "{{ _('Please select a service first.') }}",
+        selectDate:    "{{ _('Please select a date first.') }}",
+        loadError:     "{{ _('Could not load available times.') }}",
+        noSlots:       "{{ _('No available slots for this date.') }}",
+        processing:    "{{ _('Processing...') }}",
+        morning:       "{{ _('Morning') }}",
+        afternoon:     "{{ _('Afternoon') }}",
+        evening:       "{{ _('Evening') }}",
+        stepWord:      "{{ _('Step') }}",
+        ofWord:        "{{ _('of') }}",
+        continueLabel: "{{ _('Continue') }}",
+        confirmLabel:  "{{ _('Confirm') }}",
+        capService:    "{{ _('Service') }}",
+        capStylist:    "{{ _('Stylist') }}",
+        capWhen:       "{{ _('Date & Time') }}",
+        capTotal:      "{{ _('Total') }}",
+        pickSlot:      "{{ _('Pick a time slot') }}"
+    }
 };
 </script>
+<script src="{{ url_for('static', filename='js/booking_wizard.js') }}"></script>
 
-
-</div>
 {% endblock %}

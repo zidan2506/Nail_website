@@ -1,1078 +1,1410 @@
-/* =============================================================================
-   PUBLIC_BOOKING.CSS — DahaCare Booking Wizard
-   Dùng chung cho public_booking.html và customer_booking.html
-   Không dùng Tailwind — CSS thuần với BEM prefix bk-
-   Kế thừa tokens từ base.css (:root)
-   ============================================================================= */
+/* =========================================================
+   BOOKING WIZARD  (prefix: bk-)
+   ---------------------------------------------------------
+   Dùng chung cho public_booking.html (5 bước, khách vãng lai)
+   và customer_booking.html (4 bước, đã đăng nhập).
 
-/* ─── COLORS (local shortcuts) ───────────────────────────────────────────────*/
-:root {
-    --bk-primary:       #ab2261;
-    --bk-deep-plum:     #3E1F47;
-    --bk-navy:          #0F172A;
-    --bk-blossom:       #FBEAF0;
-    --bk-stone-white:   #F8F9FA;
-    --bk-surface:       #fff8f8;
-    --bk-surface-dim:   #e6d6dc;
-    --bk-outline:       #ddbfc6;
-    --bk-tertiary:      #545c72;
-    --bk-text:          #22191d;
-    --bk-text-muted:    #574147;
-    --bk-border:        rgba(221, 191, 198, 0.5);
-    --bk-border-plum:   rgba(62, 31, 71, 0.2);
-    --bk-radius-card:   20px;
-    --bk-radius-btn:    14px;
-    --bk-radius-input:  14px;
-    --bk-radius-full:   9999px;
-    --bk-shadow-sm:     0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-    --bk-shadow-md:     0 4px 12px rgba(0,0,0,0.08);
-    --bk-font:          'Plus Jakarta Sans', sans-serif;
-}
+   Đây là trang DUY NHẤT của site có TRẠNG THÁI DỞ DANG: khách
+   đang ở giữa một việc chưa xong. Mọi quyết định dưới đây phục
+   vụ đúng chỗ đó, không phải để trang trí:
 
-/* ─── PAGE WRAPPER ───────────────────────────────────────────────────────────*/
+     1. THANH DÍNH ĐÁY Ở MOBILE. Bản cũ đặt nút Continue sau
+        toàn bộ danh sách, nên bước 1 phải cuộn hết 9 dịch vụ
+        (~2.250px) mới thấy nút. Thanh mới vừa là nút vừa đọc
+        lại thứ vừa chọn, nên nó trả lời luôn câu "tôi chọn gì
+        rồi" mà không cần cuộn ngược.
+
+     2. DỊCH VỤ LÀ LƯỚI, KHÔNG PHẢI DANH SÁCH. Bản cũ xếp dọc
+        một cột với thumb 96px. 9 dịch vụ ở mobile nay còn 5
+        hàng thay vì 9, và ảnh thật được nhìn thấy.
+
+     3. KHUNG GIỜ CHIA THEO BUỔI. Bản cũ là flex-wrap nên pill
+        rộng khác nhau ("9:00 AM" vs "11:30 AM") làm hàng cuối
+        lệch. Nay là lưới cột đều, gom theo Morning / Afternoon
+        / Evening để mắt có mốc bám.
+
+   Bản cũ đặt heading bằng --bk-navy #0F172A, một màu xanh nằm
+   ngoài palette hồng/plum của cả site. Đã bỏ, thay bằng ink
+   #2A1520 đúng như bd- / lp- / ms-.
+
+   THANG ĐO - lấy đúng giá trị của bd- / lp- / ms-
+     bo góc   surface 20 · media 14 · control 12 · pill 999
+     accent   #ab2261 trên nền sáng
+              trên plum đổi sang pearl (hồng trên plum ~1.7:1)
+
+   Token khai trên .bk-wrap chứ KHÔNG phải :root. my_bookings
+   .css cũng có --bk-surface với giá trị khác; hai file không
+   bao giờ nạp cùng trang, nhưng khai phạm vi thì không cần
+   dựa vào điều đó nữa.
+   ========================================================= */
+
 .bk-wrap {
-    min-height: calc(100vh - 73px);
-    background: var(--bk-surface);
-    font-family: var(--bk-font);
+  --bk-ink:        #2A1520;
+  --bk-ink-2:      #6B5560;
+  --bk-ink-3:      #9C8A93;
+
+  --bk-accent:     #ab2261;
+  --bk-accent-2:   #8d1a4f;
+  --bk-wash:       #FBEEF4;
+  --bk-wash-2:     #F6E4EC;
+
+  --bk-plum:       #3E1F47;
+  --bk-pearl:      #FBF4F8;
+
+  --bk-page:       #FDF7F9;
+  --bk-surface:    #ffffff;
+  --bk-line:       #EDE3E8;
+  --bk-line-2:     #E2D4DB;
+
+  --bk-r-surface:  20px;
+  --bk-r-media:    14px;
+  --bk-r-control:  12px;
+
+  --bk-ease:       cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Mép trên để thanh bước dính vào. Public có header 72px; customer
+     portal desktop là sidebar (không header) và mobile là topbar 56px.
+     Ghi đè ở cuối file qua .booking-wrapper, class chỉ customer mới có. */
+  --bk-top:        72px;
+
+  min-height: 100%;
+  background: var(--bk-page);
+  font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+  color: var(--bk-ink);
 }
 
-/* ─── STEP INDICATOR BAR ─────────────────────────────────────────────────────*/
+/* Codebase không có reset box-sizing toàn cục, khai trong phạm vi */
+.bk-wrap *,
+.bk-wrap *::before,
+.bk-wrap *::after { box-sizing: border-box; }
+
+.bk-wrap button { font: inherit; }
+.bk-wrap form { margin: 0; }
+
+.bk-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* =========================================================
+   THANH BƯỚC
+   Desktop: chấm + nhãn. Mobile: một dòng chữ đọc được
+   ("Step 2 of 5 · Stylist") thay cho dãy chấm câm.
+   ========================================================= */
+
 .bk-indicator-bar {
-    position: sticky;
-    top: 73px;
-    z-index: 40;
-    background: rgba(255, 248, 248, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(221, 191, 198, 0.3);
-    padding: 16px 80px;
-    box-shadow: var(--bk-shadow-sm);
+  position: sticky;
+  top: var(--bk-top);
+  z-index: 40;
+  background: rgba(253, 247, 249, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--bk-line);
+  padding: 14px 32px;
 }
 
 .bk-indicator {
-    max-width: 768px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    position: relative;
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
 }
 
 .bk-progress-track {
-    position: absolute;
-    top: 16px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: #efdee4;
-    z-index: 0;
-    transform: translateY(-50%);
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--bk-line);
+  z-index: 0;
+  transform: translateY(-50%);
 }
 
 .bk-progress-fill {
-    height: 100%;
-    background: var(--bk-primary);
-    transition: width 0.5s ease;
+  height: 100%;
+  background: var(--bk-accent);
+  transition: width 0.45s var(--bk-ease);
 }
 
 .bk-step-dot-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    position: relative;
-    z-index: 1;
-    cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  position: relative;
+  z-index: 1;
 }
 
 .bk-step-dot {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 600;
-    background: var(--bk-surface);
-    color: var(--bk-text-muted);
-    border: 2px solid #efdee4;
-    transition: all 0.3s ease;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--bk-surface);
+  color: var(--bk-ink-3);
+  border: 2px solid var(--bk-line);
+  transition: background-color 0.25s ease, border-color 0.25s ease,
+              color 0.25s ease, box-shadow 0.25s ease;
 }
 
+.bk-step-dot-check { font-size: 16px; }
+
 .bk-step-dot--active {
-    background: var(--bk-primary);
-    color: #fff;
-    border-color: var(--bk-primary);
-    box-shadow: 0 0 0 4px rgba(171, 34, 97, 0.15);
+  background: var(--bk-accent);
+  color: #ffffff;
+  border-color: var(--bk-accent);
+  box-shadow: 0 0 0 4px rgba(171, 34, 97, 0.14);
 }
 
 .bk-step-dot--done {
-    background: var(--bk-primary);
-    color: #fff;
-    border-color: var(--bk-primary);
+  background: var(--bk-accent);
+  color: #ffffff;
+  border-color: var(--bk-accent);
 }
 
 .bk-step-label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--bk-text-muted);
-    opacity: 0.5;
-    display: none;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--bk-ink-3);
+  white-space: nowrap;
 }
 
 .bk-step-label--active,
-.bk-step-label--done {
-    color: var(--bk-primary);
-    opacity: 1;
+.bk-step-label--done { color: var(--bk-accent); }
+
+/* Bản mobile của thanh bước. Ẩn ở desktop. */
+.bk-step-mobile {
+  display: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--bk-ink-2);
+  text-align: center;
 }
 
-/* ─── MAIN CONTENT ───────────────────────────────────────────────────────────*/
+.bk-step-mobile-track {
+  display: none;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--bk-line);
+  overflow: hidden;
+  margin-top: 9px;
+}
+
+.bk-step-mobile-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--bk-accent);
+  transition: width 0.45s var(--bk-ease);
+}
+
+
+/* =========================================================
+   KHUNG NỘI DUNG
+   ========================================================= */
+
 .bk-content {
-    max-width: 896px;
-    margin: 0 auto;
-    padding: 48px 80px 120px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 32px 72px;
 }
 
-/* ─── STEP PANELS ─────────────────────────────────────────────────────────────*/
-.bk-step {
-    display: none;
-    animation: bk-fadein 0.35s ease-out;
-}
+.bk-step { display: none; }
 
 .bk-step--active {
-    display: block;
+  display: block;
+  animation: bk-fadein 0.35s var(--bk-ease);
 }
 
 @keyframes bk-fadein {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.bk-step-head {
-    text-align: center;
-    margin-bottom: 40px;
-}
+.bk-step-head { margin-bottom: 26px; }
 
 .bk-step-title {
-    font-size: clamp(28px, 5vw, 48px);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--bk-navy);
-    margin: 0 0 12px;
+  font-size: 1.95rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--bk-ink);
+  margin: 0 0 6px;
 }
 
 .bk-step-sub {
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--bk-text-muted);
-    margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--bk-ink-2);
+  margin: 0;
+  max-width: 60ch;
 }
 
-/* ─── NAV BUTTONS ─────────────────────────────────────────────────────────────*/
+
+/* =========================================================
+   NÚT
+   ========================================================= */
+
 .bk-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
 }
 
-.bk-nav--end {
-    justify-content: flex-end;
+.bk-nav--end { justify-content: flex-end; }
+
+.bk-btn-back,
+.bk-btn-next,
+.bk-btn-confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: var(--bk-r-control);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+              color 0.2s ease, box-shadow 0.2s ease, transform 0.14s ease;
 }
+
+.bk-btn-back:active,
+.bk-btn-next:active,
+.bk-btn-confirm:active { transform: scale(0.98); }
 
 .bk-btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 12px 24px;
-    border-radius: var(--bk-radius-btn);
-    border: none;
-    background: transparent;
-    color: var(--bk-tertiary);
-    font-family: var(--bk-font);
-    font-size: 15px;
-    cursor: pointer;
-    transition: background 0.2s;
+  background: var(--bk-surface);
+  color: var(--bk-ink);
+  border-color: var(--bk-line-2);
 }
 
-.bk-btn-back:hover {
-    background: rgba(239, 222, 228, 0.4);
-}
-
-.bk-btn-next {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 28px;
-    border-radius: var(--bk-radius-btn);
-    border: none;
-    background: var(--bk-primary);
-    color: #fff;
-    font-family: var(--bk-font);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: var(--bk-shadow-sm);
-    transition: opacity 0.2s;
-}
-
-.bk-btn-next:hover {
-    opacity: 0.9;
-}
-
-.bk-btn-next:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-}
-
+.bk-btn-next,
 .bk-btn-confirm {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 28px;
-    border-radius: var(--bk-radius-btn);
-    border: none;
-    background: var(--bk-primary);
-    color: #fff;
-    font-family: var(--bk-font);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: var(--bk-shadow-sm);
-    transition: opacity 0.2s, transform 0.15s;
+  background: var(--bk-accent);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(171, 34, 97, 0.20);
 }
 
-.bk-btn-confirm:hover { opacity: 0.9; }
-.bk-btn-confirm:active { transform: scale(0.98); }
-.bk-btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+@media (hover: hover) and (pointer: fine) {
+  .bk-btn-back:hover { background: var(--bk-wash); border-color: var(--bk-ink-3); }
+  .bk-btn-next:hover,
+  .bk-btn-confirm:hover {
+    background: var(--bk-accent-2);
+    box-shadow: 0 10px 26px rgba(171, 34, 97, 0.26);
+  }
+}
 
-/* ─── STEP 1: SERVICE ─────────────────────────────────────────────────────────*/
+.bk-btn-next:disabled,
+.bk-btn-confirm:disabled {
+  background: var(--bk-line-2);
+  color: #ffffff;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* =========================================================
+   THANH HÀNH ĐỘNG DÍNH ĐÁY - chỉ mobile
+   Hiện đúng khi .bk-nav thật đang ở ngoài màn hình, nên không
+   bao giờ có hai nút Continue cùng lúc, và bước ngắn (không đủ
+   chỗ để cuộn) vẫn luôn có một nút bấm được.
+   ========================================================= */
+
+.bk-sticky {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--bk-line);
+  box-shadow: 0 -8px 28px rgba(42, 21, 32, 0.10);
+  transform: translateY(115%);
+  transition: transform 0.3s var(--bk-ease);
+}
+
+.bk-sticky--visible { transform: translateY(0); }
+
+.bk-sticky-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bk-sticky-caption {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--bk-ink-3);
+}
+
+.bk-sticky-value {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--bk-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bk-sticky-back {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--bk-line-2);
+  border-radius: var(--bk-r-control);
+  background: var(--bk-surface);
+  color: var(--bk-ink);
+  cursor: pointer;
+}
+
+.bk-sticky-back[hidden] { display: none; }
+
+.bk-sticky-next {
+  flex: none;
+  min-height: 44px;
+  padding: 0 22px;
+  border: none;
+  border-radius: var(--bk-r-control);
+  background: var(--bk-accent);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.14s ease;
+}
+
+.bk-sticky-next:active { transform: scale(0.98); }
+
+.bk-sticky-next:disabled {
+  background: var(--bk-line-2);
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* =========================================================
+   BƯỚC 1 - DỊCH VỤ
+   ========================================================= */
+
 .bk-chips {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
 }
 
 .bk-chip {
-    padding: 8px 22px;
-    border-radius: var(--bk-radius-full);
-    border: 1px solid rgba(239, 222, 228, 0.6);
-    background: #fbeaf0;
-    color: var(--bk-text-muted);
-    font-family: var(--bk-font);
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--bk-line-2);
+  background: var(--bk-surface);
+  color: var(--bk-ink-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.bk-chip:hover {
-    background: var(--bk-blossom);
+.bk-chip-count {
+  margin-left: 6px;
+  font-weight: 700;
+  color: var(--bk-ink-3);
 }
+
+@media (hover: hover) and (pointer: fine) {
+  .bk-chip:hover { border-color: var(--bk-accent); color: var(--bk-accent); }
+}
+
+.bk-chip:active { transform: scale(0.97); }
 
 .bk-chip--active {
-    background: var(--bk-deep-plum);
-    color: #fff;
-    border-color: var(--bk-deep-plum);
-    box-shadow: var(--bk-shadow-sm);
+  background: var(--bk-plum);
+  border-color: var(--bk-plum);
+  color: #ffffff;
 }
 
-.bk-svc-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.bk-chip--active .bk-chip-count { color: var(--bk-pearl); opacity: 0.75; }
+
+.bk-svc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
 }
 
 .bk-svc-label {
-    display: block;
-    cursor: pointer;
-}
-
-.bk-sr-only {
-    position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    white-space: nowrap;
-    border: 0;
+  display: block;
+  cursor: pointer;
+  height: 100%;
 }
 
 .bk-svc-card {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    padding: 24px;
-    border-radius: var(--bk-radius-card);
-    border: 1px solid var(--bk-blossom);
-    background: var(--bk-stone-white);
-    transition: box-shadow 0.3s, border-color 0.2s, background 0.2s;
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bk-surface);
+  border: 1px solid var(--bk-line);
+  border-radius: var(--bk-r-surface);
+  overflow: hidden;
+  transition: background-color 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
 }
 
-.bk-svc-card:hover {
-    box-shadow: var(--bk-shadow-md);
+/* Vòng chọn vẽ bằng ::after để đổi trạng thái không làm nhảy bố cục
+   (border 1px -> 2px sẽ dịch nội dung 1px). */
+.bk-svc-card::after,
+.bk-staff-card::after,
+.bk-payment-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: border-color 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bk-svc-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(42, 21, 32, 0.10);
+  }
 }
 
 .bk-svc-card--selected {
-    border-color: var(--bk-primary);
-    background: rgba(251, 234, 240, 0.3);
+  background: var(--bk-wash);
+  border-color: transparent;
 }
 
+.bk-svc-card--selected::after { border-color: var(--bk-accent); }
+
 .bk-svc-thumb {
-    width: 96px;
-    height: 96px;
-    border-radius: var(--bk-radius-btn);
-    overflow: hidden;
-    flex-shrink: 0;
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--bk-wash-2);
+  overflow: hidden;
 }
 
 .bk-svc-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.bk-svc-thumb--bg {
-    background-size: cover;
-    background-position: center;
-}
-
-.bk-svc-thumb--fallback {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bk-blossom);
-}
-
-.bk-svc-thumb--fallback .material-symbols-outlined {
-    font-size: 40px;
-    color: var(--bk-primary);
-    opacity: 0.35;
-}
-
-.bk-svc-body {
-    flex-grow: 1;
-}
-
-.bk-svc-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8px;
-}
-
-.bk-svc-name {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--bk-navy);
-    margin: 0;
-}
-
-.bk-svc-price {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--bk-primary);
-    flex-shrink: 0;
-}
-
-.bk-svc-desc {
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--bk-text-muted);
-    margin: 0 0 10px;
-}
-
-.bk-svc-meta {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--bk-tertiary);
-}
-
-.bk-svc-meta-icon {
-    font-size: 16px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .bk-radio-check {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: 2px solid #efdee4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.2s;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--bk-line-2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .bk-svc-card--selected .bk-radio-check {
-    background: var(--bk-primary);
-    border-color: var(--bk-primary);
+  background: var(--bk-accent);
+  border-color: var(--bk-accent);
 }
 
 .bk-radio-check-icon {
-    font-size: 14px;
-    color: #fff;
-    opacity: 0;
+  font-size: 16px;
+  color: var(--bk-ink-3);
+  transition: color 0.2s ease;
 }
 
-.bk-svc-card--selected .bk-radio-check-icon {
-    opacity: 1;
+.bk-svc-card--selected .bk-radio-check-icon { color: #ffffff; }
+
+.bk-svc-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 13px 15px 15px;
 }
 
-/* ─── STEP 2: STYLIST ─────────────────────────────────────────────────────────*/
+.bk-svc-name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--bk-ink);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bk-svc-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bk-svc-dur {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--bk-ink-3);
+}
+
+.bk-svc-dur .material-symbols-outlined { font-size: 15px; }
+
+.bk-svc-price {
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--bk-accent);
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   BƯỚC 2 - CHUYÊN VIÊN
+   Desktop: "No Preference" là một hàng ngang riêng phía trên,
+   vì nó khác loại với ba người thật. Mobile: nó trở lại làm
+   một ô bình thường để lưới khép đúng 2x2.
+   ========================================================= */
+
 .bk-staff-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 }
 
 .bk-staff-label {
-    cursor: pointer;
+  display: block;
+  cursor: pointer;
+  height: 100%;
 }
+
+.bk-staff-label--any { grid-column: 1 / -1; }
 
 .bk-staff-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 28px 20px;
-    border-radius: var(--bk-radius-card);
-    border: 1px solid var(--bk-blossom);
-    background: var(--bk-stone-white);
-    transition: box-shadow 0.3s, border-color 0.2s, background 0.2s;
-    height: 100%;
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 16px;
+  background: var(--bk-surface);
+  border: 1px solid var(--bk-line);
+  border-radius: var(--bk-r-surface);
+  transition: background-color 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
 }
 
-.bk-staff-card:hover {
-    box-shadow: var(--bk-shadow-md);
+@media (hover: hover) and (pointer: fine) {
+  .bk-staff-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(42, 21, 32, 0.10);
+  }
 }
 
 .bk-staff-card--selected {
-    border-color: var(--bk-primary);
-    background: rgba(251, 234, 240, 0.3);
+  background: var(--bk-wash);
+  border-color: transparent;
+}
+
+.bk-staff-card--selected::after { border-color: var(--bk-accent); }
+
+.bk-staff-card--any {
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: 16px;
+  padding: 16px 20px;
 }
 
 .bk-staff-avatar {
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    background-size: cover;
-    background-position: center;
-    margin-bottom: 16px;
-    overflow: hidden;
-    box-shadow: var(--bk-shadow-sm);
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--bk-wash-2);
+  margin-bottom: 12px;
+  flex: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.bk-staff-card--selected .bk-staff-avatar {
+  box-shadow: 0 0 0 3px var(--bk-surface), 0 0 0 5px var(--bk-accent);
+}
+
+.bk-staff-card--any .bk-staff-avatar {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 0;
 }
 
 .bk-staff-avatar--empty {
-    background: rgba(239, 222, 228, 0.3);
-    border: 1px dashed rgba(84, 92, 114, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bk-wash);
+  border: 1px dashed var(--bk-line-2);
 }
 
 .bk-staff-avatar--empty .material-symbols-outlined {
-    font-size: 40px;
-    color: var(--bk-tertiary);
+  font-size: 30px;
+  color: var(--bk-ink-3);
 }
 
+.bk-staff-body { min-width: 0; }
+
 .bk-staff-name {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--bk-navy);
-    margin: 0 0 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--bk-ink);
+  margin: 0 0 3px;
 }
 
 .bk-staff-role {
-    font-size: 13px;
-    color: var(--bk-text-muted);
-    margin: 0;
+  font-size: 0.8rem;
+  color: var(--bk-ink-2);
+  margin: 0;
 }
 
-/* ─── STEP 3: DATE & TIME ─────────────────────────────────────────────────────*/
+
+/* =========================================================
+   BƯỚC 3 - NGÀY VÀ GIỜ
+   ========================================================= */
+
 .bk-dt-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 20px;
+  align-items: start;
 }
+
+/* Grid item mặc định có min-width:auto (= min-content), nên một ô con quá
+   rộng sẽ đẩy cả track ra ngoài thay vì co lại. Cắt ở đây cho cả hai panel. */
+.bk-dt-grid > * { min-width: 0; }
 
 .bk-cal-panel,
 .bk-time-panel {
-    background: var(--bk-stone-white);
-    border: 1px solid var(--bk-blossom);
-    border-radius: var(--bk-radius-card);
-    padding: 24px;
-    box-shadow: var(--bk-shadow-sm);
+  min-width: 0;
+  background: var(--bk-surface);
+  border: 1px solid var(--bk-line);
+  border-radius: var(--bk-r-surface);
+  padding: 20px;
 }
 
 .bk-cal-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .bk-cal-month {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--bk-navy);
-    text-align: center;
-    flex: 1;
-    margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--bk-ink);
+  text-align: center;
+  flex: 1;
+  margin: 0;
 }
 
 .bk-cal-nav-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid rgba(239, 222, 228, 0.7);
-    background: transparent;
-    color: var(--bk-tertiary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: color 0.2s;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--bk-r-control);
+  border: 1px solid var(--bk-line-2);
+  background: var(--bk-surface);
+  color: var(--bk-ink-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-.bk-cal-nav-btn:hover {
-    color: var(--bk-navy);
+@media (hover: hover) and (pointer: fine) {
+  .bk-cal-nav-btn:hover {
+    background: var(--bk-wash);
+    border-color: var(--bk-accent);
+    color: var(--bk-accent);
+  }
 }
 
 .bk-cal-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--bk-tertiary);
-    margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--bk-ink-3);
+  margin-bottom: 6px;
 }
 
 .bk-cal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
-    text-align: center;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
 }
 
-/* JS genera cal-day elements — class names defined here */
+/* .bk-cal-day do JS sinh ra. Ô vuông bo góc thay cho hình tròn 36px của bản
+   cũ: vùng chạm đạt 44px và hình dạng khớp với slot-pill bên cạnh. */
+/* KHÔNG đặt min-height ở đây. aspect-ratio CHUYỂN min-height thành min-width,
+   và ô là grid item (min-width mặc định là auto) nên 7 cột sẽ không co xuống
+   dưới 44px: lưới hoá ra cần 400px bề rộng và tràn ngang trên mọi máy
+   360-393px. Ô tự vuông theo bề rộng cột; vùng chạm được giữ ~44px bằng cách
+   siết padding panel và gap ở khối mobile bên dưới. */
 .bk-cal-day {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 500;
-    margin: 0 auto;
-    cursor: pointer;
-    transition: background 0.15s;
-    color: var(--bk-text);
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: var(--bk-r-control);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--bk-ink);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.bk-cal-day:hover {
-    background: var(--bk-blossom);
+@media (hover: hover) and (pointer: fine) {
+  .bk-cal-day:hover { background: var(--bk-wash); }
 }
 
 .bk-cal-day--past {
-    color: rgba(87, 65, 71, 0.3);
-    cursor: not-allowed;
-    pointer-events: none;
+  color: var(--bk-ink-3);
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .bk-cal-day--today {
-    border: 2px solid var(--bk-primary);
-    color: var(--bk-primary);
-    font-weight: 700;
+  box-shadow: inset 0 0 0 2px var(--bk-accent);
+  color: var(--bk-accent);
+  font-weight: 800;
 }
 
-.bk-cal-day--selected {
-    background: var(--bk-deep-plum);
-    color: #fff;
-    font-weight: 700;
-    box-shadow: 0 2px 8px rgba(62, 31, 71, 0.3);
-}
-
-.bk-time-panel {
-    display: flex;
-    flex-direction: column;
+.bk-cal-day--selected,
+.bk-cal-day--selected.bk-cal-day--today {
+  background: var(--bk-plum);
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: none;
 }
 
 .bk-time-heading {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--bk-navy);
-    margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--bk-ink);
+  margin: 0 0 3px;
 }
 
 .bk-time-sub {
-    font-size: 13px;
-    color: var(--bk-text-muted);
-    margin: 0 0 20px;
+  font-size: 0.82rem;
+  color: var(--bk-ink-2);
+  margin: 0 0 16px;
 }
 
-.bk-time-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+.bk-slot-group + .bk-slot-group { margin-top: 18px; }
+
+.bk-slot-group-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--bk-ink-3);
+  margin: 0 0 9px;
 }
 
-.bk-time-placeholder {
-    font-size: 13px;
-    color: rgba(87, 65, 71, 0.5);
-    font-style: italic;
-    margin: 0;
+.bk-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
 }
 
-/* Slot pills rendered by JS */
+/* .slot-pill do JS sinh ra */
 .slot-pill {
-    padding: 8px 18px;
-    border-radius: var(--bk-radius-full);
-    border: 1px solid var(--bk-outline);
-    background: transparent;
-    font-family: var(--bk-font);
-    font-size: 13px;
-    color: var(--bk-text);
-    cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
+  min-height: 44px;
+  padding: 0 6px;
+  border-radius: var(--bk-r-control);
+  border: 1px solid var(--bk-line-2);
+  background: var(--bk-surface);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--bk-ink);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.slot-pill:hover:not([disabled]) {
-    border-color: var(--bk-primary);
-    color: var(--bk-primary);
+@media (hover: hover) and (pointer: fine) {
+  .slot-pill:hover:not([disabled]) {
+    border-color: var(--bk-accent);
+    color: var(--bk-accent);
+    background: var(--bk-wash);
+  }
 }
+
+.slot-pill:active:not([disabled]) { transform: scale(0.97); }
 
 .slot-pill.selected {
-    background: var(--bk-deep-plum);
-    border-color: var(--bk-deep-plum);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(62, 31, 71, 0.25);
+  background: var(--bk-plum);
+  border-color: var(--bk-plum);
+  color: #ffffff;
+  font-weight: 700;
 }
 
+/* Giờ đã kín: giữ hiển thị (khách đọc được là salon đang bận) nhưng bỏ
+   gạch ngang của bản cũ, vì 10 pill gạch ngang làm nhiễu cả lưới. */
 .slot-pill[disabled],
 .slot-pill.booked {
-    color: rgba(87, 65, 71, 0.35);
-    border-color: rgba(221, 191, 198, 0.35);
-    text-decoration: line-through;
-    cursor: not-allowed;
-    pointer-events: none;
+  background: var(--bk-wash);
+  border-color: transparent;
+  color: var(--bk-ink-3);
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
-/* ─── STEP 4: INFO ────────────────────────────────────────────────────────────*/
+.bk-slot-skeleton-label {
+  width: 88px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--bk-wash-2);
+  margin-bottom: 9px;
+}
+
+.bk-slot-skeleton {
+  min-height: 44px;
+  border-radius: var(--bk-r-control);
+  background: linear-gradient(90deg, var(--bk-wash) 25%, var(--bk-wash-2) 50%, var(--bk-wash) 75%);
+  background-size: 200% 100%;
+  animation: bk-shimmer 1.3s linear infinite;
+}
+
+@keyframes bk-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+.bk-time-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 30px 16px;
+  border: 1px dashed var(--bk-line-2);
+  border-radius: var(--bk-r-media);
+  background: var(--bk-pearl);
+}
+
+.bk-time-empty-icon {
+  font-size: 28px;
+  color: var(--bk-ink-3);
+}
+
+.bk-time-empty-text {
+  font-size: 0.85rem;
+  color: var(--bk-ink-2);
+  margin: 0;
+  max-width: 34ch;
+}
+
+
+/* =========================================================
+   BƯỚC 4 - THÔNG TIN KHÁCH (chỉ luồng public)
+   ========================================================= */
+
 .bk-info-card {
-    max-width: 640px;
-    margin: 0 auto;
-    background: var(--bk-stone-white);
-    border: 1px solid var(--bk-blossom);
-    border-radius: var(--bk-radius-card);
-    padding: 32px;
-    box-shadow: var(--bk-shadow-sm);
-    position: relative;
-    overflow: hidden;
-}
-
-.bk-info-glow {
-    position: absolute;
-    top: -40px;
-    right: -40px;
-    width: 160px;
-    height: 160px;
-    background: rgba(171, 34, 97, 0.08);
-    border-radius: 50%;
-    filter: blur(40px);
-    pointer-events: none;
+  max-width: 660px;
+  background: var(--bk-surface);
+  border: 1px solid var(--bk-line);
+  border-radius: var(--bk-r-surface);
+  padding: 26px;
 }
 
 .bk-info-login-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid rgba(239, 222, 228, 0.5);
-    position: relative;
-    z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--bk-line);
 }
 
 .bk-info-login-text {
-    font-size: 14px;
-    color: var(--bk-text-muted);
+  font-size: 0.87rem;
+  color: var(--bk-ink-2);
 }
 
 .bk-info-login-link {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--bk-primary);
-    text-decoration: none;
+  font-size: 0.87rem;
+  font-weight: 700;
+  color: var(--bk-accent);
+  text-decoration: none;
 }
 
-.bk-info-login-link:hover {
-    text-decoration: underline;
-}
+.bk-info-login-link:hover { text-decoration: underline; }
 
 .bk-info-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    position: relative;
-    z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .bk-form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 .bk-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .bk-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--bk-navy);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--bk-ink);
 }
 
 .bk-label-optional {
-    font-weight: 400;
-    color: var(--bk-text-muted);
+  font-weight: 500;
+  color: var(--bk-ink-3);
 }
 
 .bk-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid var(--bk-border-plum);
-    border-radius: var(--bk-radius-input);
-    background: var(--bk-surface);
-    color: var(--bk-text);
-    font-family: var(--bk-font);
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-sizing: border-box;
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px solid var(--bk-line-2);
+  border-radius: var(--bk-r-control);
+  background: var(--bk-surface);
+  color: var(--bk-ink);
+  font-family: inherit;
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* #6B5560 trên #ffffff đạt 5.9:1, qua ngưỡng AA cho chữ thường. */
+.bk-input::placeholder { color: var(--bk-ink-2); opacity: 0.62; }
+
 .bk-input:focus {
-    border-color: var(--bk-primary);
-    box-shadow: 0 0 0 2px rgba(171, 34, 97, 0.1);
+  border-color: var(--bk-accent);
+  box-shadow: 0 0 0 3px rgba(171, 34, 97, 0.14);
 }
 
 .bk-textarea {
-    resize: none;
-    height: 90px;
+  resize: vertical;
+  min-height: 92px;
 }
 
-/* ─── STEP 5: CHECKOUT ────────────────────────────────────────────────────────*/
+
+/* =========================================================
+   BƯỚC CUỐI - XÁC NHẬN
+   ========================================================= */
+
 .bk-checkout-grid {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
-    gap: 28px;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px;
+  align-items: start;
 }
 
 .bk-payment-col {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.bk-payment-heading {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--bk-navy);
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(239, 222, 228, 0.5);
-    margin: 0;
+.bk-payment-heading,
+.bk-summary-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--bk-ink);
+  margin: 0;
 }
 
-.bk-payment-label {
-    cursor: pointer;
-}
+.bk-payment-label { display: block; cursor: pointer; }
 
 .bk-payment-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 18px;
-    border-radius: var(--bk-radius-btn);
-    border: 1px solid var(--bk-border-plum);
-    transition: border-color 0.2s, background 0.2s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--bk-surface);
+  border: 1px solid var(--bk-line);
+  border-radius: var(--bk-r-media);
+  transition: background-color 0.2s ease;
 }
 
 .bk-payment-card--selected {
-    border-color: var(--bk-primary);
-    background: rgba(251, 234, 240, 0.2);
+  background: var(--bk-wash);
+  border-color: transparent;
 }
 
-.bk-payment-card--disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
+.bk-payment-card--selected::after { border-color: var(--bk-accent); }
 
 .bk-payment-icon {
-    font-size: 24px;
-    color: var(--bk-primary);
-    flex-shrink: 0;
+  font-size: 24px;
+  color: var(--bk-accent);
+  flex: none;
 }
 
-.bk-payment-card--disabled .bk-payment-icon {
-    color: var(--bk-tertiary);
-}
-
-.bk-payment-body {
-    flex-grow: 1;
-}
+.bk-payment-body { flex: 1 1 auto; min-width: 0; }
 
 .bk-payment-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--bk-navy);
-    margin: 0 0 2px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--bk-ink);
+  margin: 0 0 2px;
 }
 
 .bk-payment-desc {
-    font-size: 13px;
-    color: var(--bk-text-muted);
-    margin: 0;
+  font-size: 0.8rem;
+  color: var(--bk-ink-2);
+  margin: 0;
 }
 
 .bk-payment-radio {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 1px solid #efdee4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.2s;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--bk-line-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .bk-payment-card--selected .bk-payment-radio {
-    background: var(--bk-primary);
-    border-color: var(--bk-primary);
+  background: var(--bk-accent);
+  border-color: var(--bk-accent);
 }
 
 .bk-payment-radio-check {
-    font-size: 12px;
-    color: #fff;
-    opacity: 0;
+  font-size: 14px;
+  color: #ffffff;
+  opacity: 0;
 }
 
-.bk-payment-card--selected .bk-payment-radio-check {
-    opacity: 1;
-}
+.bk-payment-card--selected .bk-payment-radio-check { opacity: 1; }
 
 .bk-info-note {
-    display: flex;
-    gap: 12px;
-    padding: 16px;
-    border-radius: var(--bk-radius-btn);
-    background: #fbeaf0;
-    border: 1px solid rgba(239, 222, 228, 0.5);
-    font-size: 13px;
-    color: var(--bk-text-muted);
-    line-height: 1.5;
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  border-radius: var(--bk-r-media);
+  background: var(--bk-pearl);
+  border: 1px solid var(--bk-line);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--bk-ink-2);
 }
 
 .bk-info-note-icon {
-    font-size: 18px;
-    color: var(--bk-tertiary);
-    flex-shrink: 0;
-    margin-top: 1px;
-}
-
-.bk-summary-col {
-    position: relative;
+  font-size: 18px;
+  color: var(--bk-ink-3);
+  flex: none;
 }
 
 .bk-summary-card {
-    background: var(--bk-stone-white);
-    border: 1px solid var(--bk-blossom);
-    border-radius: var(--bk-radius-card);
-    padding: 24px;
-    box-shadow: var(--bk-shadow-sm);
-    position: sticky;
-    top: 160px;
+  position: sticky;
+  top: calc(var(--bk-top) + 76px);
+  background: var(--bk-surface);
+  border: 1px solid var(--bk-line);
+  border-radius: var(--bk-r-surface);
+  padding: 22px;
 }
 
 .bk-summary-heading {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--bk-navy);
-    margin: 0 0 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(239, 222, 228, 0.5);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--bk-line);
 }
 
 .bk-summary-rows {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
 .bk-summary-row {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .bk-summary-key {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--bk-tertiary);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--bk-ink-3);
 }
 
 .bk-summary-val {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--bk-navy);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--bk-ink);
 }
 
 .bk-summary-price-rows {
-    border-top: 1px solid rgba(239, 222, 228, 0.5);
-    padding-top: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  border-top: 1px solid var(--bk-line);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
 }
 
 .bk-summary-price-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    color: var(--bk-text-muted);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--bk-ink-2);
 }
 
 .bk-summary-total {
-    display: flex;
-    justify-content: space-between;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--bk-navy);
-    padding-top: 10px;
-    margin-top: 6px;
-    border-top: 1px dashed rgba(239, 222, 228, 0.7);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--bk-ink);
+  padding-top: 11px;
+  margin-top: 5px;
+  border-top: 1px solid var(--bk-line);
 }
 
-.bk-summary-total span:last-child {
-    color: var(--bk-primary);
-}
+.bk-summary-total span:last-child { color: var(--bk-accent); }
 
 .bk-summary-points-nudge {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin-top: 14px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    background: #fff0f5;
-    font-size: 13px;
-    color: var(--bk-text-muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 11px 12px;
+  border-radius: var(--bk-r-control);
+  background: var(--bk-wash);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--bk-ink-2);
 }
 
 .bk-summary-points-nudge .material-symbols-outlined {
-    font-size: 17px;
-    color: var(--bk-tertiary);
-    flex-shrink: 0;
+  font-size: 18px;
+  color: var(--bk-accent);
+  flex: none;
 }
 
 .bk-summary-policy {
-    font-size: 11px;
-    color: var(--bk-tertiary);
-    text-align: center;
-    margin: 14px 0 0;
+  font-size: 0.72rem;
+  color: var(--bk-ink-3);
+  text-align: center;
+  margin: 14px 0 0;
 }
 
-/* ─── BOOKING WRAPPER (customer portal layout) ───────────────────────────────*/
-.booking-wrapper {
-    width: 100%;
-}
+.booking-wrapper { width: 100%; }
 
-/* ─── RESPONSIVE ──────────────────────────────────────────────────────────────*/
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
 @media (max-width: 1024px) {
-    .bk-checkout-grid {
-        grid-template-columns: 1fr;
-    }
+  .bk-svc-grid { grid-template-columns: repeat(2, 1fr); }
 
-    .bk-summary-card {
-        position: static;
-    }
+  .bk-dt-grid { grid-template-columns: 1fr; }
+
+  .bk-summary-card { position: static; }
+
+  /* Ở một cột, tóm tắt phải đứng TRƯỚC phần chọn thanh toán: đó là thứ
+     khách cần đọc lại trước khi quyết. */
+  .bk-checkout-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  .bk-summary-col { order: -1; }
 }
 
-@media (max-width: 768px) {
-    .bk-indicator-bar {
-        padding: 12px 20px;
-    }
+@media (max-width: 860px) {
+  .bk-indicator-bar { padding: 10px 18px; }
 
-    .bk-step-label {
-        display: none !important;
-    }
+  /* Dãy chấm câm không nói được đang ở bước nào khi nhãn bị ẩn */
+  .bk-indicator { display: none; }
+  .bk-step-mobile,
+  .bk-step-mobile-track { display: block; }
 
-    .bk-content {
-        padding: 32px 20px 80px;
-    }
+  .bk-content { padding: 24px 18px 110px; }
 
-    .bk-step-title {
-        font-size: 26px;
-    }
+  .bk-step-title { font-size: 1.6rem; }
+  .bk-step-sub { font-size: 0.88rem; }
+  .bk-step-head { margin-bottom: 20px; }
 
-    .bk-svc-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  .bk-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 2px 18px;
+    margin: 0 -18px 18px;
+  }
+  .bk-chips::-webkit-scrollbar { display: none; }
 
-    .bk-svc-thumb {
-        width: 100%;
-        height: 160px;
-    }
+  .bk-svc-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .bk-svc-body { padding: 11px 12px 13px; gap: 8px; }
+  .bk-svc-name { font-size: 0.88rem; }
+  .bk-svc-price { font-size: 0.98rem; }
+  .bk-svc-dur { font-size: 0.72rem; }
 
-    .bk-staff-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+  /* "No Preference" trở lại làm ô thường để lưới khép đúng 2x2 */
+  .bk-staff-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .bk-staff-label--any { grid-column: auto; }
+  .bk-staff-card { padding: 18px 12px; }
+  .bk-staff-card--any {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+    padding: 18px 12px;
+  }
+  .bk-staff-avatar,
+  .bk-staff-card--any .bk-staff-avatar {
+    width: 62px;
+    height: 62px;
+    margin-bottom: 10px;
+  }
+  .bk-staff-name { font-size: 0.87rem; }
+  .bk-staff-role { font-size: 0.74rem; }
 
-    .bk-dt-grid {
-        grid-template-columns: 1fr;
-    }
+  /* Padding và gap hẹp lại để ô ngày còn đủ rộng: ở 390px một ô ra ~44px,
+     ở 360px ra ~40px. Đây là chỗ mua lại vùng chạm đã mất khi bỏ min-height. */
+  .bk-cal-panel { padding: 12px; }
+  .bk-time-panel { padding: 16px; }
 
-    .bk-form-row {
-        grid-template-columns: 1fr;
-    }
+  .bk-cal-weekdays,
+  .bk-cal-grid { gap: 3px; }
 
-    .bk-nav {
-        flex-direction: column-reverse;
-        gap: 10px;
-    }
+  .bk-slot-grid { grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 7px; }
+  .slot-pill { font-size: 0.78rem; }
 
-    .bk-btn-next,
-    .bk-btn-back,
-    .bk-btn-confirm {
-        width: 100%;
-        justify-content: center;
-    }
+  .bk-info-card { padding: 20px; }
+  .bk-form-row { grid-template-columns: 1fr; }
+
+  .bk-sticky { display: flex; }
+
+  /* .bk-nav KHÔNG bị ẩn. Thanh dính đáy chỉ hiện khi chính .bk-nav đang ở
+     ngoài màn hình, nên ở bước ngắn (bước 2 chỉ có 4 ô, vừa một màn hình,
+     không cuộn được) khách vẫn luôn có nút thật để đi tiếp. */
+  .bk-nav {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  .bk-btn-back,
+  .bk-btn-next,
+  .bk-btn-confirm { width: 100%; }
 }
 
-@media (max-width: 480px) {
-    .bk-staff-grid {
-        grid-template-columns: 1fr;
-    }
+@media (max-width: 380px) {
+  .bk-svc-grid,
+  .bk-staff-grid { grid-template-columns: 1fr; }
+}
+
+
+/* =========================================================
+   TÙY CHỌN HỆ THỐNG
+   ========================================================= */
+
+@media (prefers-reduced-transparency: reduce) {
+  .bk-indicator-bar { background: var(--bk-page); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .bk-sticky        { background: var(--bk-surface); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .bk-radio-check   { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bk-step--active { animation: none; }
+  .bk-slot-skeleton { animation: none; }
+  .bk-sticky { transition: none; }
+  .bk-progress-fill,
+  .bk-step-mobile-fill { transition: none; }
+
+  .bk-wrap *,
+  .bk-wrap *::before,
+  .bk-wrap *::after {
+    transition-duration: 0.01ms !important;
+  }
+
+  .bk-svc-card:hover,
+  .bk-staff-card:hover { transform: none; }
+}
+
+
+/* =========================================================
+   NEO THEO LAYOUT CHỦ
+   .booking-wrapper chỉ có ở customer_booking.html. Portal
+   khách hàng dùng sidebar ở desktop (không header) và topbar
+   56px từ 860px trở xuống.
+   ========================================================= */
+
+.booking-wrapper .bk-wrap { --bk-top: 0px; }
+
+@media (max-width: 860px) {
+  .booking-wrapper .bk-wrap { --bk-top: 56px; }
 }
