@@ -10,7 +10,7 @@
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
-    color: #d64682;
+    color: var(--cp-accent);
     margin: 0 0 10px;
 }
 
@@ -166,7 +166,7 @@
 .hero__btn-primary {
     padding: 14px 32px;
     border-radius: 14px;
-    background: #ef3976;
+    background: var(--cp-accent);
     color: #fff;
     font-weight: 600;
     font-size: 16px;
@@ -180,7 +180,7 @@
     text-align: center;
     box-sizing: border-box;
 }
-.hero__btn-primary:hover { background: #e63176; }
+.hero__btn-primary:hover { background: var(--cp-accent-2); }
 
 .hero__btn-outline {
     padding: 14px 32px;
@@ -237,7 +237,7 @@
     border-radius: 999px;
     background: rgba(248,249,250,0.5);
 }
-.hero__dot--active { width: 32px; background: #ef3976; }
+.hero__dot--active { width: 32px; background: var(--cp-accent); }
 
 /* ── ROW 2 GRID ─────────────────────────────────────── */
 /* Tiêu đề chiếm một hàng riêng chỉ ở cột trái, nhờ vậy loyalty-card
@@ -441,18 +441,18 @@
 .btn:hover { transform: translateY(-1px); }
 
 .btn-primary {
-    background: #f43f84;
+    background: var(--cp-accent);
     color: #ffffff;
-    box-shadow: 0 10px 22px rgba(244,63,132,0.22);
+    box-shadow: 0 10px 22px rgba(171, 34, 97,0.22);
 }
-.btn-primary:hover { background: #e63176; color: #ffffff; }
+.btn-primary:hover { background: var(--cp-accent-2); color: #ffffff; }
 
 .btn-secondary {
     background: #ffffff;
-    color: #f43f84;
+    color: var(--cp-accent);
     border-color: #efe6ea;
 }
-.btn-secondary:hover { background: #fff8fb; }
+.btn-secondary:hover { background: var(--cp-wash); }
 
 /* Status badges */
 .appointment-status-badge {
@@ -467,9 +467,9 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
-.appointment-status-badge--confirmed { background: #dff5e8; color: #2d8a57; }
-.appointment-status-badge--pending   { background: #f7e5a7; color: #7a5200; }
-.appointment-status-badge--cancelled { background: #f5d6db; color: #8b3a4a; }
+.appointment-status-badge--confirmed { background: var(--cp-done-bg);   color: var(--cp-done-ink); }
+.appointment-status-badge--pending   { background: var(--cp-flag-bg);   color: var(--cp-flag-ink); }
+.appointment-status-badge--cancelled { background: var(--cp-danger-bg); color: var(--cp-danger-ink); }
 
 /* ── LOYALTY CARD ───────────────────────────────────── */
 .loyalty-card {
@@ -492,7 +492,7 @@
     right: -30px;
     width: 130px;
     height: 130px;
-    background: rgba(214,70,130,0.15);
+    background: rgba(171, 34, 97, 0.15);
     border-radius: 50%;
     filter: blur(30px);
     pointer-events: none;
@@ -510,12 +510,12 @@
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
-    color: #d64682;
+    color: var(--cp-accent);
 }
 
 .loyalty-icon {
     font-size: 1.1rem;
-    color: #d64682;
+    color: var(--cp-accent);
 }
 
 .loyalty-points-num {
@@ -556,7 +556,7 @@
 .progress-pct {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #d64682;
+    color: var(--cp-accent);
 }
 
 .progress-bar-track {
@@ -568,11 +568,14 @@
     margin-bottom: 8px;
 }
 
+/* Thanh này nằm TRÊN nền plum của .loyalty-card. Hồng #ab2261 trên plum chỉ
+   đạt ~1.7:1 nên không đọc được, đúng như ghi chú ở khối .loyalty-card bên
+   trên: trên plum thì đổi sang pearl. Bỏ luôn gradient và box-shadow glow,
+   vì không trang redesign nào dùng outer-glow. */
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #d64682, #f4a8c8);
+    background: var(--cp-pearl);
     border-radius: 999px;
-    box-shadow: 0 0 12px rgba(214,70,130,0.5);
     transition: width 0.6s ease;
 }
 
@@ -630,14 +633,14 @@
     align-items: center;
     padding: 12px 22px;
     border-radius: 14px;
-    background: #f43f84;
+    background: var(--cp-accent);
     color: #fff;
     font-weight: 700;
     font-size: 0.9rem;
     text-decoration: none;
     transition: background 0.18s;
 }
-.book-btn:hover { background: #e63176; color: #fff; }
+.book-btn:hover { background: var(--cp-accent-2); color: #fff; }
 
 /* ── MOBILE ≤768px ──────────────────────────────────────
    Thang bo góc mobile: container 22px · media 16px · button 14px · pill 999px */
@@ -662,12 +665,12 @@
         padding: 0 24px;
         font-size: 0.95rem;
         border-radius: 14px;
-        box-shadow: 0 10px 22px rgba(244,63,132,0.22);
+        box-shadow: 0 10px 22px rgba(171, 34, 97,0.22);
         transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
     }
     .book-btn:active {
         transform: scale(0.985);
-        box-shadow: 0 4px 12px rgba(244,63,132,0.18);
+        box-shadow: 0 4px 12px rgba(171, 34, 97,0.18);
     }
 
     /* Hero: gọn lại, nhường toàn bộ chiều ngang cho nội dung */
@@ -757,7 +760,7 @@
     /* Touch không có hover: đổi sang phản hồi khi ấn */
     .btn:hover  { transform: none; }
     .btn:active { transform: scale(0.985); }
-    .btn-primary:active { box-shadow: 0 4px 12px rgba(244,63,132,0.18); }
+    .btn-primary:active { box-shadow: 0 4px 12px rgba(171, 34, 97,0.18); }
 
     /* Loyalty card */
     .loyalty-card    { padding: 24px 20px 20px; border-radius: 22px; }

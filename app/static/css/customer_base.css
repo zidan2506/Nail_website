@@ -1,11 +1,48 @@
 /* =================================================================
    customer_base.css
-   
+
    CẤU TRÚC FILE:
    - Phần 1: CSS GỐC — giữ nguyên 100%, không chỉnh sửa gì
    - Phần 2: CSS MỚI — append thêm để update sidebar UI
              (nav icons, Book Now btn, Logout btn, sidebar layout)
 ================================================================= */
+
+
+/* =================================================================
+   TOKEN MÀU CỦA PORTAL
+
+   customer_base.html KHÔNG nạp base.css, nên --color-primary không tồn tại
+   trong portal. Hệ quả: mọi chỗ phải gõ hex tay, và đã trôi thành BẢY sắc
+   hồng khác nhau (#d63384 #d64682 #f3387a #ef3976 #e63176 #f43f84 #f4a8c8)
+   trong khi năm trang đã redesign (lp- ms- bd- bk- bkc-) đều dùng đúng một
+   màu. Khai token ở đây để lần sau không phải gõ hex nữa.
+
+   Khai trên :root là an toàn: token của các trang đã redesign scope vào
+   .lp / .ms / .bd nên vẫn thắng theo specificity.
+================================================================= */
+:root {
+  --cp-accent:    #ab2261;   /* accent duy nhất, khớp lp- / ms- / bd- / bk- / bkc- */
+  --cp-accent-2:  #8d1a4f;   /* hover. KHÔNG dùng --color-primary-hover #cc3e7a
+                                của base.css: nó nhạt hơn, lệch với 5 trang kia */
+  --cp-wash:      #FBEEF4;
+  --cp-wash-2:    #F6E4EC;
+  --cp-pearl:     #FBF4F8;   /* dùng khi nằm TRÊN nền plum: hồng #ab2261 trên
+                                plum chỉ đạt ~1.7:1, không đọc được */
+  --cp-line:      #EDE3E8;
+
+  /* Màu TRẠNG THÁI. Là màu mang thông tin, không phải trang trí, nên nó được
+     phép tồn tại ngoài accent. Lấy đúng thang của bd- / lp- / ms- / bkc-. */
+  --cp-flag-bg:    #FBF0D8;  /* chờ xử lý */
+  --cp-flag-ink:   #7A5A11;
+  --cp-done-bg:    #A7E0C0;  /* đã xong */
+  --cp-done-ink:   #1B5E3C;  /* KHÔNG dùng #1F6B44 của hệ: trên nền #A7E0C0 nó
+                                chỉ đạt 4.34:1. Ở trang Success cặp đó qua được
+                                vì icon 34px (ngưỡng chữ lớn 3:1), còn badge ở
+                                đây là chữ ~12.8px nên cần 4.5:1. Đậm thêm một
+                                nấc thành 5.18:1, giữ nguyên tông. */
+  --cp-danger-bg:  #FCF0F2;  /* đã huỷ. Nền lấy từ .bd-btn--danger:hover */
+  --cp-danger-ink: #B03A4A;
+}
 
 
 /* ================================================================
@@ -37,7 +74,7 @@
 .sidebar_brand p {
     margin-top: 6px;
     font-size: 0.85rem;
-    color: #d64682;
+    color: var(--cp-accent);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -63,13 +100,13 @@
 }
 
 .nav-item:hover {
-    background: #fdebf2;
-    color: #d63384;
+    background: var(--cp-wash);
+    color: var(--cp-accent);
 }
 
 .nav-item.active {
-    background: #fdebf2;
-    color: #d63384;
+    background: var(--cp-wash);
+    color: var(--cp-accent);
 }
 
 /* Main */
@@ -84,7 +121,7 @@
 
 .dashboard-label {
     margin: 0 0 12px;
-    color: #d63384;
+    color: var(--cp-accent);
     font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: 2px;
@@ -132,8 +169,8 @@
     display: inline-block;
     padding: 8px 14px;
     border-radius: 999px;
-    background: #dff3e7;
-    color: #228b5d;
+    background: var(--cp-done-bg);
+    color: var(--cp-done-ink);
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -167,14 +204,14 @@
     display: inline-block;
     padding: 14px 20px;
     border-radius: 14px;
-    background: #f3387a;
+    background: var(--cp-accent);
     color: #ffffff;
     text-decoration: none;
     font-weight: 700;
 }
 
 .primary-btn:hover {
-    opacity: 0.92;
+    background: var(--cp-accent-2);
 }
 
 /* Recent card */
@@ -195,7 +232,7 @@
 }
 
 .card-top a {
-    color: #d63384;
+    color: var(--cp-accent);
     text-decoration: none;
     font-weight: 700;
 }
@@ -235,7 +272,7 @@
 
 /* Profile */
 .profile-card {
-    background: #fff8fa;
+    background: var(--cp-wash);
 }
 
 .profile-card h2 {
@@ -494,7 +531,7 @@ body {
     display: block;
     width: 100%;
     padding: 15px 0;
-    background: #ef3976;
+    background: var(--cp-accent);
     color: #ffffff;
     text-align: center;
     text-decoration: none;
@@ -509,7 +546,7 @@ body {
 }
 
 .sidebar-book-btn:hover {
-    opacity: 0.92;
+    background: var(--cp-accent-2);
     transform: translateY(-1px);
 }
 
@@ -533,9 +570,9 @@ body {
 }
 
 .sidebar-logout-btn:hover {
-    background: #fdf0f4;
-    color: #d64682;
-    border-color: rgba(214, 70, 130, 0.25);
+    background: var(--cp-wash);
+    color: var(--cp-accent);
+    border-color: rgba(171, 34, 97, 0.25);
 }
 
 /* nav-button: giữ nguyên class cũ cho logout form button */
@@ -592,7 +629,7 @@ body {
         flex-shrink: 0;
         padding: 0;
     }
-    .customer-burger:hover { background: #fdebf2; }
+    .customer-burger:hover { background: var(--cp-wash); }
     .customer-topbar__brand { font-size: 1.05rem; font-weight: 800; color: #23161c; }
 
     /* Sidebar thành ngăn kéo trượt từ trái */
