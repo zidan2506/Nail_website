@@ -438,7 +438,7 @@ def customer_login_required(view_func):
         customer_id = session.get('customer_id')
         if not customer_id or not get_customer_by_customer_id(customer_id):
             session.clear()
-            flash("Please login!", "error")
+            flash(gettext("Please login!"), "error")
             return redirect(url_for('main.login'))
         return view_func(*args, **kwargs)
     return wrapped_view
@@ -460,12 +460,12 @@ def admin_required(view_func):
     @wraps(view_func)
     def wrapped_view(*args, **kwargs):
         if not session.get("user_id") or session.get("role") != "admin":
-            flash("Unauthorized.", "error")
+            flash(gettext("Unauthorized."), "error")
             return redirect(url_for("main.staff_login"))
         now = time.time()
         if now - session.get("admin_last_activity", 0) > _ADMIN_IDLE_TIMEOUT:
             session.clear()
-            flash("Session expired. Please log in again.", "error")
+            flash(gettext("Session expired. Please log in again."), "error")
             return redirect(url_for("main.staff_login"))
         session["admin_last_activity"] = now
         return view_func(*args, **kwargs)
@@ -475,7 +475,7 @@ def staff_required(view_func):
     @wraps(view_func)
     def wrapped_view(*args, **kwargs):
         if not session.get("user_id") or session.get("role") != "staff":
-            flash("Bạn không có quyền truy cập khu vực này.", "error")
+            flash(gettext("You do not have access to this area."), "error")
             return redirect(url_for("main.staff_login"))
         return view_func(*args, **kwargs)
     return wrapped_view
@@ -523,7 +523,7 @@ def customer_dashboard():
     user_id = session.get('user_id')
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for('main.login'))
 
     customer_id = customer["id"]
@@ -605,7 +605,7 @@ def customer_booking():
     staffs = get_all_staff()
 
     if preselect_id and preselect_id not in [s["id"] for s in services]:
-        flash("That service is no longer available. Showing our full menu.", "warning")
+        flash(gettext("That service is no longer available. Showing our full menu."), "warning")
         preselect_id = None
 
     services_by_category = build_services_by_category(categories, services)
@@ -630,24 +630,24 @@ def cancel_booking(booking_id):
     booking = get_booking_by_id(booking_id)
 
     if not booking:
-        flash("Booking not found", "error")
+        flash(gettext("Booking not found"), "error")
         return redirect(url_for("main.my_bookings"))
     
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
 
     if not customer or booking["customer_id"] != customer["id"]:
-        flash("User not found!", "error") 
+        flash(gettext("User not found!"), "error") 
         return redirect(url_for("main.my_bookings"))
         
     if booking["status"] not in ("pending", "confirmed"):
-        flash("This booking cannot be cancelled", "error")
+        flash(gettext("This booking cannot be cancelled"), "error")
         return redirect(url_for("main.view_booking_details", booking_id=booking_id))
     
     reason = request.form.get("cancellation_reason", "")
     cancel_booking_with_reason(booking_id, reason)
 
-    flash("Booking cancelled successfully", "success")
+    flash(gettext("Booking cancelled successfully"), "success")
     return redirect(url_for("main.my_bookings"))
 
 @main.route("/customer/my-booking")
@@ -655,13 +655,13 @@ def cancel_booking(booking_id):
 def my_bookings():
     user_id = session.get("user_id")
     if not user_id:
-        flash("Session Expired. Please login again.")
+        flash(gettext("Session Expired. Please login again."))
         session.clear()
         return redirect(url_for('main.home'))
     
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found by some how :D", "error")
+        flash(gettext("Customer profile not found by some how :D"), "error")
         return redirect(url_for('main.customer_dashboard'))
     customer_id = customer["id"]
 
@@ -751,29 +751,29 @@ def my_bookings():
 def view_booking_details(booking_id):
     booking = get_booking_by_id(booking_id)
     if not booking:
-        flash("Booking not found!", "error")
+        flash(gettext("Booking not found!"), "error")
         return redirect(url_for('main.my_bookings'))
 
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for('main.my_bookings'))
 
     if booking["customer_id"] != customer["id"]:
-        flash("Booking not found!")
+        flash(gettext("Booking not found!"))
         return redirect(url_for('main.my_bookings'))
     
     service_id = booking["service_id"]
     service = get_service_by_id(service_id)
     if not service:
-        flash("Service data unavailable.", "error")
+        flash(gettext("Service data unavailable."), "error")
         return redirect(url_for('main.my_bookings'))
 
     staff_id = booking["staff_id"]
     staff = get_staff_by_id(staff_id)
     if not staff:
-        flash("Staff data unavailable.", "error")
+        flash(gettext("Staff data unavailable."), "error")
         return redirect(url_for('main.my_bookings'))
 
     calendar_url = build_calendar_url(
@@ -819,29 +819,29 @@ def customer_reschedule(booking_id):
     
     booking = get_booking_by_id(booking_id)
     if not booking:
-        flash("Booking not found!", "error")
+        flash(gettext("Booking not found!"), "error")
         return redirect(url_for('main.my_bookings'))
 
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for('main.my_bookings'))
 
     if booking['customer_id'] != customer['id']:
-        flash('Booking not found', 'error')
+        flash(gettext("Booking not found"), 'error')
         return redirect(url_for('main.my_bookings'))
     
     service_id = booking["service_id"]
     service = get_service_by_id(service_id)
     if not service:
-        flash("Service data unavailable.", "error")
+        flash(gettext("Service data unavailable."), "error")
         return redirect(url_for('main.my_bookings'))
 
     staff_id = booking["staff_id"]
     staff = get_staff_by_id(staff_id)
     if not staff:
-        flash("Staff data unavailable.", "error")
+        flash(gettext("Staff data unavailable."), "error")
         return redirect(url_for('main.my_bookings'))
 
     booking_date_obj = datetime.strptime(booking["booking_date"], "%Y-%m-%d")
@@ -858,19 +858,19 @@ def customer_reschedule(booking_id):
         
         #Validate backend
         if not new_date or not new_time:
-            flash("Please select a new date and time", "error")
+            flash(gettext("Please select a new date and time"), "error")
             return redirect(url_for('main.customer_reschedule',booking_id=booking_id))
         
         new_date_obj = datetime.strptime(new_date, "%Y-%m-%d").date()
 
         if new_date_obj < today or new_date_obj > max_reschedule_date:
-            flash("You can only reschedule within the next 14 days", "error")
+            flash(gettext("You can only reschedule within the next 14 days"), "error")
             return redirect(url_for('main.customer_reschedule',booking_id=booking_id))
 
         try:
             new_time_obj = datetime.strptime(new_time, "%H:%M").time()
         except ValueError:
-            flash("Invalid time format", "error")
+            flash(gettext("Invalid time format"), "error")
             return redirect(url_for('main.customer_reschedule', booking_id=booking_id))
         
         new_start_dt = datetime.combine(new_date_obj, new_time_obj)
@@ -897,8 +897,8 @@ def customer_reschedule(booking_id):
         )
 
         if new_start_time not in available_slots:
-            flash("This time slot is no longer available.", "error")
-            flash("Please choose another time.", "error")
+            flash(gettext("This time slot is no longer available."), "error")
+            flash(gettext("Please choose another time."), "error")
             return redirect(url_for('main.customer_reschedule', booking_id=booking_id))
         
         update_booking_schedule(
@@ -908,7 +908,7 @@ def customer_reschedule(booking_id):
             new_end_time
         )
 
-        flash("Booking rescheduled successfully", "success")
+        flash(gettext("Booking rescheduled successfully"), "success")
         return redirect(url_for('main.view_booking_details',booking_id=booking_id))   
     
     #Data send to frontend:
@@ -1025,7 +1025,7 @@ def customer_setting():
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for("main.login"))
 
     dob_raw = customer["date_of_birth"]
@@ -1049,7 +1049,7 @@ def update_profile():
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for("main.login"))
 
     full_name = request.form.get("full_name", "").strip()
@@ -1057,11 +1057,11 @@ def update_profile():
     date_of_birth = request.form.get("date_of_birth", "").strip() or None
 
     if not full_name:
-        flash("Name is required.", "error")
+        flash(gettext("Name is required."), "error")
         return redirect(url_for("main.customer_setting"))
 
     update_customer_profile(customer["id"], full_name, customer["email"], phone, date_of_birth)
-    flash("Profile updated successfully.", "success")
+    flash(gettext("Profile updated successfully."), "success")
     return redirect(url_for("main.customer_setting"))
 
 
@@ -1078,7 +1078,7 @@ def update_avatar():
         return redirect(url_for("main.customer_setting"))
 
     if not filename:
-        flash("No file selected.", "error")
+        flash(gettext("No file selected."), "error")
         return redirect(url_for("main.customer_setting"))
 
     customer = get_customer_by_user_id(user_id)
@@ -1086,7 +1086,7 @@ def update_avatar():
     update_customer_avatar(customer["id"], filename)
     _delete_upload(old, "avatars")
 
-    flash("Profile picture updated.", "success")
+    flash(gettext("Profile picture updated."), "success")
     return redirect(url_for("main.customer_setting"))
 
 
@@ -1117,7 +1117,7 @@ def change_password():
 
     verification_id = session.get("password_change_verification_id")
     if not verification_id:
-        flash("Verification session expired. Please request a new code.", "error")
+        flash(gettext("Verification session expired. Please request a new code."), "error")
         return redirect(url_for("main.customer_setting"))
 
     user_code = request.form.get("verification_code", "").strip()
@@ -1126,30 +1126,30 @@ def change_password():
 
     verification = get_verification_by_id(verification_id)
     if not verification:
-        flash("Verification code expired. Please request a new code.", "error")
+        flash(gettext("Verification code expired. Please request a new code."), "error")
         session.pop("password_change_verification_id", None)
         return redirect(url_for("main.customer_setting"))
 
     if user_code != verification["verification_code"]:
         if register_failed_verification(verification_id):
             session.pop("password_change_verification_id", None)
-            flash("Too many incorrect attempts. Please request a new code.", "error")
+            flash(gettext("Too many incorrect attempts. Please request a new code."), "error")
         else:
-            flash("Incorrect verification code.", "error")
+            flash(gettext("Incorrect verification code."), "error")
         return redirect(url_for("main.customer_setting"))
 
     if new_password != confirm_password:
-        flash("Passwords do not match.", "error")
+        flash(gettext("Passwords do not match."), "error")
         return redirect(url_for("main.customer_setting"))
 
     if len(new_password) < 8:
-        flash("New password must be at least 8 characters.", "error")
+        flash(gettext("New password must be at least 8 characters."), "error")
         return redirect(url_for("main.customer_setting"))
 
     update_verification(verification_id, user_id, 1)
     update_user_password(user_id, generate_password_hash(new_password))
     session.pop("password_change_verification_id", None)
-    flash("Password changed successfully.", "success")
+    flash(gettext("Password changed successfully."), "success")
     return redirect(url_for("main.customer_setting"))
 
 
@@ -1179,42 +1179,42 @@ def update_email_address():
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer not found.", "error")
+        flash(gettext("Customer not found."), "error")
         return redirect(url_for("main.customer_setting"))
 
     verification_id = session.get("email_change_verification_id")
     if not verification_id:
-        flash("Verification session expired. Please request a new code.", "error")
+        flash(gettext("Verification session expired. Please request a new code."), "error")
         return redirect(url_for("main.customer_setting"))
 
     user_code = request.form.get("verification_code", "").strip()
     new_email = request.form.get("new_email", "").strip().lower()
 
     if not user_code or not new_email:
-        flash("Please fill in all fields.", "error")
+        flash(gettext("Please fill in all fields."), "error")
         return redirect(url_for("main.customer_setting"))
 
     verification = get_verification_by_id(verification_id)
     if not verification:
-        flash("Verification code expired. Please request a new code.", "error")
+        flash(gettext("Verification code expired. Please request a new code."), "error")
         session.pop("email_change_verification_id", None)
         return redirect(url_for("main.customer_setting"))
 
     if user_code != verification["verification_code"]:
         if register_failed_verification(verification_id):
             session.pop("email_change_verification_id", None)
-            flash("Too many incorrect attempts. Please request a new code.", "error")
+            flash(gettext("Too many incorrect attempts. Please request a new code."), "error")
         else:
-            flash("Incorrect verification code.", "error")
+            flash(gettext("Incorrect verification code."), "error")
         return redirect(url_for("main.customer_setting"))
 
     if new_email == customer["email"]:
-        flash("New email is the same as your current email.", "error")
+        flash(gettext("New email is the same as your current email."), "error")
         return redirect(url_for("main.customer_setting"))
 
     existing = get_user_by_email(new_email)
     if existing and existing["id"] != user_id:
-        flash("Email is already taken.", "error")
+        flash(gettext("Email is already taken."), "error")
         return redirect(url_for("main.customer_setting"))
 
     update_verification(verification_id, user_id, 1)
@@ -1223,7 +1223,7 @@ def update_email_address():
     session["user_email"] = new_email
     session.pop("email_change_verification_id", None)
 
-    flash("Email updated successfully.", "success")
+    flash(gettext("Email updated successfully."), "success")
     return redirect(url_for("main.customer_setting"))
 
 
@@ -1233,12 +1233,12 @@ def customer_history():
 
     user_id = session.get("user_id")
     if user_id is None:
-        flash("User not found. Please login!", "error")
+        flash(gettext("User not found. Please login!"), "error")
         return redirect(url_for("main.login"))
 
     customer = get_customer_by_user_id(user_id)
     if customer is None:
-        flash("Customer profile not found.", "error")
+        flash(gettext("Customer profile not found."), "error")
         return redirect(url_for("main.login"))
     
     customer_id = customer['id']
@@ -1307,17 +1307,17 @@ def invoice_detail(invoice_id):
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for('main.customer_history'))
 
     invoice = get_invoice_detail_by_id(invoice_id)
     if not invoice:
-        flash("Invoice not found!", "error")
+        flash(gettext("Invoice not found!"), "error")
         return redirect(url_for('main.customer_history'))
 
     # Bảo vệ: chỉ cho xem invoice của chính mình
     if invoice["customer_id"] != customer["id"]:
-        flash("Invoice not found!", "error")
+        flash(gettext("Invoice not found!"), "error")
         return redirect(url_for('main.customer_history'))
 
     # Format date/time để hiển thị
@@ -1357,7 +1357,7 @@ def _redirect_to_stripe(booking_id, service_id, fallback_endpoint):
         )
     except Exception as e:
         logger.exception("[payment] create session failed")
-        flash("Không tạo được phiên thanh toán. Vui lòng thử lại.", "error")
+        flash(gettext("Could not start the payment session. Please try again."), "error")
         return redirect(url_for(fallback_endpoint))
     return redirect(checkout_url)
 
@@ -1369,12 +1369,12 @@ def create_customer_booking():
     #User data
     user_id = session.get("user_id")
     if not user_id:
-        flash("Something went wrong. Please login again!", "error")
+        flash(gettext("Something went wrong. Please login again!"), "error")
         return redirect(url_for('main.customer_dashboard'))
 
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found. Please login again!", "error")
+        flash(gettext("Customer profile not found. Please login again!"), "error")
         return redirect(url_for('main.login'))
 
     service_id_raw = request.form.get("service_id", "").strip()
@@ -1382,7 +1382,7 @@ def create_customer_booking():
     slot_raw = request.form.get("start_time", "").strip()
 
     if not service_id_raw or not booking_date_raw or not slot_raw:
-        flash("Please select a service, date, and time slot before confirming.", "error")
+        flash(gettext("Please select a service, date, and time slot before confirming."), "error")
         return redirect(url_for('main.customer_booking'))
 
     #Parse form
@@ -1397,7 +1397,7 @@ def create_customer_booking():
 
     service = get_service_by_id(data["service_id"])
     if not service:
-        flash("Service not found. Please try again.", "error")
+        flash(gettext("Service not found. Please try again."), "error")
         return redirect(url_for('main.customer_booking'))
     service_duration = service["duration_minutes"]
     start_time, end_time = BookingService.parse_slot(booking_date, booking_slot, service_duration)
@@ -1441,7 +1441,7 @@ def create_customer_booking():
             data["payment_method"]
         )
     except EmailSendError:
-        flash("Could not send verification email. Please try again.", "error")
+        flash(gettext("Could not send verification email. Please try again."), "error")
         return redirect(url_for('main.customer_booking'))
 
     session["booking_id"] = booking_id
@@ -1460,17 +1460,17 @@ def upgrade_plan():
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for("main.login"))
 
     tier_name = request.form.get("tier_name", "").strip()
     if not tier_name:
-        flash("Invalid plan selected.", "error")
+        flash(gettext("Invalid plan selected."), "error")
         return redirect(url_for("main.tier_benefits"))
 
     tier = get_tier_by_name(tier_name)
     if not tier:
-        flash("Plan not found.", "error")
+        flash(gettext("Plan not found."), "error")
         return redirect(url_for("main.tier_benefits"))
 
     active_subs = get_active_subscription_rows(customer["id"])
@@ -1485,21 +1485,21 @@ def upgrade_plan():
                     cancel_subscription(s["stripe_subscription_id"])
                 except Exception as e:
                     logger.exception("[payment] cancel on downgrade failed")
-            flash("Your paid membership will stop renewing and revert to Silver at the period end.", "success")
+            flash(gettext("Your paid membership will stop renewing and revert to Silver at the period end."), "success")
         else:
-            flash("You're on the Silver plan.", "success")
+            flash(gettext("You're on the Silver plan."), "success")
         return redirect(url_for("main.tier_benefits"))
 
     # Tier trả phí nhưng chưa cấu hình Stripe Price -> lỗi cấu hình, báo rõ (thay vì
     # âm thầm coi như free). Thường do quên chạy setup_stripe_prices sau khi reset DB.
     if not tier["stripe_price_id"]:
         logger.warning("[payment] tier %s thieu stripe_price_id -> chay: python -m app.database.setup_stripe_prices", tier['name'])
-        flash("This plan isn't available for online payment right now. Please try again later.", "error")
+        flash(gettext("This plan isn't available for online payment right now. Please try again later."), "error")
         return redirect(url_for("main.tier_benefits"))
 
     # Đang gia hạn đúng tier này rồi -> thôi (khỏi mua trùng).
     if any(s["tier_id"] == tier["id"] and not s["cancel_at_period_end"] for s in active_subs):
-        flash(f"You're already subscribed to {tier['name']}.", "success")
+        flash(gettext("You are already subscribed to %(tier)s.", tier=tier['name']), "success")
         return redirect(url_for("main.tier_benefits"))
 
     # Đổi tier = MUA MỚI: luôn tạo Checkout cho gói mới (kể cả đang có sub khác).
@@ -1513,7 +1513,7 @@ def upgrade_plan():
         )
     except Exception as e:
         logger.exception("[payment] create subscription session failed")
-        flash("Could not start checkout. Please try again.", "error")
+        flash(gettext("Could not start checkout. Please try again."), "error")
         return redirect(url_for("main.tier_benefits"))
     return redirect(checkout_url)
 
@@ -1524,19 +1524,19 @@ def cancel_membership():
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for("main.login"))
 
     sub_row = get_customer_subscription_row(customer["id"])
     if not sub_row:
-        flash("No active subscription to cancel.", "error")
+        flash(gettext("No active subscription to cancel."), "error")
         return redirect(url_for("main.tier_benefits"))
     try:
         cancel_subscription(sub_row["stripe_subscription_id"])
-        flash("Your membership will not renew. You keep your benefits until the current period ends.", "success")
+        flash(gettext("Your membership will not renew. You keep your benefits until the current period ends."), "success")
     except Exception as e:
         logger.exception("[payment] cancel failed")
-        flash("Could not cancel your membership. Please try again.", "error")
+        flash(gettext("Could not cancel your membership. Please try again."), "error")
     return redirect(url_for("main.tier_benefits"))
 
 @main.route("/customer/redeem-reward", methods=["POST"])
@@ -1555,7 +1555,7 @@ def redeem_reward_route():
     if not customer:
         if is_json:
             return jsonify({"success": False, "message": "Customer profile not found."})
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for("main.login"))
 
     payload  = (request.get_json(silent=True) or {}) if is_json else {}
@@ -1563,11 +1563,11 @@ def redeem_reward_route():
 
 
     if not raw_id:
-        return _err("Invalid reward.")
+        return _err(gettext("Invalid reward."))
     try:
         reward_id = int(raw_id)
     except ValueError:
-        return _err("Invalid reward.")
+        return _err(gettext("Invalid reward."))
 
     customer_id = customer["id"]
     balance     = get_loyalty_balance(customer_id)
@@ -1575,13 +1575,13 @@ def redeem_reward_route():
     raw_rewards = get_active_rewards()
     reward = next((dict(r) for r in raw_rewards if r["id"] == reward_id), None)
     if not reward:
-        return _err("Reward not found.")
+        return _err(gettext("Reward not found."))
 
     if balance < reward["cost"]:
-        return _err("Not enough points.")
+        return _err(gettext("Not enough points."))
 
     if reward["stock"] is not None and reward["stock"] <= 0:
-        return _err("This reward is out of stock.")
+        return _err(gettext("This reward is out of stock."))
 
     status = get_customer_reward_status(customer_id, reward_id)
     redeem_count     = status["redeem_count"] or 0
@@ -1599,15 +1599,15 @@ def redeem_reward_route():
                     reset_dt = last_dt + timedelta(days=cooldown_days_val)
                     if now_helsinki() < reset_dt:
                         remaining = max((reset_dt - now_helsinki()).days, 1)
-                        return _err(f"This reward resets in {remaining} day(s).")
+                        return _err(gettext("This reward resets in %(days)s day(s).", days=remaining))
                 except (ValueError, TypeError):
                     pass
             else:
-                return _err("You've reached the redeem limit for this reward.")
+                return _err(gettext("You have reached the redeem limit for this reward."))
 
     if not redeem_reward(customer_id, reward_id, reward["cost"], reward["name"]):
-        return _err("Not enough points.")
-    flash(f"Successfully redeemed: {reward['name']}!", "success")
+        return _err(gettext("Not enough points."))
+    flash(gettext("Successfully redeemed: %(name)s", name=reward['name']), "success")
     if is_json:
         return jsonify({"success": True})
     return redirect(url_for("main.customer_loyalty_points"))
@@ -1623,7 +1623,7 @@ def tier_benefits():
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for("main.login"))
 
     # "Current plan" = tier hiện tại (gói active mới nhất) — thống nhất với loyalty
@@ -1712,10 +1712,10 @@ def tier_benefits():
 def billing_portal():
     customer = get_customer_by_user_id(session.get("user_id"))
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for("main.login"))
     if not customer["stripe_customer_id"]:
-        flash("No billing account found.", "error")
+        flash(gettext("No billing account found."), "error")
         return redirect(url_for("main.tier_benefits"))
     try:
         url = create_billing_portal_session(
@@ -1724,7 +1724,7 @@ def billing_portal():
         )
     except Exception as e:
         logger.exception("[payment] billing portal failed")
-        flash("Could not open the billing portal. Please try again later.", "error")
+        flash(gettext("Could not open the billing portal. Please try again later."), "error")
         return redirect(url_for("main.tier_benefits"))
     return redirect(url)
 
@@ -1751,7 +1751,7 @@ def customer_loyalty_points():
     user_id = session.get("user_id")
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Customer profile not found!", "error")
+        flash(gettext("Customer profile not found!"), "error")
         return redirect(url_for('main.login'))
 
     customer_id = customer["id"]
@@ -1982,32 +1982,32 @@ def staff_login():
     block_remaining = get_login_block_remaining(ip)
     if block_remaining > 0:
         remaining = int(block_remaining / 60) + 1
-        flash(f"Too many failed attempts. Try again in {remaining} minute(s).", "error")
+        flash(gettext("Too many failed attempts. Try again in %(minutes)s minute(s).", minutes=remaining), "error")
         return redirect(url_for("main.staff_login"))
 
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password","")
 
     if not email or not password:
-        flash("Please enter email or password!", "error")
+        flash(gettext("Please enter email or password!"), "error")
         return redirect(url_for("main.staff_login"))
 
     user = get_user_by_email(email)
 
     if not user:
         record_login_failure(ip, _MAX_LOGIN_ATTEMPTS, _LOGIN_LOCKOUT)
-        flash("Invalid email or password!", "error")
+        flash(gettext("Invalid email or password!"), "error")
         return redirect(url_for("main.staff_login"))
 
     user_id = user['id']
 
     if not check_password_hash(user["password_hash"], password):
         record_login_failure(ip, _MAX_LOGIN_ATTEMPTS, _LOGIN_LOCKOUT)
-        flash("Invalid email or password!", "error")
+        flash(gettext("Invalid email or password!"), "error")
         return redirect(url_for("main.staff_login"))
 
     if user["role"] not in ("staff", "admin"):
-        flash("Please use the customer login portal", "error")
+        flash(gettext("Please use the customer login portal"), "error")
         return redirect(url_for("main.login"))
 
     clear_login_attempts(ip)
@@ -2021,11 +2021,11 @@ def staff_login():
     if user["role"] == "staff":
         staff = get_staff_by_user_id(user_id)
         if not staff:
-            flash("Staff profile not found!", "error")
+            flash(gettext("Staff profile not found!"), "error")
             return redirect(url_for("main.staff_login"))
 
         session["staff_id"] = staff['id']
-        flash(f"Login successfully. Welcome {staff['full_name']}!", "success")
+        flash(gettext("Logged in. Welcome, %(name)s.", name=staff['full_name']), "success")
         return redirect(url_for("main.staff_dashboard"))
 
     if user["role"] == "admin":
@@ -2033,10 +2033,10 @@ def staff_login():
         session["admin_name"] = staff["full_name"] if staff else "Admin"
         session["admin_email"] = user["email"]
         session["admin_last_activity"] = time.time()
-        flash(f"Login successfully. Welcome master!", "success")
+        flash(gettext("Logged in. Welcome, master."), "success")
         return redirect(url_for("main.admin_dashboard"))
     
-    flash("something went wrong :(", "error")
+    flash(gettext("something went wrong :("), "error")
     return redirect(url_for("main.staff_login"))
 
 _STATUS_BORDER = {
@@ -2153,7 +2153,7 @@ def staff_dashboard():
 
     current_staff = _get_current_staff()
     if not current_staff:
-        flash("Không tìm thấy hồ sơ nhân viên.", "error")
+        flash(gettext("Staff profile not found."), "error")
         return redirect(url_for("main.staff_login"))
 
     today = today_helsinki()
@@ -2283,7 +2283,7 @@ def staff_dashboard():
 def staff_history():
     current_staff = _get_current_staff()
     if not current_staff:
-        flash("Không tìm thấy hồ sơ nhân viên.", "error")
+        flash(gettext("Staff profile not found."), "error")
         return redirect(url_for("main.staff_login"))
 
     today = today_helsinki()
@@ -2355,13 +2355,13 @@ def staff_update_avatar():
         return redirect(url_for("main.staff_profile"))
 
     if not filename:
-        flash("Vui lòng chọn ảnh.", "error")
+        flash(gettext("Please select an image."), "error")
         return redirect(url_for("main.staff_profile"))
 
     old = get_staff_by_id(current_staff["id"])
     update_staff_photo(current_staff["id"], filename)
     _delete_upload(old["photo"] if old else None, "staff")
-    flash("Đã cập nhật ảnh đại diện.", "success")
+    flash(gettext("Profile photo updated."), "success")
     return redirect(url_for("main.staff_profile"))
 
 
@@ -2387,7 +2387,7 @@ def staff_change_password():
 
     verification_id = session.get("staff_pw_verification_id")
     if not verification_id:
-        flash("Phiên xác thực đã hết hạn. Vui lòng yêu cầu mã mới.", "error")
+        flash(gettext("Your verification session has expired. Please request a new code."), "error")
         return redirect(url_for("main.staff_profile"))
 
     user_code = request.form.get("verification_code", "").strip()
@@ -2396,30 +2396,30 @@ def staff_change_password():
 
     verification = get_verification_by_id(verification_id)
     if not verification:
-        flash("Mã xác thực đã hết hạn. Vui lòng yêu cầu mã mới.", "error")
+        flash(gettext("The verification code has expired. Please request a new one."), "error")
         session.pop("staff_pw_verification_id", None)
         return redirect(url_for("main.staff_profile"))
 
     if user_code != verification["verification_code"]:
         if register_failed_verification(verification_id):
             session.pop("staff_pw_verification_id", None)
-            flash("Nhập sai quá nhiều lần. Vui lòng yêu cầu mã mới.", "error")
+            flash(gettext("Too many incorrect attempts. Please request a new code."), "error")
         else:
-            flash("Mã xác thực không đúng.", "error")
+            flash(gettext("Incorrect verification code."), "error")
         return redirect(url_for("main.staff_profile"))
 
     if len(new_password) < 8:
-        flash("Mật khẩu mới phải có ít nhất 8 ký tự.", "error")
+        flash(gettext("The new password must be at least 8 characters."), "error")
         return redirect(url_for("main.staff_profile"))
 
     if new_password != confirm_password:
-        flash("Mật khẩu xác nhận không khớp.", "error")
+        flash(gettext("Passwords do not match."), "error")
         return redirect(url_for("main.staff_profile"))
 
     update_verification(verification_id, current_staff["id"], 1)
     update_user_password(current_staff["user_id"], generate_password_hash(new_password))
     session.pop("staff_pw_verification_id", None)
-    flash("Đổi mật khẩu thành công.", "success")
+    flash(gettext("Password changed."), "success")
     return redirect(url_for("main.staff_profile"))
 
 @main.route("/staff/booking/start", methods=["POST"])
@@ -2438,11 +2438,11 @@ def mark_in_progress():
             or booking["status"] != "confirmed"
             or not (booking["booking_date"] == today_str
                     and (booking["start_time"] or "")[:5] <= now_hm)):
-        flash("Không có quyền thực hiện hành động này.", "error")
+        flash(gettext("You do not have permission to perform this action."), "error")
         return redirect(request.referrer or url_for("main.staff_dashboard"))
 
     update_status(booking_id, "in-progress")
-    flash("Đã bắt đầu thực hiện dịch vụ.", "success")
+    flash(gettext("Service started."), "success")
     return redirect(request.referrer or url_for("main.staff_dashboard"))
 
 @main.route("/staff/booking/done", methods=["POST"])
@@ -2455,13 +2455,13 @@ def mark_done():
     if (not booking or not current_staff
             or booking["staff_id"] != current_staff["id"]
             or booking["status"] != "in-progress"):
-        flash("Không có quyền thực hiện hành động này.", "error")
+        flash(gettext("You do not have permission to perform this action."), "error")
         return redirect(request.referrer or url_for("main.staff_dashboard"))
 
     if _complete_booking_txn(booking_id):
-        flash("Đã đánh dấu hoàn thành.", "success")
+        flash(gettext("Marked as completed."), "success")
     else:
-        flash("Có lỗi xảy ra. Vui lòng thử lại.", "error")
+        flash(gettext("Something went wrong. Please try again."), "error")
     return redirect(request.referrer or url_for("main.staff_dashboard"))
 
 @main.route("/staff/booking/paid", methods=["POST"])
@@ -2476,11 +2476,11 @@ def mark_paid():
             or booking["staff_id"] != current_staff["id"]
             or not invoice or invoice["payment_method"] != "cash"
             or invoice["status"] == "paid"):
-        flash("Không có quyền thực hiện hành động này.", "error")
+        flash(gettext("You do not have permission to perform this action."), "error")
         return redirect(request.referrer or url_for("main.staff_dashboard"))
 
     mark_invoice_paid(booking_id)
-    flash("Đã xác nhận thanh toán.", "success")
+    flash(gettext("Payment confirmed."), "success")
     return redirect(request.referrer or url_for("main.staff_dashboard"))
 
 #====================================
@@ -2634,12 +2634,12 @@ def admin_bookings():
 def admin_update_booking_status(booking_id):
     new_status = request.form.get("status", "").strip()
     if new_status not in {"pending", "confirmed", "in-progress", "done", "cancelled", "no-show"}:
-        flash("Trạng thái không hợp lệ.", "error")
+        flash(gettext("Invalid status."), "error")
         return redirect(url_for("main.admin_bookings"))
 
     booking = get_booking_by_id(booking_id)
     if not booking:
-        flash("Booking không tồn tại.", "error")
+        flash(gettext("Booking not found."), "error")
         return redirect(request.referrer or url_for("main.admin_bookings"))
     old_status = booking["status"]
 
@@ -2653,11 +2653,11 @@ def admin_update_booking_status(booking_id):
         # 'done' phải đi qua transaction hoàn tất (invoice + earnings + loyalty),
         # không được ghi status trần bằng update_status. Bỏ qua nếu đã 'done'.
         if old_status != "done" and not complete_booking_txn(booking_id):
-            flash("Không thể hoàn tất booking (thiếu dữ liệu dịch vụ/nhân viên).", "error")
+            flash(gettext("Could not complete the booking. Service or staff data is missing."), "error")
             return redirect(request.referrer or url_for("main.admin_bookings"))
     else:
         update_status(booking_id, new_status)
-    flash(f"Đã cập nhật trạng thái booking #{booking_id}.", "success")
+    flash(gettext("Booking #%(id)s status updated.", id=booking_id), "success")
     return redirect(request.referrer or url_for("main.admin_bookings"))
 
 
@@ -2672,23 +2672,23 @@ def admin_create_booking():
     notes        = request.form.get("notes", "").strip() or None
 
     if not all([customer_id, service_id, staff_id, booking_date, start_time]):
-        flash("Vui lòng điền đầy đủ thông tin.", "error")
+        flash(gettext("Please fill in all fields."), "error")
         return redirect(url_for("main.admin_bookings"))
 
     service = get_service_by_id(service_id)
     if not service:
-        flash("Dịch vụ không tồn tại.", "error")
+        flash(gettext("Service not found."), "error")
         return redirect(url_for("main.admin_bookings"))
 
     start_dt = datetime.strptime(start_time, "%H:%M")
     end_time = (start_dt + timedelta(minutes=service["duration_minutes"])).strftime("%H:%M")
 
     if check_booking_conflict(staff_id, booking_date, start_time, end_time):
-        flash("Stylist đã có lịch trong khung giờ này. Vui lòng chọn giờ khác.", "error")
+        flash(gettext("This stylist is already booked for that time. Please choose another slot."), "error")
         return redirect(url_for("main.admin_bookings"))
 
     create_booking(customer_id, staff_id, service_id, booking_date, start_time, end_time, "pending", notes, "cash")
-    flash("Tạo booking thành công!", "success")
+    flash(gettext("Booking created."), "success")
     return redirect(url_for("main.admin_bookings"))
 
 
@@ -2701,12 +2701,12 @@ def admin_update_booking(booking_id):
     notes        = request.form.get("notes", "").strip() or None
 
     if not all([staff_id, booking_date, start_time]):
-        flash("Vui lòng điền đầy đủ thông tin.", "error")
+        flash(gettext("Please fill in all fields."), "error")
         return redirect(url_for("main.admin_bookings"))
 
     booking = get_booking_by_id(booking_id)
     if not booking:
-        flash("Booking không tồn tại.", "error")
+        flash(gettext("Booking not found."), "error")
         return redirect(url_for("main.admin_bookings"))
 
     service = get_service_by_id(booking["service_id"])
@@ -2714,7 +2714,7 @@ def admin_update_booking(booking_id):
     end_time = (start_dt + timedelta(minutes=service["duration_minutes"])).strftime("%H:%M")
 
     update_booking_details(booking_id, staff_id, booking_date, start_time, end_time, notes)
-    flash(f"Đã cập nhật booking #{booking_id}.", "success")
+    flash(gettext("Booking #%(id)s updated.", id=booking_id), "success")
     return redirect(request.referrer or url_for("main.admin_bookings"))
 
 @main.route("/admin/staffs")
@@ -2749,11 +2749,11 @@ def admin_create_staff():
     is_active = 1 if request.form.get("is_active") == "1" else 0
 
     if not full_name or not email:
-        flash("Vui lòng điền đầy đủ họ tên và email.", "error")
+        flash(gettext("Please enter both a full name and an email address."), "error")
         return redirect(url_for("main.admin_staffs"))
 
     if get_user_by_email(email):
-        flash("Email này đã được dùng cho một tài khoản khác.", "error")
+        flash(gettext("This email is already used by another account."), "error")
         return redirect(url_for("main.admin_staffs"))
 
     alphabet = string.ascii_letters + string.digits
@@ -2777,11 +2777,11 @@ def admin_update_staff(staff_id):
     is_active = 1 if request.form.get("is_active") == "1" else 0
 
     if not full_name or not email:
-        flash("Vui lòng điền đầy đủ họ tên và email.", "error")
+        flash(gettext("Please enter both a full name and an email address."), "error")
         return redirect(url_for("main.admin_staffs"))
 
     update_staff(staff_id, full_name, email, phone, role, hourly_rate, commission_rate, is_active)
-    flash(f"Đã cập nhật nhân viên #{staff_id}.", "success")
+    flash(gettext("Staff member #%(id)s updated.", id=staff_id), "success")
     return redirect(url_for("main.admin_staffs"))
 
 
@@ -2790,9 +2790,9 @@ def admin_update_staff(staff_id):
 def admin_delete_staff(staff_id):
     try:
         delete_staff(staff_id)
-        flash("Đã xóa nhân viên.", "success")
+        flash(gettext("Staff member deleted."), "success")
     except sqlite3.IntegrityError:
-        flash("Không thể xóa nhân viên đang có lịch hẹn liên kết.", "error")
+        flash(gettext("Cannot delete a staff member with linked appointments."), "error")
     return redirect(url_for("main.admin_staffs"))
 
 
@@ -2800,7 +2800,7 @@ def admin_delete_staff(staff_id):
 @admin_required
 def admin_toggle_staff_active(staff_id):
     toggle_staff_active(staff_id)
-    flash("Đã cập nhật trạng thái nhân viên.", "success")
+    flash(gettext("Staff status updated."), "success")
     return redirect(url_for("main.admin_staffs"))
 
 @main.route("/admin/services")
@@ -2838,7 +2838,7 @@ def admin_create_service():
     is_active = 1 if request.form.get("is_active") == "1" else 0
 
     if not name or not category_id or price is None or not duration_minutes:
-        flash("Vui lòng điền đầy đủ thông tin bắt buộc.", "error")
+        flash(gettext("Please fill in all required fields."), "error")
         return redirect(url_for("main.admin_services"))
 
     try:
@@ -2856,9 +2856,9 @@ def admin_create_service():
         video_url=None if raw_video else video_url)
 
     if raw_video and _start_video_transcode(service_id, raw_video):
-        flash(f"Đã thêm dịch vụ {name}. Video đang được xử lý, vài phút nữa sẽ hiển thị.", "success")
+        flash(gettext("Service %(name)s added. The video is processing and will appear in a few minutes.", name=name), "success")
     else:
-        flash(f"Đã thêm dịch vụ {name}.", "success")
+        flash(gettext("Service %(name)s added.", name=name), "success")
     return redirect(url_for("main.admin_services"))
 
 
@@ -2867,7 +2867,7 @@ def admin_create_service():
 def admin_update_service(service_id):
     service = get_service_by_id(service_id)
     if not service:
-        flash("Không tìm thấy dịch vụ.", "error")
+        flash(gettext("Service not found."), "error")
         return redirect(url_for("main.admin_services"))
 
     name = request.form.get("name", "").strip()
@@ -2888,7 +2888,7 @@ def admin_update_service(service_id):
     remove_video = request.form.get("remove_video") == "1"
 
     if not name or not category_id or price is None or not duration_minutes:
-        flash("Vui lòng điền đầy đủ thông tin bắt buộc.", "error")
+        flash(gettext("Please fill in all required fields."), "error")
         return redirect(url_for("main.admin_services"))
 
     try:
@@ -2924,13 +2924,13 @@ def admin_update_service(service_id):
 
     if raw_video:
         if _start_video_transcode(service_id, raw_video, old_video=service["video_url"]):
-            flash(f"Đã cập nhật dịch vụ {name}. Video đang được xử lý, vài phút nữa sẽ hiển thị.", "success")
+            flash(gettext("Service %(name)s updated. The video is processing and will appear in a few minutes.", name=name), "success")
         else:
-            flash("Video trước của dịch vụ này đang được xử lý. Chờ xong rồi hãy upload tiếp.", "error")
+            flash(gettext("The previous video for this service is still processing. Please wait until it finishes before uploading another."), "error")
     else:
         if remove_video:
             clear_service_video(service_id)
-        flash(f"Đã cập nhật dịch vụ {name}.", "success")
+        flash(gettext("Service %(name)s updated.", name=name), "success")
     return redirect(url_for("main.admin_services"))
 
 
@@ -2945,9 +2945,9 @@ def admin_delete_service(service_id):
         if service:
             _delete_upload(service["image"], "services")
             _delete_upload(service["video_url"], "videos")
-        flash("Đã xóa dịch vụ.", "success")
+        flash(gettext("Service deleted."), "success")
     except sqlite3.IntegrityError:
-        flash("Không thể xóa dịch vụ đang có lịch hẹn liên kết.", "error")
+        flash(gettext("Cannot delete a service that has linked appointments."), "error")
     return redirect(url_for("main.admin_services"))
 
 
@@ -2955,7 +2955,7 @@ def admin_delete_service(service_id):
 @admin_required
 def admin_toggle_service_active(service_id):
     toggle_service_active(service_id)
-    flash("Đã cập nhật trạng thái dịch vụ.", "success")
+    flash(gettext("Service status updated."), "success")
     return redirect(url_for("main.admin_services"))
 
 
@@ -2969,14 +2969,14 @@ def admin_create_category():
     is_active = 1 if request.form.get("is_active") == "1" else 0
 
     if not name:
-        flash("Vui lòng nhập tên danh mục.", "error")
+        flash(gettext("Please enter a category name."), "error")
         return redirect(url_for("main.admin_services"))
 
     try:
         create_category(name, slug, is_active, name_fi=name_fi, name_vi=name_vi)
-        flash(f"Đã thêm danh mục {name}.", "success")
+        flash(gettext("Category %(name)s added.", name=name), "success")
     except sqlite3.IntegrityError:
-        flash("Slug này đã tồn tại. Vui lòng chọn slug khác.", "error")
+        flash(gettext("This slug already exists. Please choose another one."), "error")
     return redirect(url_for("main.admin_services"))
 
 
@@ -2990,14 +2990,14 @@ def admin_update_category(category_id):
     is_active = 1 if request.form.get("is_active") == "1" else 0
 
     if not name:
-        flash("Vui lòng nhập tên danh mục.", "error")
+        flash(gettext("Please enter a category name."), "error")
         return redirect(url_for("main.admin_services"))
 
     try:
         update_category(category_id, name, slug, is_active, name_fi=name_fi, name_vi=name_vi)
-        flash(f"Đã cập nhật danh mục {name}.", "success")
+        flash(gettext("Category %(name)s updated.", name=name), "success")
     except sqlite3.IntegrityError:
-        flash("Slug này đã tồn tại. Vui lòng chọn slug khác.", "error")
+        flash(gettext("This slug already exists. Please choose another one."), "error")
     return redirect(url_for("main.admin_services"))
 
 
@@ -3006,9 +3006,9 @@ def admin_update_category(category_id):
 def admin_delete_category(category_id):
     try:
         delete_category(category_id)
-        flash("Đã xóa danh mục.", "success")
+        flash(gettext("Category deleted."), "success")
     except sqlite3.IntegrityError:
-        flash("Không thể xóa danh mục đang có dịch vụ. Vui lòng xóa hoặc chuyển dịch vụ sang danh mục khác trước.", "error")
+        flash(gettext("Cannot delete a category that still has services. Move or delete those services first."), "error")
     return redirect(url_for("main.admin_services"))
 
 
@@ -3043,7 +3043,7 @@ def admin_gallery_upload():
 
     files = [f for f in files if f and f.filename]
     if not files:
-        flash("Vui lòng chọn ít nhất 1 ảnh.", "error")
+        flash(gettext("Please select at least one image."), "error")
         return redirect(url_for("main.admin_gallery"))
 
     rows = []
@@ -3056,7 +3056,7 @@ def admin_gallery_upload():
         return redirect(url_for("main.admin_gallery"))
 
     create_gallery_images(rows)
-    flash(f"Đã tải lên {len(rows)} ảnh thành công.", "success")
+    flash(gettext("Uploaded %(count)s images.", count=len(rows)), "success")
     return redirect(url_for("main.admin_gallery"))
 
 
@@ -3065,7 +3065,7 @@ def admin_gallery_upload():
 def admin_gallery_update(image_id):
     image = get_gallery_image_by_id(image_id)
     if not image:
-        flash("Không tìm thấy ảnh.", "error")
+        flash(gettext("Image not found."), "error")
         return redirect(url_for("main.admin_gallery"))
 
     alt_text = request.form.get("alt_text", "").strip()
@@ -3088,7 +3088,7 @@ def admin_gallery_update(image_id):
         update_gallery_image(image_id, alt_text, sort_order, is_active,
                              alt_text_fi=alt_text_fi, alt_text_vi=alt_text_vi)
 
-    flash("Đã cập nhật ảnh.", "success")
+    flash(gettext("Image updated."), "success")
     return redirect(url_for("main.admin_gallery"))
 
 
@@ -3099,7 +3099,7 @@ def admin_gallery_delete(image_id):
     if image:
         _delete_upload(image["image_url"], "gallery")
         delete_gallery_image(image_id)
-        flash("Đã xóa ảnh.", "success")
+        flash(gettext("Image deleted."), "success")
     return redirect(url_for("main.admin_gallery"))
 
 
@@ -3125,7 +3125,7 @@ def admin_gallery_bulk_delete():
 
     if image_ids:
         bulk_delete_gallery_images(image_ids)
-        flash(f"Đã xóa {len(image_ids)} ảnh.", "success")
+        flash(gettext("Deleted %(count)s images.", count=len(image_ids)), "success")
     return redirect(url_for("main.admin_gallery"))
 
 
@@ -3171,11 +3171,11 @@ def admin_create_customer():
     email = request.form.get("email", "").strip()
 
     if not full_name:
-        flash("Vui lòng điền họ và tên.", "error")
+        flash(gettext("Please enter a full name."), "error")
         return redirect(url_for("main.admin_customers"))
 
     if email and get_user_by_email(email):
-        flash("Không thể tạo khách hàng: email này đã được dùng để tạo một tài khoản khác.", "error")
+        flash(gettext("Could not create the customer. This email already belongs to another account."), "error")
         return redirect(url_for("main.admin_customers"))
 
     customer_id = create_customer_admin(full_name, email, phone, date_of_birth, notes)
@@ -3185,7 +3185,7 @@ def admin_create_customer():
         upgrade_membership(customer_id, silver_tier["id"], silver_tier["duration_days"])
 
     if not email:
-        flash("Đã thêm khách hàng mới.", "success")
+        flash(gettext("Customer added."), "success")
         return redirect(url_for("main.admin_customers"))
 
     alphabet = string.ascii_letters + string.digits
@@ -3201,7 +3201,7 @@ def admin_create_customer():
 def admin_edit_customer(customer_id):
     customer = get_customer_by_customer_id(customer_id)
     if not customer:
-        flash("Không tìm thấy khách hàng.", "error")
+        flash(gettext("Customer not found."), "error")
         return redirect(url_for("main.admin_customers"))
 
     if request.method == "POST":
@@ -3212,16 +3212,16 @@ def admin_edit_customer(customer_id):
         email = request.form.get("email", "").strip()
 
         if not full_name:
-            flash("Vui lòng điền họ và tên.", "error")
+            flash(gettext("Please enter a full name."), "error")
             return redirect(url_for("main.admin_edit_customer", customer_id=customer_id))
 
         update_customer_admin(customer_id, full_name, email, phone, date_of_birth, notes)
-        flash(f"Đã cập nhật khách hàng #{customer_id}.", "success")
+        flash(gettext("Customer #%(id)s updated.", id=customer_id), "success")
         return redirect(url_for("main.admin_customers"))
 
     # No dedicated edit-page template yet — admin_customers.html's Detail modal
     # covers view-only info. Redirect back until an edit page/modal is built.
-    flash("Trang chỉnh sửa khách hàng chưa được xây dựng.", "error")
+    flash(gettext("The customer edit page has not been built yet."), "error")
     return redirect(url_for("main.admin_customers"))
 
 
@@ -3230,17 +3230,17 @@ def admin_edit_customer(customer_id):
 def admin_adjust_points(customer_id):
     customer = get_customer_by_customer_id(customer_id)
     if not customer:
-        flash("Không tìm thấy khách hàng.", "error")
+        flash(gettext("Customer not found."), "error")
         return redirect(url_for("main.admin_customers"))
 
     points = request.form.get("points", type=int)
     if not points:
-        flash("Vui lòng nhập số điểm hợp lệ.", "error")
+        flash(gettext("Please enter a valid number of points."), "error")
         return redirect(url_for("main.admin_customers"))
 
     admin_name = session.get("admin_name", "Admin")
     award_points(customer_id, points, "admin_adjustment", note=f"Điều chỉnh bởi {admin_name}")
-    flash(f"Đã điều chỉnh {points:+d} điểm cho {customer['full_name']}.", "success")
+    flash(gettext("Adjusted %(points)s points for %(name)s.", points=f"{points:+d}", name=customer['full_name']), "success")
     return redirect(url_for("main.admin_customers"))
 
 
@@ -3249,14 +3249,14 @@ def admin_adjust_points(customer_id):
 def admin_delete_customer(customer_id):
     customer = get_customer_by_customer_id(customer_id)
     if not customer:
-        flash("Không tìm thấy khách hàng.", "error")
+        flash(gettext("Customer not found."), "error")
         return redirect(url_for("main.admin_customers"))
 
     try:
         delete_customer_admin(customer_id)
-        flash(f"Đã xóa khách hàng {customer['full_name']}.", "success")
+        flash(gettext("Deleted customer %(name)s.", name=customer['full_name']), "success")
     except sqlite3.IntegrityError:
-        flash("Không thể xóa khách hàng đang có booking hoặc dữ liệu liên kết.", "error")
+        flash(gettext("Cannot delete a customer with bookings or linked records."), "error")
 
     return redirect(url_for("main.admin_customers"))
 
@@ -3324,12 +3324,12 @@ def admin_loyalty_adjust_points():
 
     customer = get_customer_by_customer_id(customer_id) if customer_id else None
     if not customer or not points or adj_type not in ("add", "sub"):
-        flash("Vui lòng nhập đầy đủ thông tin điều chỉnh điểm.", "error")
+        flash(gettext("Please fill in all point adjustment details."), "error")
         return redirect(url_for("main.admin_loyalty"))
 
     signed_points = abs(points) if adj_type == "add" else -abs(points)
     award_points(customer_id, signed_points, "admin_adjustment", note=note)
-    flash(f"Đã điều chỉnh {signed_points:+d} điểm cho {customer['full_name']}.", "success")
+    flash(gettext("Adjusted %(points)s points for %(name)s.", points=f"{signed_points:+d}", name=customer['full_name']), "success")
     return redirect(url_for("main.admin_loyalty"))
 
 
@@ -3343,11 +3343,11 @@ def admin_loyalty_adjust_membership():
 
     customer = get_customer_by_customer_id(customer_id) if customer_id else None
     if not customer or not tier_id or not started_at or not expires_at:
-        flash("Vui lòng nhập đầy đủ thông tin membership.", "error")
+        flash(gettext("Please fill in all membership details."), "error")
         return redirect(url_for("main.admin_loyalty"))
 
     adjust_membership_admin(customer_id, tier_id, started_at, expires_at)
-    flash(f"Đã cập nhật membership cho {customer['full_name']}.", "success")
+    flash(gettext("Membership updated for %(name)s.", name=customer['full_name']), "success")
     return redirect(url_for("main.admin_loyalty"))
 
 
@@ -3366,7 +3366,7 @@ def admin_loyalty_create_voucher():
     cooldown_days = request.form.get("cooldown_days", type=int)
 
     if not name or not cost:
-        flash("Vui lòng nhập tên và chi phí điểm cho voucher.", "error")
+        flash(gettext("Please enter a name and point cost for the voucher."), "error")
         return redirect(url_for("main.admin_loyalty"))
 
     try:
@@ -3377,7 +3377,7 @@ def admin_loyalty_create_voucher():
 
     create_reward(name, description, cost, stock, max_redeems_per_customer, cooldown_days, banner_image,
                   name_fi=name_fi, name_vi=name_vi, description_fi=description_fi, description_vi=description_vi)
-    flash("Đã tạo voucher mới.", "success")
+    flash(gettext("Voucher created."), "success")
     return redirect(url_for("main.admin_loyalty"))
 
 
@@ -3386,7 +3386,7 @@ def admin_loyalty_create_voucher():
 def admin_loyalty_update_voucher(reward_id):
     reward = get_reward_by_id(reward_id)
     if not reward:
-        flash("Không tìm thấy voucher.", "error")
+        flash(gettext("Voucher not found."), "error")
         return redirect(url_for("main.admin_loyalty"))
 
     name = request.form.get("name", "").strip()
@@ -3403,7 +3403,7 @@ def admin_loyalty_update_voucher(reward_id):
     remove_image = request.form.get("remove_image") == "1"
 
     if not name or not cost:
-        flash("Vui lòng nhập tên và chi phí điểm cho voucher.", "error")
+        flash(gettext("Please enter a name and point cost for the voucher."), "error")
         return redirect(url_for("main.admin_loyalty"))
 
     try:
@@ -3424,7 +3424,7 @@ def admin_loyalty_update_voucher(reward_id):
 
     update_reward(reward_id, name, description, cost, stock, max_redeems_per_customer, cooldown_days, is_active, banner_image,
                   name_fi=name_fi, name_vi=name_vi, description_fi=description_fi, description_vi=description_vi)
-    flash("Đã cập nhật voucher.", "success")
+    flash(gettext("Voucher updated."), "success")
     return redirect(url_for("main.admin_loyalty"))
 
 
@@ -3433,16 +3433,16 @@ def admin_loyalty_update_voucher(reward_id):
 def admin_loyalty_delete_voucher(reward_id):
     reward = get_reward_by_id(reward_id)
     if not reward:
-        flash("Không tìm thấy voucher.", "error")
+        flash(gettext("Voucher not found."), "error")
         return redirect(url_for("main.admin_loyalty"))
 
     if get_reward_redemption_count(reward_id) > 0:
         deactivate_reward(reward_id)
-        flash(f"Voucher \"{reward['name']}\" đã có khách đổi nên chỉ được ẩn, không xóa hẳn.", "success")
+        flash(gettext("Voucher \"%(name)s\" has been redeemed by customers, so it was hidden instead of deleted.", name=reward['name']), "success")
     else:
         _delete_upload(reward["banner_image"], "rewards")
         delete_reward(reward_id)
-        flash(f"Đã xóa voucher \"{reward['name']}\".", "success")
+        flash(gettext("Deleted voucher \"%(name)s\".", name=reward['name']), "success")
 
     return redirect(url_for("main.admin_loyalty"))
 
@@ -3451,17 +3451,17 @@ def admin_loyalty_delete_voucher(reward_id):
 @admin_required
 def admin_loyalty_update_mission(key):
     if key not in MISSION_KEYS:
-        flash("Mission không hợp lệ.", "error")
+        flash(gettext("Invalid mission."), "error")
         return redirect(url_for("main.admin_loyalty"))
 
     description = request.form.get("description", "").strip()
     points = request.form.get("points", type=int)
     if points is None or points < 0:
-        flash("Vui lòng nhập số điểm hợp lệ.", "error")
+        flash(gettext("Please enter a valid number of points."), "error")
         return redirect(url_for("main.admin_loyalty"))
 
     update_mission_config(key, description, points)
-    flash("Đã cập nhật mission.", "success")
+    flash(gettext("Mission updated."), "success")
     return redirect(url_for("main.admin_loyalty"))
 
 
@@ -3527,7 +3527,7 @@ def admin_carousel_homepage_create():
     cta2_label_vi = request.form.get("cta2_label_vi", "").strip() or None
 
     if not title:
-        flash("Vui lòng nhập tiêu đề slide.", "error")
+        flash(gettext("Please enter a slide title."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     try:
@@ -3537,7 +3537,7 @@ def admin_carousel_homepage_create():
         return redirect(url_for("main.admin_carousels"))
 
     if not image:
-        flash("Vui lòng chọn ảnh cho slide.", "error")
+        flash(gettext("Please select an image for the slide."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     sort_order = get_next_carousel_sort_order("homepage")
@@ -3545,7 +3545,7 @@ def admin_carousel_homepage_create():
                           title_fi=title_fi, title_vi=title_vi, subtitle_fi=subtitle_fi, subtitle_vi=subtitle_vi,
                           badge_fi=badge_fi, badge_vi=badge_vi, cta_label_fi=cta_label_fi, cta_label_vi=cta_label_vi,
                           cta2_label_fi=cta2_label_fi, cta2_label_vi=cta2_label_vi)
-    flash("Đã tạo slide trang chủ mới.", "success")
+    flash(gettext("Homepage slide created."), "success")
     return redirect(url_for("main.admin_carousels"))
 
 
@@ -3554,7 +3554,7 @@ def admin_carousel_homepage_create():
 def admin_carousel_homepage_update(slide_id):
     slide = get_carousel_slide_by_id(slide_id)
     if not slide or slide["carousel_key"] != "homepage":
-        flash("Không tìm thấy slide.", "error")
+        flash(gettext("Slide not found."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     title = request.form.get("title", "").strip()
@@ -3580,7 +3580,7 @@ def admin_carousel_homepage_update(slide_id):
     remove_image = request.form.get("remove_image") == "1"
 
     if not title:
-        flash("Vui lòng nhập tiêu đề slide.", "error")
+        flash(gettext("Please enter a slide title."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     try:
@@ -3600,14 +3600,14 @@ def admin_carousel_homepage_update(slide_id):
         image = slide["image"]
 
     if not image:
-        flash("Slide cần có ảnh.", "error")
+        flash(gettext("A slide needs an image."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     update_homepage_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, cta2_label, cta2_url, cta2_style, is_active,
                           title_fi=title_fi, title_vi=title_vi, subtitle_fi=subtitle_fi, subtitle_vi=subtitle_vi,
                           badge_fi=badge_fi, badge_vi=badge_vi, cta_label_fi=cta_label_fi, cta_label_vi=cta_label_vi,
                           cta2_label_fi=cta2_label_fi, cta2_label_vi=cta2_label_vi)
-    flash("Đã cập nhật slide.", "success")
+    flash(gettext("Slide updated."), "success")
     return redirect(url_for("main.admin_carousels"))
 
 
@@ -3630,7 +3630,7 @@ def admin_carousel_offer_create():
     cta_label_vi = request.form.get("cta_label_vi", "").strip() or None
 
     if not title:
-        flash("Vui lòng nhập tiêu đề slide.", "error")
+        flash(gettext("Please enter a slide title."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     try:
@@ -3643,7 +3643,7 @@ def admin_carousel_offer_create():
     create_offer_slide(title, subtitle, badge, image, cta_label, cta_url, cta_style, sort_order,
                        title_fi=title_fi, title_vi=title_vi, subtitle_fi=subtitle_fi, subtitle_vi=subtitle_vi,
                        badge_fi=badge_fi, badge_vi=badge_vi, cta_label_fi=cta_label_fi, cta_label_vi=cta_label_vi)
-    flash("Đã thêm slide ưu đãi.", "success")
+    flash(gettext("Offer slide added."), "success")
     return redirect(url_for("main.admin_carousels"))
 
 
@@ -3652,7 +3652,7 @@ def admin_carousel_offer_create():
 def admin_carousel_offer_update(slide_id):
     slide = get_carousel_slide_by_id(slide_id)
     if not slide or slide["carousel_key"] != "dashboard_offers":
-        flash("Không tìm thấy slide.", "error")
+        flash(gettext("Slide not found."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     title = request.form.get("title", "").strip()
@@ -3673,7 +3673,7 @@ def admin_carousel_offer_update(slide_id):
     remove_image = request.form.get("remove_image") == "1"
 
     if not title:
-        flash("Vui lòng nhập tiêu đề slide.", "error")
+        flash(gettext("Please enter a slide title."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     try:
@@ -3695,7 +3695,7 @@ def admin_carousel_offer_update(slide_id):
     update_offer_slide(slide_id, title, subtitle, badge, image, cta_label, cta_url, cta_style, is_active,
                        title_fi=title_fi, title_vi=title_vi, subtitle_fi=subtitle_fi, subtitle_vi=subtitle_vi,
                        badge_fi=badge_fi, badge_vi=badge_vi, cta_label_fi=cta_label_fi, cta_label_vi=cta_label_vi)
-    flash("Đã cập nhật slide ưu đãi.", "success")
+    flash(gettext("Offer slide updated."), "success")
     return redirect(url_for("main.admin_carousels"))
 
 
@@ -3704,16 +3704,16 @@ def admin_carousel_offer_update(slide_id):
 def admin_carousel_delete(slide_id):
     slide = get_carousel_slide_by_id(slide_id)
     if not slide:
-        flash("Không tìm thấy slide.", "error")
+        flash(gettext("Slide not found."), "error")
         return redirect(url_for("main.admin_carousels"))
     if slide["carousel_key"] == "loyalty_missions":
-        flash("Không thể xóa mission cố định.", "error")
+        flash(gettext("Built-in missions cannot be deleted."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     _delete_upload(slide["image"], "carousels")
 
     delete_carousel_slide(slide_id)
-    flash("Đã xóa slide.", "success")
+    flash(gettext("Slide deleted."), "success")
     return redirect(url_for("main.admin_carousels"))
 
 
@@ -3721,7 +3721,7 @@ def admin_carousel_delete(slide_id):
 @admin_required
 def admin_carousel_mission_update(slot_key):
     if slot_key not in MISSION_SLOT_KEYS:
-        flash("Mission không hợp lệ.", "error")
+        flash(gettext("Invalid mission."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     slide = next((s for s in get_mission_slides() if s["slot_key"] == slot_key), None)
@@ -3734,7 +3734,7 @@ def admin_carousel_mission_update(slot_key):
     remove_image = request.form.get("remove_image") == "1"
 
     if not title:
-        flash("Vui lòng nhập tên mission.", "error")
+        flash(gettext("Please enter a mission name."), "error")
         return redirect(url_for("main.admin_carousels"))
 
     try:
@@ -3754,7 +3754,7 @@ def admin_carousel_mission_update(slot_key):
         image = slide["image"] if slide else None
 
     update_mission_slide(slot_key, icon, title, pts_label, image, title_fi=title_fi, title_vi=title_vi)
-    flash("Đã cập nhật mission.", "success")
+    flash(gettext("Mission updated."), "success")
     return redirect(url_for("main.admin_carousels"))
 
 
@@ -4205,7 +4205,7 @@ def public_booking():
     staffs = get_all_staff()
 
     if preselect_id and preselect_id not in [s["id"] for s in services]:
-        flash("That service is no longer available. Showing our full menu.", "warning")
+        flash(gettext("That service is no longer available. Showing our full menu."), "warning")
         preselect_id = None
 
     services_by_category = build_services_by_category(categories, services)
@@ -4240,7 +4240,7 @@ def create_public_booking():
     slot_raw = request.form.get("start_time", "").strip()
 
     if not service_id_raw or not booking_date_raw or not slot_raw:
-        flash("Please select a service, date, and time slot before confirming.", "error")
+        flash(gettext("Please select a service, date, and time slot before confirming."), "error")
         return redirect(url_for('main.public_booking'))
 
     #Parse form
@@ -4254,7 +4254,7 @@ def create_public_booking():
 
     service = get_service_by_id(data["service_id"])
     if not service:
-        flash("Service not found. Please try again.", "error")
+        flash(gettext("Service not found. Please try again."), "error")
         return redirect(url_for('main.public_booking'))
     service_duration = service["duration_minutes"]
     start_time, end_time = BookingService.parse_slot(booking_date, booking_slot, service_duration)
@@ -4296,7 +4296,7 @@ def create_public_booking():
             data["payment_method"]
         )
     except EmailSendError:
-        flash("Could not send verification email. Please try again.", "error")
+        flash(gettext("Could not send verification email. Please try again."), "error")
         return redirect(url_for('main.public_booking'))
 
     session["booking_id"] = booking_id
@@ -4423,22 +4423,22 @@ def register():
 
 
     if not full_name or not email or not password:
-        flash("Please enter required information!", "error")
+        flash(gettext("Please enter required information!"), "error")
         return redirect(url_for('main.register'))
 
     if not is_valid_email(email):
-        flash("Please enter a valid email address.", "error")
+        flash(gettext("Please enter a valid email address."), "error")
         return redirect(url_for('main.register'))
 
     if len(password) < 8:
-        flash("Password must be at least 8 characters.", "error")
+        flash(gettext("Password must be at least 8 characters."), "error")
         return redirect(url_for('main.register'))
 
     existing_user = get_user_by_email(email)
 
     if existing_user:
         #Notice email existed
-        flash("Email existed! Please try again.", "error")
+        flash(gettext("Email existed! Please try again."), "error")
         return redirect(url_for('main.register'))
 
     session.modified = True
@@ -4451,7 +4451,7 @@ def register():
     try:
         send_verification_email(email, verification_code, "register")
     except EmailSendError:
-        flash("Could not send verification email. Please try again.", "error")
+        flash(gettext("Could not send verification email. Please try again."), "error")
         return redirect(url_for('main.register'))
     verification_id = create_verification(verification_code, "register", expires_at)
 
@@ -4468,7 +4468,7 @@ def register():
     }
 
     #When user hit submit button from register form
-    flash("A verification code has been sent to your email.", "success")
+    flash(gettext("A verification code has been sent to your email."), "success")
     return redirect(url_for('main.email_verification'))
 
 @main.route("/login", methods=["GET", "POST"])
@@ -4481,32 +4481,32 @@ def login():
     block_remaining = get_login_block_remaining(ip)
     if block_remaining > 0:
         remaining = int(block_remaining / 60) + 1
-        flash(f"Too many failed attempts. Try again in {remaining} minute(s).", "error")
+        flash(gettext("Too many failed attempts. Try again in %(minutes)s minute(s).", minutes=remaining), "error")
         return redirect(url_for('main.login'))
 
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
 
     if not email or not password:
-        flash("Please enter email or password!", "error")
+        flash(gettext("Please enter email or password!"), "error")
         return redirect(url_for('main.login'))
 
     user = get_user_by_email(email)
 
     if not user:
         record_login_failure(ip, _MAX_LOGIN_ATTEMPTS, _LOGIN_LOCKOUT)
-        flash("Invalid email or password!", "error")
+        flash(gettext("Invalid email or password!"), "error")
         return redirect(url_for('main.login'))
 
     user_id = user["id"]
     customer = get_customer_by_user_id(user_id)
     if not customer:
-        flash("Profile not found! Please try again", "error")
+        flash(gettext("Profile not found! Please try again"), "error")
         return redirect(url_for('main.login'))
 
     if not check_password_hash(user["password_hash"], password):
         record_login_failure(ip, _MAX_LOGIN_ATTEMPTS, _LOGIN_LOCKOUT)
-        flash("Invalid email or password!", "error")
+        flash(gettext("Invalid email or password!"), "error")
         return redirect(url_for('main.login'))
     else:
         ##set session
@@ -4519,7 +4519,7 @@ def login():
         session["customer_id"] = customer["id"]
         _apply_login_lang(user["lang"], guest_lang)
 
-        flash(f"Login successfully, welcome back {customer['full_name']}", "success")
+        flash(gettext("Logged in. Welcome, %(name)s.", name=customer['full_name']), "success")
         return redirect(url_for('main.customer_dashboard'))
 
 @main.route("/auth/google")
@@ -4533,13 +4533,13 @@ def google_callback():
     try:
         token = oauth.google.authorize_access_token()
     except Exception:
-        flash("Google sign-in failed. Please try again.", "error")
+        flash(gettext("Google sign-in failed. Please try again."), "error")
         return redirect(url_for("main.login"))
 
     userinfo = token.get("userinfo") or {}
     email = (userinfo.get("email") or "").strip().lower()
     if not email or not userinfo.get("email_verified"):
-        flash("Could not verify your Google email. Please try again.", "error")
+        flash(gettext("Could not verify your Google email. Please try again."), "error")
         return redirect(url_for("main.login"))
 
     full_name = userinfo.get("name") or email.split("@")[0]
@@ -4549,7 +4549,7 @@ def google_callback():
 
     # OAuth chỉ dành cho customer — nếu email này là staff/admin thì chuyển sang cổng nhân viên
     if user and user["role"] != "customer":
-        flash("Please use the staff login portal.", "error")
+        flash(gettext("Please use the staff login portal."), "error")
         return redirect(url_for("main.staff_login"))
 
     if user:
@@ -4582,7 +4582,7 @@ def google_callback():
     session["customer_id"] = customer["id"]
     _apply_login_lang(user["lang"] if user else None, guest_lang)
 
-    flash(f"Login successfully, welcome {customer['full_name']}!", "success")
+    flash(gettext("Logged in. Welcome, %(name)s.", name=customer['full_name']), "success")
     return redirect(url_for("main.customer_dashboard"))
 
 @main.route('/login/forgot-password', methods=['GET', 'POST'])
@@ -4593,7 +4593,7 @@ def forgot_password():
 
     email = request.form.get("email", "").strip().lower()
     if not email:
-        flash("Please enter your email address.", "error")
+        flash(gettext("Please enter your email address."), "error")
         return redirect(url_for("main.forgot_password"))
 
     user = get_user_by_email(email)
@@ -4603,7 +4603,7 @@ def forgot_password():
         try:
             send_verification_email(email, code, "forgot_password")
         except EmailSendError:
-            flash("Could not send verification email. Please try again.", "error")
+            flash(gettext("Could not send verification email. Please try again."), "error")
             return redirect(url_for("main.forgot_password"))
         verification_id = create_verification(code, "forgot_password", expires_at)
         session["verify_context"] = {
@@ -4624,7 +4624,7 @@ def staff_forgot_password():
 
     email = request.form.get("email", "").strip().lower()
     if not email:
-        flash("Please enter your email address.", "error")
+        flash(gettext("Please enter your email address."), "error")
         return redirect(url_for("main.staff_forgot_password"))
 
     user = get_user_by_email(email)
@@ -4634,7 +4634,7 @@ def staff_forgot_password():
         try:
             send_verification_email(email, code, "forgot_password")
         except EmailSendError:
-            flash("Could not send verification email. Please try again.", "error")
+            flash(gettext("Could not send verification email. Please try again."), "error")
             return redirect(url_for("main.staff_forgot_password"))
         verification_id = create_verification(code, "forgot_password", expires_at)
         session["verify_context"] = {
@@ -4652,7 +4652,7 @@ def staff_forgot_password():
 def set_new_password():
     user_id = session.get("reset_user_id")
     if not user_id:
-        flash("Session expired. Please try again.", "error")
+        flash(gettext("Session expired. Please try again."), "error")
         return redirect(url_for("main.forgot_password"))
 
     login_endpoint = "main.staff_login" if session.get("reset_role") in ("staff", "admin") else "main.login"
@@ -4664,23 +4664,23 @@ def set_new_password():
     confirm_password = request.form.get("confirm_password", "")
 
     if new_password != confirm_password:
-        flash("Passwords do not match.", "error")
+        flash(gettext("Passwords do not match."), "error")
         return redirect(url_for("main.set_new_password"))
 
     if len(new_password) < 8:
-        flash("Password must be at least 8 characters.", "error")
+        flash(gettext("Password must be at least 8 characters."), "error")
         return redirect(url_for("main.set_new_password"))
 
     update_user_password(user_id, generate_password_hash(new_password))
     session.pop("reset_user_id", None)
     session.pop("reset_role", None)
-    flash("Password reset successfully. Please log in.", "success")
+    flash(gettext("Password reset successfully. Please log in."), "success")
     return redirect(url_for(login_endpoint))
 
 @main.route('/logout', methods=['POST'])
 def logout():
     session.clear()
-    flash("Logged out successfully.", "success")
+    flash(gettext("Logged out successfully."), "success")
     return redirect(url_for('main.home'))
 
 @main.route("/resend-verification-code", methods=["POST"])
@@ -4689,7 +4689,7 @@ def redo_verification():
     verify_context = session.get("verify_context")
 
     if not verify_context:
-        flash("Your verification session has expired. Please start again.", "error")
+        flash(gettext("Your verification session has expired. Please start again."), "error")
         return redirect(url_for("main.home"))
     
     verification_id = verify_context.get("verification_id")
@@ -4882,7 +4882,7 @@ def verify_email():
 
         verify_context = session.get("verify_context")
         if not verify_context:
-            flash("Your verification session has expired. Please start again.","error")
+            flash(gettext("Your verification session has expired. Please start again."),"error")
             return jsonify({
                 "success": False,
                 "message": "Verification session has expired.",
@@ -4929,7 +4929,7 @@ def verify_email():
             #register data
             pending_register = session.get("pending_register")
             if not pending_register:
-                flash("Register session expired. Please register again.", "error")
+                flash(gettext("Register session expired. Please register again."), "error")
                 # return redirect(url_for("main.register"))
                 return jsonify({
                     "success": False,
@@ -4955,7 +4955,7 @@ def verify_email():
                         link_customer_to_user(customer_id, user_id)
 
                     update_verification(verification_id, user_id, 1)
-                    flash('Register successfully!', "success")
+                    flash(gettext("Register successfully!"), "success")
                     return jsonify({
                         "success": True,
                         "message": "Verify successfully!",
@@ -4991,7 +4991,7 @@ def verify_email():
             if user_code == verification_code:
 
                 if check_booking_conflict(staff_id, booking_date, start_time, end_time):
-                    flash("This slot has been booked by other customer! Please try again.", "error")
+                    flash(gettext("This slot has been booked by other customer! Please try again."), "error")
                     return jsonify({
                         "success": False,
                         "message": "This slot has been booked by other customer! Please try again.",
@@ -5011,7 +5011,7 @@ def verify_email():
                 verify_customer(customer_id)
 
                 update_verification(verification_id, booking_id, 1)
-                flash('Your booking is processing!', "success")
+                flash(gettext("Your booking is processing!"), "success")
 
                 ##Send thank you email to customer
                 service = get_service_by_id(booking["service_id"])

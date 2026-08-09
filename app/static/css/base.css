@@ -884,9 +884,16 @@ header.nav-open .nav-mobile-menu {
         padding: 0 24px;
     }
 
+    /* Explore và Support là hai danh sách 2-3 link, xếp dọc thì footer dài ra vô
+       ích. Cho hai cột đó nằm cạnh nhau, khối thương hiệu chiếm trọn hàng trên
+       vì nó có địa chỉ và mã số kinh doanh, không nhét vừa nửa bề ngang. */
     .footer-grid {
-        grid-template-columns: 1fr;
-        gap: 28px;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px 24px;
+    }
+
+    .footer-col--brand {
+        grid-column: 1 / -1;
     }
 
     .footer-bottom {

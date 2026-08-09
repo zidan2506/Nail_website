@@ -1,5 +1,9 @@
+{%- import "_lang_switcher.html" as ls with context -%}
 <!DOCTYPE html>
-<html lang="en">
+{# lang động: trình đọc màn hình và công cụ dịch của trình duyệt đọc thuộc tính
+   này để chọn bộ phát âm và ngôn ngữ nguồn. Hardcode "en" trên trang tiếng Việt
+   là nói sai với chúng. current_lang do inject_language() cấp cho mọi template. #}
+<html lang="{{ current_lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +15,7 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lang_switcher.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/public/auth.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
@@ -35,14 +40,20 @@
             <div class="auth-panel__overlay"></div>
             <div class="auth-panel__text">
                 {% block auth_panel_text %}
-                <h1 class="auth-panel__title">Where precision meets care.</h1>
-                <p class="auth-panel__subtitle">Experience the pinnacle of luxury nail and beauty treatments.</p>
+                <h1 class="auth-panel__title">{{ _('Where precision meets care.') }}</h1>
+                <p class="auth-panel__subtitle">{{ _('Experience the pinnacle of luxury nail and beauty treatments.') }}</p>
                 {% endblock %}
             </div>
         </div>
 
         <div class="auth-form-wrap">
             <div class="auth-form-card">
+
+                {# Khách vào thẳng /login từ email hoặc bookmark thì đây là chỗ DUY
+                   NHẤT đổi được ngôn ngữ: layout auth không có navbar. #}
+                <div class="auth-lang">
+                    {{ ls.lang_switcher() }}
+                </div>
 
                 <div class="auth-logo">
                     <a href="{{ url_for('main.home') }}" class="auth-logo__link">
@@ -76,6 +87,34 @@
                 flash.classList.add("flash-hide");
                 flash.addEventListener("animationend", () => flash.remove(), { once: true });
             }, 3000);
+        });
+    });
+
+    /* Dropdown ngôn ngữ — cùng logic với base.html chính */
+    document.addEventListener("DOMContentLoaded", function () {
+        const dropdowns = document.querySelectorAll("[data-lang-dropdown]");
+
+        function closeAll(except) {
+            dropdowns.forEach((d) => {
+                if (d === except) return;
+                d.classList.remove("lang-dropdown--open");
+                d.querySelector(".lang-dropdown__trigger").setAttribute("aria-expanded", "false");
+            });
+        }
+
+        dropdowns.forEach((dropdown) => {
+            const trigger = dropdown.querySelector(".lang-dropdown__trigger");
+            trigger.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const open = dropdown.classList.toggle("lang-dropdown--open");
+                trigger.setAttribute("aria-expanded", open ? "true" : "false");
+                closeAll(dropdown);
+            });
+        });
+
+        document.addEventListener("click", () => closeAll(null));
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeAll(null);
         });
     });
 

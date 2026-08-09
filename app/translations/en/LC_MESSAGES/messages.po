@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-09 15:52+0700\n"
+"POT-Creation-Date: 2026-08-09 17:41+0700\n"
 "PO-Revision-Date: 2026-07-10 19:40+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -84,12 +84,284 @@ msgstr ""
 msgid "Claim"
 msgstr ""
 
+#: app/routes.py:441
+msgid "Please login!"
+msgstr ""
+
+#: app/routes.py:463
+msgid "Unauthorized."
+msgstr ""
+
+#: app/routes.py:468
+msgid "Session expired. Please log in again."
+msgstr ""
+
+#: app/routes.py:478
+msgid "You do not have access to this area."
+msgstr ""
+
 #: app/routes.py:514
 msgid "Today"
 msgstr ""
 
 #: app/routes.py:516
 msgid "Tomorrow"
+msgstr ""
+
+#: app/routes.py:526 app/routes.py:760 app/routes.py:828 app/routes.py:1028
+#: app/routes.py:1052 app/routes.py:1310 app/routes.py:1463 app/routes.py:1527
+#: app/routes.py:1558 app/routes.py:1626 app/routes.py:1715 app/routes.py:1754
+msgid "Customer profile not found!"
+msgstr ""
+
+#: app/routes.py:608 app/routes.py:4208
+msgid "That service is no longer available. Showing our full menu."
+msgstr ""
+
+#: app/routes.py:633 app/routes.py:832
+msgid "Booking not found"
+msgstr ""
+
+#: app/routes.py:640
+msgid "User not found!"
+msgstr ""
+
+#: app/routes.py:644
+msgid "This booking cannot be cancelled"
+msgstr ""
+
+#: app/routes.py:650
+msgid "Booking cancelled successfully"
+msgstr ""
+
+#: app/routes.py:658
+msgid "Session Expired. Please login again."
+msgstr ""
+
+#: app/routes.py:664
+msgid "Customer profile not found by some how :D"
+msgstr ""
+
+#: app/routes.py:754 app/routes.py:764 app/routes.py:822
+msgid "Booking not found!"
+msgstr ""
+
+#: app/routes.py:770 app/routes.py:838
+msgid "Service data unavailable."
+msgstr ""
+
+#: app/routes.py:776 app/routes.py:844
+msgid "Staff data unavailable."
+msgstr ""
+
+#: app/routes.py:861
+msgid "Please select a new date and time"
+msgstr ""
+
+#: app/routes.py:867
+msgid "You can only reschedule within the next 14 days"
+msgstr ""
+
+#: app/routes.py:873
+msgid "Invalid time format"
+msgstr ""
+
+#: app/routes.py:900
+msgid "This time slot is no longer available."
+msgstr ""
+
+#: app/routes.py:901
+msgid "Please choose another time."
+msgstr ""
+
+#: app/routes.py:911
+msgid "Booking rescheduled successfully"
+msgstr ""
+
+#: app/routes.py:1060
+msgid "Name is required."
+msgstr ""
+
+#: app/routes.py:1064
+msgid "Profile updated successfully."
+msgstr ""
+
+#: app/routes.py:1081
+msgid "No file selected."
+msgstr ""
+
+#: app/routes.py:1089
+msgid "Profile picture updated."
+msgstr ""
+
+#: app/routes.py:1120 app/routes.py:1187
+msgid "Verification session expired. Please request a new code."
+msgstr ""
+
+#: app/routes.py:1129 app/routes.py:1199
+msgid "Verification code expired. Please request a new code."
+msgstr ""
+
+#: app/routes.py:1136 app/routes.py:1206 app/routes.py:2406
+msgid "Too many incorrect attempts. Please request a new code."
+msgstr ""
+
+#: app/routes.py:1138 app/routes.py:1208 app/routes.py:2408
+msgid "Incorrect verification code."
+msgstr ""
+
+#: app/routes.py:1142 app/routes.py:2416 app/routes.py:4667
+msgid "Passwords do not match."
+msgstr ""
+
+#: app/routes.py:1146
+msgid "New password must be at least 8 characters."
+msgstr ""
+
+#: app/routes.py:1152
+msgid "Password changed successfully."
+msgstr ""
+
+#: app/routes.py:1182 app/routes.py:3204 app/routes.py:3233 app/routes.py:3252
+msgid "Customer not found."
+msgstr ""
+
+#: app/routes.py:1194 app/routes.py:2675 app/routes.py:2704
+msgid "Please fill in all fields."
+msgstr ""
+
+#: app/routes.py:1212
+msgid "New email is the same as your current email."
+msgstr ""
+
+#: app/routes.py:1217
+msgid "Email is already taken."
+msgstr ""
+
+#: app/routes.py:1226
+msgid "Email updated successfully."
+msgstr ""
+
+#: app/routes.py:1236
+msgid "User not found. Please login!"
+msgstr ""
+
+#: app/routes.py:1241
+msgid "Customer profile not found."
+msgstr ""
+
+#: app/routes.py:1315 app/routes.py:1320
+msgid "Invoice not found!"
+msgstr ""
+
+#: app/routes.py:1360
+msgid "Could not start the payment session. Please try again."
+msgstr ""
+
+#: app/routes.py:1372
+msgid "Something went wrong. Please login again!"
+msgstr ""
+
+#: app/routes.py:1377
+msgid "Customer profile not found. Please login again!"
+msgstr ""
+
+#: app/routes.py:1385 app/routes.py:4243
+msgid "Please select a service, date, and time slot before confirming."
+msgstr ""
+
+#: app/routes.py:1400 app/routes.py:4257
+msgid "Service not found. Please try again."
+msgstr ""
+
+#: app/routes.py:1444 app/routes.py:4299 app/routes.py:4454 app/routes.py:4606
+#: app/routes.py:4637
+msgid "Could not send verification email. Please try again."
+msgstr ""
+
+#: app/routes.py:1468
+msgid "Invalid plan selected."
+msgstr ""
+
+#: app/routes.py:1473
+msgid "Plan not found."
+msgstr ""
+
+#: app/routes.py:1488
+msgid ""
+"Your paid membership will stop renewing and revert to Silver at the "
+"period end."
+msgstr ""
+
+#: app/routes.py:1490
+msgid "You're on the Silver plan."
+msgstr ""
+
+#: app/routes.py:1497
+msgid ""
+"This plan isn't available for online payment right now. Please try again "
+"later."
+msgstr ""
+
+#: app/routes.py:1502
+#, python-format
+msgid "You are already subscribed to %(tier)s."
+msgstr ""
+
+#: app/routes.py:1516
+msgid "Could not start checkout. Please try again."
+msgstr ""
+
+#: app/routes.py:1532
+msgid "No active subscription to cancel."
+msgstr ""
+
+#: app/routes.py:1536
+msgid ""
+"Your membership will not renew. You keep your benefits until the current "
+"period ends."
+msgstr ""
+
+#: app/routes.py:1539
+msgid "Could not cancel your membership. Please try again."
+msgstr ""
+
+#: app/routes.py:1566 app/routes.py:1570
+msgid "Invalid reward."
+msgstr ""
+
+#: app/routes.py:1578
+msgid "Reward not found."
+msgstr ""
+
+#: app/routes.py:1581 app/routes.py:1609
+msgid "Not enough points."
+msgstr ""
+
+#: app/routes.py:1584
+msgid "This reward is out of stock."
+msgstr ""
+
+#: app/routes.py:1602
+#, python-format
+msgid "This reward resets in %(days)s day(s)."
+msgstr ""
+
+#: app/routes.py:1606
+msgid "You have reached the redeem limit for this reward."
+msgstr ""
+
+#: app/routes.py:1610
+#, python-format
+msgid "Successfully redeemed: %(name)s"
+msgstr ""
+
+#: app/routes.py:1718
+msgid "No billing account found."
+msgstr ""
+
+#: app/routes.py:1727
+msgid "Could not open the billing portal. Please try again later."
 msgstr ""
 
 #: app/routes.py:1862
@@ -128,6 +400,44 @@ msgstr ""
 msgid "Redeemed on"
 msgstr ""
 
+#: app/routes.py:1985 app/routes.py:4484
+#, python-format
+msgid "Too many failed attempts. Try again in %(minutes)s minute(s)."
+msgstr ""
+
+#: app/routes.py:1992 app/routes.py:4491
+msgid "Please enter email or password!"
+msgstr ""
+
+#: app/routes.py:1999 app/routes.py:2006 app/routes.py:4498 app/routes.py:4509
+msgid "Invalid email or password!"
+msgstr ""
+
+#: app/routes.py:2010
+msgid "Please use the customer login portal"
+msgstr ""
+
+#: app/routes.py:2024
+msgid "Staff profile not found!"
+msgstr ""
+
+#: app/routes.py:2028 app/routes.py:4522 app/routes.py:4585
+#, python-format
+msgid "Logged in. Welcome, %(name)s."
+msgstr ""
+
+#: app/routes.py:2036
+msgid "Logged in. Welcome, master."
+msgstr ""
+
+#: app/routes.py:2039
+msgid "something went wrong :("
+msgstr ""
+
+#: app/routes.py:2156 app/routes.py:2286
+msgid "Staff profile not found."
+msgstr ""
+
 #: app/routes.py:2198
 #, python-format
 msgid "vào ngày %(date)s"
@@ -137,6 +447,420 @@ msgstr "on %(date)s"
 #, python-format
 msgid "từ %(start)s đến %(end)s"
 msgstr "from %(start)s to %(end)s"
+
+#: app/routes.py:2358
+msgid "Please select an image."
+msgstr ""
+
+#: app/routes.py:2364
+msgid "Profile photo updated."
+msgstr ""
+
+#: app/routes.py:2390
+msgid "Your verification session has expired. Please request a new code."
+msgstr ""
+
+#: app/routes.py:2399
+msgid "The verification code has expired. Please request a new one."
+msgstr ""
+
+#: app/routes.py:2412
+msgid "The new password must be at least 8 characters."
+msgstr ""
+
+#: app/routes.py:2422
+msgid "Password changed."
+msgstr ""
+
+#: app/routes.py:2441 app/routes.py:2458 app/routes.py:2479
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: app/routes.py:2445
+msgid "Service started."
+msgstr ""
+
+#: app/routes.py:2462
+msgid "Marked as completed."
+msgstr ""
+
+#: app/routes.py:2464 app/templates/Auth/email_verification.html:199
+#: app/templates/Auth/email_verification.html:221
+#: app/templates/customer/customer_setting.html:1116
+#: app/templates/customer/customer_setting.html:1248
+#: app/templates/customer/redeem_confirm_modal.html:91
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+#: app/routes.py:2483
+msgid "Payment confirmed."
+msgstr ""
+
+#: app/routes.py:2637
+msgid "Invalid status."
+msgstr ""
+
+#: app/routes.py:2642 app/routes.py:2709
+msgid "Booking not found."
+msgstr ""
+
+#: app/routes.py:2656
+msgid "Could not complete the booking. Service or staff data is missing."
+msgstr ""
+
+#: app/routes.py:2660
+#, python-format
+msgid "Booking #%(id)s status updated."
+msgstr ""
+
+#: app/routes.py:2680 app/routes.py:2870
+msgid "Service not found."
+msgstr ""
+
+#: app/routes.py:2687
+msgid "This stylist is already booked for that time. Please choose another slot."
+msgstr ""
+
+#: app/routes.py:2691
+#, fuzzy
+msgid "Booking created."
+msgstr "booking"
+
+#: app/routes.py:2717
+#, python-format
+msgid "Booking #%(id)s updated."
+msgstr ""
+
+#: app/routes.py:2752 app/routes.py:2780
+msgid "Please enter both a full name and an email address."
+msgstr ""
+
+#: app/routes.py:2756
+msgid "This email is already used by another account."
+msgstr ""
+
+#: app/routes.py:2784
+#, python-format
+msgid "Staff member #%(id)s updated."
+msgstr ""
+
+#: app/routes.py:2793
+msgid "Staff member deleted."
+msgstr ""
+
+#: app/routes.py:2795
+msgid "Cannot delete a staff member with linked appointments."
+msgstr ""
+
+#: app/routes.py:2803
+msgid "Staff status updated."
+msgstr ""
+
+#: app/routes.py:2841 app/routes.py:2891
+msgid "Please fill in all required fields."
+msgstr ""
+
+#: app/routes.py:2859
+#, python-format
+msgid ""
+"Service %(name)s added. The video is processing and will appear in a few "
+"minutes."
+msgstr ""
+
+#: app/routes.py:2861
+#, python-format
+msgid "Service %(name)s added."
+msgstr ""
+
+#: app/routes.py:2927
+#, python-format
+msgid ""
+"Service %(name)s updated. The video is processing and will appear in a "
+"few minutes."
+msgstr ""
+
+#: app/routes.py:2929
+msgid ""
+"The previous video for this service is still processing. Please wait "
+"until it finishes before uploading another."
+msgstr ""
+
+#: app/routes.py:2933
+#, python-format
+msgid "Service %(name)s updated."
+msgstr ""
+
+#: app/routes.py:2948
+msgid "Service deleted."
+msgstr ""
+
+#: app/routes.py:2950
+msgid "Cannot delete a service that has linked appointments."
+msgstr ""
+
+#: app/routes.py:2958
+msgid "Service status updated."
+msgstr ""
+
+#: app/routes.py:2972 app/routes.py:2993
+msgid "Please enter a category name."
+msgstr ""
+
+#: app/routes.py:2977
+#, python-format
+msgid "Category %(name)s added."
+msgstr ""
+
+#: app/routes.py:2979 app/routes.py:3000
+msgid "This slug already exists. Please choose another one."
+msgstr ""
+
+#: app/routes.py:2998
+#, python-format
+msgid "Category %(name)s updated."
+msgstr ""
+
+#: app/routes.py:3009
+msgid "Category deleted."
+msgstr ""
+
+#: app/routes.py:3011
+msgid ""
+"Cannot delete a category that still has services. Move or delete those "
+"services first."
+msgstr ""
+
+#: app/routes.py:3046
+msgid "Please select at least one image."
+msgstr ""
+
+#: app/routes.py:3059
+#, python-format
+msgid "Uploaded %(count)s images."
+msgstr ""
+
+#: app/routes.py:3068
+msgid "Image not found."
+msgstr ""
+
+#: app/routes.py:3091
+msgid "Image updated."
+msgstr ""
+
+#: app/routes.py:3102
+msgid "Image deleted."
+msgstr ""
+
+#: app/routes.py:3128
+#, python-format
+msgid "Deleted %(count)s images."
+msgstr ""
+
+#: app/routes.py:3174 app/routes.py:3215
+msgid "Please enter a full name."
+msgstr ""
+
+#: app/routes.py:3178
+msgid ""
+"Could not create the customer. This email already belongs to another "
+"account."
+msgstr ""
+
+#: app/routes.py:3188
+msgid "Customer added."
+msgstr ""
+
+#: app/routes.py:3219
+#, python-format
+msgid "Customer #%(id)s updated."
+msgstr ""
+
+#: app/routes.py:3224
+msgid "The customer edit page has not been built yet."
+msgstr ""
+
+#: app/routes.py:3238 app/routes.py:3460
+msgid "Please enter a valid number of points."
+msgstr ""
+
+#: app/routes.py:3243 app/routes.py:3332
+#, python-format
+msgid "Adjusted %(points)s points for %(name)s."
+msgstr ""
+
+#: app/routes.py:3257
+#, python-format
+msgid "Deleted customer %(name)s."
+msgstr ""
+
+#: app/routes.py:3259
+msgid "Cannot delete a customer with bookings or linked records."
+msgstr ""
+
+#: app/routes.py:3327
+msgid "Please fill in all point adjustment details."
+msgstr ""
+
+#: app/routes.py:3346
+msgid "Please fill in all membership details."
+msgstr ""
+
+#: app/routes.py:3350
+#, python-format
+msgid "Membership updated for %(name)s."
+msgstr ""
+
+#: app/routes.py:3369 app/routes.py:3406
+msgid "Please enter a name and point cost for the voucher."
+msgstr ""
+
+#: app/routes.py:3380
+msgid "Voucher created."
+msgstr ""
+
+#: app/routes.py:3389 app/routes.py:3436
+msgid "Voucher not found."
+msgstr ""
+
+#: app/routes.py:3427
+msgid "Voucher updated."
+msgstr ""
+
+#: app/routes.py:3441
+#, python-format
+msgid ""
+"Voucher \"%(name)s\" has been redeemed by customers, so it was hidden "
+"instead of deleted."
+msgstr ""
+
+#: app/routes.py:3445
+#, python-format
+msgid "Deleted voucher \"%(name)s\"."
+msgstr ""
+
+#: app/routes.py:3454 app/routes.py:3724
+msgid "Invalid mission."
+msgstr ""
+
+#: app/routes.py:3464 app/routes.py:3757
+msgid "Mission updated."
+msgstr ""
+
+#: app/routes.py:3530 app/routes.py:3583 app/routes.py:3633 app/routes.py:3676
+msgid "Please enter a slide title."
+msgstr ""
+
+#: app/routes.py:3540
+msgid "Please select an image for the slide."
+msgstr ""
+
+#: app/routes.py:3548
+msgid "Homepage slide created."
+msgstr ""
+
+#: app/routes.py:3557 app/routes.py:3655 app/routes.py:3707
+msgid "Slide not found."
+msgstr ""
+
+#: app/routes.py:3603
+msgid "A slide needs an image."
+msgstr ""
+
+#: app/routes.py:3610
+msgid "Slide updated."
+msgstr ""
+
+#: app/routes.py:3646
+msgid "Offer slide added."
+msgstr ""
+
+#: app/routes.py:3698
+msgid "Offer slide updated."
+msgstr ""
+
+#: app/routes.py:3710
+msgid "Built-in missions cannot be deleted."
+msgstr ""
+
+#: app/routes.py:3716
+msgid "Slide deleted."
+msgstr ""
+
+#: app/routes.py:3737
+msgid "Please enter a mission name."
+msgstr ""
+
+#: app/routes.py:4426
+msgid "Please enter required information!"
+msgstr ""
+
+#: app/routes.py:4430
+msgid "Please enter a valid email address."
+msgstr ""
+
+#: app/routes.py:4434 app/routes.py:4671
+msgid "Password must be at least 8 characters."
+msgstr ""
+
+#: app/routes.py:4441
+msgid "Email existed! Please try again."
+msgstr ""
+
+#: app/routes.py:4471
+msgid "A verification code has been sent to your email."
+msgstr ""
+
+#: app/routes.py:4504
+msgid "Profile not found! Please try again"
+msgstr ""
+
+#: app/routes.py:4536
+msgid "Google sign-in failed. Please try again."
+msgstr ""
+
+#: app/routes.py:4542
+msgid "Could not verify your Google email. Please try again."
+msgstr ""
+
+#: app/routes.py:4552
+msgid "Please use the staff login portal."
+msgstr ""
+
+#: app/routes.py:4596 app/routes.py:4627
+msgid "Please enter your email address."
+msgstr ""
+
+#: app/routes.py:4655
+msgid "Session expired. Please try again."
+msgstr ""
+
+#: app/routes.py:4677
+msgid "Password reset successfully. Please log in."
+msgstr ""
+
+#: app/routes.py:4683
+msgid "Logged out successfully."
+msgstr ""
+
+#: app/routes.py:4692 app/routes.py:4885
+msgid "Your verification session has expired. Please start again."
+msgstr ""
+
+#: app/routes.py:4932
+msgid "Register session expired. Please register again."
+msgstr ""
+
+#: app/routes.py:4958
+msgid "Register successfully!"
+msgstr ""
+
+#: app/routes.py:4994
+msgid "This slot has been booked by other customer! Please try again."
+msgstr ""
+
+#: app/routes.py:5014
+msgid "Your booking is processing!"
+msgstr ""
 
 #: app/template_filters.py:119
 msgid "Visa"
@@ -277,6 +1001,14 @@ msgid ""
 "Dahacare\n"
 msgstr ""
 
+#: app/templates/auth_base.html:43
+msgid "Where precision meets care."
+msgstr ""
+
+#: app/templates/auth_base.html:44
+msgid "Experience the pinnacle of luxury nail and beauty treatments."
+msgstr ""
+
 #: app/templates/base.html:28 app/templates/base.html:61
 #: app/templates/base.html:176 app/templates/public/services.html:3
 msgid "Services"
@@ -402,6 +1134,248 @@ msgstr ""
 
 #: app/templates/customer_base.html:113
 msgid "Logout"
+msgstr ""
+
+#: app/templates/Auth/customer_forgot_password.html:3
+#: app/templates/Auth/set_new_password.html:48
+#: app/templates/Auth/staff_forgot_password.html:3
+msgid "Reset password"
+msgstr ""
+
+#: app/templates/Auth/customer_forgot_password.html:6
+#: app/templates/Auth/staff_forgot_password.html:11
+msgid "Forgot something?"
+msgstr ""
+
+#: app/templates/Auth/customer_forgot_password.html:7
+msgid "No worries. We'll help you get back in."
+msgstr ""
+
+#: app/templates/Auth/customer_forgot_password.html:46
+#: app/templates/Auth/staff_forgot_password.html:18
+msgid "Reset your password"
+msgstr ""
+
+#: app/templates/Auth/customer_forgot_password.html:47
+msgid "Enter your email and we'll send you a reset link."
+msgstr ""
+
+#: app/templates/Auth/customer_forgot_password.html:54
+#: app/templates/Auth/customer_login.html:53
+#: app/templates/Auth/customer_register.html:72
+#: app/templates/Auth/staff_forgot_password.html:26
+#: app/templates/customer/customer_setting.html:764
+#: app/templates/public/public_booking.html:251
+#: app/templates/staff/login.html:31
+msgid "Email Address"
+msgstr ""
+
+#: app/templates/Auth/customer_forgot_password.html:64
+msgid "Send reset link"
+msgstr ""
+
+#: app/templates/Auth/customer_forgot_password.html:73
+#: app/templates/Auth/customer_forgot_password.html:92
+#: app/templates/Auth/staff_forgot_password.html:45
+msgid "Back to login"
+msgstr ""
+
+#: app/templates/Auth/customer_forgot_password.html:86
+msgid "Check your email"
+msgstr ""
+
+#: app/templates/Auth/customer_forgot_password.html:88
+msgid "We've sent a password reset link to"
+msgstr ""
+
+#: app/templates/Auth/customer_login.html:3
+#: app/templates/Auth/customer_login.html:80
+#: app/templates/Auth/customer_register.html:103
+#: app/templates/Auth/set_new_password.html:54
+#: app/templates/public/public_booking.html:237
+msgid "Log in"
+msgstr ""
+
+#: app/templates/Auth/customer_login.html:30
+msgid "Welcome back"
+msgstr ""
+
+#: app/templates/Auth/customer_login.html:31
+msgid "Log in to manage your bookings."
+msgstr ""
+
+#: app/templates/Auth/customer_login.html:45
+#: app/templates/Auth/customer_register.html:55
+msgid "or"
+msgstr ""
+
+#: app/templates/Auth/customer_login.html:63
+#: app/templates/Auth/customer_register.html:82
+#: app/templates/customer/customer_setting.html:858
+#: app/templates/staff/login.html:41
+msgid "Password"
+msgstr ""
+
+#: app/templates/Auth/customer_login.html:69
+#: app/templates/Auth/customer_register.html:88
+#: app/templates/Auth/set_new_password.html:27
+#: app/templates/Auth/set_new_password.html:41
+msgid "Toggle password visibility"
+msgstr ""
+
+#: app/templates/Auth/customer_login.html:76 app/templates/staff/login.html:55
+msgid "Forgot password?"
+msgstr ""
+
+#: app/templates/Auth/customer_login.html:87
+msgid "Don't have an account?"
+msgstr ""
+
+#: app/templates/Auth/customer_login.html:87
+#: app/templates/Auth/customer_register.html:3
+msgid "Sign up"
+msgstr ""
+
+#: app/templates/Auth/customer_register.html:8
+msgid "Join the atélier."
+msgstr ""
+
+#: app/templates/Auth/customer_register.html:9
+msgid "Create an account to book faster and track every visit."
+msgstr ""
+
+#: app/templates/Auth/customer_register.html:40
+msgid "Create your account"
+msgstr ""
+
+#: app/templates/Auth/customer_register.html:41
+msgid "Book faster and track your visits."
+msgstr ""
+
+#: app/templates/Auth/customer_register.html:62
+#: app/templates/customer/customer_setting.html:746
+#: app/templates/public/public_booking.html:242
+msgid "Full Name"
+msgstr ""
+
+#: app/templates/Auth/customer_register.html:67
+#: app/templates/public/public_booking.html:243
+msgid "Jane Doe"
+msgstr ""
+
+#: app/templates/Auth/customer_register.html:92
+msgid "At least 8 characters"
+msgstr ""
+
+#: app/templates/Auth/customer_register.html:96
+#: app/templates/public/index.html:238
+msgid "Create account"
+msgstr ""
+
+#: app/templates/Auth/customer_register.html:103
+#: app/templates/public/public_booking.html:236
+msgid "Already have an account?"
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:3
+#: app/templates/Auth/email_verification.html:60
+msgid "Verify your email"
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:6
+#: app/templates/Auth/set_new_password.html:6
+msgid "Almost there."
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:7
+msgid ""
+"Just one more step to secure your account and unlock your personalized "
+"beauty journey."
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:62
+msgid "We sent a 6-digit code to"
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:75
+#: app/templates/Auth/email_verification.html:76
+#: app/templates/Auth/email_verification.html:77
+#: app/templates/Auth/email_verification.html:78
+#: app/templates/Auth/email_verification.html:79
+#: app/templates/Auth/email_verification.html:80
+#, python-format
+msgid "Digit %(n)s"
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:85
+msgid "Didn't get the code?"
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:85
+#: app/templates/Auth/email_verification.html:216
+msgid "Resend code"
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:90
+msgid "Verify email"
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:187
+msgid "Invalid verification code."
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:215
+msgid "Code sent!"
+msgstr ""
+
+#: app/templates/Auth/email_verification.html:218
+msgid "Could not resend code. Please try again."
+msgstr ""
+
+#: app/templates/Auth/set_new_password.html:3
+#: app/templates/Auth/set_new_password.html:13
+msgid "Set new password"
+msgstr ""
+
+#: app/templates/Auth/set_new_password.html:7
+msgid "Create a new password to regain access to your account."
+msgstr ""
+
+#: app/templates/Auth/set_new_password.html:14
+msgid "Choose a strong password for your account."
+msgstr ""
+
+#: app/templates/Auth/set_new_password.html:21
+#: app/templates/customer/customer_setting.html:1021
+msgid "New Password"
+msgstr ""
+
+#: app/templates/Auth/set_new_password.html:31
+msgid "At least 6 characters"
+msgstr ""
+
+#: app/templates/Auth/set_new_password.html:35
+msgid "Confirm Password"
+msgstr ""
+
+#: app/templates/Auth/set_new_password.html:54
+msgid "Remember your password?"
+msgstr ""
+
+#: app/templates/Auth/staff_forgot_password.html:10
+msgid "Staff &amp; admin portal"
+msgstr ""
+
+#: app/templates/Auth/staff_forgot_password.html:12
+msgid "No worries. We'll help you get back into managing salon operations."
+msgstr ""
+
+#: app/templates/Auth/staff_forgot_password.html:19
+msgid "Enter your email and we'll send you a verification code."
+msgstr ""
+
+#: app/templates/Auth/staff_forgot_password.html:36
+msgid "Send code"
 msgstr ""
 
 #: app/templates/customer/coming_soon.html:3
@@ -1270,11 +2244,6 @@ msgstr ""
 msgid "Personal Information"
 msgstr ""
 
-#: app/templates/customer/customer_setting.html:746
-#: app/templates/public/public_booking.html:242
-msgid "Full Name"
-msgstr ""
-
 #: app/templates/customer/customer_setting.html:755
 msgid "Enter full name"
 msgstr ""
@@ -1285,12 +2254,6 @@ msgstr ""
 #: app/templates/customer/customer_setting.html:808
 #: app/templates/customer/customer_setting.html:1152
 msgid "Change"
-msgstr ""
-
-#: app/templates/customer/customer_setting.html:764
-#: app/templates/public/public_booking.html:251
-#: app/templates/staff/login.html:31
-msgid "Email Address"
 msgstr ""
 
 #: app/templates/customer/customer_setting.html:773
@@ -1316,11 +2279,6 @@ msgstr ""
 
 #: app/templates/customer/customer_setting.html:852
 msgid "Security"
-msgstr ""
-
-#: app/templates/customer/customer_setting.html:858
-#: app/templates/staff/login.html:41
-msgid "Password"
 msgstr ""
 
 #: app/templates/customer/customer_setting.html:863
@@ -1421,10 +2379,6 @@ msgstr ""
 msgid "and your new password."
 msgstr ""
 
-#: app/templates/customer/customer_setting.html:1021
-msgid "New Password"
-msgstr ""
-
 #: app/templates/customer/customer_setting.html:1022
 msgid "Create new password"
 msgstr ""
@@ -1440,12 +2394,6 @@ msgstr ""
 #: app/templates/customer/customer_setting.html:1097
 #: app/templates/customer/customer_setting.html:1229
 msgid "Sending..."
-msgstr ""
-
-#: app/templates/customer/customer_setting.html:1116
-#: app/templates/customer/customer_setting.html:1248
-#: app/templates/customer/redeem_confirm_modal.html:91
-msgid "Something went wrong. Please try again."
 msgstr ""
 
 #: app/templates/customer/customer_setting.html:1122
@@ -2117,10 +3065,6 @@ msgstr ""
 msgid "Earn rewards points"
 msgstr ""
 
-#: app/templates/public/index.html:238
-msgid "Create account"
-msgstr ""
-
 #: app/templates/public/index.html:239
 msgid "Already have one? Log in"
 msgstr ""
@@ -2165,18 +3109,6 @@ msgstr ""
 
 #: app/templates/public/public_booking.html:231
 msgid "Please provide your contact information to secure the booking."
-msgstr ""
-
-#: app/templates/public/public_booking.html:236
-msgid "Already have an account?"
-msgstr ""
-
-#: app/templates/public/public_booking.html:237
-msgid "Log in"
-msgstr ""
-
-#: app/templates/public/public_booking.html:243
-msgid "Jane Doe"
 msgstr ""
 
 #: app/templates/public/public_booking.html:255
@@ -2345,10 +3277,6 @@ msgstr ""
 
 #: app/templates/staff/login.html:22
 msgid "Staff & administrator access"
-msgstr ""
-
-#: app/templates/staff/login.html:55
-msgid "Forgot password?"
 msgstr ""
 
 #: app/templates/staff/login.html:66

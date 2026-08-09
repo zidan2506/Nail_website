@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-09 15:52+0700\n"
+"POT-Creation-Date: 2026-08-09 17:41+0700\n"
 "PO-Revision-Date: 2026-07-10 19:40+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: vi\n"
@@ -84,6 +84,22 @@ msgstr "Bắt đầu"
 msgid "Claim"
 msgstr "Nhận"
 
+#: app/routes.py:441
+msgid "Please login!"
+msgstr "Vui lòng đăng nhập!"
+
+#: app/routes.py:463
+msgid "Unauthorized."
+msgstr "Không có quyền truy cập."
+
+#: app/routes.py:468
+msgid "Session expired. Please log in again."
+msgstr "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
+
+#: app/routes.py:478
+msgid "You do not have access to this area."
+msgstr "Bạn không có quyền truy cập khu vực này."
+
 #: app/routes.py:514
 msgid "Today"
 msgstr "Hôm nay"
@@ -91,6 +107,262 @@ msgstr "Hôm nay"
 #: app/routes.py:516
 msgid "Tomorrow"
 msgstr "Ngày mai"
+
+#: app/routes.py:526 app/routes.py:760 app/routes.py:828 app/routes.py:1028
+#: app/routes.py:1052 app/routes.py:1310 app/routes.py:1463 app/routes.py:1527
+#: app/routes.py:1558 app/routes.py:1626 app/routes.py:1715 app/routes.py:1754
+msgid "Customer profile not found!"
+msgstr "Không tìm thấy hồ sơ khách hàng!"
+
+#: app/routes.py:608 app/routes.py:4208
+msgid "That service is no longer available. Showing our full menu."
+msgstr "Dịch vụ đó không còn nữa. Đang hiển thị toàn bộ danh mục."
+
+#: app/routes.py:633 app/routes.py:832
+msgid "Booking not found"
+msgstr "Không tìm thấy lịch hẹn"
+
+#: app/routes.py:640
+msgid "User not found!"
+msgstr "Không tìm thấy người dùng!"
+
+#: app/routes.py:644
+msgid "This booking cannot be cancelled"
+msgstr "Lịch hẹn này không thể huỷ"
+
+#: app/routes.py:650
+msgid "Booking cancelled successfully"
+msgstr "Đã huỷ lịch hẹn."
+
+#: app/routes.py:658
+msgid "Session Expired. Please login again."
+msgstr "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
+
+#: app/routes.py:664
+msgid "Customer profile not found by some how :D"
+msgstr "Không tìm thấy hồ sơ khách hàng."
+
+#: app/routes.py:754 app/routes.py:764 app/routes.py:822
+msgid "Booking not found!"
+msgstr "Không tìm thấy lịch hẹn!"
+
+#: app/routes.py:770 app/routes.py:838
+msgid "Service data unavailable."
+msgstr "Không lấy được dữ liệu dịch vụ."
+
+#: app/routes.py:776 app/routes.py:844
+msgid "Staff data unavailable."
+msgstr "Không lấy được dữ liệu nhân viên."
+
+#: app/routes.py:861
+msgid "Please select a new date and time"
+msgstr "Vui lòng chọn ngày và giờ mới"
+
+#: app/routes.py:867
+msgid "You can only reschedule within the next 14 days"
+msgstr "Chỉ đổi lịch được trong vòng 14 ngày tới"
+
+#: app/routes.py:873
+msgid "Invalid time format"
+msgstr "Định dạng giờ không hợp lệ"
+
+#: app/routes.py:900
+msgid "This time slot is no longer available."
+msgstr "Khung giờ này không còn trống."
+
+#: app/routes.py:901
+msgid "Please choose another time."
+msgstr "Vui lòng chọn giờ khác."
+
+#: app/routes.py:911
+msgid "Booking rescheduled successfully"
+msgstr "Đã đổi lịch hẹn."
+
+#: app/routes.py:1060
+msgid "Name is required."
+msgstr "Vui lòng nhập họ tên."
+
+#: app/routes.py:1064
+msgid "Profile updated successfully."
+msgstr "Đã cập nhật hồ sơ."
+
+#: app/routes.py:1081
+msgid "No file selected."
+msgstr "Chưa chọn tệp nào."
+
+#: app/routes.py:1089
+msgid "Profile picture updated."
+msgstr "Đã cập nhật ảnh đại diện."
+
+#: app/routes.py:1120 app/routes.py:1187
+msgid "Verification session expired. Please request a new code."
+msgstr "Phiên xác thực đã hết hạn. Vui lòng yêu cầu mã mới."
+
+#: app/routes.py:1129 app/routes.py:1199
+msgid "Verification code expired. Please request a new code."
+msgstr "Mã xác thực đã hết hạn. Vui lòng yêu cầu mã mới."
+
+#: app/routes.py:1136 app/routes.py:1206 app/routes.py:2406
+msgid "Too many incorrect attempts. Please request a new code."
+msgstr "Nhập sai quá nhiều lần. Vui lòng yêu cầu mã mới."
+
+#: app/routes.py:1138 app/routes.py:1208 app/routes.py:2408
+msgid "Incorrect verification code."
+msgstr "Mã xác thực không đúng."
+
+#: app/routes.py:1142 app/routes.py:2416 app/routes.py:4667
+msgid "Passwords do not match."
+msgstr "Mật khẩu xác nhận không khớp."
+
+#: app/routes.py:1146
+msgid "New password must be at least 8 characters."
+msgstr "Mật khẩu mới phải có ít nhất 8 ký tự."
+
+#: app/routes.py:1152
+msgid "Password changed successfully."
+msgstr "Đã đổi mật khẩu."
+
+#: app/routes.py:1182 app/routes.py:3204 app/routes.py:3233 app/routes.py:3252
+msgid "Customer not found."
+msgstr "Không tìm thấy khách hàng."
+
+#: app/routes.py:1194 app/routes.py:2675 app/routes.py:2704
+msgid "Please fill in all fields."
+msgstr "Vui lòng điền đầy đủ thông tin."
+
+#: app/routes.py:1212
+msgid "New email is the same as your current email."
+msgstr "Email mới trùng với email hiện tại."
+
+#: app/routes.py:1217
+msgid "Email is already taken."
+msgstr "Email này đã được sử dụng."
+
+#: app/routes.py:1226
+msgid "Email updated successfully."
+msgstr "Đã cập nhật email."
+
+#: app/routes.py:1236
+msgid "User not found. Please login!"
+msgstr "Không tìm thấy người dùng. Vui lòng đăng nhập!"
+
+#: app/routes.py:1241
+msgid "Customer profile not found."
+msgstr "Không tìm thấy hồ sơ khách hàng."
+
+#: app/routes.py:1315 app/routes.py:1320
+msgid "Invoice not found!"
+msgstr "Không tìm thấy hoá đơn!"
+
+#: app/routes.py:1360
+msgid "Could not start the payment session. Please try again."
+msgstr "Không tạo được phiên thanh toán. Vui lòng thử lại."
+
+#: app/routes.py:1372
+msgid "Something went wrong. Please login again!"
+msgstr "Đã có lỗi xảy ra. Vui lòng đăng nhập lại!"
+
+#: app/routes.py:1377
+msgid "Customer profile not found. Please login again!"
+msgstr "Không tìm thấy hồ sơ khách hàng. Vui lòng đăng nhập lại!"
+
+#: app/routes.py:1385 app/routes.py:4243
+msgid "Please select a service, date, and time slot before confirming."
+msgstr "Vui lòng chọn dịch vụ, ngày và khung giờ trước khi xác nhận."
+
+#: app/routes.py:1400 app/routes.py:4257
+msgid "Service not found. Please try again."
+msgstr "Không tìm thấy dịch vụ. Vui lòng thử lại."
+
+#: app/routes.py:1444 app/routes.py:4299 app/routes.py:4454 app/routes.py:4606
+#: app/routes.py:4637
+msgid "Could not send verification email. Please try again."
+msgstr "Không gửi được email xác thực. Vui lòng thử lại."
+
+#: app/routes.py:1468
+msgid "Invalid plan selected."
+msgstr "Gói đã chọn không hợp lệ."
+
+#: app/routes.py:1473
+msgid "Plan not found."
+msgstr "Không tìm thấy gói."
+
+#: app/routes.py:1488
+msgid ""
+"Your paid membership will stop renewing and revert to Silver at the "
+"period end."
+msgstr "Gói trả phí của bạn sẽ ngừng gia hạn và trở về Silver khi hết kỳ."
+
+#: app/routes.py:1490
+msgid "You're on the Silver plan."
+msgstr "Bạn đang dùng gói Silver."
+
+#: app/routes.py:1497
+msgid ""
+"This plan isn't available for online payment right now. Please try again "
+"later."
+msgstr "Gói này hiện chưa thanh toán online được. Vui lòng thử lại sau."
+
+#: app/routes.py:1502
+#, python-format
+msgid "You are already subscribed to %(tier)s."
+msgstr "Bạn đã đăng ký gói %(tier)s rồi."
+
+#: app/routes.py:1516
+msgid "Could not start checkout. Please try again."
+msgstr "Không mở được trang thanh toán. Vui lòng thử lại."
+
+#: app/routes.py:1532
+msgid "No active subscription to cancel."
+msgstr "Không có gói nào đang chạy để huỷ."
+
+#: app/routes.py:1536
+msgid ""
+"Your membership will not renew. You keep your benefits until the current "
+"period ends."
+msgstr "Gói của bạn sẽ không gia hạn. Bạn vẫn giữ quyền lợi tới hết kỳ hiện tại."
+
+#: app/routes.py:1539
+msgid "Could not cancel your membership. Please try again."
+msgstr "Không huỷ được gói. Vui lòng thử lại."
+
+#: app/routes.py:1566 app/routes.py:1570
+msgid "Invalid reward."
+msgstr "Phần thưởng không hợp lệ."
+
+#: app/routes.py:1578
+msgid "Reward not found."
+msgstr "Không tìm thấy phần thưởng."
+
+#: app/routes.py:1581 app/routes.py:1609
+msgid "Not enough points."
+msgstr "Không đủ điểm."
+
+#: app/routes.py:1584
+msgid "This reward is out of stock."
+msgstr "Phần thưởng này đã hết."
+
+#: app/routes.py:1602
+#, python-format
+msgid "This reward resets in %(days)s day(s)."
+msgstr "Phần thưởng này sẽ mở lại sau %(days)s ngày."
+
+#: app/routes.py:1606
+msgid "You have reached the redeem limit for this reward."
+msgstr "Bạn đã đổi phần thưởng này đủ số lần cho phép."
+
+#: app/routes.py:1610
+#, python-format
+msgid "Successfully redeemed: %(name)s"
+msgstr "Đã đổi thành công: %(name)s"
+
+#: app/routes.py:1718
+msgid "No billing account found."
+msgstr "Không tìm thấy tài khoản thanh toán."
+
+#: app/routes.py:1727
+msgid "Could not open the billing portal. Please try again later."
+msgstr "Không mở được cổng thanh toán. Vui lòng thử lại sau."
 
 #: app/routes.py:1862
 msgid "All rewards unlocked!"
@@ -128,6 +400,44 @@ msgstr "Nhận ngày"
 msgid "Redeemed on"
 msgstr "Đã đổi ngày"
 
+#: app/routes.py:1985 app/routes.py:4484
+#, python-format
+msgid "Too many failed attempts. Try again in %(minutes)s minute(s)."
+msgstr "Sai quá nhiều lần. Vui lòng thử lại sau %(minutes)s phút."
+
+#: app/routes.py:1992 app/routes.py:4491
+msgid "Please enter email or password!"
+msgstr "Vui lòng nhập email và mật khẩu!"
+
+#: app/routes.py:1999 app/routes.py:2006 app/routes.py:4498 app/routes.py:4509
+msgid "Invalid email or password!"
+msgstr "Email hoặc mật khẩu không đúng!"
+
+#: app/routes.py:2010
+msgid "Please use the customer login portal"
+msgstr "Vui lòng dùng cổng đăng nhập dành cho khách hàng"
+
+#: app/routes.py:2024
+msgid "Staff profile not found!"
+msgstr "Không tìm thấy hồ sơ nhân viên!"
+
+#: app/routes.py:2028 app/routes.py:4522 app/routes.py:4585
+#, python-format
+msgid "Logged in. Welcome, %(name)s."
+msgstr "Đăng nhập thành công. Chào %(name)s."
+
+#: app/routes.py:2036
+msgid "Logged in. Welcome, master."
+msgstr "Đăng nhập thành công. Chào sếp."
+
+#: app/routes.py:2039
+msgid "something went wrong :("
+msgstr "Đã có lỗi xảy ra."
+
+#: app/routes.py:2156 app/routes.py:2286
+msgid "Staff profile not found."
+msgstr "Không tìm thấy hồ sơ nhân viên."
+
 #: app/routes.py:2198
 #, python-format
 msgid "vào ngày %(date)s"
@@ -137,6 +447,425 @@ msgstr ""
 #, python-format
 msgid "từ %(start)s đến %(end)s"
 msgstr ""
+
+#: app/routes.py:2358
+msgid "Please select an image."
+msgstr "Vui lòng chọn ảnh."
+
+#: app/routes.py:2364
+msgid "Profile photo updated."
+msgstr "Đã cập nhật ảnh đại diện."
+
+#: app/routes.py:2390
+msgid "Your verification session has expired. Please request a new code."
+msgstr "Phiên xác thực đã hết hạn. Vui lòng yêu cầu mã mới."
+
+#: app/routes.py:2399
+msgid "The verification code has expired. Please request a new one."
+msgstr "Mã xác thực đã hết hạn. Vui lòng yêu cầu mã mới."
+
+#: app/routes.py:2412
+msgid "The new password must be at least 8 characters."
+msgstr "Mật khẩu mới phải có ít nhất 8 ký tự."
+
+#: app/routes.py:2422
+msgid "Password changed."
+msgstr "Đổi mật khẩu thành công."
+
+#: app/routes.py:2441 app/routes.py:2458 app/routes.py:2479
+msgid "You do not have permission to perform this action."
+msgstr "Không có quyền thực hiện hành động này."
+
+#: app/routes.py:2445
+msgid "Service started."
+msgstr "Đã bắt đầu thực hiện dịch vụ."
+
+#: app/routes.py:2462
+msgid "Marked as completed."
+msgstr "Đã đánh dấu hoàn thành."
+
+#: app/routes.py:2464 app/templates/Auth/email_verification.html:199
+#: app/templates/Auth/email_verification.html:221
+#: app/templates/customer/customer_setting.html:1116
+#: app/templates/customer/customer_setting.html:1248
+#: app/templates/customer/redeem_confirm_modal.html:91
+msgid "Something went wrong. Please try again."
+msgstr "Có lỗi xảy ra. Vui lòng thử lại."
+
+#: app/routes.py:2483
+msgid "Payment confirmed."
+msgstr "Đã xác nhận thanh toán."
+
+#: app/routes.py:2637
+msgid "Invalid status."
+msgstr "Trạng thái không hợp lệ."
+
+#: app/routes.py:2642 app/routes.py:2709
+msgid "Booking not found."
+msgstr "Booking không tồn tại."
+
+#: app/routes.py:2656
+msgid "Could not complete the booking. Service or staff data is missing."
+msgstr "Không thể hoàn tất booking (thiếu dữ liệu dịch vụ/nhân viên)."
+
+#: app/routes.py:2660
+#, python-format
+msgid "Booking #%(id)s status updated."
+msgstr "Đã cập nhật trạng thái booking #%(id)s."
+
+#: app/routes.py:2680 app/routes.py:2870
+msgid "Service not found."
+msgstr "Dịch vụ không tồn tại."
+
+#: app/routes.py:2687
+msgid "This stylist is already booked for that time. Please choose another slot."
+msgstr "Stylist đã có lịch trong khung giờ này. Vui lòng chọn giờ khác."
+
+#: app/routes.py:2691
+msgid "Booking created."
+msgstr "Tạo booking thành công!"
+
+#: app/routes.py:2717
+#, python-format
+msgid "Booking #%(id)s updated."
+msgstr "Đã cập nhật booking #%(id)s."
+
+#: app/routes.py:2752 app/routes.py:2780
+msgid "Please enter both a full name and an email address."
+msgstr "Vui lòng điền đầy đủ họ tên và email."
+
+#: app/routes.py:2756
+msgid "This email is already used by another account."
+msgstr "Email này đã được dùng cho một tài khoản khác."
+
+#: app/routes.py:2784
+#, python-format
+msgid "Staff member #%(id)s updated."
+msgstr "Đã cập nhật nhân viên #%(id)s."
+
+#: app/routes.py:2793
+msgid "Staff member deleted."
+msgstr "Đã xóa nhân viên."
+
+#: app/routes.py:2795
+msgid "Cannot delete a staff member with linked appointments."
+msgstr "Không thể xóa nhân viên đang có lịch hẹn liên kết."
+
+#: app/routes.py:2803
+msgid "Staff status updated."
+msgstr "Đã cập nhật trạng thái nhân viên."
+
+#: app/routes.py:2841 app/routes.py:2891
+msgid "Please fill in all required fields."
+msgstr "Vui lòng điền đầy đủ thông tin bắt buộc."
+
+#: app/routes.py:2859
+#, python-format
+msgid ""
+"Service %(name)s added. The video is processing and will appear in a few "
+"minutes."
+msgstr "Đã thêm dịch vụ %(name)s. Video đang được xử lý, vài phút nữa sẽ hiển thị."
+
+#: app/routes.py:2861
+#, python-format
+msgid "Service %(name)s added."
+msgstr "Đã thêm dịch vụ %(name)s."
+
+#: app/routes.py:2927
+#, python-format
+msgid ""
+"Service %(name)s updated. The video is processing and will appear in a "
+"few minutes."
+msgstr ""
+"Đã cập nhật dịch vụ %(name)s. Video đang được xử lý, vài phút nữa sẽ hiển"
+" thị."
+
+#: app/routes.py:2929
+msgid ""
+"The previous video for this service is still processing. Please wait "
+"until it finishes before uploading another."
+msgstr "Video trước của dịch vụ này đang được xử lý. Chờ xong rồi hãy upload tiếp."
+
+#: app/routes.py:2933
+#, python-format
+msgid "Service %(name)s updated."
+msgstr "Đã cập nhật dịch vụ %(name)s."
+
+#: app/routes.py:2948
+msgid "Service deleted."
+msgstr "Đã xóa dịch vụ."
+
+#: app/routes.py:2950
+msgid "Cannot delete a service that has linked appointments."
+msgstr "Không thể xóa dịch vụ đang có lịch hẹn liên kết."
+
+#: app/routes.py:2958
+msgid "Service status updated."
+msgstr "Đã cập nhật trạng thái dịch vụ."
+
+#: app/routes.py:2972 app/routes.py:2993
+msgid "Please enter a category name."
+msgstr "Vui lòng nhập tên danh mục."
+
+#: app/routes.py:2977
+#, python-format
+msgid "Category %(name)s added."
+msgstr "Đã thêm danh mục %(name)s."
+
+#: app/routes.py:2979 app/routes.py:3000
+msgid "This slug already exists. Please choose another one."
+msgstr "Slug này đã tồn tại. Vui lòng chọn slug khác."
+
+#: app/routes.py:2998
+#, python-format
+msgid "Category %(name)s updated."
+msgstr "Đã cập nhật danh mục %(name)s."
+
+#: app/routes.py:3009
+msgid "Category deleted."
+msgstr "Đã xóa danh mục."
+
+#: app/routes.py:3011
+msgid ""
+"Cannot delete a category that still has services. Move or delete those "
+"services first."
+msgstr ""
+"Không thể xóa danh mục đang có dịch vụ. Vui lòng xóa hoặc chuyển dịch vụ "
+"sang danh mục khác trước."
+
+#: app/routes.py:3046
+msgid "Please select at least one image."
+msgstr "Vui lòng chọn ít nhất 1 ảnh."
+
+#: app/routes.py:3059
+#, python-format
+msgid "Uploaded %(count)s images."
+msgstr "Đã tải lên %(count)s ảnh thành công."
+
+#: app/routes.py:3068
+msgid "Image not found."
+msgstr "Không tìm thấy ảnh."
+
+#: app/routes.py:3091
+msgid "Image updated."
+msgstr "Đã cập nhật ảnh."
+
+#: app/routes.py:3102
+msgid "Image deleted."
+msgstr "Đã xóa ảnh."
+
+#: app/routes.py:3128
+#, python-format
+msgid "Deleted %(count)s images."
+msgstr "Đã xóa %(count)s ảnh."
+
+#: app/routes.py:3174 app/routes.py:3215
+msgid "Please enter a full name."
+msgstr "Vui lòng điền họ và tên."
+
+#: app/routes.py:3178
+msgid ""
+"Could not create the customer. This email already belongs to another "
+"account."
+msgstr ""
+"Không thể tạo khách hàng: email này đã được dùng để tạo một tài khoản "
+"khác."
+
+#: app/routes.py:3188
+msgid "Customer added."
+msgstr "Đã thêm khách hàng mới."
+
+#: app/routes.py:3219
+#, python-format
+msgid "Customer #%(id)s updated."
+msgstr "Đã cập nhật khách hàng #%(id)s."
+
+#: app/routes.py:3224
+msgid "The customer edit page has not been built yet."
+msgstr "Trang chỉnh sửa khách hàng chưa được xây dựng."
+
+#: app/routes.py:3238 app/routes.py:3460
+msgid "Please enter a valid number of points."
+msgstr "Vui lòng nhập số điểm hợp lệ."
+
+#: app/routes.py:3243 app/routes.py:3332
+#, python-format
+msgid "Adjusted %(points)s points for %(name)s."
+msgstr "Đã điều chỉnh %(points)s điểm cho %(name)s."
+
+#: app/routes.py:3257
+#, python-format
+msgid "Deleted customer %(name)s."
+msgstr "Đã xóa khách hàng %(name)s."
+
+#: app/routes.py:3259
+msgid "Cannot delete a customer with bookings or linked records."
+msgstr "Không thể xóa khách hàng đang có booking hoặc dữ liệu liên kết."
+
+#: app/routes.py:3327
+msgid "Please fill in all point adjustment details."
+msgstr "Vui lòng nhập đầy đủ thông tin điều chỉnh điểm."
+
+#: app/routes.py:3346
+msgid "Please fill in all membership details."
+msgstr "Vui lòng nhập đầy đủ thông tin membership."
+
+#: app/routes.py:3350
+#, python-format
+msgid "Membership updated for %(name)s."
+msgstr "Đã cập nhật membership cho %(name)s."
+
+#: app/routes.py:3369 app/routes.py:3406
+msgid "Please enter a name and point cost for the voucher."
+msgstr "Vui lòng nhập tên và chi phí điểm cho voucher."
+
+#: app/routes.py:3380
+msgid "Voucher created."
+msgstr "Đã tạo voucher mới."
+
+#: app/routes.py:3389 app/routes.py:3436
+msgid "Voucher not found."
+msgstr "Không tìm thấy voucher."
+
+#: app/routes.py:3427
+msgid "Voucher updated."
+msgstr "Đã cập nhật voucher."
+
+#: app/routes.py:3441
+#, python-format
+msgid ""
+"Voucher \"%(name)s\" has been redeemed by customers, so it was hidden "
+"instead of deleted."
+msgstr "Voucher \"%(name)s\" đã có khách đổi nên chỉ được ẩn, không xóa hẳn."
+
+#: app/routes.py:3445
+#, python-format
+msgid "Deleted voucher \"%(name)s\"."
+msgstr "Đã xóa voucher \"%(name)s\"."
+
+#: app/routes.py:3454 app/routes.py:3724
+msgid "Invalid mission."
+msgstr "Mission không hợp lệ."
+
+#: app/routes.py:3464 app/routes.py:3757
+msgid "Mission updated."
+msgstr "Đã cập nhật mission."
+
+#: app/routes.py:3530 app/routes.py:3583 app/routes.py:3633 app/routes.py:3676
+msgid "Please enter a slide title."
+msgstr "Vui lòng nhập tiêu đề slide."
+
+#: app/routes.py:3540
+msgid "Please select an image for the slide."
+msgstr "Vui lòng chọn ảnh cho slide."
+
+#: app/routes.py:3548
+msgid "Homepage slide created."
+msgstr "Đã tạo slide trang chủ mới."
+
+#: app/routes.py:3557 app/routes.py:3655 app/routes.py:3707
+msgid "Slide not found."
+msgstr "Không tìm thấy slide."
+
+#: app/routes.py:3603
+msgid "A slide needs an image."
+msgstr "Slide cần có ảnh."
+
+#: app/routes.py:3610
+msgid "Slide updated."
+msgstr "Đã cập nhật slide."
+
+#: app/routes.py:3646
+msgid "Offer slide added."
+msgstr "Đã thêm slide ưu đãi."
+
+#: app/routes.py:3698
+msgid "Offer slide updated."
+msgstr "Đã cập nhật slide ưu đãi."
+
+#: app/routes.py:3710
+msgid "Built-in missions cannot be deleted."
+msgstr "Không thể xóa mission cố định."
+
+#: app/routes.py:3716
+msgid "Slide deleted."
+msgstr "Đã xóa slide."
+
+#: app/routes.py:3737
+msgid "Please enter a mission name."
+msgstr "Vui lòng nhập tên mission."
+
+#: app/routes.py:4426
+msgid "Please enter required information!"
+msgstr "Vui lòng nhập đầy đủ thông tin bắt buộc!"
+
+#: app/routes.py:4430
+msgid "Please enter a valid email address."
+msgstr "Vui lòng nhập địa chỉ email hợp lệ."
+
+#: app/routes.py:4434 app/routes.py:4671
+msgid "Password must be at least 8 characters."
+msgstr "Mật khẩu phải có ít nhất 8 ký tự."
+
+#: app/routes.py:4441
+msgid "Email existed! Please try again."
+msgstr "Email này đã tồn tại! Vui lòng thử lại."
+
+#: app/routes.py:4471
+msgid "A verification code has been sent to your email."
+msgstr "Mã xác thực đã được gửi tới email của bạn."
+
+#: app/routes.py:4504
+msgid "Profile not found! Please try again"
+msgstr "Không tìm thấy hồ sơ! Vui lòng thử lại"
+
+#: app/routes.py:4536
+msgid "Google sign-in failed. Please try again."
+msgstr "Đăng nhập Google thất bại. Vui lòng thử lại."
+
+#: app/routes.py:4542
+msgid "Could not verify your Google email. Please try again."
+msgstr "Không xác thực được email Google của bạn. Vui lòng thử lại."
+
+#: app/routes.py:4552
+msgid "Please use the staff login portal."
+msgstr "Vui lòng dùng cổng đăng nhập dành cho nhân viên."
+
+#: app/routes.py:4596 app/routes.py:4627
+msgid "Please enter your email address."
+msgstr "Vui lòng nhập địa chỉ email của bạn."
+
+#: app/routes.py:4655
+msgid "Session expired. Please try again."
+msgstr "Phiên làm việc đã hết hạn. Vui lòng thử lại."
+
+#: app/routes.py:4677
+msgid "Password reset successfully. Please log in."
+msgstr "Đã đặt lại mật khẩu. Vui lòng đăng nhập."
+
+#: app/routes.py:4683
+msgid "Logged out successfully."
+msgstr "Đã đăng xuất."
+
+#: app/routes.py:4692 app/routes.py:4885
+msgid "Your verification session has expired. Please start again."
+msgstr "Phiên xác thực đã hết hạn. Vui lòng bắt đầu lại."
+
+#: app/routes.py:4932
+msgid "Register session expired. Please register again."
+msgstr "Phiên đăng ký đã hết hạn. Vui lòng đăng ký lại."
+
+#: app/routes.py:4958
+msgid "Register successfully!"
+msgstr "Đăng ký thành công!"
+
+#: app/routes.py:4994
+msgid "This slot has been booked by other customer! Please try again."
+msgstr "Khung giờ này vừa có khách khác đặt! Vui lòng chọn giờ khác."
+
+#: app/routes.py:5014
+msgid "Your booking is processing!"
+msgstr "Lịch hẹn của bạn đang được xử lý!"
 
 #: app/template_filters.py:119
 msgid "Visa"
@@ -331,6 +1060,14 @@ msgstr ""
 "Trân trọng,\n"
 "Dahacare\n"
 
+#: app/templates/auth_base.html:43
+msgid "Where precision meets care."
+msgstr "Nơi sự tỉ mỉ gặp sự chăm sóc."
+
+#: app/templates/auth_base.html:44
+msgid "Experience the pinnacle of luxury nail and beauty treatments."
+msgstr "Trải nghiệm dịch vụ làm móng và chăm sóc sắc đẹp cao cấp."
+
 #: app/templates/base.html:28 app/templates/base.html:61
 #: app/templates/base.html:176 app/templates/public/services.html:3
 msgid "Services"
@@ -457,6 +1194,250 @@ msgstr "Cài đặt"
 #: app/templates/customer_base.html:113
 msgid "Logout"
 msgstr "Đăng xuất"
+
+#: app/templates/Auth/customer_forgot_password.html:3
+#: app/templates/Auth/set_new_password.html:48
+#: app/templates/Auth/staff_forgot_password.html:3
+msgid "Reset password"
+msgstr "Đặt lại mật khẩu"
+
+#: app/templates/Auth/customer_forgot_password.html:6
+#: app/templates/Auth/staff_forgot_password.html:11
+msgid "Forgot something?"
+msgstr "Quên gì đó phải không?"
+
+#: app/templates/Auth/customer_forgot_password.html:7
+msgid "No worries. We'll help you get back in."
+msgstr "Đừng lo. Chúng tôi sẽ giúp bạn đăng nhập lại."
+
+#: app/templates/Auth/customer_forgot_password.html:46
+#: app/templates/Auth/staff_forgot_password.html:18
+msgid "Reset your password"
+msgstr "Đặt lại mật khẩu của bạn"
+
+#: app/templates/Auth/customer_forgot_password.html:47
+msgid "Enter your email and we'll send you a reset link."
+msgstr "Nhập email của bạn, chúng tôi sẽ gửi liên kết đặt lại mật khẩu."
+
+#: app/templates/Auth/customer_forgot_password.html:54
+#: app/templates/Auth/customer_login.html:53
+#: app/templates/Auth/customer_register.html:72
+#: app/templates/Auth/staff_forgot_password.html:26
+#: app/templates/customer/customer_setting.html:764
+#: app/templates/public/public_booking.html:251
+#: app/templates/staff/login.html:31
+msgid "Email Address"
+msgstr "Địa chỉ email"
+
+#: app/templates/Auth/customer_forgot_password.html:64
+msgid "Send reset link"
+msgstr "Gửi liên kết"
+
+#: app/templates/Auth/customer_forgot_password.html:73
+#: app/templates/Auth/customer_forgot_password.html:92
+#: app/templates/Auth/staff_forgot_password.html:45
+msgid "Back to login"
+msgstr "Quay lại đăng nhập"
+
+#: app/templates/Auth/customer_forgot_password.html:86
+msgid "Check your email"
+msgstr "Kiểm tra email của bạn"
+
+#: app/templates/Auth/customer_forgot_password.html:88
+msgid "We've sent a password reset link to"
+msgstr "Chúng tôi đã gửi liên kết đặt lại mật khẩu tới"
+
+#: app/templates/Auth/customer_login.html:3
+#: app/templates/Auth/customer_login.html:80
+#: app/templates/Auth/customer_register.html:103
+#: app/templates/Auth/set_new_password.html:54
+#: app/templates/public/public_booking.html:237
+msgid "Log in"
+msgstr "Đăng nhập"
+
+#: app/templates/Auth/customer_login.html:30
+msgid "Welcome back"
+msgstr "Chào mừng trở lại"
+
+#: app/templates/Auth/customer_login.html:31
+msgid "Log in to manage your bookings."
+msgstr "Đăng nhập để quản lý lịch hẹn của bạn."
+
+#: app/templates/Auth/customer_login.html:45
+#: app/templates/Auth/customer_register.html:55
+msgid "or"
+msgstr "hoặc"
+
+#: app/templates/Auth/customer_login.html:63
+#: app/templates/Auth/customer_register.html:82
+#: app/templates/customer/customer_setting.html:858
+#: app/templates/staff/login.html:41
+msgid "Password"
+msgstr "Mật khẩu"
+
+#: app/templates/Auth/customer_login.html:69
+#: app/templates/Auth/customer_register.html:88
+#: app/templates/Auth/set_new_password.html:27
+#: app/templates/Auth/set_new_password.html:41
+msgid "Toggle password visibility"
+msgstr "Hiện hoặc ẩn mật khẩu"
+
+#: app/templates/Auth/customer_login.html:76 app/templates/staff/login.html:55
+msgid "Forgot password?"
+msgstr "Quên mật khẩu?"
+
+#: app/templates/Auth/customer_login.html:87
+msgid "Don't have an account?"
+msgstr "Chưa có tài khoản?"
+
+#: app/templates/Auth/customer_login.html:87
+#: app/templates/Auth/customer_register.html:3
+msgid "Sign up"
+msgstr "Đăng ký"
+
+#: app/templates/Auth/customer_register.html:8
+msgid "Join the atélier."
+msgstr "Gia nhập atélier."
+
+#: app/templates/Auth/customer_register.html:9
+msgid "Create an account to book faster and track every visit."
+msgstr "Tạo tài khoản để đặt lịch nhanh hơn và theo dõi mọi lần ghé thăm."
+
+#: app/templates/Auth/customer_register.html:40
+msgid "Create your account"
+msgstr "Tạo tài khoản"
+
+#: app/templates/Auth/customer_register.html:41
+msgid "Book faster and track your visits."
+msgstr "Đặt lịch nhanh hơn và theo dõi lịch sử."
+
+#: app/templates/Auth/customer_register.html:62
+#: app/templates/customer/customer_setting.html:746
+#: app/templates/public/public_booking.html:242
+msgid "Full Name"
+msgstr "Họ và tên"
+
+#: app/templates/Auth/customer_register.html:67
+#: app/templates/public/public_booking.html:243
+msgid "Jane Doe"
+msgstr "Nguyễn Văn A"
+
+#: app/templates/Auth/customer_register.html:92
+msgid "At least 8 characters"
+msgstr "Ít nhất 8 ký tự"
+
+#: app/templates/Auth/customer_register.html:96
+#: app/templates/public/index.html:238
+msgid "Create account"
+msgstr "Tạo tài khoản"
+
+#: app/templates/Auth/customer_register.html:103
+#: app/templates/public/public_booking.html:236
+msgid "Already have an account?"
+msgstr "Đã có tài khoản?"
+
+#: app/templates/Auth/email_verification.html:3
+#: app/templates/Auth/email_verification.html:60
+msgid "Verify your email"
+msgstr "Xác thực email của bạn"
+
+#: app/templates/Auth/email_verification.html:6
+#: app/templates/Auth/set_new_password.html:6
+msgid "Almost there."
+msgstr "Sắp xong rồi."
+
+#: app/templates/Auth/email_verification.html:7
+msgid ""
+"Just one more step to secure your account and unlock your personalized "
+"beauty journey."
+msgstr ""
+"Chỉ còn một bước nữa để bảo vệ tài khoản và mở khoá hành trình làm đẹp "
+"của bạn."
+
+#: app/templates/Auth/email_verification.html:62
+msgid "We sent a 6-digit code to"
+msgstr "Chúng tôi đã gửi mã 6 chữ số tới"
+
+#: app/templates/Auth/email_verification.html:75
+#: app/templates/Auth/email_verification.html:76
+#: app/templates/Auth/email_verification.html:77
+#: app/templates/Auth/email_verification.html:78
+#: app/templates/Auth/email_verification.html:79
+#: app/templates/Auth/email_verification.html:80
+#, python-format
+msgid "Digit %(n)s"
+msgstr "Chữ số %(n)s"
+
+#: app/templates/Auth/email_verification.html:85
+msgid "Didn't get the code?"
+msgstr "Chưa nhận được mã?"
+
+#: app/templates/Auth/email_verification.html:85
+#: app/templates/Auth/email_verification.html:216
+msgid "Resend code"
+msgstr "Gửi lại mã"
+
+#: app/templates/Auth/email_verification.html:90
+msgid "Verify email"
+msgstr "Xác thực email"
+
+#: app/templates/Auth/email_verification.html:187
+msgid "Invalid verification code."
+msgstr "Mã xác thực không đúng."
+
+#: app/templates/Auth/email_verification.html:215
+msgid "Code sent!"
+msgstr "Đã gửi mã!"
+
+#: app/templates/Auth/email_verification.html:218
+msgid "Could not resend code. Please try again."
+msgstr "Không gửi lại được mã. Vui lòng thử lại."
+
+#: app/templates/Auth/set_new_password.html:3
+#: app/templates/Auth/set_new_password.html:13
+msgid "Set new password"
+msgstr "Đặt mật khẩu mới"
+
+#: app/templates/Auth/set_new_password.html:7
+msgid "Create a new password to regain access to your account."
+msgstr "Tạo mật khẩu mới để lấy lại quyền truy cập tài khoản."
+
+#: app/templates/Auth/set_new_password.html:14
+msgid "Choose a strong password for your account."
+msgstr "Chọn một mật khẩu mạnh cho tài khoản của bạn."
+
+#: app/templates/Auth/set_new_password.html:21
+#: app/templates/customer/customer_setting.html:1021
+msgid "New Password"
+msgstr "Mật khẩu mới"
+
+#: app/templates/Auth/set_new_password.html:31
+msgid "At least 6 characters"
+msgstr "Ít nhất 6 ký tự"
+
+#: app/templates/Auth/set_new_password.html:35
+msgid "Confirm Password"
+msgstr "Xác nhận mật khẩu"
+
+#: app/templates/Auth/set_new_password.html:54
+msgid "Remember your password?"
+msgstr "Nhớ ra mật khẩu rồi?"
+
+#: app/templates/Auth/staff_forgot_password.html:10
+msgid "Staff &amp; admin portal"
+msgstr "Cổng nhân viên &amp; quản trị"
+
+#: app/templates/Auth/staff_forgot_password.html:12
+msgid "No worries. We'll help you get back into managing salon operations."
+msgstr "Đừng lo. Chúng tôi sẽ giúp bạn quay lại quản lý tiệm."
+
+#: app/templates/Auth/staff_forgot_password.html:19
+msgid "Enter your email and we'll send you a verification code."
+msgstr "Nhập email của bạn, chúng tôi sẽ gửi mã xác thực."
+
+#: app/templates/Auth/staff_forgot_password.html:36
+msgid "Send code"
+msgstr "Gửi mã"
 
 #: app/templates/customer/coming_soon.html:3
 #: app/templates/customer/coming_soon.html:129
@@ -1329,11 +2310,6 @@ msgstr "JPG, GIF hoặc PNG. Tối đa 800K"
 msgid "Personal Information"
 msgstr "Thông tin cá nhân"
 
-#: app/templates/customer/customer_setting.html:746
-#: app/templates/public/public_booking.html:242
-msgid "Full Name"
-msgstr "Họ và tên"
-
 #: app/templates/customer/customer_setting.html:755
 msgid "Enter full name"
 msgstr "Nhập họ và tên"
@@ -1345,12 +2321,6 @@ msgstr "Nhập họ và tên"
 #: app/templates/customer/customer_setting.html:1152
 msgid "Change"
 msgstr "Thay đổi"
-
-#: app/templates/customer/customer_setting.html:764
-#: app/templates/public/public_booking.html:251
-#: app/templates/staff/login.html:31
-msgid "Email Address"
-msgstr "Địa chỉ email"
 
 #: app/templates/customer/customer_setting.html:773
 #: app/templates/public/public_booking.html:246
@@ -1376,11 +2346,6 @@ msgstr "Lưu thay đổi"
 #: app/templates/customer/customer_setting.html:852
 msgid "Security"
 msgstr "Bảo mật"
-
-#: app/templates/customer/customer_setting.html:858
-#: app/templates/staff/login.html:41
-msgid "Password"
-msgstr "Mật khẩu"
 
 #: app/templates/customer/customer_setting.html:863
 msgid "Change Password"
@@ -1482,10 +2447,6 @@ msgstr "Để xác minh danh tính, chúng tôi sẽ gửi mã xác minh đến 
 msgid "and your new password."
 msgstr "và mật khẩu mới của bạn."
 
-#: app/templates/customer/customer_setting.html:1021
-msgid "New Password"
-msgstr "Mật khẩu mới"
-
 #: app/templates/customer/customer_setting.html:1022
 msgid "Create new password"
 msgstr "Tạo mật khẩu mới"
@@ -1502,12 +2463,6 @@ msgstr "Xác nhận mật khẩu mới"
 #: app/templates/customer/customer_setting.html:1229
 msgid "Sending..."
 msgstr "Đang gửi..."
-
-#: app/templates/customer/customer_setting.html:1116
-#: app/templates/customer/customer_setting.html:1248
-#: app/templates/customer/redeem_confirm_modal.html:91
-msgid "Something went wrong. Please try again."
-msgstr "Đã có lỗi xảy ra. Vui lòng thử lại."
 
 #: app/templates/customer/customer_setting.html:1122
 #: app/templates/customer/customer_setting.html:1254
@@ -2210,10 +3165,6 @@ msgstr "Đặt lịch trực tuyến dễ dàng"
 msgid "Earn rewards points"
 msgstr "Tích điểm thưởng"
 
-#: app/templates/public/index.html:238
-msgid "Create account"
-msgstr "Tạo tài khoản"
-
 #: app/templates/public/index.html:239
 msgid "Already have one? Log in"
 msgstr "Đã có tài khoản? Đăng nhập"
@@ -2259,18 +3210,6 @@ msgstr "Thông tin của bạn"
 #: app/templates/public/public_booking.html:231
 msgid "Please provide your contact information to secure the booking."
 msgstr "Vui lòng cung cấp thông tin liên hệ để xác nhận đặt lịch."
-
-#: app/templates/public/public_booking.html:236
-msgid "Already have an account?"
-msgstr "Đã có tài khoản?"
-
-#: app/templates/public/public_booking.html:237
-msgid "Log in"
-msgstr "Đăng nhập"
-
-#: app/templates/public/public_booking.html:243
-msgid "Jane Doe"
-msgstr "Nguyễn Văn A"
 
 #: app/templates/public/public_booking.html:255
 msgid "Booking Notes"
@@ -2447,10 +3386,6 @@ msgstr "Đăng nhập"
 #: app/templates/staff/login.html:22
 msgid "Staff & administrator access"
 msgstr "Truy cập nhân viên & quản trị"
-
-#: app/templates/staff/login.html:55
-msgid "Forgot password?"
-msgstr "Quên mật khẩu?"
 
 #: app/templates/staff/login.html:66
 msgid "Not a staff member?"

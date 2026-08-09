@@ -1,6 +1,6 @@
 {% extends "auth_base.html" %}
 
-{% block title %}Log in | DahaCare{% endblock %}
+{% block title %}{{ _('Log in') }} | DahaCare{% endblock %}
 
 {% block auth_content %}
 
@@ -27,8 +27,8 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 
 <div class="auth-heading">
-    <h2 class="auth-heading__title">Welcome back</h2>
-    <p class="auth-heading__subtitle">Log in to manage your bookings.</p>
+    <h2 class="auth-heading__title">{{ _('Welcome back') }}</h2>
+    <p class="auth-heading__subtitle">{{ _('Log in to manage your bookings.') }}</p>
 </div>
 
 <div class="auth-social-row">
@@ -42,7 +42,7 @@
     </a>
 </div>
 
-<div class="auth-divider"><span>or</span></div>
+<div class="auth-divider"><span>{{ _('or') }}</span></div>
 
 <form class="auth-form" method="POST" action="{{ url_for('main.login') }}">
 
@@ -50,7 +50,7 @@
 
 
     <div>
-        <label class="auth-field__label" for="email">Email Address</label>
+        <label class="auth-field__label" for="email">{{ _('Email Address') }}</label>
         <div class="auth-field__input-wrap">
             <span class="material-symbols-outlined auth-field__icon">mail</span>
             <input class="auth-field__input"
@@ -60,31 +60,31 @@
     </div>
 
     <div>
-        <label class="auth-field__label" for="password">Password</label>
+        <label class="auth-field__label" for="password">{{ _('Password') }}</label>
         <div class="auth-field__input-wrap">
             <span class="material-symbols-outlined auth-field__icon">lock</span>
             <input class="auth-field__input auth-field__input--with-toggle"
                    id="password" name="password" type="password"
                    placeholder="••••••••" required>
-            <button class="auth-toggle-pw" type="button" data-target="password" aria-label="Toggle password visibility">
+            <button class="auth-toggle-pw" type="button" data-target="password" aria-label="{{ _('Toggle password visibility') }}">
                 <span class="material-symbols-outlined">visibility</span>
             </button>
         </div>
     </div>
 
     <div class="auth-forgot-row">
-        <a href="{{ url_for('main.forgot_password') }}" class="auth-forgot-link">Forgot password?</a>
+        <a href="{{ url_for('main.forgot_password') }}" class="auth-forgot-link">{{ _('Forgot password?') }}</a>
     </div>
 
     <button class="auth-submit-btn" type="submit">
-        Log in
+        {{ _('Log in') }}
         <span class="material-symbols-outlined">arrow_forward</span>
     </button>
 
 </form>
 
 <div class="auth-switch">
-    <p>Don't have an account? <a href="{{ url_for('main.register') }}">Sign up</a></p>
+    <p>{{ _("Don't have an account?") }} <a href="{{ url_for('main.register') }}">{{ _('Sign up') }}</a></p>
 </div>
 
 {% endblock %}

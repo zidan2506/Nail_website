@@ -79,6 +79,16 @@
 }
 
 
+/* ─── BỘ CHUYỂN NGÔN NGỮ ──────────────────────────────────────────────────────
+   Layout auth không có navbar, nên đây là lối đổi ngôn ngữ duy nhất cho khách
+   vào thẳng /login. Căn phải, ngay trên logo. */
+.auth-lang {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+
 /* ─── LOGO ────────────────────────────────────────────────────────────────────*/
 .auth-logo {
     text-align: center;

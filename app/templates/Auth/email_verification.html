@@ -1,10 +1,10 @@
 {% extends "auth_base.html" %}
 
-{% block title %}Verify your email | DahaCare{% endblock %}
+{% block title %}{{ _('Verify your email') }} | DahaCare{% endblock %}
 
 {% block auth_panel_text %}
-<h1 class="auth-panel__title">Almost there.</h1>
-<p class="auth-panel__subtitle">Just one more step to secure your account and unlock your personalized beauty journey.</p>
+<h1 class="auth-panel__title">{{ _('Almost there.') }}</h1>
+<p class="auth-panel__subtitle">{{ _('Just one more step to secure your account and unlock your personalized beauty journey.') }}</p>
 {% endblock %}
 
 {% block extra_css %}
@@ -57,9 +57,9 @@
 </div>
 
 <div class="auth-heading">
-    <h2 class="auth-heading__title">Verify your email</h2>
+    <h2 class="auth-heading__title">{{ _('Verify your email') }}</h2>
     <p class="auth-heading__subtitle">
-        We sent a 6-digit code to<br>
+        {{ _('We sent a 6-digit code to') }}<br>
         <strong class="ev-email">{{ email }}</strong>
     </p>
 </div>
@@ -72,22 +72,22 @@
 <form class="ev-form" id="ev-form" novalidate>
 
     <div class="ev-otp-row" id="otp-container">
-        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" data-otp-index="0" aria-label="Digit 1">
-        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="1" aria-label="Digit 2">
-        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="2" aria-label="Digit 3">
-        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="3" aria-label="Digit 4">
-        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="4" aria-label="Digit 5">
-        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="5" aria-label="Digit 6">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" autocomplete="one-time-code" data-otp-index="0" aria-label="{{ _('Digit %(n)s', n=1) }}">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="1" aria-label="{{ _('Digit %(n)s', n=2) }}">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="2" aria-label="{{ _('Digit %(n)s', n=3) }}">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="3" aria-label="{{ _('Digit %(n)s', n=4) }}">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="4" aria-label="{{ _('Digit %(n)s', n=5) }}">
+        <input class="ev-otp-box" type="text" inputmode="numeric" pattern="[0-9]" maxlength="1" data-otp-index="5" aria-label="{{ _('Digit %(n)s', n=6) }}">
     </div>
 
     <div class="ev-resend-row">
         <span class="ev-resend-text">
-            Didn't get the code? <button type="button" class="ev-resend-link" id="ev-resend-btn">Resend code</button>
+            {{ _("Didn't get the code?") }} <button type="button" class="ev-resend-link" id="ev-resend-btn">{{ _('Resend code') }}</button>
         </span>
     </div>
 
     <button class="auth-submit-btn" type="submit" id="ev-submit-btn">
-        Verify email
+        {{ _('Verify email') }}
         <span class="material-symbols-outlined">arrow_forward</span>
     </button>
 
@@ -184,7 +184,7 @@
             if (data.success) {
                 window.location.href = data.redirect_url || "{{ url_for('main.home') }}";
             } else {
-                showError(data.message || 'Invalid verification code.');
+                showError(data.message || {{ _("Invalid verification code.")|tojson }});
                 otpBoxes.forEach(b => b.value = '');
                 otpBoxes[0].focus();
                 if (data.redirect_url) {
@@ -196,7 +196,7 @@
                 }
             }
         } catch (err) {
-            showError('Something went wrong. Please try again.');
+            showError({{ _("Something went wrong. Please try again.")|tojson }});
         } finally {
             submitBtn.disabled = false;
         }
@@ -212,13 +212,13 @@
             const data = await res.json();
 
             if (data.success) {
-                resendBtn.textContent = 'Code sent!';
-                setTimeout(() => { resendBtn.textContent = 'Resend code'; }, 3000);
+                resendBtn.textContent = {{ _("Code sent!")|tojson }};
+                setTimeout(() => { resendBtn.textContent = {{ _("Resend code")|tojson }}; }, 3000);
             } else {
-                showError(data.message || 'Could not resend code. Please try again.');
+                showError(data.message || {{ _("Could not resend code. Please try again.")|tojson }});
             }
         } catch (err) {
-            showError('Something went wrong. Please try again.');
+            showError({{ _("Something went wrong. Please try again.")|tojson }});
         } finally {
             resendBtn.disabled = false;
         }
