@@ -1,485 +1,623 @@
-/* =============================================================================
-   BOOKING_PENDING.CSS — DahaCare Booking Confirmation Page
-   Dùng riêng cho templates/booking_pending.html
-   Kế thừa design tokens từ base.css (không redefine :root)
-   ============================================================================= */
+/* =========================================================
+   TRANG XÁC NHẬN ĐẶT LỊCH  (prefix: bkc-)
+   ---------------------------------------------------------
+   Dùng riêng cho templates/public/success.html.
 
+   Đây là trang khách nhìn NGAY SAU khi đã cam kết. Việc của
+   nó là trấn an và chỉ rõ bước kế, nên nét riêng đến từ hai
+   thứ mang thông tin thật, không từ hiệu ứng thêm vào:
 
-/* ─── MAIN WRAPPER + BACKGROUND DECOR ─────────────────────────────────────────*/
-.bkc-main {
-    position: relative;
-    overflow: hidden;
-    padding: 120px 80px 120px;
-    display: flex;
-    justify-content: center;
+     1. VÉ HẸN. Bản cũ là một card kính chung chung. Vé có
+        cuống tách bằng đường răng cưa và hai khuyết tròn:
+        đúng ẩn dụ của vật khách vừa nhận, và cuống là chỗ
+        tự nhiên cho Add to Calendar.
+
+     2. DẢI TIẾN TRÌNH BA MỐC thay khối "What's Next" cũ
+        (hai card giống hệt nhau, cạnh nhau). Mốc giữa thở
+        khi đang chờ salon, tắt khi đã xác nhận. Đó là câu
+        trả lời cho "sao chưa confirmed", và là animation lặp
+        DUY NHẤT còn lại trên trang.
+
+   Bản cũ để vòng ping lặp vô hạn quanh icon check của trạng
+   thái ĐÃ XONG, không guard prefers-reduced-motion. Vòng lặp
+   nói "đang chờ" trong khi hình vẽ nói "đã xong". Đã chuyển
+   sang mốc thật sự đang chờ.
+
+   Bản cũ còn: hai blob blur 120px làm nền, một URL ảnh
+   lh3.googleusercontent.com/aida/... do Stitch sinh (sẽ chết),
+   và màu hồng thứ tư #d64682 dưới dạng rgba(214,70,130) ở ba
+   chỗ. Tất cả đã bỏ.
+
+   THANG ĐO - lấy đúng giá trị của bd- / lp- / ms- / bk-
+     bo góc   surface 20 · media 14 · control 12 · pill 999
+     accent   #ab2261, dùng cho CẢ trang
+     trạng thái là màu MANG THÔNG TIN, không phải trang trí:
+       hổ phách #FBF0D8 / #7A5A11  đang chờ
+       xanh     #A7E0C0            đã xong
+   ========================================================= */
+
+.bkc {
+  --bkc-ink:        #2A1520;
+  --bkc-ink-2:      #6B5560;
+  --bkc-ink-3:      #9C8A93;
+
+  --bkc-accent:     #ab2261;
+  --bkc-accent-2:   #8d1a4f;
+  --bkc-wash:       #FBEEF4;
+  --bkc-wash-2:     #F6E4EC;
+
+  --bkc-plum:       #3E1F47;
+  --bkc-pearl:      #FBF4F8;
+  --bkc-pearl-2:    #D9C7D2;
+
+  --bkc-page:       #FDF7F9;
+  --bkc-surface:    #ffffff;
+  --bkc-line:       #EDE3E8;
+  --bkc-line-2:     #E2D4DB;
+
+  --bkc-flag-bg:    #FBF0D8;
+  --bkc-flag-ink:   #7A5A11;
+  --bkc-done:       #A7E0C0;
+  --bkc-done-ink:   #1F6B44;
+
+  --bkc-r-surface:  20px;
+  --bkc-r-media:    14px;
+  --bkc-r-control:  12px;
+
+  --bkc-ease:       cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Bán kính khuyết vé. Dùng lại ở cả cuống và đường răng cưa. */
+  --bkc-notch:      11px;
+
+  background: var(--bkc-page);
+  font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+  color: var(--bkc-ink);
+  padding: 56px 32px 96px;
 }
 
-.bkc-bg-decor {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    pointer-events: none;
-}
+/* Codebase không có reset box-sizing toàn cục, khai trong phạm vi */
+.bkc *,
+.bkc *::before,
+.bkc *::after { box-sizing: border-box; }
 
-.bkc-bg-blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(120px);
-}
-
-.bkc-bg-blob--1 {
-    top: -20%;
-    right: -10%;
-    width: 60%;
-    height: 60%;
-    background: var(--color-surface-mid);
-    opacity: 0.7;
-}
-
-.bkc-bg-blob--2 {
-    bottom: -20%;
-    left: -10%;
-    width: 50%;
-    height: 50%;
-    background: var(--color-surface-low);
-    opacity: 0.5;
-    filter: blur(100px);
-}
+.bkc a { text-decoration: none; }
 
 .bkc-container {
-    width: 100%;
-    max-width: 720px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  max-width: 760px;
+  margin: 0 auto;
 }
 
 
-/* ─── HEADER SECTION ──────────────────────────────────────────────────────────*/
-.bkc-header {
-    text-align: center;
-    margin-bottom: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* =========================================================
+   ĐẦU TRANG
+   ========================================================= */
+
+/* base.css:98 đặt `header { position: sticky; top: 0; z-index: 100 }` trên
+   SELECTOR THẺ TRẦN, không phải class. Khối này là <header> cho đúng ngữ nghĩa
+   (h1 + mô tả của trang) nên nó ăn nguyên rule đó và dính lên đỉnh màn hình khi
+   cuộn. Trả về static ở đây; đừng bỏ ba dòng dưới. */
+.bkc-head {
+  position: static;
+  top: auto;
+  z-index: auto;
+
+  text-align: center;
+  margin-bottom: 36px;
 }
 
-.bkc-header__icon-wrap {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    background: var(--color-surface-low);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 24px;
+.bkc-head__badge {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.bkc-header__icon-ping {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: rgba(214, 70, 130, 0.1);
-    animation: bkc-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+.bkc-head__badge .material-symbols-outlined {
+  font-size: 34px;
+  font-variation-settings: 'FILL' 1;
 }
 
-@keyframes bkc-ping {
-    75%, 100% {
-        transform: scale(1.4);
-        opacity: 0;
-    }
+.bkc-head__badge--confirmed {
+  background: var(--bkc-done);
+  color: var(--bkc-done-ink);
 }
 
-.bkc-header__icon {
-    position: relative;
-    color: var(--color-primary);
-    font-size: 40px;
-    font-variation-settings: 'FILL' 1;
+.bkc-head__badge--pending {
+  background: var(--bkc-flag-bg);
+  color: var(--bkc-flag-ink);
 }
 
-.bkc-header__title {
-    font-size: 40px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--color-text-primary);
-    margin: 0 0 16px;
+.bkc-head__title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--bkc-ink);
+  margin: 0 0 10px;
 }
 
-.bkc-header__subtitle {
-    font-size: 18px;
-    line-height: 1.6;
-    color: var(--color-text-secondary);
-    max-width: 420px;
-    margin: 0 auto;
-}
-
-
-/* ─── CONFIRMATION CARD ───────────────────────────────────────────────────────*/
-.bkc-card {
-    width: 100%;
-    background: rgba(248, 249, 250, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-xl);
-    padding: 32px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-    margin-bottom: 48px;
-}
-
-.bkc-card__row {
-    display: flex;
-    gap: 32px;
-}
-
-.bkc-card__details {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.bkc-card__summary-head {
-    border-bottom: 1px solid var(--color-border-subtle);
-    padding-bottom: 16px;
-}
-
-.bkc-card__eyebrow {
-    display: block;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-primary);
-    margin-bottom: 4px;
-}
-
-.bkc-card__service-name {
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin: 0;
-}
-
-.bkc-card__meta-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.bkc-card__meta-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    color: var(--color-text-secondary);
-}
-
-.bkc-card__meta-icon {
-    color: var(--color-primary);
-}
-
-.bkc-card__meta-text {
-    font-size: 16px;
-}
-
-.bkc-card__calendar-btn-wrap {
-    padding-top: 8px;
-}
-
-.bkc-card__calendar-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border: none;
-    border-radius: var(--radius-md);
-    background: rgba(214, 70, 130, 0.1);
-    color: var(--color-primary);
-    font-family: var(--font-base);
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.bkc-card__calendar-btn:hover {
-    background: rgba(214, 70, 130, 0.2);
-}
-
-.bkc-card__img-wrap {
-    width: 256px;
-    height: 256px;
-    flex-shrink: 0;
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    background: var(--color-surface-low);
-}
-
-.bkc-card__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.bkc-card__img-fallback {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.bkc-card__img-fallback .material-symbols-outlined {
-    font-size: 72px;
-    color: var(--color-primary);
-    opacity: 0.3;
+.bkc-head__sub {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--bkc-ink-2);
+  max-width: 46ch;
+  margin: 0 auto;
 }
 
 
-/* ─── WHAT'S NEXT ──────────────────────────────────────────────────────────────*/
-.bkc-next {
-    width: 100%;
-    margin-bottom: 48px;
+/* =========================================================
+   VÉ HẸN
+   Không dùng overflow:hidden trên thẻ vé vì hai khuyết tròn
+   phải tràn ra ngoài mép. Ảnh tự bo góc riêng.
+   ========================================================= */
+
+.bkc-ticket {
+  position: relative;
+  background: var(--bkc-surface);
+  border: 1px solid var(--bkc-line);
+  border-radius: var(--bkc-r-surface);
+  margin-bottom: 40px;
 }
 
-.bkc-next__title {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin: 0 0 24px;
+.bkc-ticket__body {
+  display: grid;
+  grid-template-columns: 1fr 190px;
+  gap: 22px;
+  padding: 24px;
 }
 
-.bkc-next__grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+.bkc-ticket__main { min-width: 0; }
+
+.bkc-ticket__service {
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--bkc-ink);
+  margin: 0 0 18px;
 }
 
-.bkc-next__card {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 24px;
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-xl);
-    background: var(--color-surface-low);
+.bkc-ticket__meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.bkc-next__icon {
-    color: var(--color-primary);
+.bkc-ticket__meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 
-.bkc-next__card-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin: 0;
+.bkc-ticket__meta-row dt {
+  flex: none;
+  display: flex;
+  color: var(--bkc-accent);
 }
 
-.bkc-next__card-text {
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--color-text-secondary);
-    margin: 8px 0 0;
+.bkc-ticket__meta-row dt .material-symbols-outlined { font-size: 20px; }
+
+.bkc-ticket__meta-row dd {
+  margin: 0;
+  font-size: 0.94rem;
+  font-weight: 500;
+  color: var(--bkc-ink-2);
+  min-width: 0;
 }
 
-
-/* ─── ACCOUNT CTA ──────────────────────────────────────────────────────────────*/
-.bkc-account-cta {
-    position: relative;
-    width: 100%;
-    background: var(--color-deep-plum);
-    border-radius: var(--radius-xl);
-    padding: 40px;
-    text-align: center;
-    overflow: hidden;
-    margin-bottom: 48px;
+.bkc-ticket__media {
+  border-radius: var(--bkc-r-media);
+  overflow: hidden;
+  background: var(--bkc-wash-2);
+  aspect-ratio: 1;
 }
 
-.bkc-account-cta__bg-img {
-    position: absolute;
-    inset: 0;
-    background-image: url('https://lh3.googleusercontent.com/aida/AP1WRLvnLzHt23015Dh5aSONPZTUYChiANz4_0SqSjWLgwka0k9IqF8nxeWAIT1DYmK3KOgYl5UAQuShgWNDrhi0bgCq_8sYhY7H6p5vqOhLCM9x_A4GOoYtvATnTiFIgC0LajlHsRm3vkT8u94ll4R_U0twpy6xCiFzur-9TaBwB3BHon7cNc5OzlqME_YOxH9B5TVpUWPRq39uPWmnUMw2hf1w11tY9Jpxq25cK5d_laKF5zer62pUKA67S9oG');
-    background-size: cover;
-    background-position: center;
-    opacity: 0.2;
-    mix-blend-mode: overlay;
+.bkc-ticket__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.bkc-account-cta__content {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.bkc-ticket__media-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.bkc-account-cta__title {
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--color-stone-white);
-    margin: 0;
+.bkc-ticket__media-fallback .material-symbols-outlined {
+  font-size: 52px;
+  color: var(--bkc-accent);
+  opacity: 0.28;
 }
 
-.bkc-account-cta__text {
-    font-size: 16px;
-    line-height: 1.6;
-    color: rgba(248, 249, 250, 0.9);
-    max-width: 420px;
-    margin: 8px 0 0;
+/* Cuống vé. Đường răng cưa vẽ bằng border-dashed, hai khuyết là hai hình
+   tròn nền trang đặt đè lên mép trái phải, ăn mất cả viền lẫn đường răng cưa
+   ở đúng chỗ đó nên đọc ra là chỗ bấm lỗ. */
+.bkc-ticket__stub {
+  position: relative;
+  border-top: 1px dashed var(--bkc-line-2);
+  padding: 16px 24px;
 }
 
-.bkc-account-cta__btn {
-    display: inline-block;
-    margin-top: 24px;
-    padding: 16px 32px;
-    background: var(--color-primary);
-    color: #ffffff;
-    font-family: var(--font-base);
-    font-weight: 600;
-    font-size: 16px;
-    border-radius: var(--radius-md);
-    text-decoration: none;
-    transition: opacity 0.2s ease, transform 0.15s ease;
+.bkc-ticket__stub::before,
+.bkc-ticket__stub::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--bkc-notch) * -1);
+  width: calc(var(--bkc-notch) * 2);
+  height: calc(var(--bkc-notch) * 2);
+  border-radius: 50%;
+  background: var(--bkc-page);
 }
 
-.bkc-account-cta__btn:hover {
-    opacity: 0.9;
+.bkc-ticket__stub::before { left: calc(var(--bkc-notch) * -1 - 1px); }
+.bkc-ticket__stub::after  { right: calc(var(--bkc-notch) * -1 - 1px); }
+
+.bkc-ticket__cal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 20px;
+  border-radius: var(--bkc-r-control);
+  background: var(--bkc-wash);
+  color: var(--bkc-accent);
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.14s ease;
 }
 
-.bkc-account-cta__btn:active {
-    transform: scale(0.98);
+.bkc-ticket__cal .material-symbols-outlined { font-size: 20px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .bkc-ticket__cal:hover { background: var(--bkc-wash-2); color: var(--bkc-accent-2); }
 }
 
+.bkc-ticket__cal:active { transform: scale(0.98); }
 
-/* ─── ACTIONS ──────────────────────────────────────────────────────────────────*/
+
+/* =========================================================
+   DẢI TIẾN TRÌNH
+   Mobile dọc (đường nối chạy bên trái), desktop ngang
+   (đường nối chạy sau hàng chấm).
+   ========================================================= */
+
+.bkc-rail {
+  list-style: none;
+  margin: 0 0 40px;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.bkc-rail__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 14px;
+  padding-bottom: 22px;
+}
+
+.bkc-rail__step:last-child { padding-bottom: 0; }
+
+/* Đường nối dọc: vẽ từ chấm của mốc này xuống mốc kế. */
+.bkc-rail__step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 28px;
+  bottom: 6px;
+  width: 2px;
+  background: var(--bkc-line);
+}
+
+.bkc-rail__step--done:not(:last-child)::before { background: var(--bkc-done); }
+
+.bkc-rail__dot {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bkc-surface);
+  border: 2px solid var(--bkc-line);
+  color: transparent;
+  flex: none;
+}
+
+.bkc-rail__dot .material-symbols-outlined { font-size: 16px; }
+
+.bkc-rail__step--done .bkc-rail__dot {
+  background: var(--bkc-done);
+  border-color: var(--bkc-done);
+  color: var(--bkc-done-ink);
+}
+
+.bkc-rail__step--current .bkc-rail__dot {
+  background: var(--bkc-flag-bg);
+  border-color: var(--bkc-flag-ink);
+}
+
+/* Vòng thở. Chỉ tồn tại ở mốc ĐANG chờ, nên nhịp lặp mang đúng nghĩa
+   "chưa xong". Ở trạng thái confirmed mốc này thành --done và mất hẳn. */
+.bkc-rail__step--current .bkc-rail__dot::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--bkc-flag-ink);
+  opacity: 0;
+  animation: bkc-breathe 2.4s var(--bkc-ease) infinite;
+}
+
+@keyframes bkc-breathe {
+  0%        { transform: scale(0.82); opacity: 0.55; }
+  70%, 100% { transform: scale(1.18); opacity: 0; }
+}
+
+.bkc-rail__text { min-width: 0; padding-top: 3px; }
+
+.bkc-rail__label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--bkc-ink);
+  margin: 0 0 2px;
+}
+
+.bkc-rail__step--todo .bkc-rail__label { color: var(--bkc-ink-3); }
+
+.bkc-rail__note {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--bkc-ink-2);
+  margin: 0;
+}
+
+.bkc-rail__step--todo .bkc-rail__note { color: var(--bkc-ink-3); }
+
+
+/* =========================================================
+   MỜI TẠO TÀI KHOẢN  (chỉ guest)
+   ========================================================= */
+
+.bkc-invite {
+  background: var(--bkc-plum);
+  border-radius: var(--bkc-r-surface);
+  padding: 32px 28px;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.bkc-invite__title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--bkc-pearl);
+  margin: 0 0 8px;
+}
+
+.bkc-invite__text {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--bkc-pearl-2);
+  max-width: 44ch;
+  margin: 0 auto 22px;
+}
+
+/* Trên nền plum accent hồng chỉ đạt ~1.7:1, nên nút đổi sang pearl với chữ
+   plum. Cùng cách xử lý như lp- và ms- đã dùng. */
+.bkc-invite__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 26px;
+  border-radius: var(--bkc-r-control);
+  background: var(--bkc-pearl);
+  color: var(--bkc-plum);
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: background-color 0.2s ease, transform 0.14s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bkc-invite__btn:hover { background: #ffffff; }
+}
+
+.bkc-invite__btn:active { transform: scale(0.98); }
+
+
+/* =========================================================
+   HÀNH ĐỘNG
+   ========================================================= */
+
 .bkc-actions {
-    width: 100%;
-    display: flex;
-    gap: 24px;
-    margin-bottom: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 44px;
 }
 
-.bkc-actions__btn {
-    flex: 1;
-    text-align: center;
-    padding: 16px 24px;
-    border-radius: var(--radius-md);
-    font-family: var(--font-base);
-    font-weight: 600;
-    font-size: 16px;
-    text-decoration: none;
-    transition: opacity 0.2s ease, background 0.2s ease;
+.bkc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: var(--bkc-r-control);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+              color 0.2s ease, box-shadow 0.2s ease, transform 0.14s ease;
 }
 
-.bkc-actions__btn--primary {
-    background: var(--color-primary);
-    color: #ffffff;
+.bkc-btn:active { transform: scale(0.98); }
+
+.bkc-btn--solid {
+  background: var(--bkc-accent);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(171, 34, 97, 0.20);
 }
 
-.bkc-actions__btn--primary:hover {
-    opacity: 0.9;
+.bkc-btn--outline {
+  background: var(--bkc-surface);
+  color: var(--bkc-ink);
+  border-color: var(--bkc-line-2);
 }
 
-.bkc-actions__btn--secondary {
-    background: transparent;
-    border: 1px solid var(--color-border-subtle);
-    color: var(--color-text-primary);
-}
-
-.bkc-actions__btn--secondary:hover {
-    background: var(--color-surface-low);
-}
-
-
-/* ─── LOCATION MINI MAP ────────────────────────────────────────────────────────*/
-.bkc-location {
-    width: 100%;
-    padding: 32px 0;
-    border-top: 1px solid var(--color-border-subtle);
-}
-
-.bkc-location__label {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-}
-
-.bkc-location__label .material-symbols-outlined {
-    color: var(--color-primary);
-}
-
-.bkc-location__map-wrap {
-    display: block;
-    position: relative;
-    height: 256px;
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    background: var(--color-surface-low);
-    transition: transform 0.35s ease;
-    text-decoration: none;
-}
-
-.bkc-location__map-wrap:hover {
-    transform: scale(1.015);
-}
-
-.bkc-location__map-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: linear-gradient(to bottom, transparent 50%, rgba(74, 30, 50, 0.25));
-    pointer-events: none;
-}
-
-.bkc-location__map-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: grayscale(25%) saturate(0.85) brightness(0.95);
-    transition: filter 0.35s ease, transform 0.35s ease;
-}
-
-.bkc-location__map-wrap:hover .bkc-location__map-img {
-    filter: grayscale(0%) saturate(1.05) brightness(1);
-    transform: scale(1.04);
+@media (hover: hover) and (pointer: fine) {
+  .bkc-btn--solid:hover {
+    background: var(--bkc-accent-2);
+    box-shadow: 0 10px 26px rgba(171, 34, 97, 0.26);
+  }
+  .bkc-btn--outline:hover { background: var(--bkc-wash); border-color: var(--bkc-ink-3); }
 }
 
 
-/* ─── RESPONSIVE ──────────────────────────────────────────────────────────────*/
+/* =========================================================
+   ĐỊA ĐIỂM
+   Ảnh là ảnh TIỆM, không phải bản đồ. Bản cũ để alt="Map
+   location" nên trình đọc màn hình đọc sai hẳn vật thể.
+   ========================================================= */
+
+.bkc-place {
+  border-top: 1px solid var(--bkc-line);
+  padding-top: 26px;
+}
+
+.bkc-place__label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--bkc-ink);
+  margin: 0 0 16px;
+}
+
+.bkc-place__label .material-symbols-outlined {
+  font-size: 20px;
+  color: var(--bkc-accent);
+  flex: none;
+}
+
+.bkc-place__media {
+  position: relative;
+  display: block;
+  height: 220px;
+  border-radius: var(--bkc-r-surface);
+  overflow: hidden;
+  background: var(--bkc-wash-2);
+}
+
+.bkc-place__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.45s var(--bkc-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bkc-place__media:hover img { transform: scale(1.04); }
+}
+
+.bkc-place__cta {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--bkc-ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.bkc-place__cta .material-symbols-outlined { font-size: 18px; }
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
 @media (max-width: 768px) {
-    .bkc-main {
-        padding: 100px 20px 64px;
-    }
+  .bkc { padding: 36px 18px 72px; }
 
-    .bkc-header__title {
-        font-size: 30px;
-    }
+  .bkc-head { margin-bottom: 28px; }
+  .bkc-head__badge { width: 60px; height: 60px; margin-bottom: 16px; }
+  .bkc-head__badge .material-symbols-outlined { font-size: 30px; }
+  .bkc-head__title { font-size: 1.7rem; }
+  .bkc-head__sub { font-size: 0.92rem; }
 
-    .bkc-card {
-        padding: 24px;
-    }
+  /* Ảnh lên trên, thông tin xuống dưới: ở một cột ảnh vuông 190px cạnh chữ
+     sẽ bóp cột chữ còn quá hẹp. */
+  .bkc-ticket__body {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 18px;
+  }
 
-    .bkc-card__row {
-        flex-direction: column;
-    }
+  .bkc-ticket__media {
+    order: -1;
+    aspect-ratio: 16 / 9;
+  }
 
-    .bkc-card__img-wrap {
-        width: 100%;
-        height: 200px;
-    }
+  .bkc-ticket__service { font-size: 1.15rem; margin-bottom: 14px; }
 
-    .bkc-next__grid {
-        grid-template-columns: 1fr;
-    }
+  .bkc-ticket__stub { padding: 14px 18px; }
+  .bkc-ticket__cal { width: 100%; }
 
-    .bkc-actions {
-        flex-direction: column;
-    }
+  .bkc-invite { padding: 26px 20px; }
+  .bkc-invite__title { font-size: 1.2rem; }
+
+  .bkc-actions { grid-template-columns: 1fr; }
+
+  .bkc-place__media { height: 180px; }
+}
+
+
+/* =========================================================
+   TÙY CHỌN HỆ THỐNG
+   ========================================================= */
+
+@media (prefers-reduced-transparency: reduce) {
+  .bkc-place__cta {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bkc-rail__step--current .bkc-rail__dot::after {
+    animation: none;
+    opacity: 0.5;
+    transform: none;
+  }
+
+  .bkc *,
+  .bkc *::before,
+  .bkc *::after {
+    transition-duration: 0.01ms !important;
+  }
+
+  .bkc-place__media:hover img { transform: none; }
 }

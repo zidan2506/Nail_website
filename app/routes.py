@@ -4372,6 +4372,14 @@ def success():
     if not booking:
         return redirect(url_for("main.home"))
 
+    # Trang chỉ có việc để nói với một booking vừa tạo còn sống. session["booking_id"]
+    # được set TRƯỚC cả hai cổng (OTP ở /email-verification và Stripe), không chỗ nào
+    # clear, và session sống 8h. Nên nếu không chặn: bỏ ngang OTP/Stripe rồi gõ lại
+    # /success sẽ ra 'unverified', và khách quay lại bằng session cũ sau khi salon huỷ
+    # sẽ ra 'cancelled'. Cả hai đều làm mọi câu chữ trong trang này thành sai.
+    if booking["status"] not in ("pending", "confirmed"):
+        return redirect(url_for("main.home"))
+
     service = get_service_by_id(booking["service_id"])
     staff   = get_staff_by_id(booking["staff_id"])
     if not service or not staff:
@@ -4391,6 +4399,7 @@ def success():
 
     return render_template(
         "/public/success.html",
+        booking_status=booking["status"],
         service_name=service["name"],
         appointment_date=appointment_date,
         appointment_time=appointment_time,

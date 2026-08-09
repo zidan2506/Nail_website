@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-09 14:56+0700\n"
+"POT-Creation-Date: 2026-08-09 15:52+0700\n"
 "PO-Revision-Date: 2026-07-10 19:40+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fi\n"
@@ -842,7 +842,7 @@ msgstr "Tuleva aika"
 #: app/templates/customer/customer_dashboard.html:881
 #: app/templates/customer/my_bookings.html:100
 #: app/templates/customer/view_booking_details.html:69
-#: app/templates/public/success.html:98
+#: app/templates/public/success.html:89
 msgid "Add to Calendar"
 msgstr "Lisää kalenteriin"
 
@@ -2282,53 +2282,59 @@ msgstr "Valmis luomaan tunnusomaisen tyylisi?"
 msgid "Book a consultation"
 msgstr "Varaa konsultaatio"
 
-#: app/templates/public/success.html:3
-msgid "Booking Confirmed"
+#: app/templates/public/success.html:5 app/templates/public/success.html:43
+msgid "Booking confirmed"
 msgstr "Varaus vahvistettu"
 
-#: app/templates/public/success.html:67
-msgid "Booking Confirmed!"
-msgstr "Varaus vahvistettu!"
+#: app/templates/public/success.html:5 app/templates/public/success.html:46
+msgid "Booking received"
+msgstr "Varaus vastaanotettu"
 
-#: app/templates/public/success.html:68
+#: app/templates/public/success.html:44
 msgid "We've reserved your spot. Get ready for some well-deserved pampering."
 msgstr "Olemme varanneet paikkasi. Valmistaudu ansaittuun hemmotteluun."
 
-#: app/templates/public/success.html:76
-msgid "Appointment Summary"
-msgstr "Ajan yhteenveto"
-
-#: app/templates/public/success.html:117
-msgid "What's Next?"
-msgstr "Mitä seuraavaksi?"
-
-#: app/templates/public/success.html:122
-msgid "Check your inbox"
-msgstr "Tarkista sähköpostisi"
-
-#: app/templates/public/success.html:123
-msgid "We sent a detailed confirmation email with our location and contact info."
-msgstr ""
-"Lähetimme yksityiskohtaisen vahvistussähköpostin sijainti- ja "
-"yhteystietoinemme."
-
-#: app/templates/public/success.html:129
-msgid "Arrive on time"
-msgstr "Saavu ajoissa"
-
-#: app/templates/public/success.html:130
+#: app/templates/public/success.html:47
 msgid ""
-"Please arrive 5-10 minutes early to choose your perfect shade and settle "
-"in."
+"We've got your request. We'll email you as soon as the salon confirms "
+"your appointment."
 msgstr ""
-"Saavu 5–10 minuuttia etuajassa valitaksesi täydellisen sävyn ja "
-"asettuaksesi."
+"Olemme saaneet pyyntösi. Lähetämme sähköpostin heti kun salonki vahvistaa"
+" aikasi."
 
-#: app/templates/public/success.html:142
+#: app/templates/public/success.html:101
+msgid "Request received"
+msgstr "Pyyntö vastaanotettu"
+
+#: app/templates/public/success.html:102
+msgid "We sent the details to your inbox."
+msgstr "Lähetimme tiedot sähköpostiisi."
+
+#: app/templates/public/success.html:111
+msgid "Salon confirms"
+msgstr "Salonki vahvistaa"
+
+#: app/templates/public/success.html:114
+msgid "Your time is locked in."
+msgstr "Aikasi on varmistettu."
+
+#: app/templates/public/success.html:116
+msgid "Usually within a few hours during opening times."
+msgstr "Yleensä muutamassa tunnissa aukioloaikoina."
+
+#: app/templates/public/success.html:125
+msgid "Your appointment"
+msgstr "Varattu aikasi"
+
+#: app/templates/public/success.html:126
+msgid "Arrive 5-10 minutes early to pick your shade."
+msgstr "Saavu 5-10 minuuttia etuajassa valitsemaan sävysi."
+
+#: app/templates/public/success.html:134
 msgid "Manage bookings easily"
 msgstr "Hallitse varauksia helposti"
 
-#: app/templates/public/success.html:143
+#: app/templates/public/success.html:135
 msgid ""
 "Create an account to track your loyalty points, reschedule appointments, "
 "and save your favorite colors."
@@ -2336,25 +2342,29 @@ msgstr ""
 "Luo tili seurataksesi kanta-asiakaspisteitäsi, siirtääksesi aikoja ja "
 "tallentaaksesi suosikkivärisi."
 
-#: app/templates/public/success.html:144
+#: app/templates/public/success.html:136
 msgid "Create Account"
 msgstr "Luo tili"
 
-#: app/templates/public/success.html:150
+#: app/templates/public/success.html:141
 msgid "Book Another Service"
 msgstr "Varaa toinen palvelu"
 
-#: app/templates/public/success.html:151
+#: app/templates/public/success.html:142
 msgid "Back to Home"
 msgstr "Takaisin etusivulle"
 
-#: app/templates/public/success.html:157
+#: app/templates/public/success.html:148
 msgid "Find us at:"
 msgstr "Löydät meidät:"
 
-#: app/templates/public/success.html:163
-msgid "Map location"
-msgstr "Kartan sijainti"
+#: app/templates/public/success.html:152
+msgid "DahaCare studio"
+msgstr "DahaCare-salonki"
+
+#: app/templates/public/success.html:155
+msgid "Open in Maps"
+msgstr "Avaa kartalla"
 
 #: app/templates/staff/login.html:3
 msgid "Sign In"
@@ -3020,4 +3030,29 @@ msgstr "Verkkovirhe. Yritä uudelleen."
 
 #~ msgid "Other plans"
 #~ msgstr "Muut paketit"
+
+#~ msgid "Booking Confirmed!"
+#~ msgstr "Varaus vahvistettu!"
+
+#~ msgid "Appointment Summary"
+#~ msgstr "Ajan yhteenveto"
+
+#~ msgid "What's Next?"
+#~ msgstr "Mitä seuraavaksi?"
+
+#~ msgid "Check your inbox"
+#~ msgstr "Tarkista sähköpostisi"
+
+#~ msgid ""
+#~ "We sent a detailed confirmation email"
+#~ " with our location and contact info."
+#~ msgstr ""
+#~ "Lähetimme yksityiskohtaisen vahvistussähköpostin "
+#~ "sijainti- ja yhteystietoinemme."
+
+#~ msgid "Arrive on time"
+#~ msgstr "Saavu ajoissa"
+
+#~ msgid "Map location"
+#~ msgstr "Kartan sijainti"
 

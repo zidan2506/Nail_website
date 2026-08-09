@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Booking Confirmed') }} | DahaCare{% endblock %}
+{% set is_confirmed = booking_status == 'confirmed' %}
+
+{% block title %}{% if is_confirmed %}{{ _('Booking confirmed') }}{% else %}{{ _('Booking received') }}{% endif %} | DahaCare{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/public/success.css') }}">
@@ -9,163 +11,153 @@
 {% block content %}
 
 {# ═══════════════════════════════════════════════════════════════════════════
-   BOOKING CONFIRMATION PAGE
-   - extends base.html (navbar + footer dùng chung, không tự viết riêng)
-   - LƯU Ý QUAN TRỌNG: trạng thái booking thực tế lúc này là "pending" trong
-     DB (chưa được salon xác nhận), nhưng theo quyết định của Mon, nội dung
-     trang VẪN giữ nguyên wording "Booking Confirmed!" như bản Stitch gốc —
-     không đổi thành "pending"/"received" dù trạng thái kỹ thuật khác. Đây là
-     lựa chọn UX có chủ đích (ưu tiên cảm giác an tâm cho khách hơn là phản
-     ánh chính xác trạng thái backend), Claude Code không cần "sửa lại cho
-     đúng" — giữ nguyên text như trong file này.
-   - DB INTEGRATION (cho Claude Code):
-       1. Route nhận booking_id (qua URL param hoặc session sau khi tạo
-          booking xong), query bảng `bookings` JOIN `services` JOIN `staff`
-          để lấy đủ thông tin hiển thị
-       2. Context cần truyền xuống template:
-            booking_id        -> hiển thị mã booking (hiện CHƯA có trong UI
-                                  Stitch gốc — xem phần Header Section, Stitch
-                                  không có chỗ hiển thị booking ID. Cân nhắc
-                                  thêm 1 dòng nhỏ dưới heading kiểu
-                                  "Booking #{{ booking_id }}" nếu Mon muốn
-                                  hiện mã này — hiện đang để placeholder
-                                  comment, CHƯA chèn vào UI vì Stitch không
-                                  thiết kế chỗ cho nó)
-            service_name       -> "Deluxe Manicure & Gel Polish"
-            appointment_date   -> format "Friday, October 25, 2024"
-            appointment_time   -> format "2:00 PM (approx. 60 mins)"
-            staff_name          -> "Sarah M.", staff_title (vd "Senior Stylist")
-            service_image_url   -> ảnh bên phải card summary
-            salon_address       -> "123 Beauty Lane, Glow City"
-            salon_map_image_url -> ảnh minh họa bản đồ (Stitch dùng ảnh tĩnh,
-                                    không phải embed Google Maps thật — nếu
-                                    muốn map tương tác thật, cần thay bằng
-                                    Google Maps Embed API sau)
-       3. "Create Account" button trong Account CTA section: chỉ hiện section
-          này NẾU khách đang booking là GUEST (session không có customer_id).
-          Nếu là customer đã đăng nhập, nên ẩn cả section này (không cần mời
-          tạo tài khoản khi đã có tài khoản) — dùng
-          {% if not session.get("customer_id") %} bọc quanh Account CTA.
-       4. "Book Another Service" button -> link tới main.public_booking
-          "Back to Home" button -> link tới main.home
+   TRANG XÁC NHẬN ĐẶT LỊCH  (prefix: bkc-)
+
+   2026-08-09 - ĐẢO QUYẾT ĐỊNH CŨ. Bản trước cố tình luôn ghi "Booking
+   Confirmed!" kể cả khi DB là 'pending', với lý do ưu tiên cảm giác an tâm.
+   Theo yêu cầu mới của Mon, trang PHẢI nói đúng trạng thái thật. Đừng đổi
+   ngược lại.
+
+   Chỉ có HAI trạng thái vào được đây, route đã guard:
+     pending   - trả tại salon, đã xác thực email, đang chờ salon duyệt
+     confirmed - đã thanh toán online, Stripe đã fulfill
+
+   Dải tiến trình ba mốc chính là câu trả lời cho "sao chưa confirmed": mốc
+   giữa đang thở khi pending, tắt khi confirmed. Đó cũng là chỗ DUY NHẤT còn
+   animation lặp trên trang, và nó lặp vì đang thật sự chờ.
+
+   Context từ main.success: booking_status, service_name, appointment_date,
+   appointment_time, staff_display, service_image, calendar_url,
+   salon_address, gg_map_url
 ═══════════════════════════════════════════════════════════════════════════ #}
 
-<main class="bkc-main">
+<main class="bkc">
+  <div class="bkc-container">
 
-    <div class="bkc-bg-decor">
-        <div class="bkc-bg-blob bkc-bg-blob--1"></div>
-        <div class="bkc-bg-blob bkc-bg-blob--2"></div>
+    <header class="bkc-head">
+      <div class="bkc-head__badge {% if is_confirmed %}bkc-head__badge--confirmed{% else %}bkc-head__badge--pending{% endif %}">
+        <span class="material-symbols-outlined">{% if is_confirmed %}check_circle{% else %}hourglass_top{% endif %}</span>
+      </div>
+
+      {% if is_confirmed %}
+      <h1 class="bkc-head__title">{{ _('Booking confirmed') }}</h1>
+      <p class="bkc-head__sub">{{ _("We've reserved your spot. Get ready for some well-deserved pampering.") }}</p>
+      {% else %}
+      <h1 class="bkc-head__title">{{ _('Booking received') }}</h1>
+      <p class="bkc-head__sub">{{ _("We've got your request. We'll email you as soon as the salon confirms your appointment.") }}</p>
+      {% endif %}
+    </header>
+
+    {# ── VÉ HẸN ────────────────────────────────────────────────────────────
+       Thân vé và cuống vé cách nhau bằng đường răng cưa, hai khuyết tròn ăn
+       vào mép trái phải. Cuống chỉ chứa Add to Calendar. #}
+    <div class="bkc-ticket">
+      <div class="bkc-ticket__body">
+        <div class="bkc-ticket__main">
+          <h2 class="bkc-ticket__service">{{ service_name }}</h2>
+
+          <dl class="bkc-ticket__meta">
+            <div class="bkc-ticket__meta-row">
+              <dt><span class="material-symbols-outlined">calendar_today</span></dt>
+              <dd>{{ appointment_date }}</dd>
+            </div>
+            <div class="bkc-ticket__meta-row">
+              <dt><span class="material-symbols-outlined">schedule</span></dt>
+              <dd>{{ appointment_time }}</dd>
+            </div>
+            <div class="bkc-ticket__meta-row">
+              <dt><span class="material-symbols-outlined">person</span></dt>
+              <dd>{{ staff_display }}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="bkc-ticket__media">
+          {% if service_image %}
+          <img src="{{ service_image }}" alt="{{ service_name }}">
+          {% else %}
+          <div class="bkc-ticket__media-fallback">
+            <span class="material-symbols-outlined">spa</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="bkc-ticket__stub">
+        <a class="bkc-ticket__cal" href="{{ calendar_url }}" target="_blank" rel="noopener">
+          <span class="material-symbols-outlined">event</span>
+          {{ _('Add to Calendar') }}
+        </a>
+      </div>
     </div>
 
-    <div class="bkc-container">
-
-        <div class="bkc-header">
-            <div class="bkc-header__icon-wrap">
-                <div class="bkc-header__icon-ping"></div>
-                <span class="material-symbols-outlined bkc-header__icon">check_circle</span>
-            </div>
-            <h1 class="bkc-header__title">{{ _('Booking Confirmed!') }}</h1>
-            <p class="bkc-header__subtitle">{{ _("We've reserved your spot. Get ready for some well-deserved pampering.") }}</p>
+    {# ── DẢI TIẾN TRÌNH ────────────────────────────────────────────────────
+       Thay khối "What's Next" cũ (hai card giống hệt nhau). Ở pending mốc
+       giữa là --current và thở; ở confirmed nó thành --done, hết thở. #}
+    <ol class="bkc-rail">
+      <li class="bkc-rail__step bkc-rail__step--done">
+        <span class="bkc-rail__dot"><span class="material-symbols-outlined">check</span></span>
+        <div class="bkc-rail__text">
+          <p class="bkc-rail__label">{{ _('Request received') }}</p>
+          <p class="bkc-rail__note">{{ _('We sent the details to your inbox.') }}</p>
         </div>
+      </li>
 
-        <div class="bkc-card">
-            <div class="bkc-card__row">
-                <div class="bkc-card__details">
-
-                    <div class="bkc-card__summary-head">
-                        <span class="bkc-card__eyebrow">{{ _('Appointment Summary') }}</span>
-                        <h3 class="bkc-card__service-name">{{ service_name }}</h3>
-                    </div>
-
-                    <div class="bkc-card__meta-list">
-                        <div class="bkc-card__meta-row">
-                            <span class="material-symbols-outlined bkc-card__meta-icon">calendar_today</span>
-                            <span class="bkc-card__meta-text">{{ appointment_date }}</span>
-                        </div>
-                        <div class="bkc-card__meta-row">
-                            <span class="material-symbols-outlined bkc-card__meta-icon">schedule</span>
-                            <span class="bkc-card__meta-text">{{ appointment_time }}</span>
-                        </div>
-                        <div class="bkc-card__meta-row">
-                            <span class="material-symbols-outlined bkc-card__meta-icon">person</span>
-                            <span class="bkc-card__meta-text">{{ staff_display }}</span>
-                        </div>
-                    </div>
-
-                    <div class="bkc-card__calendar-btn-wrap">
-                        <a class="bkc-card__calendar-btn" href="{{ calendar_url }}" target="_blank">
-                            <span class="material-symbols-outlined">event</span>
-                            {{ _('Add to Calendar') }}
-                        </a>
-                    </div>
-
-                </div>
-
-                <div class="bkc-card__img-wrap">
-                    {% if service_image %}
-                    <img class="bkc-card__img" src="{{ service_image }}" alt="{{ service_name }}">
-                    {% else %}
-                    <div class="bkc-card__img-fallback">
-                        <span class="material-symbols-outlined">spa</span>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+      <li class="bkc-rail__step {% if is_confirmed %}bkc-rail__step--done{% else %}bkc-rail__step--current{% endif %}">
+        <span class="bkc-rail__dot">
+          {% if is_confirmed %}<span class="material-symbols-outlined">check</span>{% endif %}
+        </span>
+        <div class="bkc-rail__text">
+          <p class="bkc-rail__label">{{ _('Salon confirms') }}</p>
+          <p class="bkc-rail__note">
+            {%- if is_confirmed -%}
+              {{ _('Your time is locked in.') }}
+            {%- else -%}
+              {{ _('Usually within a few hours during opening times.') }}
+            {%- endif -%}
+          </p>
         </div>
+      </li>
 
-        <section class="bkc-next">
-            <h3 class="bkc-next__title">{{ _("What's Next?") }}</h3>
-            <div class="bkc-next__grid">
-                <div class="bkc-next__card">
-                    <span class="material-symbols-outlined bkc-next__icon">mail</span>
-                    <div>
-                        <p class="bkc-next__card-title">{{ _('Check your inbox') }}</p>
-                        <p class="bkc-next__card-text">{{ _('We sent a detailed confirmation email with our location and contact info.') }}</p>
-                    </div>
-                </div>
-                <div class="bkc-next__card">
-                    <span class="material-symbols-outlined bkc-next__icon">alarm</span>
-                    <div>
-                        <p class="bkc-next__card-title">{{ _('Arrive on time') }}</p>
-                        <p class="bkc-next__card-text">{{ _('Please arrive 5-10 minutes early to choose your perfect shade and settle in.') }}</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        {# Account CTA — chỉ hiện cho guest booking (chưa có tài khoản), ẩn
-           với customer đã đăng nhập. Xem comment DB INTEGRATION #3 phía trên. #}
-        {% if not session.get("customer_id") %}
-        <div class="bkc-account-cta">
-            <div class="bkc-account-cta__bg-img"></div>
-            <div class="bkc-account-cta__content">
-                <h3 class="bkc-account-cta__title">{{ _('Manage bookings easily') }}</h3>
-                <p class="bkc-account-cta__text">{{ _('Create an account to track your loyalty points, reschedule appointments, and save your favorite colors.') }}</p>
-                <a href="{{ url_for('main.register') }}" class="bkc-account-cta__btn">{{ _('Create Account') }}</a>
-            </div>
+      <li class="bkc-rail__step bkc-rail__step--todo">
+        <span class="bkc-rail__dot"></span>
+        <div class="bkc-rail__text">
+          <p class="bkc-rail__label">{{ _('Your appointment') }}</p>
+          <p class="bkc-rail__note">{{ _('Arrive 5-10 minutes early to pick your shade.') }}</p>
         </div>
-        {% endif %}
+      </li>
+    </ol>
 
-        <div class="bkc-actions">
-            <a href="{{ url_for('main.public_booking') }}" class="bkc-actions__btn bkc-actions__btn--primary">{{ _('Book Another Service') }}</a>
-            <a href="{{ url_for('main.home') }}" class="bkc-actions__btn bkc-actions__btn--secondary">{{ _('Back to Home') }}</a>
-        </div>
+    {# Chỉ mời tạo tài khoản khi khách đang là guest #}
+    {% if not session.get("customer_id") %}
+    <section class="bkc-invite">
+      <h2 class="bkc-invite__title">{{ _('Manage bookings easily') }}</h2>
+      <p class="bkc-invite__text">{{ _('Create an account to track your loyalty points, reschedule appointments, and save your favorite colors.') }}</p>
+      <a href="{{ url_for('main.register') }}" class="bkc-invite__btn">{{ _('Create Account') }}</a>
+    </section>
+    {% endif %}
 
-        <div class="bkc-location">
-            <div class="bkc-location__label">
-                <span class="material-symbols-outlined">location_on</span>
-                <span>{{ _('Find us at:') }} {{ salon_address }}</span>
-            </div>
-            <a class="bkc-location__map-wrap" href="{{ gg_map_url }}" target="_blank">
-                <div class="bkc-location__map-overlay"></div>
-                <img class="bkc-location__map-img"
-                     src="/static/images/public/nail_studio.jpg"
-                     alt="{{ _('Map location') }}">
-            </a>
-        </div>
-
+    <div class="bkc-actions">
+      <a href="{{ url_for('main.public_booking') }}" class="bkc-btn bkc-btn--solid">{{ _('Book Another Service') }}</a>
+      <a href="{{ url_for('main.home') }}" class="bkc-btn bkc-btn--outline">{{ _('Back to Home') }}</a>
     </div>
 
+    <section class="bkc-place">
+      <p class="bkc-place__label">
+        <span class="material-symbols-outlined">location_on</span>
+        {{ _('Find us at:') }} {{ salon_address }}
+      </p>
+      <a class="bkc-place__media" href="{{ gg_map_url }}" target="_blank" rel="noopener">
+        <img src="{{ url_for('static', filename='images/public/nail_studio.jpg') }}"
+             alt="{{ _('DahaCare studio') }}" loading="lazy">
+        <span class="bkc-place__cta">
+          <span class="material-symbols-outlined">directions</span>
+          {{ _('Open in Maps') }}
+        </span>
+      </a>
+    </section>
+
+  </div>
 </main>
 
 {% endblock %}

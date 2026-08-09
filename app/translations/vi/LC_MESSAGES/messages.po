@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-09 14:56+0700\n"
+"POT-Creation-Date: 2026-08-09 15:52+0700\n"
 "PO-Revision-Date: 2026-07-10 19:40+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: vi\n"
@@ -898,7 +898,7 @@ msgstr "Lịch hẹn sắp tới"
 #: app/templates/customer/customer_dashboard.html:881
 #: app/templates/customer/my_bookings.html:100
 #: app/templates/customer/view_booking_details.html:69
-#: app/templates/public/success.html:98
+#: app/templates/public/success.html:89
 msgid "Add to Calendar"
 msgstr "Thêm vào lịch"
 
@@ -2338,51 +2338,61 @@ msgstr "Sẵn sàng tạo phong cách riêng của bạn?"
 msgid "Book a consultation"
 msgstr "Đặt lịch tư vấn"
 
-#: app/templates/public/success.html:3
-msgid "Booking Confirmed"
-msgstr "Đã xác nhận đặt lịch"
+#: app/templates/public/success.html:5 app/templates/public/success.html:43
+msgid "Booking confirmed"
+msgstr "Đã xác nhận lịch hẹn"
 
-#: app/templates/public/success.html:67
-msgid "Booking Confirmed!"
-msgstr "Đã xác nhận đặt lịch!"
+#: app/templates/public/success.html:5 app/templates/public/success.html:46
+msgid "Booking received"
+msgstr "Đã nhận lịch hẹn"
 
-#: app/templates/public/success.html:68
+#: app/templates/public/success.html:44
 msgid "We've reserved your spot. Get ready for some well-deserved pampering."
 msgstr ""
 "Chúng tôi đã giữ chỗ cho bạn. Hãy sẵn sàng cho giây phút chăm sóc xứng "
 "đáng."
 
-#: app/templates/public/success.html:76
-msgid "Appointment Summary"
-msgstr "Tóm tắt lịch hẹn"
-
-#: app/templates/public/success.html:117
-msgid "What's Next?"
-msgstr "Tiếp theo là gì?"
-
-#: app/templates/public/success.html:122
-msgid "Check your inbox"
-msgstr "Kiểm tra hộp thư"
-
-#: app/templates/public/success.html:123
-msgid "We sent a detailed confirmation email with our location and contact info."
-msgstr "Chúng tôi đã gửi email xác nhận chi tiết kèm địa chỉ và thông tin liên hệ."
-
-#: app/templates/public/success.html:129
-msgid "Arrive on time"
-msgstr "Đến đúng giờ"
-
-#: app/templates/public/success.html:130
+#: app/templates/public/success.html:47
 msgid ""
-"Please arrive 5-10 minutes early to choose your perfect shade and settle "
-"in."
-msgstr "Vui lòng đến sớm 5-10 phút để chọn màu ưng ý và ổn định chỗ ngồi."
+"We've got your request. We'll email you as soon as the salon confirms "
+"your appointment."
+msgstr ""
+"Chúng tôi đã nhận yêu cầu của bạn. Bạn sẽ nhận được email ngay khi salon "
+"xác nhận lịch hẹn."
 
-#: app/templates/public/success.html:142
+#: app/templates/public/success.html:101
+msgid "Request received"
+msgstr "Đã nhận yêu cầu"
+
+#: app/templates/public/success.html:102
+msgid "We sent the details to your inbox."
+msgstr "Chi tiết đã được gửi vào email của bạn."
+
+#: app/templates/public/success.html:111
+msgid "Salon confirms"
+msgstr "Salon xác nhận"
+
+#: app/templates/public/success.html:114
+msgid "Your time is locked in."
+msgstr "Giờ hẹn của bạn đã được giữ."
+
+#: app/templates/public/success.html:116
+msgid "Usually within a few hours during opening times."
+msgstr "Thường trong vài giờ, vào khung giờ mở cửa."
+
+#: app/templates/public/success.html:125
+msgid "Your appointment"
+msgstr "Buổi hẹn của bạn"
+
+#: app/templates/public/success.html:126
+msgid "Arrive 5-10 minutes early to pick your shade."
+msgstr "Đến sớm 5-10 phút để chọn màu ưng ý."
+
+#: app/templates/public/success.html:134
 msgid "Manage bookings easily"
 msgstr "Quản lý lịch đặt dễ dàng"
 
-#: app/templates/public/success.html:143
+#: app/templates/public/success.html:135
 msgid ""
 "Create an account to track your loyalty points, reschedule appointments, "
 "and save your favorite colors."
@@ -2390,25 +2400,29 @@ msgstr ""
 "Tạo tài khoản để theo dõi điểm thưởng, đổi lịch hẹn và lưu những màu yêu "
 "thích của bạn."
 
-#: app/templates/public/success.html:144
+#: app/templates/public/success.html:136
 msgid "Create Account"
 msgstr "Tạo tài khoản"
 
-#: app/templates/public/success.html:150
+#: app/templates/public/success.html:141
 msgid "Book Another Service"
 msgstr "Đặt dịch vụ khác"
 
-#: app/templates/public/success.html:151
+#: app/templates/public/success.html:142
 msgid "Back to Home"
 msgstr "Về trang chủ"
 
-#: app/templates/public/success.html:157
+#: app/templates/public/success.html:148
 msgid "Find us at:"
 msgstr "Tìm chúng tôi tại:"
 
-#: app/templates/public/success.html:163
-msgid "Map location"
-msgstr "Vị trí trên bản đồ"
+#: app/templates/public/success.html:152
+msgid "DahaCare studio"
+msgstr "Tiệm DahaCare"
+
+#: app/templates/public/success.html:155
+msgid "Open in Maps"
+msgstr "Mở trong Maps"
 
 #: app/templates/staff/login.html:3
 msgid "Sign In"
@@ -3077,4 +3091,30 @@ msgstr ""
 
 #~ msgid "Other plans"
 #~ msgstr "Gói khác"
+
+#~ msgid "Booking Confirmed!"
+#~ msgstr "Đã xác nhận đặt lịch!"
+
+#~ msgid "Appointment Summary"
+#~ msgstr "Tóm tắt lịch hẹn"
+
+#~ msgid "What's Next?"
+#~ msgstr "Tiếp theo là gì?"
+
+#~ msgid "Check your inbox"
+#~ msgstr "Kiểm tra hộp thư"
+
+#~ msgid ""
+#~ "We sent a detailed confirmation email"
+#~ " with our location and contact info."
+#~ msgstr ""
+#~ "Chúng tôi đã gửi email xác nhận"
+#~ " chi tiết kèm địa chỉ và thông"
+#~ " tin liên hệ."
+
+#~ msgid "Arrive on time"
+#~ msgstr "Đến đúng giờ"
+
+#~ msgid "Map location"
+#~ msgstr "Vị trí trên bản đồ"
 
