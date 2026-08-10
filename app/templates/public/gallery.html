@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Gallery') }} | DahaCare Atélier{% endblock %}
+{% block title %}{{ _('Gallery') }} | {{ biz.brand_name }} Atélier{% endblock %}
 
 {# Load gallery-page-specific CSS — base.css đã được load sẵn trong base.html #}
 {% block extra_css %}
@@ -18,7 +18,7 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="gal-hero">
     <h1 class="gal-hero__title">{{ _('Our Work') }}</h1>
-    <p class="gal-hero__subtitle">{{ _('A glimpse into the artistry and precision behind every visit.') }}</p>
+    <p class="gal-hero__subtitle">{{ txt('gallery.hero_sub') }}</p>
 </section>
 
 

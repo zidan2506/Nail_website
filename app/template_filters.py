@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from flask import session
 from app.utils.helpers import now_helsinki, mask_email
+from app.business import txt, perks
 
 
 def translate_field(obj, field):
@@ -183,3 +184,6 @@ def register_filters(app):
     app.template_filter('mask_email')(mask_email)
     # i18n nội dung DB: {{ tr(service, 'name') }}
     app.jinja_env.globals['tr'] = translate_field
+    # Nội dung tĩnh từ app/business.py: {{ txt('about.story_lead') }}
+    app.jinja_env.globals['txt'] = txt
+    app.jinja_env.globals['perks'] = perks

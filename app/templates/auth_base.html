@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}MisaNails{% endblock %}</title>
+    <title>{% block title %}{{ biz.brand_name }}{% endblock %}</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
@@ -57,7 +57,7 @@
 
                 <div class="auth-logo">
                     <a href="{{ url_for('main.home') }}" class="auth-logo__link">
-                        Misa<span class="auth-logo__accent">Nails</span>
+                        {{ biz.brand_logo_parts[0] }}<span class="auth-logo__accent">{{ biz.brand_logo_parts[1] }}</span>
                     </a>
                 </div>
 

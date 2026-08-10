@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title %}MisaNails Admin{% endblock %}</title>
+<title>{% block title %}{{ biz.brand_name }} Admin{% endblock %}</title>
 
 {# ── Fonts ── #}
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -377,7 +377,7 @@ body {
 
     {# Logo #}
     <div class="adm-sidebar__logo">
-        <h1>MisaNails</h1>
+        <h1>{{ biz.brand_name }}</h1>
         <span>Admin</span>
     </div>
 

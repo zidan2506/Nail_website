@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('About Us') }} | DahaCare{% endblock %}
+{% block title %}{{ _('About Us') }} | {{ biz.brand_name }}{% endblock %}
 
 {# Load about-page-specific CSS — base.css đã được load sẵn trong base.html #}
 {% block extra_css %}
@@ -18,7 +18,7 @@
 <section class="abt-hero">
     <span class="abt-hero__eyebrow">{{ _('The Retreat') }}</span>
     <h1 class="abt-hero__title">{{ _('Our Story') }}</h1>
-    <p class="abt-hero__subtitle">{{ _('Redefining luxury wellness with precise, artisanal care in a sanctuary of soft mood and quiet elegance.') }}</p>
+    <p class="abt-hero__subtitle">{{ txt('about.hero_sub') }}</p>
 </section>
 
 
@@ -31,13 +31,13 @@
     <div class="abt-story__img-wrap abt-reveal">
         <img class="abt-story__img"
              src="{{ url_for('static', filename='images/public/About_img.png')}}"
-             alt="DahaCare salon interior — soft blossom-pink and stone-white tones">
+             alt="{{ biz.brand_name }} salon interior — soft blossom-pink and stone-white tones">
     </div>
     <div class="abt-story__text abt-reveal">
         <h2 class="abt-story__heading">{{ _('Crafted with intention') }}</h2>
         <div class="abt-story__divider"></div>
-        <p class="abt-story__lead">{{ _('At DahaCare, we believe that true luxury lies in the details. Founded on the principle of bringing atelier-level precision to daily wellness, our space was designed as a retreat from the noise of the city.') }}</p>
-        <p class="abt-story__body">{{ _("Every treatment is a careful composition of quality products, rigorous hygiene standards, and the trained hands of our artists. We don't just provide a service; we curate an experience that honors your time and elevates your personal care ritual.") }}</p>
+        <p class="abt-story__lead">{{ txt('about.story_lead', brand=biz.brand_name) }}</p>
+        <p class="abt-story__body">{{ txt('about.story_body') }}</p>
     </div>
 </section>
 
@@ -45,30 +45,17 @@
 {# ═══════════════════════════════════════════════════════════════════════════
    STATS BAR
    - 4 số liệu ngang, nền tối (deep-plum) tương phản với phần còn lại
-   - HIỆN TẠI: hardcode 4 số liệu thật theo yêu cầu (5+ years / 12k+ clients /
-     5 master artists / 4.9 rating)
-   - DB INTEGRATION (cho Claude Code):
-       Nếu muốn cập nhật số liệu mà không sửa code, truyền qua context của
-       view function main.about:
-            stats = {
-                "years": "5+",
-                "clients": "12k+",
-                "artists": Staff.query.count(),   # hoặc hardcode nếu chưa có bảng staff
-                "rating": "4.9",
-            }
-       rồi thay giá trị tĩnh bên dưới bằng {{ stats.years }}, {{ stats.clients }}, ...
-       Số "artists" nên đồng bộ với số lượng thật trong TEAM SECTION bên dưới —
-       tốt nhất là tính bằng len(team_members) thay vì hardcode riêng, tránh
-       lệch số khi thêm/bớt nhân viên.
+   - years / clients / rating lấy từ BUSINESS["about_stats"] trong app/business.py
+   - artists đếm từ DB (staff_members) nên luôn khớp TEAM SECTION bên dưới
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="abt-stats" id="abt-stats">
     <div class="abt-stats__grid">
         <div class="abt-stats__item abt-reveal">
-            <span class="abt-stats__number">5+</span>
+            <span class="abt-stats__number">{{ biz.about_stats.years }}</span>
             <span class="abt-stats__label">{{ _('Years of Excellence') }}</span>
         </div>
         <div class="abt-stats__item abt-reveal">
-            <span class="abt-stats__number">12k+</span>
+            <span class="abt-stats__number">{{ biz.about_stats.clients }}</span>
             <span class="abt-stats__label">{{ _('Clients Served') }}</span>
         </div>
         <div class="abt-stats__item abt-reveal">
@@ -76,7 +63,7 @@
             <span class="abt-stats__label">{{ _('Master Artists') }}</span>
         </div>
         <div class="abt-stats__item abt-reveal">
-            <span class="abt-stats__number">4.9</span>
+            <span class="abt-stats__number">{{ biz.about_stats.rating }}</span>
             <span class="abt-stats__label">{{ _('Average Rating') }}</span>
         </div>
     </div>
@@ -157,7 +144,7 @@
             </div>
             <div>
                 <h3 class="abt-value__title">{{ _('Hygiene first') }}</h3>
-                <p class="abt-value__desc">{{ _('Medical-grade sterilization processes for every tool, ensuring your safety is never compromised.') }}</p>
+                <p class="abt-value__desc">{{ txt('about.value_hygiene_desc') }}</p>
             </div>
         </div>
 
@@ -167,7 +154,7 @@
             </div>
             <div>
                 <h3 class="abt-value__title">{{ _('Trained artists') }}</h3>
-                <p class="abt-value__desc">{{ _('Continuous education and mastery of techniques mean you receive the pinnacle of modern care.') }}</p>
+                <p class="abt-value__desc">{{ txt('about.value_artists_desc') }}</p>
             </div>
         </div>
 
@@ -177,7 +164,7 @@
             </div>
             <div>
                 <h3 class="abt-value__title">{{ _('Quality products') }}</h3>
-                <p class="abt-value__desc">{{ _('We source only premium, non-toxic, and sustainable materials for long-lasting, brilliant results.') }}</p>
+                <p class="abt-value__desc">{{ txt('about.value_quality_desc') }}</p>
             </div>
         </div>
 
@@ -187,7 +174,7 @@
             </div>
             <div>
                 <h3 class="abt-value__title">{{ _('Client-first care') }}</h3>
-                <p class="abt-value__desc">{{ _('Your comfort is our priority. Enjoy a serene environment designed entirely around your relaxation.') }}</p>
+                <p class="abt-value__desc">{{ txt('about.value_care_desc') }}</p>
             </div>
         </div>
 
@@ -202,7 +189,7 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="abt-cta">
     <h2 class="abt-cta__title">{{ _('Come meet the team') }}</h2>
-    <p class="abt-cta__subtitle">{{ _('Experience the DahaCare difference in person.') }}</p>
+    <p class="abt-cta__subtitle">{{ txt('about.cta_sub', brand=biz.brand_name) }}</p>
     <a href="{{ url_for('main.public_booking') }}" class="abt-cta__btn">
         {{ _('Book your visit') }}
         <span class="material-symbols-outlined">arrow_forward</span>

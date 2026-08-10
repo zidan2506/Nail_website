@@ -43,6 +43,7 @@ from werkzeug.utils import secure_filename
 from PIL import Image, ImageOps
 from functools import wraps
 from app.utils.helpers import split_customer_bookings, format_booking_date, format_booking_time, build_calendar_url, build_gg_map_url, build_services_by_category, mask_email, now_helsinki, today_helsinki
+from app.business import BUSINESS
 from collections import Counter
 from app import oauth, csrf, LANGUAGES
 from app.template_filters import translate_field as tr
@@ -419,6 +420,20 @@ def inject_language():
     return {
         "current_lang": session.get("lang") if session.get("lang") in LANGUAGES else "fi",
         "languages": LANGUAGES,
+    }
+
+
+@main.app_context_processor
+def inject_business():
+    """Thông tin doanh nghiệp cho mọi template. `branches` / `business_id` /
+    `current_year` được footer trong base.html dùng từ trước nhưng chưa từng
+    có ai truyền vào — nên footer đang render danh sách chi nhánh rỗng và
+    dòng "Business ID:" trống."""
+    return {
+        "biz": BUSINESS,
+        "branches": BUSINESS["branches"],
+        "business_id": BUSINESS["business_id"],
+        "current_year": now_helsinki().year,
     }
 
 
@@ -822,8 +837,7 @@ def view_booking_details(booking_id):
 
     booking_time = format_booking_time(booking["start_time"])
 
-    address = "Kyyhkysmäki 9, 02650 Espoo"
-    ggmap_url = build_gg_map_url(address)
+    ggmap_url = build_gg_map_url(BUSINESS["address"])
 
     return render_template(
         "/customer/view_booking_details.html",
@@ -4374,7 +4388,7 @@ def export_report_csv():
     buf.write("﻿")  # BOM để Excel đọc đúng tiếng Việt
     w = csv.writer(buf)
 
-    w.writerow(["Báo cáo DahaCare", f"Từ {df}", f"Đến {dt}"])
+    w.writerow([f"Báo cáo {BUSINESS['brand_name']}", f"Từ {df}", f"Đến {dt}"])
     w.writerow([])
     w.writerow(["Chỉ số", "Giá trị"])
     w.writerow(["Tổng doanh thu", f"{kpi['total_revenue']:.0f}"])
@@ -4392,7 +4406,7 @@ def export_report_csv():
     for s in ctx["staff_performance"]:
         w.writerow([s["full_name"], s["booking_count"], f"{s['revenue']:.0f}"])
 
-    filename = f"dahacare-bao-cao-{df}-{dt}.csv"
+    filename = f"{BUSINESS['brand_name'].lower()}-bao-cao-{df}-{dt}.csv"
     return Response(
         buf.getvalue(),
         mimetype="text/csv",
@@ -4644,7 +4658,7 @@ def success():
     service_image = _resolve_upload(service["image"], "services")
 
     cal           = build_calendar_url(service["name"], staff["full_name"], booking["booking_date"], booking["start_time"], booking["end_time"])
-    salon_address = "Kyyhkysmäki 9, 02650 Espoo"
+    salon_address = BUSINESS["address"]
 
     return render_template(
         "/public/success.html",

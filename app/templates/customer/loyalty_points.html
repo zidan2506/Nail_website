@@ -411,9 +411,9 @@ document.addEventListener("DOMContentLoaded", function () {
     expired:  {{ _('Expired') | tojson }}
   };
   var NOTE = {
-    active:  {{ _('Show this code to our staff at your next visit to redeem.') | tojson }},
+    active:  {{ txt('loyalty.voucher_active') | tojson }},
     used:    {{ _('This voucher has already been used.')                       | tojson }},
-    expired: {{ _('This voucher has expired and is no longer valid.')          | tojson }}
+    expired: {{ txt('loyalty.voucher_expired') | tojson }}
   };
   var COPY_LABEL   = {{ _('Copy')   | tojson }};
   var COPIED_LABEL = {{ _('Copied') | tojson }};

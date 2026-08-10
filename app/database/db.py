@@ -5,6 +5,7 @@ import string
 import time
 from pathlib import Path
 from werkzeug.security import generate_password_hash
+from app.business import MEMBERSHIP
 from app.utils.helpers import now_helsinki
 
 logger = logging.getLogger(__name__)
@@ -2101,6 +2102,45 @@ def toggle_mission_config(key, default_points):
     conn.commit()
     conn.close()
     return new_value
+
+
+def sync_membership_tiers():
+    """Ghi MEMBERSHIP (app/business.py) xuống bảng membership_tiers lúc app khởi
+    động. business.py là nguồn chính; bảng chỉ là bản sao để 10 chỗ đọc tier
+    sẵn có (loyalty, payment, template) không phải sửa, và để customer_memberships
+    còn khoá ngoại trỏ vào.
+
+    Giá đổi thì xoá stripe_price_id: Stripe Price là immutable nên Price cũ vẫn
+    thu giá cũ. Bỏ id đi khiến `buyable` thành False (routes.py) → nút mua bị
+    khoá thay vì charge sai giá. Mở lại bằng:
+        python -m app.database.setup_stripe_prices
+    """
+    conn = get_connection()
+    changed = []
+    for name, cfg in MEMBERSHIP.items():
+        row = conn.execute(
+            "SELECT id, price, stripe_price_id FROM membership_tiers WHERE name = ?", (name,)
+        ).fetchone()
+        if row is None:
+            logger.warning("[business] tier %s chua co trong DB, bo qua sync", name)
+            continue
+        drop_price_id = row["stripe_price_id"] and float(row["price"]) != float(cfg["price"])
+        conn.execute(
+            "UPDATE membership_tiers SET price = ?, point_multiplier = ?, duration_days = ?"
+            + (", stripe_price_id = NULL" if drop_price_id else "")
+            + " WHERE id = ?",
+            (cfg["price"], cfg["point_multiplier"], cfg["duration_days"], row["id"]),
+        )
+        if drop_price_id:
+            changed.append(f"{name} {row['price']}->{cfg['price']}")
+    conn.commit()
+    conn.close()
+    if changed:
+        logger.warning(
+            "[business] gia tier doi (%s) -> da xoa stripe_price_id, khach CHUA MUA DUOC. "
+            "Chay: python -m app.database.setup_stripe_prices",
+            ", ".join(changed),
+        )
 
 
 def get_active_membership_tiers():

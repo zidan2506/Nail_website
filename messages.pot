@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-10 18:31+0700\n"
+"POT-Creation-Date: 2026-08-10 20:26+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,20 +17,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes.py:55
+#: app/routes.py:56
 msgid "Chờ xác nhận"
 msgstr ""
 
-#: app/routes.py:55 app/templates/staff/staff_bookings.html:311
+#: app/routes.py:56 app/templates/staff/staff_bookings.html:311
 msgid "Đã xác nhận"
 msgstr ""
 
-#: app/routes.py:55 app/templates/staff/staff_bookings.html:312
+#: app/routes.py:56 app/templates/staff/staff_bookings.html:312
 #: app/templates/staff/staff_bookings.html:338
 msgid "Đang thực hiện"
 msgstr ""
 
-#: app/routes.py:56 app/templates/staff/staff_bookings.html:312
+#: app/routes.py:57 app/templates/staff/staff_bookings.html:312
 #: app/templates/staff/staff_bookings.html:342
 #: app/templates/staff/staff_bookings.html:409
 #: app/templates/staff/staff_bookings.html:487
@@ -40,450 +40,450 @@ msgstr ""
 msgid "Hoàn thành"
 msgstr ""
 
-#: app/routes.py:56 app/templates/staff/staff_history.html:260
+#: app/routes.py:57 app/templates/staff/staff_history.html:260
 #: app/templates/staff/staff_history.html:283
 #: app/templates/staff/staff_history.html:339
 #: app/templates/staff/staff_history.html:425
 msgid "Đã hủy"
 msgstr ""
 
-#: app/routes.py:56
+#: app/routes.py:57
 msgid "Không đến"
 msgstr ""
 
-#: app/routes.py:57
+#: app/routes.py:58
 msgid "hôm nay"
 msgstr ""
 
-#: app/routes.py:57
+#: app/routes.py:58
 msgid "trong tuần này"
 msgstr ""
 
-#: app/routes.py:57
+#: app/routes.py:58
 msgid "trong tháng này"
 msgstr ""
 
-#: app/routes.py:58
+#: app/routes.py:59
 msgid "trong tháng trước"
 msgstr ""
 
-#: app/routes.py:59 app/routes.py:2002
+#: app/routes.py:60 app/routes.py:2016
 msgid "✓ Claimed"
 msgstr ""
 
-#: app/routes.py:59 app/routes.py:2004
+#: app/routes.py:60 app/routes.py:2018
 msgid "✓ All Reviewed"
 msgstr ""
 
-#: app/routes.py:59
+#: app/routes.py:60
 msgid "Start"
 msgstr ""
 
-#: app/routes.py:59
+#: app/routes.py:60
 msgid "Claim"
 msgstr ""
 
-#: app/routes.py:474
+#: app/routes.py:489
 msgid "Please login!"
 msgstr ""
 
-#: app/routes.py:496
+#: app/routes.py:511
 msgid "Unauthorized."
 msgstr ""
 
-#: app/routes.py:501
+#: app/routes.py:516
 msgid "Session expired. Please log in again."
 msgstr ""
 
-#: app/routes.py:511
+#: app/routes.py:526
 msgid "You do not have access to this area."
 msgstr ""
 
-#: app/routes.py:547
+#: app/routes.py:562
 msgid "Today"
 msgstr ""
 
-#: app/routes.py:549
+#: app/routes.py:564
 msgid "Tomorrow"
 msgstr ""
 
-#: app/routes.py:559 app/routes.py:793 app/routes.py:861 app/routes.py:1118
-#: app/routes.py:1142 app/routes.py:1400 app/routes.py:1553 app/routes.py:1617
-#: app/routes.py:1648 app/routes.py:1716 app/routes.py:1805 app/routes.py:1844
+#: app/routes.py:574 app/routes.py:808 app/routes.py:875 app/routes.py:1132
+#: app/routes.py:1156 app/routes.py:1414 app/routes.py:1567 app/routes.py:1631
+#: app/routes.py:1662 app/routes.py:1730 app/routes.py:1819 app/routes.py:1858
 msgid "Customer profile not found!"
 msgstr ""
 
-#: app/routes.py:641 app/routes.py:4457
+#: app/routes.py:656 app/routes.py:4471
 msgid "That service is no longer available. Showing our full menu."
 msgstr ""
 
-#: app/routes.py:666 app/routes.py:865
+#: app/routes.py:681 app/routes.py:879
 msgid "Booking not found"
 msgstr ""
 
-#: app/routes.py:673
+#: app/routes.py:688
 msgid "User not found!"
 msgstr ""
 
-#: app/routes.py:677
+#: app/routes.py:692
 msgid "This booking cannot be cancelled"
 msgstr ""
 
-#: app/routes.py:683
+#: app/routes.py:698
 msgid "Booking cancelled successfully"
 msgstr ""
 
-#: app/routes.py:691
+#: app/routes.py:706
 msgid "Session Expired. Please login again."
 msgstr ""
 
-#: app/routes.py:697
+#: app/routes.py:712
 msgid "Customer profile not found by some how :D"
 msgstr ""
 
-#: app/routes.py:787 app/routes.py:797 app/routes.py:855
+#: app/routes.py:802 app/routes.py:812 app/routes.py:869
 msgid "Booking not found!"
 msgstr ""
 
-#: app/routes.py:803 app/routes.py:871
+#: app/routes.py:818 app/routes.py:885
 msgid "Service data unavailable."
 msgstr ""
 
-#: app/routes.py:809 app/routes.py:877
+#: app/routes.py:824 app/routes.py:891
 msgid "Staff data unavailable."
 msgstr ""
 
-#: app/routes.py:894
+#: app/routes.py:908
 msgid "Please select a new date and time"
 msgstr ""
 
-#: app/routes.py:900
+#: app/routes.py:914
 msgid "You can only reschedule within the next 14 days"
 msgstr ""
 
-#: app/routes.py:906
+#: app/routes.py:920
 msgid "Invalid time format"
 msgstr ""
 
-#: app/routes.py:933
+#: app/routes.py:947
 msgid "This time slot is no longer available."
 msgstr ""
 
-#: app/routes.py:934
+#: app/routes.py:948
 msgid "Please choose another time."
 msgstr ""
 
-#: app/routes.py:944
+#: app/routes.py:958
 msgid "Booking rescheduled successfully"
 msgstr ""
 
-#: app/routes.py:1150
+#: app/routes.py:1164
 msgid "Name is required."
 msgstr ""
 
-#: app/routes.py:1154
+#: app/routes.py:1168
 msgid "Profile updated successfully."
 msgstr ""
 
-#: app/routes.py:1171
+#: app/routes.py:1185
 msgid "No file selected."
 msgstr ""
 
-#: app/routes.py:1179
+#: app/routes.py:1193
 msgid "Profile picture updated."
 msgstr ""
 
-#: app/routes.py:1210 app/routes.py:1277
+#: app/routes.py:1224 app/routes.py:1291
 msgid "Verification session expired. Please request a new code."
 msgstr ""
 
-#: app/routes.py:1219 app/routes.py:1289
+#: app/routes.py:1233 app/routes.py:1303
 msgid "Verification code expired. Please request a new code."
 msgstr ""
 
-#: app/routes.py:1226 app/routes.py:1296 app/routes.py:2496
+#: app/routes.py:1240 app/routes.py:1310 app/routes.py:2510
 msgid "Too many incorrect attempts. Please request a new code."
 msgstr ""
 
-#: app/routes.py:1228 app/routes.py:1298 app/routes.py:2498
+#: app/routes.py:1242 app/routes.py:1312 app/routes.py:2512
 msgid "Incorrect verification code."
 msgstr ""
 
-#: app/routes.py:1232 app/routes.py:2506 app/routes.py:4916
+#: app/routes.py:1246 app/routes.py:2520 app/routes.py:4930
 msgid "Passwords do not match."
 msgstr ""
 
-#: app/routes.py:1236
+#: app/routes.py:1250
 msgid "New password must be at least 8 characters."
 msgstr ""
 
-#: app/routes.py:1242
+#: app/routes.py:1256
 msgid "Password changed successfully."
 msgstr ""
 
-#: app/routes.py:1272 app/routes.py:3294 app/routes.py:3323 app/routes.py:3342
+#: app/routes.py:1286 app/routes.py:3308 app/routes.py:3337 app/routes.py:3356
 msgid "Customer not found."
 msgstr ""
 
-#: app/routes.py:1284 app/routes.py:2765 app/routes.py:2794
+#: app/routes.py:1298 app/routes.py:2779 app/routes.py:2808
 msgid "Please fill in all fields."
 msgstr ""
 
-#: app/routes.py:1302
+#: app/routes.py:1316
 msgid "New email is the same as your current email."
 msgstr ""
 
-#: app/routes.py:1307
+#: app/routes.py:1321
 msgid "Email is already taken."
 msgstr ""
 
-#: app/routes.py:1316
+#: app/routes.py:1330
 msgid "Email updated successfully."
 msgstr ""
 
-#: app/routes.py:1326
+#: app/routes.py:1340
 msgid "User not found. Please login!"
 msgstr ""
 
-#: app/routes.py:1331
+#: app/routes.py:1345
 msgid "Customer profile not found."
 msgstr ""
 
-#: app/routes.py:1405 app/routes.py:1410
+#: app/routes.py:1419 app/routes.py:1424
 msgid "Invoice not found!"
 msgstr ""
 
-#: app/routes.py:1450
+#: app/routes.py:1464
 msgid "Could not start the payment session. Please try again."
 msgstr ""
 
-#: app/routes.py:1462
+#: app/routes.py:1476
 msgid "Something went wrong. Please login again!"
 msgstr ""
 
-#: app/routes.py:1467
+#: app/routes.py:1481
 msgid "Customer profile not found. Please login again!"
 msgstr ""
 
-#: app/routes.py:1475 app/routes.py:4492
+#: app/routes.py:1489 app/routes.py:4506
 msgid "Please select a service, date, and time slot before confirming."
 msgstr ""
 
-#: app/routes.py:1490 app/routes.py:4506
+#: app/routes.py:1504 app/routes.py:4520
 msgid "Service not found. Please try again."
 msgstr ""
 
-#: app/routes.py:1534 app/routes.py:4548 app/routes.py:4703 app/routes.py:4855
-#: app/routes.py:4886
+#: app/routes.py:1548 app/routes.py:4562 app/routes.py:4717 app/routes.py:4869
+#: app/routes.py:4900
 msgid "Could not send verification email. Please try again."
 msgstr ""
 
-#: app/routes.py:1558
+#: app/routes.py:1572
 msgid "Invalid plan selected."
 msgstr ""
 
-#: app/routes.py:1563
+#: app/routes.py:1577
 msgid "Plan not found."
 msgstr ""
 
-#: app/routes.py:1578
+#: app/routes.py:1592
 msgid ""
 "Your paid membership will stop renewing and revert to Silver at the "
 "period end."
 msgstr ""
 
-#: app/routes.py:1580
+#: app/routes.py:1594
 msgid "You're on the Silver plan."
 msgstr ""
 
-#: app/routes.py:1587
+#: app/routes.py:1601
 msgid ""
 "This plan isn't available for online payment right now. Please try again "
 "later."
 msgstr ""
 
-#: app/routes.py:1592
+#: app/routes.py:1606
 #, python-format
 msgid "You are already subscribed to %(tier)s."
 msgstr ""
 
-#: app/routes.py:1606
+#: app/routes.py:1620
 msgid "Could not start checkout. Please try again."
 msgstr ""
 
-#: app/routes.py:1622
+#: app/routes.py:1636
 msgid "No active subscription to cancel."
 msgstr ""
 
-#: app/routes.py:1626
+#: app/routes.py:1640
 msgid ""
 "Your membership will not renew. You keep your benefits until the current "
 "period ends."
 msgstr ""
 
-#: app/routes.py:1629
+#: app/routes.py:1643
 msgid "Could not cancel your membership. Please try again."
 msgstr ""
 
-#: app/routes.py:1656 app/routes.py:1660
+#: app/routes.py:1670 app/routes.py:1674
 msgid "Invalid reward."
 msgstr ""
 
-#: app/routes.py:1668
+#: app/routes.py:1682
 msgid "Reward not found."
 msgstr ""
 
-#: app/routes.py:1671 app/routes.py:1699
+#: app/routes.py:1685 app/routes.py:1713
 msgid "Not enough points."
 msgstr ""
 
-#: app/routes.py:1674
+#: app/routes.py:1688
 msgid "This reward is out of stock."
 msgstr ""
 
-#: app/routes.py:1692
+#: app/routes.py:1706
 #, python-format
 msgid "This reward resets in %(days)s day(s)."
 msgstr ""
 
-#: app/routes.py:1696
+#: app/routes.py:1710
 msgid "You have reached the redeem limit for this reward."
 msgstr ""
 
-#: app/routes.py:1700
+#: app/routes.py:1714
 #, python-format
 msgid "Successfully redeemed: %(name)s"
 msgstr ""
 
-#: app/routes.py:1808
+#: app/routes.py:1822
 msgid "No billing account found."
 msgstr ""
 
-#: app/routes.py:1817
+#: app/routes.py:1831
 msgid "Could not open the billing portal. Please try again later."
 msgstr ""
 
-#: app/routes.py:1952
+#: app/routes.py:1966
 msgid "All rewards unlocked!"
 msgstr ""
 
-#: app/routes.py:1961
+#: app/routes.py:1975
 msgid "Booking"
 msgstr ""
 
-#: app/routes.py:1962
+#: app/routes.py:1976
 msgid "Double points"
 msgstr ""
 
-#: app/routes.py:1963
+#: app/routes.py:1977
 msgid "First booking"
 msgstr ""
 
-#: app/routes.py:1964
+#: app/routes.py:1978
 msgid "Streak bonus"
 msgstr ""
 
-#: app/routes.py:1965
+#: app/routes.py:1979
 msgid "Manual adjustment"
 msgstr ""
 
-#: app/routes.py:1966
+#: app/routes.py:1980
 msgid "Reward redemption"
 msgstr ""
 
-#: app/routes.py:1987
+#: app/routes.py:2001
 msgid "Earned on"
 msgstr ""
 
-#: app/routes.py:1987 app/templates/customer/loyalty_points.html:315
+#: app/routes.py:2001 app/templates/customer/loyalty_points.html:315
 msgid "Redeemed on"
 msgstr ""
 
-#: app/routes.py:2075 app/routes.py:4733
+#: app/routes.py:2089 app/routes.py:4747
 #, python-format
 msgid "Too many failed attempts. Try again in %(minutes)s minute(s)."
 msgstr ""
 
-#: app/routes.py:2082 app/routes.py:4740
+#: app/routes.py:2096 app/routes.py:4754
 msgid "Please enter email or password!"
 msgstr ""
 
-#: app/routes.py:2089 app/routes.py:2096 app/routes.py:4747 app/routes.py:4758
+#: app/routes.py:2103 app/routes.py:2110 app/routes.py:4761 app/routes.py:4772
 msgid "Invalid email or password!"
 msgstr ""
 
-#: app/routes.py:2100
+#: app/routes.py:2114
 msgid "Please use the customer login portal"
 msgstr ""
 
-#: app/routes.py:2114
+#: app/routes.py:2128
 msgid "Staff profile not found!"
 msgstr ""
 
-#: app/routes.py:2118 app/routes.py:4771 app/routes.py:4834
+#: app/routes.py:2132 app/routes.py:4785 app/routes.py:4848
 #, python-format
 msgid "Logged in. Welcome, %(name)s."
 msgstr ""
 
-#: app/routes.py:2126
+#: app/routes.py:2140
 msgid "Logged in. Welcome, master."
 msgstr ""
 
-#: app/routes.py:2129
+#: app/routes.py:2143
 msgid "something went wrong :("
 msgstr ""
 
-#: app/routes.py:2246 app/routes.py:2376
+#: app/routes.py:2260 app/routes.py:2390
 msgid "Staff profile not found."
 msgstr ""
 
-#: app/routes.py:2288
+#: app/routes.py:2302
 #, python-format
 msgid "vào ngày %(date)s"
 msgstr ""
 
-#: app/routes.py:2289
+#: app/routes.py:2303
 #, python-format
 msgid "từ %(start)s đến %(end)s"
 msgstr ""
 
-#: app/routes.py:2448
+#: app/routes.py:2462
 msgid "Please select an image."
 msgstr ""
 
-#: app/routes.py:2454
+#: app/routes.py:2468
 msgid "Profile photo updated."
 msgstr ""
 
-#: app/routes.py:2480
+#: app/routes.py:2494
 msgid "Your verification session has expired. Please request a new code."
 msgstr ""
 
-#: app/routes.py:2489
+#: app/routes.py:2503
 msgid "The verification code has expired. Please request a new one."
 msgstr ""
 
-#: app/routes.py:2502
+#: app/routes.py:2516
 msgid "The new password must be at least 8 characters."
 msgstr ""
 
-#: app/routes.py:2512
+#: app/routes.py:2526
 msgid "Password changed."
 msgstr ""
 
-#: app/routes.py:2531 app/routes.py:2548 app/routes.py:2569
+#: app/routes.py:2545 app/routes.py:2562 app/routes.py:2583
 msgid "You do not have permission to perform this action."
 msgstr ""
 
-#: app/routes.py:2535
+#: app/routes.py:2549
 msgid "Service started."
 msgstr ""
 
-#: app/routes.py:2552
+#: app/routes.py:2566
 msgid "Marked as completed."
 msgstr ""
 
-#: app/routes.py:2554 app/templates/Auth/email_verification.html:199
+#: app/routes.py:2568 app/templates/Auth/email_verification.html:199
 #: app/templates/Auth/email_verification.html:221
 #: app/templates/customer/customer_setting.html:1116
 #: app/templates/customer/customer_setting.html:1248
@@ -491,553 +491,442 @@ msgstr ""
 msgid "Something went wrong. Please try again."
 msgstr ""
 
-#: app/routes.py:2573
+#: app/routes.py:2587
 msgid "Payment confirmed."
 msgstr ""
 
-#: app/routes.py:2727
+#: app/routes.py:2741
 msgid "Invalid status."
 msgstr ""
 
-#: app/routes.py:2732 app/routes.py:2799
+#: app/routes.py:2746 app/routes.py:2813
 msgid "Booking not found."
 msgstr ""
 
-#: app/routes.py:2746
+#: app/routes.py:2760
 msgid "Could not complete the booking. Service or staff data is missing."
 msgstr ""
 
-#: app/routes.py:2750
+#: app/routes.py:2764
 #, python-format
 msgid "Booking #%(id)s status updated."
 msgstr ""
 
-#: app/routes.py:2770 app/routes.py:2960
+#: app/routes.py:2784 app/routes.py:2974
 msgid "Service not found."
 msgstr ""
 
-#: app/routes.py:2777
+#: app/routes.py:2791
 msgid "This stylist is already booked for that time. Please choose another slot."
 msgstr ""
 
-#: app/routes.py:2781
+#: app/routes.py:2795
 msgid "Booking created."
 msgstr ""
 
-#: app/routes.py:2807
+#: app/routes.py:2821
 #, python-format
 msgid "Booking #%(id)s updated."
 msgstr ""
 
-#: app/routes.py:2842 app/routes.py:2870
+#: app/routes.py:2856 app/routes.py:2884
 msgid "Please enter both a full name and an email address."
 msgstr ""
 
-#: app/routes.py:2846
+#: app/routes.py:2860
 msgid "This email is already used by another account."
 msgstr ""
 
-#: app/routes.py:2874
+#: app/routes.py:2888
 #, python-format
 msgid "Staff member #%(id)s updated."
 msgstr ""
 
-#: app/routes.py:2883
+#: app/routes.py:2897
 msgid "Staff member deleted."
 msgstr ""
 
-#: app/routes.py:2885
+#: app/routes.py:2899
 msgid "Cannot delete a staff member with linked appointments."
 msgstr ""
 
-#: app/routes.py:2893
+#: app/routes.py:2907
 msgid "Staff status updated."
 msgstr ""
 
-#: app/routes.py:2931 app/routes.py:2981
+#: app/routes.py:2945 app/routes.py:2995
 msgid "Please fill in all required fields."
 msgstr ""
 
-#: app/routes.py:2949
+#: app/routes.py:2963
 #, python-format
 msgid ""
 "Service %(name)s added. The video is processing and will appear in a few "
 "minutes."
 msgstr ""
 
-#: app/routes.py:2951
+#: app/routes.py:2965
 #, python-format
 msgid "Service %(name)s added."
 msgstr ""
 
-#: app/routes.py:3017
+#: app/routes.py:3031
 #, python-format
 msgid ""
 "Service %(name)s updated. The video is processing and will appear in a "
 "few minutes."
 msgstr ""
 
-#: app/routes.py:3019
+#: app/routes.py:3033
 msgid ""
 "The previous video for this service is still processing. Please wait "
 "until it finishes before uploading another."
 msgstr ""
 
-#: app/routes.py:3023
+#: app/routes.py:3037
 #, python-format
 msgid "Service %(name)s updated."
 msgstr ""
 
-#: app/routes.py:3038
+#: app/routes.py:3052
 msgid "Service deleted."
 msgstr ""
 
-#: app/routes.py:3040
+#: app/routes.py:3054
 msgid "Cannot delete a service that has linked appointments."
 msgstr ""
 
-#: app/routes.py:3048
+#: app/routes.py:3062
 msgid "Service status updated."
 msgstr ""
 
-#: app/routes.py:3062 app/routes.py:3083
+#: app/routes.py:3076 app/routes.py:3097
 msgid "Please enter a category name."
 msgstr ""
 
-#: app/routes.py:3067
+#: app/routes.py:3081
 #, python-format
 msgid "Category %(name)s added."
 msgstr ""
 
-#: app/routes.py:3069 app/routes.py:3090
+#: app/routes.py:3083 app/routes.py:3104
 msgid "This slug already exists. Please choose another one."
 msgstr ""
 
-#: app/routes.py:3088
+#: app/routes.py:3102
 #, python-format
 msgid "Category %(name)s updated."
 msgstr ""
 
-#: app/routes.py:3099
+#: app/routes.py:3113
 msgid "Category deleted."
 msgstr ""
 
-#: app/routes.py:3101
+#: app/routes.py:3115
 msgid ""
 "Cannot delete a category that still has services. Move or delete those "
 "services first."
 msgstr ""
 
-#: app/routes.py:3136
+#: app/routes.py:3150
 msgid "Please select at least one image."
 msgstr ""
 
-#: app/routes.py:3149
+#: app/routes.py:3163
 #, python-format
 msgid "Uploaded %(count)s images."
 msgstr ""
 
-#: app/routes.py:3158
+#: app/routes.py:3172
 msgid "Image not found."
 msgstr ""
 
-#: app/routes.py:3181
+#: app/routes.py:3195
 msgid "Image updated."
 msgstr ""
 
-#: app/routes.py:3192
+#: app/routes.py:3206
 msgid "Image deleted."
 msgstr ""
 
-#: app/routes.py:3218
+#: app/routes.py:3232
 #, python-format
 msgid "Deleted %(count)s images."
 msgstr ""
 
-#: app/routes.py:3264 app/routes.py:3305
+#: app/routes.py:3278 app/routes.py:3319
 msgid "Please enter a full name."
 msgstr ""
 
-#: app/routes.py:3268
+#: app/routes.py:3282
 msgid ""
 "Could not create the customer. This email already belongs to another "
 "account."
 msgstr ""
 
-#: app/routes.py:3278
+#: app/routes.py:3292
 msgid "Customer added."
 msgstr ""
 
-#: app/routes.py:3309
+#: app/routes.py:3323
 #, python-format
 msgid "Customer #%(id)s updated."
 msgstr ""
 
-#: app/routes.py:3314
+#: app/routes.py:3328
 msgid "The customer edit page has not been built yet."
 msgstr ""
 
-#: app/routes.py:3328 app/routes.py:3550
+#: app/routes.py:3342 app/routes.py:3564
 msgid "Please enter a valid number of points."
 msgstr ""
 
-#: app/routes.py:3333 app/routes.py:3422
+#: app/routes.py:3347 app/routes.py:3436
 #, python-format
 msgid "Adjusted %(points)s points for %(name)s."
 msgstr ""
 
-#: app/routes.py:3347
+#: app/routes.py:3361
 #, python-format
 msgid "Deleted customer %(name)s."
 msgstr ""
 
-#: app/routes.py:3349
+#: app/routes.py:3363
 msgid "Cannot delete a customer with bookings or linked records."
 msgstr ""
 
-#: app/routes.py:3417
+#: app/routes.py:3431
 msgid "Please fill in all point adjustment details."
 msgstr ""
 
-#: app/routes.py:3436
+#: app/routes.py:3450
 msgid "Please fill in all membership details."
 msgstr ""
 
-#: app/routes.py:3440
+#: app/routes.py:3454
 #, python-format
 msgid "Membership updated for %(name)s."
 msgstr ""
 
-#: app/routes.py:3459 app/routes.py:3496
+#: app/routes.py:3473 app/routes.py:3510
 msgid "Please enter a name and point cost for the voucher."
 msgstr ""
 
-#: app/routes.py:3470
+#: app/routes.py:3484
 msgid "Voucher created."
 msgstr ""
 
-#: app/routes.py:3479 app/routes.py:3526
+#: app/routes.py:3493 app/routes.py:3540
 msgid "Voucher not found."
 msgstr ""
 
-#: app/routes.py:3517
+#: app/routes.py:3531
 msgid "Voucher updated."
 msgstr ""
 
-#: app/routes.py:3531
+#: app/routes.py:3545
 #, python-format
 msgid ""
 "Voucher \"%(name)s\" has been redeemed by customers, so it was hidden "
 "instead of deleted."
 msgstr ""
 
-#: app/routes.py:3535
+#: app/routes.py:3549
 #, python-format
 msgid "Deleted voucher \"%(name)s\"."
 msgstr ""
 
-#: app/routes.py:3544 app/routes.py:3814
+#: app/routes.py:3558 app/routes.py:3828
 msgid "Invalid mission."
 msgstr ""
 
-#: app/routes.py:3554 app/routes.py:3847
+#: app/routes.py:3568 app/routes.py:3861
 msgid "Mission updated."
 msgstr ""
 
-#: app/routes.py:3620 app/routes.py:3673 app/routes.py:3723 app/routes.py:3766
+#: app/routes.py:3634 app/routes.py:3687 app/routes.py:3737 app/routes.py:3780
 msgid "Please enter a slide title."
 msgstr ""
 
-#: app/routes.py:3630
+#: app/routes.py:3644
 msgid "Please select an image for the slide."
 msgstr ""
 
-#: app/routes.py:3638
+#: app/routes.py:3652
 msgid "Homepage slide created."
 msgstr ""
 
-#: app/routes.py:3647 app/routes.py:3745 app/routes.py:3797
+#: app/routes.py:3661 app/routes.py:3759 app/routes.py:3811
 msgid "Slide not found."
 msgstr ""
 
-#: app/routes.py:3693
+#: app/routes.py:3707
 msgid "A slide needs an image."
 msgstr ""
 
-#: app/routes.py:3700
+#: app/routes.py:3714
 msgid "Slide updated."
 msgstr ""
 
-#: app/routes.py:3736
+#: app/routes.py:3750
 msgid "Offer slide added."
 msgstr ""
 
-#: app/routes.py:3788
+#: app/routes.py:3802
 msgid "Offer slide updated."
 msgstr ""
 
-#: app/routes.py:3800
+#: app/routes.py:3814
 msgid "Built-in missions cannot be deleted."
 msgstr ""
 
-#: app/routes.py:3806
+#: app/routes.py:3820
 msgid "Slide deleted."
 msgstr ""
 
-#: app/routes.py:3827
+#: app/routes.py:3841
 msgid "Please enter a mission name."
 msgstr ""
 
-#: app/routes.py:3913 app/routes.py:3935
+#: app/routes.py:3927 app/routes.py:3949
 msgid "Notice content is required."
 msgstr ""
 
-#: app/routes.py:3922
+#: app/routes.py:3936
 msgid "Notice created."
 msgstr ""
 
-#: app/routes.py:3930
+#: app/routes.py:3944
 msgid "Notice not found."
 msgstr ""
 
-#: app/routes.py:3946
+#: app/routes.py:3960
 msgid "Notice updated."
 msgstr ""
 
-#: app/routes.py:3961
+#: app/routes.py:3975
 msgid "Notice deleted."
 msgstr ""
 
-#: app/routes.py:3975
+#: app/routes.py:3989
 msgid "Title and message are required."
 msgstr ""
 
-#: app/routes.py:3978
+#: app/routes.py:3992
 msgid "Please choose a customer."
 msgstr ""
 
-#: app/routes.py:4003
+#: app/routes.py:4017
 #, python-format
 msgid "Notification sent. Emails are being delivered to %(count)s recipients."
 msgstr ""
 
-#: app/routes.py:4006
+#: app/routes.py:4020
 msgid "Notification sent."
 msgstr ""
 
-#: app/routes.py:4015
+#: app/routes.py:4029
 msgid "Notification deleted."
 msgstr ""
 
-#: app/routes.py:4675
+#: app/routes.py:4689
 msgid "Please enter required information!"
 msgstr ""
 
-#: app/routes.py:4679
+#: app/routes.py:4693
 msgid "Please enter a valid email address."
 msgstr ""
 
-#: app/routes.py:4683 app/routes.py:4920
+#: app/routes.py:4697 app/routes.py:4934
 msgid "Password must be at least 8 characters."
 msgstr ""
 
-#: app/routes.py:4690
+#: app/routes.py:4704
 msgid "Email existed! Please try again."
 msgstr ""
 
-#: app/routes.py:4720
+#: app/routes.py:4734
 msgid "A verification code has been sent to your email."
 msgstr ""
 
-#: app/routes.py:4753
+#: app/routes.py:4767
 msgid "Profile not found! Please try again"
 msgstr ""
 
-#: app/routes.py:4785
+#: app/routes.py:4799
 msgid "Google sign-in failed. Please try again."
 msgstr ""
 
-#: app/routes.py:4791
+#: app/routes.py:4805
 msgid "Could not verify your Google email. Please try again."
 msgstr ""
 
-#: app/routes.py:4801
+#: app/routes.py:4815
 msgid "Please use the staff login portal."
 msgstr ""
 
-#: app/routes.py:4845 app/routes.py:4876
+#: app/routes.py:4859 app/routes.py:4890
 msgid "Please enter your email address."
 msgstr ""
 
-#: app/routes.py:4904
+#: app/routes.py:4918
 msgid "Session expired. Please try again."
 msgstr ""
 
-#: app/routes.py:4926
+#: app/routes.py:4940
 msgid "Password reset successfully. Please log in."
 msgstr ""
 
-#: app/routes.py:4932
+#: app/routes.py:4946
 msgid "Logged out successfully."
 msgstr ""
 
-#: app/routes.py:4941 app/routes.py:5134
+#: app/routes.py:4955 app/routes.py:5148
 msgid "Your verification session has expired. Please start again."
 msgstr ""
 
-#: app/routes.py:5181
+#: app/routes.py:5195
 msgid "Register session expired. Please register again."
 msgstr ""
 
-#: app/routes.py:5207
+#: app/routes.py:5221
 msgid "Register successfully!"
 msgstr ""
 
-#: app/routes.py:5243
+#: app/routes.py:5257
 msgid "This slot has been booked by other customer! Please try again."
 msgstr ""
 
-#: app/routes.py:5263
+#: app/routes.py:5277
 msgid "Your booking is processing!"
 msgstr ""
 
-#: app/template_filters.py:119
+#: app/template_filters.py:120
 msgid "Visa"
 msgstr ""
 
-#: app/template_filters.py:120
+#: app/template_filters.py:121
 msgid "Mastercard"
 msgstr ""
 
-#: app/template_filters.py:121
+#: app/template_filters.py:122
 msgid "Mobile Pay"
 msgstr ""
 
-#: app/template_filters.py:122
+#: app/template_filters.py:123
 msgid "Apple Pay"
 msgstr ""
 
-#: app/template_filters.py:123
+#: app/template_filters.py:124
 msgid "Google Pay"
 msgstr ""
 
-#: app/template_filters.py:124 app/templates/customer/customer_history.html:141
+#: app/template_filters.py:125 app/templates/customer/customer_history.html:141
 msgid "Cash"
 msgstr ""
 
-#: app/template_filters.py:125 app/templates/customer/customer_history.html:142
+#: app/template_filters.py:126 app/templates/customer/customer_history.html:142
 msgid "Bank Transfer"
-msgstr ""
-
-#: app/services/email_system.py:81
-msgid "Verify your email – Daha Care"
-msgstr ""
-
-#: app/services/email_system.py:83
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code to confirm your email address and complete your "
-"registration.\n"
-"\n"
-"If you did not create an account with Daha Care, please ignore this "
-"email.\n"
-msgstr ""
-
-#: app/services/email_system.py:89
-msgid "Password Change Request – Daha Care"
-msgstr ""
-
-#: app/services/email_system.py:91
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code to confirm your password change request.\n"
-"\n"
-"If you did not request this, please ignore this email and your password "
-"will remain unchanged.\n"
-msgstr ""
-
-#: app/services/email_system.py:97
-msgid "Email Change Request – Daha Care"
-msgstr ""
-
-#: app/services/email_system.py:99
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code to confirm your email address change request.\n"
-"\n"
-"If you did not request this, please ignore this email and your email "
-"address will remain unchanged.\n"
-msgstr ""
-
-#: app/services/email_system.py:105
-msgid "Reset Your Password – Daha Care"
-msgstr ""
-
-#: app/services/email_system.py:107
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your password reset code is: %(code)s\n"
-"\n"
-"Please enter this code to reset your password. This code expires in 10 "
-"minutes.\n"
-"\n"
-"If you did not request a password reset, please ignore this email.\n"
-msgstr ""
-
-#: app/services/email_system.py:113
-msgid "Your Booking Verification Code – Daha Care"
-msgstr ""
-
-#: app/services/email_system.py:115
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code on the verification page to confirm your booking.\n"
-"\n"
-"If you did not request this, please ignore this email.\n"
-msgstr ""
-
-#: app/services/email_system.py:132
-msgid "Your booking request has been received"
-msgstr ""
-
-#: app/services/email_system.py:134
-#, python-format
-msgid ""
-"Hi %(name)s,\n"
-"\n"
-"Thank you for your booking.\n"
-"\n"
-"We have received your booking request and it is currently pending "
-"confirmation.\n"
-"\n"
-"Booking details:\n"
-"- Service: %(service)s\n"
-"- Staff: %(staff)s\n"
-"- Date: %(date)s\n"
-"- Time: %(start)s - %(end)s\n"
-"\n"
-"We will contact you again once your booking has been confirmed.\n"
-"\n"
-"Best regards,\n"
-"Dahacare\n"
 msgstr ""
 
 #: app/templates/auth_base.html:43
@@ -1073,8 +962,8 @@ msgstr ""
 
 #: app/templates/base.html:40 app/templates/base.html:49
 #: app/templates/base.html:72 app/templates/base.html:81
-#: app/templates/customer_base.html:99 app/templates/public/about.html:225
-#: app/templates/public/gallery.html:87 app/templates/public/index.html:339
+#: app/templates/customer_base.html:99 app/templates/public/about.html:212
+#: app/templates/public/gallery.html:87 app/templates/public/index.html:341
 msgid "Book Now"
 msgstr ""
 
@@ -1330,7 +1219,7 @@ msgid "At least 8 characters"
 msgstr ""
 
 #: app/templates/Auth/customer_register.html:96
-#: app/templates/public/index.html:238
+#: app/templates/public/index.html:239
 msgid "Create account"
 msgstr ""
 
@@ -1347,12 +1236,6 @@ msgstr ""
 #: app/templates/Auth/email_verification.html:6
 #: app/templates/Auth/set_new_password.html:6
 msgid "Almost there."
-msgstr ""
-
-#: app/templates/Auth/email_verification.html:7
-msgid ""
-"Just one more step to secure your account and unlock your personalized "
-"beauty journey."
 msgstr ""
 
 #: app/templates/Auth/email_verification.html:62
@@ -1454,7 +1337,7 @@ msgid "Currently in development"
 msgstr ""
 
 #: app/templates/customer/coming_soon.html:138
-#: app/templates/customer/customer_membership.html:191
+#: app/templates/customer/customer_membership.html:169
 msgid "Coming soon"
 msgstr ""
 
@@ -1525,11 +1408,6 @@ msgstr ""
 msgid "Select a Service"
 msgstr ""
 
-#: app/templates/customer/customer_booking.html:67
-#: app/templates/public/public_booking.html:67
-msgid "Choose from our curated selection of luxury treatments."
-msgstr ""
-
 #: app/templates/customer/customer_booking.html:72
 #: app/templates/public/public_booking.html:72
 msgid "All Services"
@@ -1559,11 +1437,6 @@ msgstr ""
 #: app/templates/customer/customer_booking.html:134
 #: app/templates/public/public_booking.html:133
 msgid "Choose a Professional"
-msgstr ""
-
-#: app/templates/customer/customer_booking.html:135
-#: app/templates/public/public_booking.html:134
-msgid "Select your preferred stylist or let us match you."
 msgstr ""
 
 #: app/templates/customer/customer_booking.html:141
@@ -1705,17 +1578,7 @@ msgstr ""
 
 #: app/templates/customer/customer_booking.html:271
 #: app/templates/public/public_booking.html:316
-msgid "You'll receive a verification email after confirming. Your booking will be"
-msgstr ""
-
-#: app/templates/customer/customer_booking.html:271
-#: app/templates/public/public_booking.html:316
 msgid "pending"
-msgstr ""
-
-#: app/templates/customer/customer_booking.html:271
-#: app/templates/public/public_booking.html:316
-msgid "until the salon confirms your appointment."
 msgstr ""
 
 #: app/templates/customer/customer_booking.html:277
@@ -1759,11 +1622,6 @@ msgstr ""
 
 #: app/templates/customer/customer_booking.html:310
 msgid "loyalty points with this booking."
-msgstr ""
-
-#: app/templates/customer/customer_booking.html:312
-#: app/templates/public/public_booking.html:357
-msgid "By confirming, you agree to our 24h cancellation policy."
 msgstr ""
 
 #: app/templates/customer/customer_booking.html:323
@@ -1875,7 +1733,7 @@ msgstr ""
 
 #: app/templates/customer/customer_dashboard.html:884
 #: app/templates/customer/my_bookings.html:100
-#: app/templates/customer/view_booking_details.html:69
+#: app/templates/customer/view_booking_details.html:71
 #: app/templates/public/success.html:89
 msgid "Add to Calendar"
 msgstr ""
@@ -2093,7 +1951,7 @@ msgstr ""
 
 #: app/templates/customer/customer_history.html:322
 #: app/templates/customer/my_bookings.html:138
-#: app/templates/customer/view_booking_details.html:18
+#: app/templates/customer/view_booking_details.html:20
 msgid "Cancelled"
 msgstr ""
 
@@ -2103,7 +1961,7 @@ msgid "Paid"
 msgstr ""
 
 #: app/templates/customer/customer_membership.html:3
-#: app/templates/customer/customer_membership.html:129
+#: app/templates/customer/customer_membership.html:107
 msgid "Membership Plans"
 msgstr ""
 
@@ -2119,165 +1977,108 @@ msgstr ""
 msgid "For our most valued guests"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:35
-msgid "Earn base loyalty points on every visit"
-msgstr ""
-
 #: app/templates/customer/customer_membership.html:36
-msgid "Birthday bonus points"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:37
-msgid "Access to member-only promotions"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:38
-msgid "Monthly reward voucher"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:39
-msgid "Priority booking (standard)"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:42
-msgid "Everything in Silver"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:43
-msgid "Early access to new services & seasonal offers"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:44
-msgid "Complimentary nail care kit (quarterly)"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:45
-msgid "Dedicated booking slot on weekends"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:48
-msgid "Everything in Gold"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:49
-msgid "Free add-on service every visit"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:50
-msgid "Personal nail stylist assignment"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:51
-msgid "VIP lounge access & complimentary drinks"
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:58
 msgid "Choose your plan"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:59
-msgid ""
-"Unlock exclusive perks, rewards, and priority care tailored to your "
-"loyalty."
-msgstr ""
-
-#: app/templates/customer/customer_membership.html:71
+#: app/templates/customer/customer_membership.html:49
 msgid "Your last payment failed."
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:72
+#: app/templates/customer/customer_membership.html:50
 msgid "Update your card"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:73
+#: app/templates/customer/customer_membership.html:51
 msgid "to keep your membership active."
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:79
-#: app/templates/customer/customer_membership.html:107
+#: app/templates/customer/customer_membership.html:57
+#: app/templates/customer/customer_membership.html:85
 msgid "Update payment method"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:97
-#: app/templates/customer/customer_membership.html:251
+#: app/templates/customer/customer_membership.html:75
+#: app/templates/customer/customer_membership.html:229
 #, python-format
 msgid "Your %(plan)s membership will not renew · active until %(date)s."
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:99
+#: app/templates/customer/customer_membership.html:77
 #, python-format
 msgid "Your %(plan)s membership renews on %(date)s."
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:116
-#: app/templates/customer/customer_membership.html:230
+#: app/templates/customer/customer_membership.html:94
+#: app/templates/customer/customer_membership.html:208
 msgid "Cancel renewal"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:156
+#: app/templates/customer/customer_membership.html:134
 #: app/templates/public/services.html:95 app/templates/public/services.html:129
 msgid "Popular"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:163
+#: app/templates/customer/customer_membership.html:141
 msgid "per year"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:165
+#: app/templates/customer/customer_membership.html:143
 msgid "Free"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:174
+#: app/templates/customer/customer_membership.html:152
 msgid "points on all services"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:186
+#: app/templates/customer/customer_membership.html:164
 msgid "Current plan"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:202
+#: app/templates/customer/customer_membership.html:180
 msgid "Upgrade to Gold"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:202
+#: app/templates/customer/customer_membership.html:180
 msgid "Upgrade to Diamond"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:204
+#: app/templates/customer/customer_membership.html:182
 msgid "Switch to Gold"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:204
+#: app/templates/customer/customer_membership.html:182
 msgid "Switch to Silver"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:231
+#: app/templates/customer/customer_membership.html:209
 #: app/templates/customer/customer_notifications.html:98
 #: app/templates/customer/customer_setting.html:921
 #: app/templates/customer/customer_setting.html:990
 #: app/templates/customer/loyalty_points.html:303
 #: app/templates/customer/my_bookings.html:268
-#: app/templates/customer/view_booking_details.html:195
+#: app/templates/customer/view_booking_details.html:196
 #: app/templates/public/gallery.html:102 app/templates/public/services.html:197
 msgid "Close"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:243
+#: app/templates/customer/customer_membership.html:221
 msgid "Renews on"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:255
+#: app/templates/customer/customer_membership.html:233
 msgid "Keep renewal"
 msgstr ""
 
-#: app/templates/customer/customer_membership.html:256
+#: app/templates/customer/customer_membership.html:234
 #: app/templates/customer/my_bookings.html:305
-#: app/templates/customer/view_booking_details.html:232
+#: app/templates/customer/view_booking_details.html:233
 msgid "Yes, cancel"
 msgstr ""
 
 #: app/templates/customer/customer_notifications.html:24
-msgid "Announcements from Misa Nails and messages sent to you."
+#, python-format
+msgid "Announcements from %(brand)s and messages sent to you."
 msgstr ""
 
 #: app/templates/customer/customer_notifications.html:32
@@ -2419,7 +2220,7 @@ msgstr ""
 #: app/templates/customer/my_bookings.html:195
 #: app/templates/customer/redeem_confirm_modal.html:72
 #: app/templates/customer/reschedule.html:237
-#: app/templates/customer/view_booking_details.html:133
+#: app/templates/customer/view_booking_details.html:135
 msgid "Cancel"
 msgstr ""
 
@@ -2631,16 +2432,8 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-#: app/templates/customer/loyalty_points.html:414
-msgid "Show this code to our staff at your next visit to redeem."
-msgstr ""
-
 #: app/templates/customer/loyalty_points.html:415
 msgid "This voucher has already been used."
-msgstr ""
-
-#: app/templates/customer/loyalty_points.html:416
-msgid "This voucher has expired and is no longer valid."
 msgstr ""
 
 #: app/templates/customer/loyalty_points.html:419
@@ -2666,7 +2459,7 @@ msgstr ""
 #: app/templates/customer/my_bookings.html:158
 #: app/templates/customer/reschedule.html:3
 #: app/templates/customer/reschedule.html:18
-#: app/templates/customer/view_booking_details.html:124
+#: app/templates/customer/view_booking_details.html:126
 msgid "Reschedule"
 msgstr ""
 
@@ -2708,52 +2501,52 @@ msgid "View All History"
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:267
-#: app/templates/customer/view_booking_details.html:194
+#: app/templates/customer/view_booking_details.html:195
 msgid "Cancel appointment?"
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:287
-#: app/templates/customer/view_booking_details.html:214
+#: app/templates/customer/view_booking_details.html:215
 msgid "Cancellation Policy"
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:292
-#: app/templates/customer/view_booking_details.html:219
+#: app/templates/customer/view_booking_details.html:220
 msgid "Reason for cancellation"
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:292
-#: app/templates/customer/view_booking_details.html:219
+#: app/templates/customer/view_booking_details.html:220
 msgid "(optional)"
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:295
-#: app/templates/customer/view_booking_details.html:222
+#: app/templates/customer/view_booking_details.html:223
 msgid "Select a reason..."
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:296
-#: app/templates/customer/view_booking_details.html:223
+#: app/templates/customer/view_booking_details.html:224
 msgid "Change of plans"
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:297
-#: app/templates/customer/view_booking_details.html:224
+#: app/templates/customer/view_booking_details.html:225
 msgid "Feeling unwell"
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:298
-#: app/templates/customer/view_booking_details.html:225
+#: app/templates/customer/view_booking_details.html:226
 msgid "Want to reschedule instead"
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:299
-#: app/templates/customer/view_booking_details.html:226
+#: app/templates/customer/view_booking_details.html:227
 msgid "Other"
 msgstr ""
 
 #: app/templates/customer/my_bookings.html:304
-#: app/templates/customer/view_booking_details.html:231
+#: app/templates/customer/view_booking_details.html:232
 msgid "Keep appointment"
 msgstr ""
 
@@ -2794,12 +2587,6 @@ msgstr ""
 msgid "APPOINTMENT MANAGEMENT"
 msgstr ""
 
-#: app/templates/customer/reschedule.html:20
-msgid ""
-"Modify your session with ease. Please note our 24-hour rescheduling "
-"window to ensure we can accommodate all guests."
-msgstr ""
-
 #: app/templates/customer/reschedule.html:40
 msgid "Service image"
 msgstr ""
@@ -2829,7 +2616,7 @@ msgid "Session duration:"
 msgstr ""
 
 #: app/templates/customer/reschedule.html:149
-#: app/templates/customer/view_booking_details.html:59
+#: app/templates/customer/view_booking_details.html:61
 #: app/templates/public/services.html:107
 #: app/templates/public/services.html:137
 msgid "mins"
@@ -2837,12 +2624,6 @@ msgstr ""
 
 #: app/templates/customer/reschedule.html:166
 msgid "Policy Notice"
-msgstr ""
-
-#: app/templates/customer/reschedule.html:167
-msgid ""
-"Bookings can only be rescheduled at least 24 hours in advance and can "
-"only be changed once. Further changes may require a new deposit."
 msgstr ""
 
 #: app/templates/customer/reschedule.html:183
@@ -2875,7 +2656,7 @@ msgid "Confirm Reschedule"
 msgstr ""
 
 #: app/templates/customer/view_booking_details.html:3
-#: app/templates/customer/view_booking_details.html:33
+#: app/templates/customer/view_booking_details.html:35
 msgid "Booking Details"
 msgstr ""
 
@@ -2883,36 +2664,44 @@ msgstr ""
 msgid "Confirmed"
 msgstr ""
 
-#: app/templates/customer/view_booking_details.html:30
+#: app/templates/customer/view_booking_details.html:18
+msgid "In Progress"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:21
+msgid "No Show"
+msgstr ""
+
+#: app/templates/customer/view_booking_details.html:32
 msgid "Back to Appointments"
 msgstr ""
 
-#: app/templates/customer/view_booking_details.html:81
+#: app/templates/customer/view_booking_details.html:83
 msgid "Artist"
 msgstr ""
 
-#: app/templates/customer/view_booking_details.html:92
+#: app/templates/customer/view_booking_details.html:94
 msgid "Service Description"
 msgstr ""
 
-#: app/templates/customer/view_booking_details.html:105
+#: app/templates/customer/view_booking_details.html:107
 msgid "Demo video"
 msgstr ""
 
-#: app/templates/customer/view_booking_details.html:146
+#: app/templates/customer/view_booking_details.html:148
 msgid "Salon location map"
 msgstr ""
 
-#: app/templates/customer/view_booking_details.html:153
-#: app/templates/public/index.html:267
+#: app/templates/customer/view_booking_details.html:155
+#: app/templates/public/index.html:268
 msgid "Address"
 msgstr ""
 
-#: app/templates/customer/view_booking_details.html:159
+#: app/templates/customer/view_booking_details.html:160
 msgid "Get Directions"
 msgstr ""
 
-#: app/templates/customer/view_booking_details.html:167
+#: app/templates/customer/view_booking_details.html:168
 msgid "Salon Contact"
 msgstr ""
 
@@ -2924,113 +2713,60 @@ msgstr ""
 msgid "Our Story"
 msgstr ""
 
-#: app/templates/public/about.html:21
-msgid ""
-"Redefining luxury wellness with precise, artisanal care in a sanctuary of"
-" soft mood and quiet elegance."
-msgstr ""
-
 #: app/templates/public/about.html:37
 msgid "Crafted with intention"
 msgstr ""
 
-#: app/templates/public/about.html:39
-msgid ""
-"At DahaCare, we believe that true luxury lies in the details. Founded on "
-"the principle of bringing atelier-level precision to daily wellness, our "
-"space was designed as a retreat from the noise of the city."
-msgstr ""
-
-#: app/templates/public/about.html:40
-msgid ""
-"Every treatment is a careful composition of quality products, rigorous "
-"hygiene standards, and the trained hands of our artists. We don't just "
-"provide a service; we curate an experience that honors your time and "
-"elevates your personal care ritual."
-msgstr ""
-
-#: app/templates/public/about.html:68
+#: app/templates/public/about.html:55
 msgid "Years of Excellence"
 msgstr ""
 
-#: app/templates/public/about.html:72
+#: app/templates/public/about.html:59
 msgid "Clients Served"
 msgstr ""
 
-#: app/templates/public/about.html:76
+#: app/templates/public/about.html:63
 msgid "Master Artists"
 msgstr ""
 
-#: app/templates/public/about.html:80 app/templates/public/services.html:161
+#: app/templates/public/about.html:67 app/templates/public/services.html:161
 msgid "Average Rating"
 msgstr ""
 
-#: app/templates/public/about.html:118
+#: app/templates/public/about.html:105
 msgid "Meet the team"
 msgstr ""
 
-#: app/templates/public/about.html:148
+#: app/templates/public/about.html:135
 msgid "What we stand for"
 msgstr ""
 
-#: app/templates/public/about.html:159
+#: app/templates/public/about.html:146
 msgid "Hygiene first"
 msgstr ""
 
-#: app/templates/public/about.html:160
-msgid ""
-"Medical-grade sterilization processes for every tool, ensuring your "
-"safety is never compromised."
-msgstr ""
-
-#: app/templates/public/about.html:169
+#: app/templates/public/about.html:156
 msgid "Trained artists"
 msgstr ""
 
-#: app/templates/public/about.html:170
-msgid ""
-"Continuous education and mastery of techniques mean you receive the "
-"pinnacle of modern care."
-msgstr ""
-
-#: app/templates/public/about.html:179
+#: app/templates/public/about.html:166
 msgid "Quality products"
 msgstr ""
 
-#: app/templates/public/about.html:180
-msgid ""
-"We source only premium, non-toxic, and sustainable materials for long-"
-"lasting, brilliant results."
-msgstr ""
-
-#: app/templates/public/about.html:189
+#: app/templates/public/about.html:176
 msgid "Client-first care"
 msgstr ""
 
-#: app/templates/public/about.html:190
-msgid ""
-"Your comfort is our priority. Enjoy a serene environment designed "
-"entirely around your relaxation."
-msgstr ""
-
-#: app/templates/public/about.html:204
+#: app/templates/public/about.html:191
 msgid "Come meet the team"
 msgstr ""
 
-#: app/templates/public/about.html:205
-msgid "Experience the DahaCare difference in person."
-msgstr ""
-
-#: app/templates/public/about.html:207
+#: app/templates/public/about.html:194
 msgid "Book your visit"
 msgstr ""
 
 #: app/templates/public/gallery.html:20
 msgid "Our Work"
-msgstr ""
-
-#: app/templates/public/gallery.html:21
-msgid "A glimpse into the artistry and precision behind every visit."
 msgstr ""
 
 #: app/templates/public/gallery.html:53
@@ -3086,116 +2822,72 @@ msgid "A glimpse of what we create every day"
 msgstr ""
 
 #: app/templates/public/index.html:133
-msgid "Why MisaNails?"
+#, python-format
+msgid "Why %(brand)s?"
 msgstr ""
 
 #: app/templates/public/index.html:139
 msgid "Happy clients"
 msgstr ""
 
-#: app/templates/public/index.html:140
-msgid "Trusted by thousands of satisfied customers who love our work."
-msgstr ""
-
 #: app/templates/public/index.html:144
 msgid "Safe products"
-msgstr ""
-
-#: app/templates/public/index.html:145
-msgid "We use only premium, non-toxic products for your health and safety."
 msgstr ""
 
 #: app/templates/public/index.html:149
 msgid "Expert artists"
 msgstr ""
 
-#: app/templates/public/index.html:150
-msgid "Our highly trained professionals bring your vision to life."
-msgstr ""
-
 #: app/templates/public/index.html:163
 msgid "What clients say"
 msgstr ""
 
-#: app/templates/public/index.html:176
-msgid ""
-"\"Absolutely wonderful experience! The attention to detail is unmatched, "
-"and my nails have never looked better. Highly recommend the gel "
-"extensions.\""
-msgstr ""
-
-#: app/templates/public/index.html:181
-msgid "Gold member"
-msgstr ""
-
-#: app/templates/public/index.html:194
-msgid ""
-"\"The ambiance is so relaxing, and the staff is incredibly professional. "
-"I love the creative nail art options they offer. A true luxury "
-"experience.\""
-msgstr ""
-
-#: app/templates/public/index.html:199
-msgid "First-time client"
-msgstr ""
-
-#: app/templates/public/index.html:219
+#: app/templates/public/index.html:220
 msgid "New member offer"
 msgstr ""
 
-#: app/templates/public/index.html:220
-#, python-format
-msgid "Create an account & get 15%% off your first visit"
-msgstr ""
-
-#: app/templates/public/index.html:221
-msgid ""
-"Join our community today and start enjoying the perks of premium nail "
-"care right away."
-msgstr ""
-
-#: app/templates/public/index.html:225
+#: app/templates/public/index.html:226
 msgid "Exclusive member updates"
 msgstr ""
 
-#: app/templates/public/index.html:229
+#: app/templates/public/index.html:230
 msgid "Easy online booking"
 msgstr ""
 
-#: app/templates/public/index.html:233
+#: app/templates/public/index.html:234
 msgid "Earn rewards points"
 msgstr ""
 
-#: app/templates/public/index.html:239
+#: app/templates/public/index.html:240
 msgid "Already have one? Log in"
 msgstr ""
 
-#: app/templates/public/index.html:245
+#: app/templates/public/index.html:246
 msgid "welcome discount"
 msgstr ""
 
-#: app/templates/public/index.html:261
+#: app/templates/public/index.html:262
 msgid "Find us"
 msgstr ""
 
-#: app/templates/public/index.html:275
+#: app/templates/public/index.html:279
 msgid "Hours"
 msgstr ""
 
-#: app/templates/public/index.html:283
+#: app/templates/public/index.html:287
 msgid "Phone"
 msgstr ""
 
-#: app/templates/public/index.html:291
+#: app/templates/public/index.html:295
 #: app/templates/staff/staff_profile.html:276
 msgid "Email"
 msgstr ""
 
-#: app/templates/public/index.html:303
+#: app/templates/public/index.html:307
 msgid "Map to our salon"
 msgstr ""
 
-#: app/templates/public/index.html:312
+#: app/templates/public/index.html:316
 msgid "Get directions"
 msgstr ""
 
@@ -3206,10 +2898,6 @@ msgstr ""
 
 #: app/templates/public/public_booking.html:230
 msgid "Your Details"
-msgstr ""
-
-#: app/templates/public/public_booking.html:231
-msgid "Please provide your contact information to secure the booking."
 msgstr ""
 
 #: app/templates/public/public_booking.html:255
@@ -3228,19 +2916,8 @@ msgstr ""
 msgid "Continue to Checkout"
 msgstr ""
 
-#: app/templates/public/public_booking.html:355
-msgid "Sign in to earn loyalty points with this booking."
-msgstr ""
-
 #: app/templates/public/services.html:19
 msgid "Our Services"
-msgstr ""
-
-#: app/templates/public/services.html:20
-msgid ""
-"Discover a curated collection of premium nail care and aesthetic "
-"treatments designed for the modern individual. Precision meets "
-"tranquility in every session."
 msgstr ""
 
 #: app/templates/public/services.html:97 app/templates/public/services.html:131
@@ -3283,16 +2960,6 @@ msgstr ""
 msgid "Booking received"
 msgstr ""
 
-#: app/templates/public/success.html:44
-msgid "We've reserved your spot. Get ready for some well-deserved pampering."
-msgstr ""
-
-#: app/templates/public/success.html:47
-msgid ""
-"We've got your request. We'll email you as soon as the salon confirms "
-"your appointment."
-msgstr ""
-
 #: app/templates/public/success.html:101
 msgid "Request received"
 msgstr ""
@@ -3309,26 +2976,12 @@ msgstr ""
 msgid "Your time is locked in."
 msgstr ""
 
-#: app/templates/public/success.html:116
-msgid "Usually within a few hours during opening times."
-msgstr ""
-
 #: app/templates/public/success.html:125
 msgid "Your appointment"
 msgstr ""
 
-#: app/templates/public/success.html:126
-msgid "Arrive 5-10 minutes early to pick your shade."
-msgstr ""
-
 #: app/templates/public/success.html:134
 msgid "Manage bookings easily"
-msgstr ""
-
-#: app/templates/public/success.html:135
-msgid ""
-"Create an account to track your loyalty points, reschedule appointments, "
-"and save your favorite colors."
 msgstr ""
 
 #: app/templates/public/success.html:136
@@ -3348,7 +3001,8 @@ msgid "Find us at:"
 msgstr ""
 
 #: app/templates/public/success.html:152
-msgid "DahaCare studio"
+#, python-format
+msgid "%(brand)s studio"
 msgstr ""
 
 #: app/templates/public/success.html:155

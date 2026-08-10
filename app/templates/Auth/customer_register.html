@@ -1,6 +1,6 @@
 {% extends "auth_base.html" %}
 
-{% block title %}{{ _('Sign up') }} | DahaCare{% endblock %}
+{% block title %}{{ _('Sign up') }} | {{ biz.brand_name }}{% endblock %}
 
 {% block auth_panel_text %}
 {# Override text bên panel ảnh trái — đổi tagline phù hợp ngữ cảnh đăng ký
@@ -31,7 +31,7 @@
        4. Đăng ký thành công: tạo customer mới trong DB, set session
           (auto-login luôn sau khi đăng ký, đúng UX phổ biến), redirect
           main.customer_dashboard. Cân nhắc thêm flash("Welcome to
-          DahaCare!", "success")
+          {{ biz.brand_name }}!", "success")
    - Google/Facebook signup: hiện tại CHỈ LÀ UI, href="#" — backend OAuth
      wire sau, giống Login
 ═══════════════════════════════════════════════════════════════════════════ #}

@@ -35,7 +35,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{% block title %}{{ _('Staff') }} — DahaCare{% endblock %}</title>
+<title>{% block title %}{{ _('Staff') }} — {{ biz.brand_name }}{% endblock %}</title>
 
 {# ── Fonts / Icons ── #}
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -365,7 +365,7 @@ body {
             aria-label="{{ _('Mở menu') }}" aria-controls="sfSidebar" aria-expanded="false">
         <i class="ti ti-menu-2"></i>
     </button>
-    <span class="sf-topbar__brand">DahaCare</span>
+    <span class="sf-topbar__brand">{{ biz.brand_name }}</span>
 </div>
 
 {# Lớp phủ nền khi mở drawer #}
@@ -387,7 +387,7 @@ body {
             </svg>
         </div>
         <div>
-            <div class="sf-sidebar__logo-name">DahaCare</div>
+            <div class="sf-sidebar__logo-name">{{ biz.brand_name }}</div>
             <div class="sf-sidebar__logo-sub">{{ _('Staff') }}</div>
         </div>
     </div>

@@ -25,38 +25,16 @@
      'diamond': _('For our most valued guests')
    } %}
 
-{#  Quyền lợi theo bậc. Vẫn ở template chứ không ở DB: membership_tiers chỉ có
-    một câu `description` và không có cột bản dịch, nên đưa 14 dòng copy này
-    vào đó sẽ mất i18n. Nhưng HỆ SỐ ĐIỂM đã thoát ra khỏi chuỗi: nó lấy từ
-    point_multiplier, nên admin đổi DB thì UI đúng theo ở cả ba ngôn ngữ.
-    Bản cũ hardcode "1.5×" và "2×" ngay trong msgid. #}
-{% set perks = {
-     'silver': [
-       _('Earn base loyalty points on every visit'),
-       _('Birthday bonus points'),
-       _('Access to member-only promotions'),
-       _('Monthly reward voucher'),
-       _('Priority booking (standard)')
-     ],
-     'gold': [
-       _('Everything in Silver'),
-       _('Early access to new services & seasonal offers'),
-       _('Complimentary nail care kit (quarterly)'),
-       _('Dedicated booking slot on weekends')
-     ],
-     'diamond': [
-       _('Everything in Gold'),
-       _('Free add-on service every visit'),
-       _('Personal nail stylist assignment'),
-       _('VIP lounge access & complimentary drinks')
-     ]
-   } %}
+{#  Quyền lợi theo bậc đọc từ MEMBERSHIP trong app/business.py qua global
+    perks() — đã chọn sẵn đúng ngôn ngữ. HỆ SỐ ĐIỂM vẫn lấy từ point_multiplier
+    (t.multiplier) chứ không nằm trong chuỗi, nên đổi hệ số trong business.py
+    thì UI đúng theo ở cả ba ngôn ngữ. #}
 
 <div class="ms">
 
   <header class="ms-intro">
     <h1 class="ms-intro__title">{{ _('Choose your plan') }}</h1>
-    <p class="ms-intro__sub">{{ _('Unlock exclusive perks, rewards, and priority care tailored to your loyalty.') }}</p>
+    <p class="ms-intro__sub">{{ txt('membership.intro_sub') }}</p>
   </header>
 
 
@@ -173,7 +151,7 @@
             <span class="material-symbols-outlined" aria-hidden="true">check</span>
             <span class="ms-perks__mult">×{{ t.multiplier }}</span> {{ _('points on all services') }}
           </li>
-          {% for p in perks.get(key, []) %}
+          {% for p in perks(t.name) %}
           <li>
             <span class="material-symbols-outlined" aria-hidden="true">check</span>
             {{ p }}

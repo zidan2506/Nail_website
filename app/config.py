@@ -22,7 +22,7 @@ class Config:
     RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
     if not RESEND_API_KEY:
         raise RuntimeError("RESEND_API_KEY is not set. Add it to your .env file.")
-    # 'from': phải thuộc domain đã verify trên Resend, vd "Misa Nails <noreply@dahatrans.com>"
+    # 'from': phải thuộc domain đã verify trên Resend, vd "MisaNails <noreply@your-domain.com>"
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
     if not MAIL_DEFAULT_SENDER:
         raise RuntimeError("MAIL_DEFAULT_SENDER is not set (địa chỉ thuộc domain đã verify trên Resend).")

@@ -1,6 +1,6 @@
 {% extends "customer_base.html" %}
 
-{% block title %}{{ _('Coming Soon') }} – Daha Care{% endblock %}
+{% block title %}{{ _('Coming Soon') }} – {{ biz.brand_name }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -145,7 +145,7 @@
 
     <div class="cs-divider"></div>
 
-    <p class="cs-brand">Daha Care · Vietnamese Shop</p>
+    <p class="cs-brand">{{ biz.brand_name }} · Vietnamese Shop</p>
 
     <a href="{{ url_for('main.customer_dashboard') }}" class="cs-btn">← {{ _('Back to dashboard') }}</a>
 

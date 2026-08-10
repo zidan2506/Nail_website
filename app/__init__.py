@@ -70,13 +70,20 @@ def create_app():
 
     # Thread transcode video là daemon nên chết theo process. Job nào còn
     # 'processing' lúc này chắc chắn không còn ai xử lý -> dọn để khỏi kẹt.
-    from app.database.db import reset_stuck_video_jobs
+    from app.database.db import reset_stuck_video_jobs, sync_membership_tiers
     from app.routes import _cleanup_stale_temp
     try:
         reset_stuck_video_jobs()
     except Exception:
         # DB chưa init (lần chạy đầu / CI) thì bỏ qua, không chặn app khởi động
         logging.getLogger(__name__).warning("Bỏ qua dọn job video treo: DB chưa sẵn sàng")
+
+    # business.py là nguồn chính cho giá + hệ số điểm của membership; đẩy xuống
+    # DB để mọi code đọc bảng membership_tiers vẫn thấy đúng số mới nhất.
+    try:
+        sync_membership_tiers()
+    except Exception:
+        logging.getLogger(__name__).warning("Bỏ qua sync membership tiers: DB chưa sẵn sàng")
     try:
         _cleanup_stale_temp()
     except Exception:

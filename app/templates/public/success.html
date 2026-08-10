@@ -2,7 +2,7 @@
 
 {% set is_confirmed = booking_status == 'confirmed' %}
 
-{% block title %}{% if is_confirmed %}{{ _('Booking confirmed') }}{% else %}{{ _('Booking received') }}{% endif %} | DahaCare{% endblock %}
+{% block title %}{% if is_confirmed %}{{ _('Booking confirmed') }}{% else %}{{ _('Booking received') }}{% endif %} | {{ biz.brand_name }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/public/success.css') }}">
@@ -41,10 +41,10 @@
 
       {% if is_confirmed %}
       <h1 class="bkc-head__title">{{ _('Booking confirmed') }}</h1>
-      <p class="bkc-head__sub">{{ _("We've reserved your spot. Get ready for some well-deserved pampering.") }}</p>
+      <p class="bkc-head__sub">{{ txt('success.head_sub_confirmed') }}</p>
       {% else %}
       <h1 class="bkc-head__title">{{ _('Booking received') }}</h1>
-      <p class="bkc-head__sub">{{ _("We've got your request. We'll email you as soon as the salon confirms your appointment.") }}</p>
+      <p class="bkc-head__sub">{{ txt('success.head_sub_pending') }}</p>
       {% endif %}
     </header>
 
@@ -113,7 +113,7 @@
             {%- if is_confirmed -%}
               {{ _('Your time is locked in.') }}
             {%- else -%}
-              {{ _('Usually within a few hours during opening times.') }}
+              {{ txt('success.note_response_time') }}
             {%- endif -%}
           </p>
         </div>
@@ -123,7 +123,7 @@
         <span class="bkc-rail__dot"></span>
         <div class="bkc-rail__text">
           <p class="bkc-rail__label">{{ _('Your appointment') }}</p>
-          <p class="bkc-rail__note">{{ _('Arrive 5-10 minutes early to pick your shade.') }}</p>
+          <p class="bkc-rail__note">{{ txt('success.note_arrive_early') }}</p>
         </div>
       </li>
     </ol>
@@ -132,7 +132,7 @@
     {% if not session.get("customer_id") %}
     <section class="bkc-invite">
       <h2 class="bkc-invite__title">{{ _('Manage bookings easily') }}</h2>
-      <p class="bkc-invite__text">{{ _('Create an account to track your loyalty points, reschedule appointments, and save your favorite colors.') }}</p>
+      <p class="bkc-invite__text">{{ txt('success.invite_signup') }}</p>
       <a href="{{ url_for('main.register') }}" class="bkc-invite__btn">{{ _('Create Account') }}</a>
     </section>
     {% endif %}
@@ -149,7 +149,7 @@
       </p>
       <a class="bkc-place__media" href="{{ gg_map_url }}" target="_blank" rel="noopener">
         <img src="{{ url_for('static', filename='images/public/nail_studio.jpg') }}"
-             alt="{{ _('DahaCare studio') }}" loading="lazy">
+             alt="{{ _('%(brand)s studio', brand=biz.brand_name) }}" loading="lazy">
         <span class="bkc-place__cta">
           <span class="material-symbols-outlined">directions</span>
           {{ _('Open in Maps') }}

@@ -317,7 +317,7 @@
 /* =========================================================
    STATUS - nhãn duy nhất của trang
    ---------------------------------------------------------
-   Bốn trạng thái vẽ theo CÙNG một công thức, chỉ đổi hue:
+   Sáu trạng thái vẽ theo CÙNG một công thức, chỉ đổi hue:
 
      nền   = hue @ 12%
      viền  = hue @ 34%
@@ -356,8 +356,8 @@
   color: #F4DFA8;
 }
 
-/* Hai trạng thái này nằm trên nền sáng (.bd-focus--past) */
-.bd-status--completed {
+/* Bốn trạng thái này nằm trên nền sáng (.bd-focus--past) */
+.bd-status--done {
   background: rgba(171, 34, 97, 0.10);
   border-color: rgba(171, 34, 97, 0.30);
   color: var(--bd-accent);
@@ -366,6 +366,21 @@
   background: rgba(176, 58, 74, 0.10);
   border-color: rgba(176, 58, 74, 0.30);
   color: var(--bd-danger);
+}
+/* Tím mượn nguyên hue của .bk-pill--in-progress bên admin: đang-làm là
+   thứ duy nhất không thuộc trục hồng/đỏ, nên nó không bị đọc nhầm
+   thành "đã xong" hay "hỏng". #5C2D91 trên wash đạt ~8:1. */
+.bd-status--in-progress {
+  background: rgba(92, 45, 145, 0.10);
+  border-color: rgba(92, 45, 145, 0.30);
+  color: #5C2D91;
+}
+/* Đỏ nâu trầm, KHÔNG dùng lại --bd-danger: no-show và cancelled đứng
+   cạnh nhau trong cùng bộ nhãn, cùng một đỏ thì mất phân biệt. */
+.bd-status--no-show {
+  background: rgba(107, 44, 44, 0.10);
+  border-color: rgba(107, 44, 44, 0.30);
+  color: #6B2C2C;
 }
 
 

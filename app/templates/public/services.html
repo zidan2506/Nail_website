@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Services') }} | DahaCare Atélier{% endblock %}
+{% block title %}{{ _('Services') }} | {{ biz.brand_name }} Atélier{% endblock %}
 
 {# Load services-page-specific CSS — base.css đã được load sẵn trong base.html #}
 {% block extra_css %}
@@ -17,7 +17,7 @@
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="svc-hero">
     <h1 class="svc-hero__title">{{ _('Our Services') }}</h1>
-    <p class="svc-hero__subtitle">{{ _('Discover a curated collection of premium nail care and aesthetic treatments designed for the modern individual. Precision meets tranquility in every session.') }}</p>
+    <p class="svc-hero__subtitle">{{ txt('services.hero_sub') }}</p>
 </section>
 
 

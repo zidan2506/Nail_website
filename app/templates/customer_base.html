@@ -24,7 +24,7 @@
 
             <div class="sidebar_brand">
                 <a href="{{ url_for('main.home') }}" class="brand-link">
-                    <h2>✦ Misa Nails </h2>
+                    <h2>✦ {{ biz.brand_name }}</h2>
                     <p>Vietnamese shop</p>
                 </a>
             </div>
@@ -119,7 +119,7 @@
                         aria-label="{{ _('Open menu') }}" aria-controls="customerSidebar" aria-expanded="false">
                     <span class="material-symbols-outlined">menu</span>
                 </button>
-                <span class="customer-topbar__brand">✦ Misa Nails</span>
+                <span class="customer-topbar__brand">✦ {{ biz.brand_name }}</span>
 
                 {# Hòm thư: thông báo chung của tiệm + thông báo gửi riêng.
                    Badge + 5 tin gần nhất do inject_customer_notifications() cấp,

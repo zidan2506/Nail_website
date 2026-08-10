@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-10 18:31+0700\n"
+"POT-Creation-Date: 2026-08-10 20:26+0700\n"
 "PO-Revision-Date: 2026-07-10 19:40+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fi\n"
@@ -18,20 +18,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes.py:55
+#: app/routes.py:56
 msgid "Chờ xác nhận"
 msgstr "Odottaa vahvistusta"
 
-#: app/routes.py:55 app/templates/staff/staff_bookings.html:311
+#: app/routes.py:56 app/templates/staff/staff_bookings.html:311
 msgid "Đã xác nhận"
 msgstr "Vahvistettu"
 
-#: app/routes.py:55 app/templates/staff/staff_bookings.html:312
+#: app/routes.py:56 app/templates/staff/staff_bookings.html:312
 #: app/templates/staff/staff_bookings.html:338
 msgid "Đang thực hiện"
 msgstr "Käynnissä"
 
-#: app/routes.py:56 app/templates/staff/staff_bookings.html:312
+#: app/routes.py:57 app/templates/staff/staff_bookings.html:312
 #: app/templates/staff/staff_bookings.html:342
 #: app/templates/staff/staff_bookings.html:409
 #: app/templates/staff/staff_bookings.html:487
@@ -41,253 +41,253 @@ msgstr "Käynnissä"
 msgid "Hoàn thành"
 msgstr "Valmis"
 
-#: app/routes.py:56 app/templates/staff/staff_history.html:260
+#: app/routes.py:57 app/templates/staff/staff_history.html:260
 #: app/templates/staff/staff_history.html:283
 #: app/templates/staff/staff_history.html:339
 #: app/templates/staff/staff_history.html:425
 msgid "Đã hủy"
 msgstr "Peruttu"
 
-#: app/routes.py:56
+#: app/routes.py:57
 msgid "Không đến"
 msgstr "Ei saapunut"
 
-#: app/routes.py:57
+#: app/routes.py:58
 msgid "hôm nay"
 msgstr "tänään"
 
-#: app/routes.py:57
+#: app/routes.py:58
 msgid "trong tuần này"
 msgstr "tällä viikolla"
 
-#: app/routes.py:57
+#: app/routes.py:58
 msgid "trong tháng này"
 msgstr "tässä kuussa"
 
-#: app/routes.py:58
+#: app/routes.py:59
 msgid "trong tháng trước"
 msgstr "viime kuussa"
 
-#: app/routes.py:59 app/routes.py:2002
+#: app/routes.py:60 app/routes.py:2016
 msgid "✓ Claimed"
 msgstr "✓ Lunastettu"
 
-#: app/routes.py:59 app/routes.py:2004
+#: app/routes.py:60 app/routes.py:2018
 msgid "✓ All Reviewed"
 msgstr "✓ Kaikki arvosteltu"
 
-#: app/routes.py:59
+#: app/routes.py:60
 msgid "Start"
 msgstr "Aloita"
 
-#: app/routes.py:59
+#: app/routes.py:60
 msgid "Claim"
 msgstr "Lunasta"
 
-#: app/routes.py:474
+#: app/routes.py:489
 msgid "Please login!"
 msgstr "Kirjaudu sisään!"
 
-#: app/routes.py:496
+#: app/routes.py:511
 msgid "Unauthorized."
 msgstr "Ei käyttöoikeutta."
 
-#: app/routes.py:501
+#: app/routes.py:516
 msgid "Session expired. Please log in again."
 msgstr "Istunto on vanhentunut. Kirjaudu uudelleen."
 
-#: app/routes.py:511
+#: app/routes.py:526
 msgid "You do not have access to this area."
 msgstr "Sinulla ei ole pääsyä tälle alueelle."
 
-#: app/routes.py:547
+#: app/routes.py:562
 msgid "Today"
 msgstr "Tänään"
 
-#: app/routes.py:549
+#: app/routes.py:564
 msgid "Tomorrow"
 msgstr "Huomenna"
 
-#: app/routes.py:559 app/routes.py:793 app/routes.py:861 app/routes.py:1118
-#: app/routes.py:1142 app/routes.py:1400 app/routes.py:1553 app/routes.py:1617
-#: app/routes.py:1648 app/routes.py:1716 app/routes.py:1805 app/routes.py:1844
+#: app/routes.py:574 app/routes.py:808 app/routes.py:875 app/routes.py:1132
+#: app/routes.py:1156 app/routes.py:1414 app/routes.py:1567 app/routes.py:1631
+#: app/routes.py:1662 app/routes.py:1730 app/routes.py:1819 app/routes.py:1858
 msgid "Customer profile not found!"
 msgstr "Asiakasprofiilia ei löytynyt!"
 
-#: app/routes.py:641 app/routes.py:4457
+#: app/routes.py:656 app/routes.py:4471
 msgid "That service is no longer available. Showing our full menu."
 msgstr "Palvelu ei ole enää saatavilla. Näytetään koko valikoima."
 
-#: app/routes.py:666 app/routes.py:865
+#: app/routes.py:681 app/routes.py:879
 msgid "Booking not found"
 msgstr "Varausta ei löytynyt"
 
-#: app/routes.py:673
+#: app/routes.py:688
 msgid "User not found!"
 msgstr "Käyttäjää ei löytynyt!"
 
-#: app/routes.py:677
+#: app/routes.py:692
 msgid "This booking cannot be cancelled"
 msgstr "Tätä varausta ei voi perua"
 
-#: app/routes.py:683
+#: app/routes.py:698
 msgid "Booking cancelled successfully"
 msgstr "Varaus peruttu."
 
-#: app/routes.py:691
+#: app/routes.py:706
 msgid "Session Expired. Please login again."
 msgstr "Istunto on vanhentunut. Kirjaudu uudelleen."
 
-#: app/routes.py:697
+#: app/routes.py:712
 msgid "Customer profile not found by some how :D"
 msgstr "Asiakasprofiilia ei löytynyt."
 
-#: app/routes.py:787 app/routes.py:797 app/routes.py:855
+#: app/routes.py:802 app/routes.py:812 app/routes.py:869
 msgid "Booking not found!"
 msgstr "Varausta ei löytynyt!"
 
-#: app/routes.py:803 app/routes.py:871
+#: app/routes.py:818 app/routes.py:885
 msgid "Service data unavailable."
 msgstr "Palvelutietoja ei ole saatavilla."
 
-#: app/routes.py:809 app/routes.py:877
+#: app/routes.py:824 app/routes.py:891
 msgid "Staff data unavailable."
 msgstr "Henkilökunnan tietoja ei ole saatavilla."
 
-#: app/routes.py:894
+#: app/routes.py:908
 msgid "Please select a new date and time"
 msgstr "Valitse uusi päivä ja aika"
 
-#: app/routes.py:900
+#: app/routes.py:914
 msgid "You can only reschedule within the next 14 days"
 msgstr "Voit siirtää varausta vain seuraavien 14 päivän sisällä"
 
-#: app/routes.py:906
+#: app/routes.py:920
 msgid "Invalid time format"
 msgstr "Virheellinen aikamuoto"
 
-#: app/routes.py:933
+#: app/routes.py:947
 msgid "This time slot is no longer available."
 msgstr "Tämä aika ei ole enää vapaa."
 
-#: app/routes.py:934
+#: app/routes.py:948
 msgid "Please choose another time."
 msgstr "Valitse toinen aika."
 
-#: app/routes.py:944
+#: app/routes.py:958
 msgid "Booking rescheduled successfully"
 msgstr "Varaus siirretty."
 
-#: app/routes.py:1150
+#: app/routes.py:1164
 msgid "Name is required."
 msgstr "Nimi on pakollinen."
 
-#: app/routes.py:1154
+#: app/routes.py:1168
 msgid "Profile updated successfully."
 msgstr "Profiili päivitetty."
 
-#: app/routes.py:1171
+#: app/routes.py:1185
 msgid "No file selected."
 msgstr "Tiedostoa ei valittu."
 
-#: app/routes.py:1179
+#: app/routes.py:1193
 msgid "Profile picture updated."
 msgstr "Profiilikuva päivitetty."
 
-#: app/routes.py:1210 app/routes.py:1277
+#: app/routes.py:1224 app/routes.py:1291
 msgid "Verification session expired. Please request a new code."
 msgstr "Vahvistusistunto on vanhentunut. Pyydä uusi koodi."
 
-#: app/routes.py:1219 app/routes.py:1289
+#: app/routes.py:1233 app/routes.py:1303
 msgid "Verification code expired. Please request a new code."
 msgstr "Vahvistuskoodi on vanhentunut. Pyydä uusi koodi."
 
-#: app/routes.py:1226 app/routes.py:1296 app/routes.py:2496
+#: app/routes.py:1240 app/routes.py:1310 app/routes.py:2510
 msgid "Too many incorrect attempts. Please request a new code."
 msgstr "Liian monta väärää yritystä. Pyydä uusi koodi."
 
-#: app/routes.py:1228 app/routes.py:1298 app/routes.py:2498
+#: app/routes.py:1242 app/routes.py:1312 app/routes.py:2512
 msgid "Incorrect verification code."
 msgstr "Virheellinen vahvistuskoodi."
 
-#: app/routes.py:1232 app/routes.py:2506 app/routes.py:4916
+#: app/routes.py:1246 app/routes.py:2520 app/routes.py:4930
 msgid "Passwords do not match."
 msgstr "Salasanat eivät täsmää."
 
-#: app/routes.py:1236
+#: app/routes.py:1250
 msgid "New password must be at least 8 characters."
 msgstr "Uuden salasanan on oltava vähintään 8 merkkiä."
 
-#: app/routes.py:1242
+#: app/routes.py:1256
 msgid "Password changed successfully."
 msgstr "Salasana vaihdettu."
 
-#: app/routes.py:1272 app/routes.py:3294 app/routes.py:3323 app/routes.py:3342
+#: app/routes.py:1286 app/routes.py:3308 app/routes.py:3337 app/routes.py:3356
 msgid "Customer not found."
 msgstr "Asiakasta ei löytynyt."
 
-#: app/routes.py:1284 app/routes.py:2765 app/routes.py:2794
+#: app/routes.py:1298 app/routes.py:2779 app/routes.py:2808
 msgid "Please fill in all fields."
 msgstr "Täytä kaikki kentät."
 
-#: app/routes.py:1302
+#: app/routes.py:1316
 msgid "New email is the same as your current email."
 msgstr "Uusi sähköposti on sama kuin nykyinen."
 
-#: app/routes.py:1307
+#: app/routes.py:1321
 msgid "Email is already taken."
 msgstr "Sähköposti on jo käytössä."
 
-#: app/routes.py:1316
+#: app/routes.py:1330
 msgid "Email updated successfully."
 msgstr "Sähköposti päivitetty."
 
-#: app/routes.py:1326
+#: app/routes.py:1340
 msgid "User not found. Please login!"
 msgstr "Käyttäjää ei löytynyt. Kirjaudu sisään!"
 
-#: app/routes.py:1331
+#: app/routes.py:1345
 msgid "Customer profile not found."
 msgstr "Asiakasprofiilia ei löytynyt."
 
-#: app/routes.py:1405 app/routes.py:1410
+#: app/routes.py:1419 app/routes.py:1424
 msgid "Invoice not found!"
 msgstr "Laskua ei löytynyt!"
 
-#: app/routes.py:1450
+#: app/routes.py:1464
 msgid "Could not start the payment session. Please try again."
 msgstr "Maksusession aloitus epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:1462
+#: app/routes.py:1476
 msgid "Something went wrong. Please login again!"
 msgstr "Jotain meni pieleen. Kirjaudu uudelleen!"
 
-#: app/routes.py:1467
+#: app/routes.py:1481
 msgid "Customer profile not found. Please login again!"
 msgstr "Asiakasprofiilia ei löytynyt. Kirjaudu uudelleen!"
 
-#: app/routes.py:1475 app/routes.py:4492
+#: app/routes.py:1489 app/routes.py:4506
 msgid "Please select a service, date, and time slot before confirming."
 msgstr "Valitse palvelu, päivä ja aika ennen vahvistusta."
 
-#: app/routes.py:1490 app/routes.py:4506
+#: app/routes.py:1504 app/routes.py:4520
 msgid "Service not found. Please try again."
 msgstr "Palvelua ei löytynyt. Yritä uudelleen."
 
-#: app/routes.py:1534 app/routes.py:4548 app/routes.py:4703 app/routes.py:4855
-#: app/routes.py:4886
+#: app/routes.py:1548 app/routes.py:4562 app/routes.py:4717 app/routes.py:4869
+#: app/routes.py:4900
 msgid "Could not send verification email. Please try again."
 msgstr "Vahvistussähköpostin lähetys epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:1558
+#: app/routes.py:1572
 msgid "Invalid plan selected."
 msgstr "Virheellinen paketti."
 
-#: app/routes.py:1563
+#: app/routes.py:1577
 msgid "Plan not found."
 msgstr "Pakettia ei löytynyt."
 
-#: app/routes.py:1578
+#: app/routes.py:1592
 msgid ""
 "Your paid membership will stop renewing and revert to Silver at the "
 "period end."
@@ -295,200 +295,200 @@ msgstr ""
 "Maksullinen jäsenyytesi ei uusiudu ja palautuu Silver-tasolle kauden "
 "lopussa."
 
-#: app/routes.py:1580
+#: app/routes.py:1594
 msgid "You're on the Silver plan."
 msgstr "Sinulla on Silver-paketti."
 
-#: app/routes.py:1587
+#: app/routes.py:1601
 msgid ""
 "This plan isn't available for online payment right now. Please try again "
 "later."
 msgstr "Tätä pakettia ei voi juuri nyt maksaa verkossa. Yritä myöhemmin uudelleen."
 
-#: app/routes.py:1592
+#: app/routes.py:1606
 #, python-format
 msgid "You are already subscribed to %(tier)s."
 msgstr "Sinulla on jo %(tier)s-paketti."
 
-#: app/routes.py:1606
+#: app/routes.py:1620
 msgid "Could not start checkout. Please try again."
 msgstr "Kassalle siirtyminen epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:1622
+#: app/routes.py:1636
 msgid "No active subscription to cancel."
 msgstr "Ei aktiivista tilausta peruttavaksi."
 
-#: app/routes.py:1626
+#: app/routes.py:1640
 msgid ""
 "Your membership will not renew. You keep your benefits until the current "
 "period ends."
 msgstr "Jäsenyytesi ei uusiudu. Edut säilyvät nykyisen kauden loppuun."
 
-#: app/routes.py:1629
+#: app/routes.py:1643
 msgid "Could not cancel your membership. Please try again."
 msgstr "Jäsenyyden peruutus epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:1656 app/routes.py:1660
+#: app/routes.py:1670 app/routes.py:1674
 msgid "Invalid reward."
 msgstr "Virheellinen palkinto."
 
-#: app/routes.py:1668
+#: app/routes.py:1682
 msgid "Reward not found."
 msgstr "Palkintoa ei löytynyt."
 
-#: app/routes.py:1671 app/routes.py:1699
+#: app/routes.py:1685 app/routes.py:1713
 msgid "Not enough points."
 msgstr "Ei tarpeeksi pisteitä."
 
-#: app/routes.py:1674
+#: app/routes.py:1688
 msgid "This reward is out of stock."
 msgstr "Tämä palkinto on loppunut."
 
-#: app/routes.py:1692
+#: app/routes.py:1706
 #, python-format
 msgid "This reward resets in %(days)s day(s)."
 msgstr "Tämä palkinto avautuu uudelleen %(days)s päivän kuluttua."
 
-#: app/routes.py:1696
+#: app/routes.py:1710
 msgid "You have reached the redeem limit for this reward."
 msgstr "Olet jo lunastanut tämän palkinnon sallitun määrän."
 
-#: app/routes.py:1700
+#: app/routes.py:1714
 #, python-format
 msgid "Successfully redeemed: %(name)s"
 msgstr "Lunastettu: %(name)s"
 
-#: app/routes.py:1808
+#: app/routes.py:1822
 msgid "No billing account found."
 msgstr "Laskutustiliä ei löytynyt."
 
-#: app/routes.py:1817
+#: app/routes.py:1831
 msgid "Could not open the billing portal. Please try again later."
 msgstr "Laskutusportaalin avaus epäonnistui. Yritä myöhemmin uudelleen."
 
-#: app/routes.py:1952
+#: app/routes.py:1966
 msgid "All rewards unlocked!"
 msgstr "Kaikki palkinnot avattu!"
 
-#: app/routes.py:1961
+#: app/routes.py:1975
 msgid "Booking"
 msgstr "Varaus"
 
-#: app/routes.py:1962
+#: app/routes.py:1976
 msgid "Double points"
 msgstr "Tuplapisteet"
 
-#: app/routes.py:1963
+#: app/routes.py:1977
 msgid "First booking"
 msgstr "Ensimmäinen varaus"
 
-#: app/routes.py:1964
+#: app/routes.py:1978
 msgid "Streak bonus"
 msgstr "Putkibonus"
 
-#: app/routes.py:1965
+#: app/routes.py:1979
 msgid "Manual adjustment"
 msgstr "Manuaalinen korjaus"
 
-#: app/routes.py:1966
+#: app/routes.py:1980
 msgid "Reward redemption"
 msgstr "Palkinnon lunastus"
 
-#: app/routes.py:1987
+#: app/routes.py:2001
 msgid "Earned on"
 msgstr "Ansaittu"
 
-#: app/routes.py:1987 app/templates/customer/loyalty_points.html:315
+#: app/routes.py:2001 app/templates/customer/loyalty_points.html:315
 msgid "Redeemed on"
 msgstr "Lunastettu"
 
-#: app/routes.py:2075 app/routes.py:4733
+#: app/routes.py:2089 app/routes.py:4747
 #, python-format
 msgid "Too many failed attempts. Try again in %(minutes)s minute(s)."
 msgstr ""
 "Liian monta epäonnistunutta yritystä. Yritä uudelleen %(minutes)s "
 "minuutin kuluttua."
 
-#: app/routes.py:2082 app/routes.py:4740
+#: app/routes.py:2096 app/routes.py:4754
 msgid "Please enter email or password!"
 msgstr "Syötä sähköposti ja salasana!"
 
-#: app/routes.py:2089 app/routes.py:2096 app/routes.py:4747 app/routes.py:4758
+#: app/routes.py:2103 app/routes.py:2110 app/routes.py:4761 app/routes.py:4772
 msgid "Invalid email or password!"
 msgstr "Virheellinen sähköposti tai salasana!"
 
-#: app/routes.py:2100
+#: app/routes.py:2114
 msgid "Please use the customer login portal"
 msgstr "Käytä asiakkaiden kirjautumissivua"
 
-#: app/routes.py:2114
+#: app/routes.py:2128
 msgid "Staff profile not found!"
 msgstr "Henkilökunnan profiilia ei löytynyt!"
 
-#: app/routes.py:2118 app/routes.py:4771 app/routes.py:4834
+#: app/routes.py:2132 app/routes.py:4785 app/routes.py:4848
 #, python-format
 msgid "Logged in. Welcome, %(name)s."
 msgstr "Kirjauduit sisään. Tervetuloa, %(name)s."
 
-#: app/routes.py:2126
+#: app/routes.py:2140
 msgid "Logged in. Welcome, master."
 msgstr "Kirjauduit sisään. Tervetuloa, pomo."
 
-#: app/routes.py:2129
+#: app/routes.py:2143
 msgid "something went wrong :("
 msgstr "Jotain meni pieleen."
 
-#: app/routes.py:2246 app/routes.py:2376
+#: app/routes.py:2260 app/routes.py:2390
 msgid "Staff profile not found."
 msgstr "Henkilökunnan profiilia ei löytynyt."
 
-#: app/routes.py:2288
+#: app/routes.py:2302
 #, python-format
 msgid "vào ngày %(date)s"
 msgstr "päivänä %(date)s"
 
-#: app/routes.py:2289
+#: app/routes.py:2303
 #, python-format
 msgid "từ %(start)s đến %(end)s"
 msgstr "%(start)s – %(end)s"
 
-#: app/routes.py:2448
+#: app/routes.py:2462
 msgid "Please select an image."
 msgstr "Valitse kuva."
 
-#: app/routes.py:2454
+#: app/routes.py:2468
 msgid "Profile photo updated."
 msgstr "Profiilikuva päivitetty."
 
-#: app/routes.py:2480
+#: app/routes.py:2494
 msgid "Your verification session has expired. Please request a new code."
 msgstr "Vahvistusistunto on vanhentunut. Pyydä uusi koodi."
 
-#: app/routes.py:2489
+#: app/routes.py:2503
 msgid "The verification code has expired. Please request a new one."
 msgstr "Vahvistuskoodi on vanhentunut. Pyydä uusi."
 
-#: app/routes.py:2502
+#: app/routes.py:2516
 msgid "The new password must be at least 8 characters."
 msgstr "Uuden salasanan on oltava vähintään 8 merkkiä."
 
-#: app/routes.py:2512
+#: app/routes.py:2526
 msgid "Password changed."
 msgstr "Salasana vaihdettu."
 
-#: app/routes.py:2531 app/routes.py:2548 app/routes.py:2569
+#: app/routes.py:2545 app/routes.py:2562 app/routes.py:2583
 msgid "You do not have permission to perform this action."
 msgstr "Sinulla ei ole oikeutta tähän toimintoon."
 
-#: app/routes.py:2535
+#: app/routes.py:2549
 msgid "Service started."
 msgstr "Palvelu aloitettu."
 
-#: app/routes.py:2552
+#: app/routes.py:2566
 msgid "Marked as completed."
 msgstr "Merkitty valmiiksi."
 
-#: app/routes.py:2554 app/templates/Auth/email_verification.html:199
+#: app/routes.py:2568 app/templates/Auth/email_verification.html:199
 #: app/templates/Auth/email_verification.html:221
 #: app/templates/customer/customer_setting.html:1116
 #: app/templates/customer/customer_setting.html:1248
@@ -496,74 +496,74 @@ msgstr "Merkitty valmiiksi."
 msgid "Something went wrong. Please try again."
 msgstr "Jokin meni pieleen. Yritä uudelleen."
 
-#: app/routes.py:2573
+#: app/routes.py:2587
 msgid "Payment confirmed."
 msgstr "Maksu vahvistettu."
 
-#: app/routes.py:2727
+#: app/routes.py:2741
 msgid "Invalid status."
 msgstr "Virheellinen tila."
 
-#: app/routes.py:2732 app/routes.py:2799
+#: app/routes.py:2746 app/routes.py:2813
 msgid "Booking not found."
 msgstr "Varausta ei löytynyt."
 
-#: app/routes.py:2746
+#: app/routes.py:2760
 msgid "Could not complete the booking. Service or staff data is missing."
 msgstr "Varausta ei voitu viimeistellä. Palvelu- tai henkilökuntatiedot puuttuvat."
 
-#: app/routes.py:2750
+#: app/routes.py:2764
 #, python-format
 msgid "Booking #%(id)s status updated."
 msgstr "Varauksen #%(id)s tila päivitetty."
 
-#: app/routes.py:2770 app/routes.py:2960
+#: app/routes.py:2784 app/routes.py:2974
 msgid "Service not found."
 msgstr "Palvelua ei löytynyt."
 
-#: app/routes.py:2777
+#: app/routes.py:2791
 msgid "This stylist is already booked for that time. Please choose another slot."
 msgstr "Tällä työntekijällä on jo varaus kyseiselle ajalle. Valitse toinen aika."
 
-#: app/routes.py:2781
+#: app/routes.py:2795
 msgid "Booking created."
 msgstr "Varaus luotu."
 
-#: app/routes.py:2807
+#: app/routes.py:2821
 #, python-format
 msgid "Booking #%(id)s updated."
 msgstr "Varaus #%(id)s päivitetty."
 
-#: app/routes.py:2842 app/routes.py:2870
+#: app/routes.py:2856 app/routes.py:2884
 msgid "Please enter both a full name and an email address."
 msgstr "Syötä sekä koko nimi että sähköpostiosoite."
 
-#: app/routes.py:2846
+#: app/routes.py:2860
 msgid "This email is already used by another account."
 msgstr "Tämä sähköposti on jo toisen tilin käytössä."
 
-#: app/routes.py:2874
+#: app/routes.py:2888
 #, python-format
 msgid "Staff member #%(id)s updated."
 msgstr "Työntekijä #%(id)s päivitetty."
 
-#: app/routes.py:2883
+#: app/routes.py:2897
 msgid "Staff member deleted."
 msgstr "Työntekijä poistettu."
 
-#: app/routes.py:2885
+#: app/routes.py:2899
 msgid "Cannot delete a staff member with linked appointments."
 msgstr "Työntekijää, jolla on varauksia, ei voi poistaa."
 
-#: app/routes.py:2893
+#: app/routes.py:2907
 msgid "Staff status updated."
 msgstr "Työntekijän tila päivitetty."
 
-#: app/routes.py:2931 app/routes.py:2981
+#: app/routes.py:2945 app/routes.py:2995
 msgid "Please fill in all required fields."
 msgstr "Täytä kaikki pakolliset kentät."
 
-#: app/routes.py:2949
+#: app/routes.py:2963
 #, python-format
 msgid ""
 "Service %(name)s added. The video is processing and will appear in a few "
@@ -572,12 +572,12 @@ msgstr ""
 "Palvelu %(name)s lisätty. Video käsitellään ja näkyy muutaman minuutin "
 "kuluttua."
 
-#: app/routes.py:2951
+#: app/routes.py:2965
 #, python-format
 msgid "Service %(name)s added."
 msgstr "Palvelu %(name)s lisätty."
 
-#: app/routes.py:3017
+#: app/routes.py:3031
 #, python-format
 msgid ""
 "Service %(name)s updated. The video is processing and will appear in a "
@@ -586,7 +586,7 @@ msgstr ""
 "Palvelu %(name)s päivitetty. Video käsitellään ja näkyy muutaman minuutin"
 " kuluttua."
 
-#: app/routes.py:3019
+#: app/routes.py:3033
 msgid ""
 "The previous video for this service is still processing. Please wait "
 "until it finishes before uploading another."
@@ -594,46 +594,46 @@ msgstr ""
 "Tämän palvelun edellinen video on vielä käsittelyssä. Odota sen "
 "valmistumista ennen uuden lataamista."
 
-#: app/routes.py:3023
+#: app/routes.py:3037
 #, python-format
 msgid "Service %(name)s updated."
 msgstr "Palvelu %(name)s päivitetty."
 
-#: app/routes.py:3038
+#: app/routes.py:3052
 msgid "Service deleted."
 msgstr "Palvelu poistettu."
 
-#: app/routes.py:3040
+#: app/routes.py:3054
 msgid "Cannot delete a service that has linked appointments."
 msgstr "Palvelua, johon liittyy varauksia, ei voi poistaa."
 
-#: app/routes.py:3048
+#: app/routes.py:3062
 msgid "Service status updated."
 msgstr "Palvelun tila päivitetty."
 
-#: app/routes.py:3062 app/routes.py:3083
+#: app/routes.py:3076 app/routes.py:3097
 msgid "Please enter a category name."
 msgstr "Syötä kategorian nimi."
 
-#: app/routes.py:3067
+#: app/routes.py:3081
 #, python-format
 msgid "Category %(name)s added."
 msgstr "Kategoria %(name)s lisätty."
 
-#: app/routes.py:3069 app/routes.py:3090
+#: app/routes.py:3083 app/routes.py:3104
 msgid "This slug already exists. Please choose another one."
 msgstr "Tämä tunnus on jo olemassa. Valitse toinen."
 
-#: app/routes.py:3088
+#: app/routes.py:3102
 #, python-format
 msgid "Category %(name)s updated."
 msgstr "Kategoria %(name)s päivitetty."
 
-#: app/routes.py:3099
+#: app/routes.py:3113
 msgid "Category deleted."
 msgstr "Kategoria poistettu."
 
-#: app/routes.py:3101
+#: app/routes.py:3115
 msgid ""
 "Cannot delete a category that still has services. Move or delete those "
 "services first."
@@ -641,103 +641,103 @@ msgstr ""
 "Kategoriaa, jossa on vielä palveluita, ei voi poistaa. Siirrä tai poista "
 "palvelut ensin."
 
-#: app/routes.py:3136
+#: app/routes.py:3150
 msgid "Please select at least one image."
 msgstr "Valitse vähintään yksi kuva."
 
-#: app/routes.py:3149
+#: app/routes.py:3163
 #, python-format
 msgid "Uploaded %(count)s images."
 msgstr "Ladattiin %(count)s kuvaa."
 
-#: app/routes.py:3158
+#: app/routes.py:3172
 msgid "Image not found."
 msgstr "Kuvaa ei löytynyt."
 
-#: app/routes.py:3181
+#: app/routes.py:3195
 msgid "Image updated."
 msgstr "Kuva päivitetty."
 
-#: app/routes.py:3192
+#: app/routes.py:3206
 msgid "Image deleted."
 msgstr "Kuva poistettu."
 
-#: app/routes.py:3218
+#: app/routes.py:3232
 #, python-format
 msgid "Deleted %(count)s images."
 msgstr "Poistettiin %(count)s kuvaa."
 
-#: app/routes.py:3264 app/routes.py:3305
+#: app/routes.py:3278 app/routes.py:3319
 msgid "Please enter a full name."
 msgstr "Syötä koko nimi."
 
-#: app/routes.py:3268
+#: app/routes.py:3282
 msgid ""
 "Could not create the customer. This email already belongs to another "
 "account."
 msgstr "Asiakasta ei voitu luoda. Sähköposti kuuluu jo toiselle tilille."
 
-#: app/routes.py:3278
+#: app/routes.py:3292
 msgid "Customer added."
 msgstr "Asiakas lisätty."
 
-#: app/routes.py:3309
+#: app/routes.py:3323
 #, python-format
 msgid "Customer #%(id)s updated."
 msgstr "Asiakas #%(id)s päivitetty."
 
-#: app/routes.py:3314
+#: app/routes.py:3328
 msgid "The customer edit page has not been built yet."
 msgstr "Asiakkaan muokkaussivua ei ole vielä toteutettu."
 
-#: app/routes.py:3328 app/routes.py:3550
+#: app/routes.py:3342 app/routes.py:3564
 msgid "Please enter a valid number of points."
 msgstr "Syötä kelvollinen pistemäärä."
 
-#: app/routes.py:3333 app/routes.py:3422
+#: app/routes.py:3347 app/routes.py:3436
 #, python-format
 msgid "Adjusted %(points)s points for %(name)s."
 msgstr "Säädettiin %(points)s pistettä asiakkaalle %(name)s."
 
-#: app/routes.py:3347
+#: app/routes.py:3361
 #, python-format
 msgid "Deleted customer %(name)s."
 msgstr "Asiakas %(name)s poistettu."
 
-#: app/routes.py:3349
+#: app/routes.py:3363
 msgid "Cannot delete a customer with bookings or linked records."
 msgstr "Asiakasta, jolla on varauksia tai liitettyjä tietoja, ei voi poistaa."
 
-#: app/routes.py:3417
+#: app/routes.py:3431
 msgid "Please fill in all point adjustment details."
 msgstr "Täytä kaikki pistesäädön tiedot."
 
-#: app/routes.py:3436
+#: app/routes.py:3450
 msgid "Please fill in all membership details."
 msgstr "Täytä kaikki jäsenyystiedot."
 
-#: app/routes.py:3440
+#: app/routes.py:3454
 #, python-format
 msgid "Membership updated for %(name)s."
 msgstr "Asiakkaan %(name)s jäsenyys päivitetty."
 
-#: app/routes.py:3459 app/routes.py:3496
+#: app/routes.py:3473 app/routes.py:3510
 msgid "Please enter a name and point cost for the voucher."
 msgstr "Syötä etusetelin nimi ja pistehinta."
 
-#: app/routes.py:3470
+#: app/routes.py:3484
 msgid "Voucher created."
 msgstr "Etuseteli luotu."
 
-#: app/routes.py:3479 app/routes.py:3526
+#: app/routes.py:3493 app/routes.py:3540
 msgid "Voucher not found."
 msgstr "Etuseteliä ei löytynyt."
 
-#: app/routes.py:3517
+#: app/routes.py:3531
 msgid "Voucher updated."
 msgstr "Etuseteli päivitetty."
 
-#: app/routes.py:3531
+#: app/routes.py:3545
 #, python-format
 msgid ""
 "Voucher \"%(name)s\" has been redeemed by customers, so it was hidden "
@@ -746,314 +746,203 @@ msgstr ""
 "Etusetelin \"%(name)s\" ovat asiakkaat jo lunastaneet, joten se "
 "piilotettiin poistamisen sijaan."
 
-#: app/routes.py:3535
+#: app/routes.py:3549
 #, python-format
 msgid "Deleted voucher \"%(name)s\"."
 msgstr "Etuseteli \"%(name)s\" poistettu."
 
-#: app/routes.py:3544 app/routes.py:3814
+#: app/routes.py:3558 app/routes.py:3828
 msgid "Invalid mission."
 msgstr "Virheellinen tehtävä."
 
-#: app/routes.py:3554 app/routes.py:3847
+#: app/routes.py:3568 app/routes.py:3861
 msgid "Mission updated."
 msgstr "Tehtävä päivitetty."
 
-#: app/routes.py:3620 app/routes.py:3673 app/routes.py:3723 app/routes.py:3766
+#: app/routes.py:3634 app/routes.py:3687 app/routes.py:3737 app/routes.py:3780
 msgid "Please enter a slide title."
 msgstr "Syötä dian otsikko."
 
-#: app/routes.py:3630
+#: app/routes.py:3644
 msgid "Please select an image for the slide."
 msgstr "Valitse dialle kuva."
 
-#: app/routes.py:3638
+#: app/routes.py:3652
 msgid "Homepage slide created."
 msgstr "Etusivun dia luotu."
 
-#: app/routes.py:3647 app/routes.py:3745 app/routes.py:3797
+#: app/routes.py:3661 app/routes.py:3759 app/routes.py:3811
 msgid "Slide not found."
 msgstr "Diaa ei löytynyt."
 
-#: app/routes.py:3693
+#: app/routes.py:3707
 msgid "A slide needs an image."
 msgstr "Dia tarvitsee kuvan."
 
-#: app/routes.py:3700
+#: app/routes.py:3714
 msgid "Slide updated."
 msgstr "Dia päivitetty."
 
-#: app/routes.py:3736
+#: app/routes.py:3750
 msgid "Offer slide added."
 msgstr "Tarjousdia lisätty."
 
-#: app/routes.py:3788
+#: app/routes.py:3802
 msgid "Offer slide updated."
 msgstr "Tarjousdia päivitetty."
 
-#: app/routes.py:3800
+#: app/routes.py:3814
 msgid "Built-in missions cannot be deleted."
 msgstr "Kiinteitä tehtäviä ei voi poistaa."
 
-#: app/routes.py:3806
+#: app/routes.py:3820
 msgid "Slide deleted."
 msgstr "Dia poistettu."
 
-#: app/routes.py:3827
+#: app/routes.py:3841
 msgid "Please enter a mission name."
 msgstr "Syötä tehtävän nimi."
 
-#: app/routes.py:3913 app/routes.py:3935
+#: app/routes.py:3927 app/routes.py:3949
 msgid "Notice content is required."
 msgstr "Tiedotteen sisältö on pakollinen."
 
-#: app/routes.py:3922
+#: app/routes.py:3936
 msgid "Notice created."
 msgstr "Tiedote luotu."
 
-#: app/routes.py:3930
+#: app/routes.py:3944
 msgid "Notice not found."
 msgstr "Tiedotetta ei löytynyt."
 
-#: app/routes.py:3946
+#: app/routes.py:3960
 msgid "Notice updated."
 msgstr "Tiedote päivitetty."
 
-#: app/routes.py:3961
+#: app/routes.py:3975
 msgid "Notice deleted."
 msgstr "Tiedote poistettu."
 
-#: app/routes.py:3975
+#: app/routes.py:3989
 msgid "Title and message are required."
 msgstr "Otsikko ja viesti ovat pakollisia."
 
-#: app/routes.py:3978
+#: app/routes.py:3992
 msgid "Please choose a customer."
 msgstr "Valitse asiakas."
 
-#: app/routes.py:4003
+#: app/routes.py:4017
 #, python-format
 msgid "Notification sent. Emails are being delivered to %(count)s recipients."
 msgstr "Ilmoitus lähetetty. Sähköpostit toimitetaan %(count)s vastaanottajalle."
 
-#: app/routes.py:4006
+#: app/routes.py:4020
 msgid "Notification sent."
 msgstr "Ilmoitus lähetetty."
 
-#: app/routes.py:4015
+#: app/routes.py:4029
 msgid "Notification deleted."
 msgstr "Ilmoitus poistettu."
 
-#: app/routes.py:4675
+#: app/routes.py:4689
 msgid "Please enter required information!"
 msgstr "Täytä pakolliset tiedot!"
 
-#: app/routes.py:4679
+#: app/routes.py:4693
 msgid "Please enter a valid email address."
 msgstr "Syötä kelvollinen sähköpostiosoite."
 
-#: app/routes.py:4683 app/routes.py:4920
+#: app/routes.py:4697 app/routes.py:4934
 msgid "Password must be at least 8 characters."
 msgstr "Salasanan on oltava vähintään 8 merkkiä."
 
-#: app/routes.py:4690
+#: app/routes.py:4704
 msgid "Email existed! Please try again."
 msgstr "Sähköposti on jo olemassa! Yritä uudelleen."
 
-#: app/routes.py:4720
+#: app/routes.py:4734
 msgid "A verification code has been sent to your email."
 msgstr "Vahvistuskoodi on lähetetty sähköpostiisi."
 
-#: app/routes.py:4753
+#: app/routes.py:4767
 msgid "Profile not found! Please try again"
 msgstr "Profiilia ei löytynyt! Yritä uudelleen"
 
-#: app/routes.py:4785
+#: app/routes.py:4799
 msgid "Google sign-in failed. Please try again."
 msgstr "Google-kirjautuminen epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:4791
+#: app/routes.py:4805
 msgid "Could not verify your Google email. Please try again."
 msgstr "Google-sähköpostisi vahvistus epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:4801
+#: app/routes.py:4815
 msgid "Please use the staff login portal."
 msgstr "Käytä henkilökunnan kirjautumissivua."
 
-#: app/routes.py:4845 app/routes.py:4876
+#: app/routes.py:4859 app/routes.py:4890
 msgid "Please enter your email address."
 msgstr "Syötä sähköpostiosoitteesi."
 
-#: app/routes.py:4904
+#: app/routes.py:4918
 msgid "Session expired. Please try again."
 msgstr "Istunto on vanhentunut. Yritä uudelleen."
 
-#: app/routes.py:4926
+#: app/routes.py:4940
 msgid "Password reset successfully. Please log in."
 msgstr "Salasana vaihdettu. Kirjaudu sisään."
 
-#: app/routes.py:4932
+#: app/routes.py:4946
 msgid "Logged out successfully."
 msgstr "Kirjauduit ulos."
 
-#: app/routes.py:4941 app/routes.py:5134
+#: app/routes.py:4955 app/routes.py:5148
 msgid "Your verification session has expired. Please start again."
 msgstr "Vahvistusistunto on vanhentunut. Aloita alusta."
 
-#: app/routes.py:5181
+#: app/routes.py:5195
 msgid "Register session expired. Please register again."
 msgstr "Rekisteröitymisistunto on vanhentunut. Rekisteröidy uudelleen."
 
-#: app/routes.py:5207
+#: app/routes.py:5221
 msgid "Register successfully!"
 msgstr "Rekisteröityminen onnistui!"
 
-#: app/routes.py:5243
+#: app/routes.py:5257
 msgid "This slot has been booked by other customer! Please try again."
 msgstr "Toinen asiakas ehti varata tämän ajan! Valitse toinen aika."
 
-#: app/routes.py:5263
+#: app/routes.py:5277
 msgid "Your booking is processing!"
 msgstr "Varaustasi käsitellään!"
 
-#: app/template_filters.py:119
+#: app/template_filters.py:120
 msgid "Visa"
 msgstr ""
 
-#: app/template_filters.py:120
+#: app/template_filters.py:121
 msgid "Mastercard"
 msgstr ""
 
-#: app/template_filters.py:121
+#: app/template_filters.py:122
 msgid "Mobile Pay"
 msgstr ""
 
-#: app/template_filters.py:122
+#: app/template_filters.py:123
 msgid "Apple Pay"
 msgstr ""
 
-#: app/template_filters.py:123
+#: app/template_filters.py:124
 msgid "Google Pay"
 msgstr ""
 
-#: app/template_filters.py:124 app/templates/customer/customer_history.html:141
+#: app/template_filters.py:125 app/templates/customer/customer_history.html:141
 msgid "Cash"
 msgstr "Käteinen"
 
-#: app/template_filters.py:125 app/templates/customer/customer_history.html:142
+#: app/template_filters.py:126 app/templates/customer/customer_history.html:142
 msgid "Bank Transfer"
 msgstr "Tilisiirto"
-
-#: app/services/email_system.py:81
-msgid "Verify your email – Daha Care"
-msgstr ""
-
-#: app/services/email_system.py:83
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code to confirm your email address and complete your "
-"registration.\n"
-"\n"
-"If you did not create an account with Daha Care, please ignore this "
-"email.\n"
-msgstr ""
-
-#: app/services/email_system.py:89
-msgid "Password Change Request – Daha Care"
-msgstr ""
-
-#: app/services/email_system.py:91
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code to confirm your password change request.\n"
-"\n"
-"If you did not request this, please ignore this email and your password "
-"will remain unchanged.\n"
-msgstr ""
-
-#: app/services/email_system.py:97
-msgid "Email Change Request – Daha Care"
-msgstr ""
-
-#: app/services/email_system.py:99
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code to confirm your email address change request.\n"
-"\n"
-"If you did not request this, please ignore this email and your email "
-"address will remain unchanged.\n"
-msgstr ""
-
-#: app/services/email_system.py:105
-msgid "Reset Your Password – Daha Care"
-msgstr ""
-
-#: app/services/email_system.py:107
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your password reset code is: %(code)s\n"
-"\n"
-"Please enter this code to reset your password. This code expires in 10 "
-"minutes.\n"
-"\n"
-"If you did not request a password reset, please ignore this email.\n"
-msgstr ""
-
-#: app/services/email_system.py:113
-msgid "Your Booking Verification Code – Daha Care"
-msgstr ""
-
-#: app/services/email_system.py:115
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code on the verification page to confirm your booking.\n"
-"\n"
-"If you did not request this, please ignore this email.\n"
-msgstr ""
-
-#: app/services/email_system.py:132
-msgid "Your booking request has been received"
-msgstr ""
-
-#: app/services/email_system.py:134
-#, python-format
-msgid ""
-"Hi %(name)s,\n"
-"\n"
-"Thank you for your booking.\n"
-"\n"
-"We have received your booking request and it is currently pending "
-"confirmation.\n"
-"\n"
-"Booking details:\n"
-"- Service: %(service)s\n"
-"- Staff: %(staff)s\n"
-"- Date: %(date)s\n"
-"- Time: %(start)s - %(end)s\n"
-"\n"
-"We will contact you again once your booking has been confirmed.\n"
-"\n"
-"Best regards,\n"
-"Dahacare\n"
-msgstr ""
 
 #: app/templates/auth_base.html:43
 msgid "Where precision meets care."
@@ -1088,8 +977,8 @@ msgstr "Rekisteröidy"
 
 #: app/templates/base.html:40 app/templates/base.html:49
 #: app/templates/base.html:72 app/templates/base.html:81
-#: app/templates/customer_base.html:99 app/templates/public/about.html:225
-#: app/templates/public/gallery.html:87 app/templates/public/index.html:339
+#: app/templates/customer_base.html:99 app/templates/public/about.html:212
+#: app/templates/public/gallery.html:87 app/templates/public/index.html:341
 msgid "Book Now"
 msgstr "Varaa nyt"
 
@@ -1345,7 +1234,7 @@ msgid "At least 8 characters"
 msgstr "Vähintään 8 merkkiä"
 
 #: app/templates/Auth/customer_register.html:96
-#: app/templates/public/index.html:238
+#: app/templates/public/index.html:239
 msgid "Create account"
 msgstr "Luo tili"
 
@@ -1363,12 +1252,6 @@ msgstr "Vahvista sähköpostisi"
 #: app/templates/Auth/set_new_password.html:6
 msgid "Almost there."
 msgstr "Melkein valmista."
-
-#: app/templates/Auth/email_verification.html:7
-msgid ""
-"Just one more step to secure your account and unlock your personalized "
-"beauty journey."
-msgstr "Enää yksi askel: suojaa tilisi ja avaa oma kauneuspolkusi."
 
 #: app/templates/Auth/email_verification.html:62
 msgid "We sent a 6-digit code to"
@@ -1469,7 +1352,7 @@ msgid "Currently in development"
 msgstr "Kehitteillä parhaillaan"
 
 #: app/templates/customer/coming_soon.html:138
-#: app/templates/customer/customer_membership.html:191
+#: app/templates/customer/customer_membership.html:169
 msgid "Coming soon"
 msgstr "Tulossa pian"
 
@@ -1540,11 +1423,6 @@ msgstr "Maksu"
 msgid "Select a Service"
 msgstr "Valitse palvelu"
 
-#: app/templates/customer/customer_booking.html:67
-#: app/templates/public/public_booking.html:67
-msgid "Choose from our curated selection of luxury treatments."
-msgstr "Valitse valikoiduista ylellisyyshoidoistamme."
-
 #: app/templates/customer/customer_booking.html:72
 #: app/templates/public/public_booking.html:72
 msgid "All Services"
@@ -1575,11 +1453,6 @@ msgstr "Jatka"
 #: app/templates/public/public_booking.html:133
 msgid "Choose a Professional"
 msgstr "Valitse ammattilainen"
-
-#: app/templates/customer/customer_booking.html:135
-#: app/templates/public/public_booking.html:134
-msgid "Select your preferred stylist or let us match you."
-msgstr "Valitse haluamasi stylisti tai anna meidän valita puolestasi."
 
 #: app/templates/customer/customer_booking.html:141
 #: app/templates/customer/customer_booking.html:147
@@ -1720,18 +1593,8 @@ msgstr "Maksa nyt turvallisesti kortilla"
 
 #: app/templates/customer/customer_booking.html:271
 #: app/templates/public/public_booking.html:316
-msgid "You'll receive a verification email after confirming. Your booking will be"
-msgstr "Saat vahvistussähköpostin vahvistuksen jälkeen. Varauksesi on"
-
-#: app/templates/customer/customer_booking.html:271
-#: app/templates/public/public_booking.html:316
 msgid "pending"
 msgstr "vahvistamatta"
-
-#: app/templates/customer/customer_booking.html:271
-#: app/templates/public/public_booking.html:316
-msgid "until the salon confirms your appointment."
-msgstr "kunnes salonki vahvistaa aikasi."
 
 #: app/templates/customer/customer_booking.html:277
 #: app/templates/public/public_booking.html:322
@@ -1775,11 +1638,6 @@ msgstr "Ansaitset"
 #: app/templates/customer/customer_booking.html:310
 msgid "loyalty points with this booking."
 msgstr "kanta-asiakaspistettä tästä varauksesta."
-
-#: app/templates/customer/customer_booking.html:312
-#: app/templates/public/public_booking.html:357
-msgid "By confirming, you agree to our 24h cancellation policy."
-msgstr "Vahvistamalla hyväksyt 24 tunnin peruutusehtomme."
 
 #: app/templates/customer/customer_booking.html:323
 #: app/templates/public/public_booking.html:368
@@ -1892,7 +1750,7 @@ msgstr "Tuleva aika"
 
 #: app/templates/customer/customer_dashboard.html:884
 #: app/templates/customer/my_bookings.html:100
-#: app/templates/customer/view_booking_details.html:69
+#: app/templates/customer/view_booking_details.html:71
 #: app/templates/public/success.html:89
 msgid "Add to Calendar"
 msgstr "Lisää kalenteriin"
@@ -2110,7 +1968,7 @@ msgstr "Valmis"
 
 #: app/templates/customer/customer_history.html:322
 #: app/templates/customer/my_bookings.html:138
-#: app/templates/customer/view_booking_details.html:18
+#: app/templates/customer/view_booking_details.html:20
 msgid "Cancelled"
 msgstr "Peruttu"
 
@@ -2120,7 +1978,7 @@ msgid "Paid"
 msgstr "Maksettu"
 
 #: app/templates/customer/customer_membership.html:3
-#: app/templates/customer/customer_membership.html:129
+#: app/templates/customer/customer_membership.html:107
 msgid "Membership Plans"
 msgstr "Jäsenyystasot"
 
@@ -2136,168 +1994,109 @@ msgstr "Omistautuneille asiakkaillemme"
 msgid "For our most valued guests"
 msgstr "Arvostetuimmille asiakkaillemme"
 
-#: app/templates/customer/customer_membership.html:35
-msgid "Earn base loyalty points on every visit"
-msgstr "Ansaitse peruskanta-asiakaspisteitä joka käynnillä"
-
 #: app/templates/customer/customer_membership.html:36
-msgid "Birthday bonus points"
-msgstr "Syntymäpäivän bonuspisteet"
-
-#: app/templates/customer/customer_membership.html:37
-msgid "Access to member-only promotions"
-msgstr "Pääsy vain jäsenille tarkoitettuihin tarjouksiin"
-
-#: app/templates/customer/customer_membership.html:38
-msgid "Monthly reward voucher"
-msgstr "Kuukausittainen palkintokuponki"
-
-#: app/templates/customer/customer_membership.html:39
-msgid "Priority booking (standard)"
-msgstr "Etusijavaraus (perus)"
-
-#: app/templates/customer/customer_membership.html:42
-msgid "Everything in Silver"
-msgstr "Kaikki Silverissä"
-
-#: app/templates/customer/customer_membership.html:43
-msgid "Early access to new services & seasonal offers"
-msgstr "Ennakkopääsy uusiin palveluihin ja kausitarjouksiin"
-
-#: app/templates/customer/customer_membership.html:44
-msgid "Complimentary nail care kit (quarterly)"
-msgstr "Maksuton kynsienhoitosetti (neljännesvuosittain)"
-
-#: app/templates/customer/customer_membership.html:45
-msgid "Dedicated booking slot on weekends"
-msgstr "Oma varausaika viikonloppuisin"
-
-#: app/templates/customer/customer_membership.html:48
-msgid "Everything in Gold"
-msgstr "Kaikki Goldissa"
-
-#: app/templates/customer/customer_membership.html:49
-msgid "Free add-on service every visit"
-msgstr "Ilmainen lisäpalvelu joka käynnillä"
-
-#: app/templates/customer/customer_membership.html:50
-msgid "Personal nail stylist assignment"
-msgstr "Oma henkilökohtainen kynsistylisti"
-
-#: app/templates/customer/customer_membership.html:51
-msgid "VIP lounge access & complimentary drinks"
-msgstr "Pääsy VIP-loungeen ja maksuttomat juomat"
-
-#: app/templates/customer/customer_membership.html:58
 msgid "Choose your plan"
 msgstr "Valitse tasosi"
 
-#: app/templates/customer/customer_membership.html:59
-msgid ""
-"Unlock exclusive perks, rewards, and priority care tailored to your "
-"loyalty."
-msgstr ""
-"Avaa eksklusiiviset edut, palkinnot ja etusijainen hoito uskollisuutesi "
-"mukaan."
-
-#: app/templates/customer/customer_membership.html:71
+#: app/templates/customer/customer_membership.html:49
 msgid "Your last payment failed."
 msgstr "Viimeisin maksusi epäonnistui."
 
-#: app/templates/customer/customer_membership.html:72
+#: app/templates/customer/customer_membership.html:50
 msgid "Update your card"
 msgstr "Päivitä korttisi"
 
-#: app/templates/customer/customer_membership.html:73
+#: app/templates/customer/customer_membership.html:51
 msgid "to keep your membership active."
 msgstr "pitääksesi jäsenyytesi voimassa."
 
-#: app/templates/customer/customer_membership.html:79
-#: app/templates/customer/customer_membership.html:107
+#: app/templates/customer/customer_membership.html:57
+#: app/templates/customer/customer_membership.html:85
 msgid "Update payment method"
 msgstr "Päivitä maksutapa"
 
-#: app/templates/customer/customer_membership.html:97
-#: app/templates/customer/customer_membership.html:251
+#: app/templates/customer/customer_membership.html:75
+#: app/templates/customer/customer_membership.html:229
 #, python-format
 msgid "Your %(plan)s membership will not renew · active until %(date)s."
 msgstr "%(plan)s-jäsenyytesi ei uusiudu · voimassa %(date)s asti."
 
-#: app/templates/customer/customer_membership.html:99
+#: app/templates/customer/customer_membership.html:77
 #, python-format
 msgid "Your %(plan)s membership renews on %(date)s."
 msgstr "%(plan)s-jäsenyytesi uusiutuu %(date)s."
 
-#: app/templates/customer/customer_membership.html:116
-#: app/templates/customer/customer_membership.html:230
+#: app/templates/customer/customer_membership.html:94
+#: app/templates/customer/customer_membership.html:208
 msgid "Cancel renewal"
 msgstr "Peruuta uusiutuminen"
 
-#: app/templates/customer/customer_membership.html:156
+#: app/templates/customer/customer_membership.html:134
 #: app/templates/public/services.html:95 app/templates/public/services.html:129
 msgid "Popular"
 msgstr "Suosittu"
 
-#: app/templates/customer/customer_membership.html:163
+#: app/templates/customer/customer_membership.html:141
 msgid "per year"
 msgstr "vuodessa"
 
-#: app/templates/customer/customer_membership.html:165
+#: app/templates/customer/customer_membership.html:143
 msgid "Free"
 msgstr "Ilmainen"
 
-#: app/templates/customer/customer_membership.html:174
+#: app/templates/customer/customer_membership.html:152
 msgid "points on all services"
 msgstr "pistettä kaikista palveluista"
 
-#: app/templates/customer/customer_membership.html:186
+#: app/templates/customer/customer_membership.html:164
 msgid "Current plan"
 msgstr "Nykyinen taso"
 
-#: app/templates/customer/customer_membership.html:202
+#: app/templates/customer/customer_membership.html:180
 msgid "Upgrade to Gold"
 msgstr "Päivitä Gold-tasoon"
 
-#: app/templates/customer/customer_membership.html:202
+#: app/templates/customer/customer_membership.html:180
 msgid "Upgrade to Diamond"
 msgstr "Päivitä Diamond-tasoon"
 
-#: app/templates/customer/customer_membership.html:204
+#: app/templates/customer/customer_membership.html:182
 msgid "Switch to Gold"
 msgstr "Vaihda Goldiin"
 
-#: app/templates/customer/customer_membership.html:204
+#: app/templates/customer/customer_membership.html:182
 msgid "Switch to Silver"
 msgstr "Vaihda Silveriin"
 
-#: app/templates/customer/customer_membership.html:231
+#: app/templates/customer/customer_membership.html:209
 #: app/templates/customer/customer_notifications.html:98
 #: app/templates/customer/customer_setting.html:921
 #: app/templates/customer/customer_setting.html:990
 #: app/templates/customer/loyalty_points.html:303
 #: app/templates/customer/my_bookings.html:268
-#: app/templates/customer/view_booking_details.html:195
+#: app/templates/customer/view_booking_details.html:196
 #: app/templates/public/gallery.html:102 app/templates/public/services.html:197
 msgid "Close"
 msgstr "Sulje"
 
-#: app/templates/customer/customer_membership.html:243
+#: app/templates/customer/customer_membership.html:221
 msgid "Renews on"
 msgstr "Uusiutuu"
 
-#: app/templates/customer/customer_membership.html:255
+#: app/templates/customer/customer_membership.html:233
 msgid "Keep renewal"
 msgstr "Säilytä uusiutuminen"
 
-#: app/templates/customer/customer_membership.html:256
+#: app/templates/customer/customer_membership.html:234
 #: app/templates/customer/my_bookings.html:305
-#: app/templates/customer/view_booking_details.html:232
+#: app/templates/customer/view_booking_details.html:233
 msgid "Yes, cancel"
 msgstr "Kyllä, peruuta"
 
 #: app/templates/customer/customer_notifications.html:24
-msgid "Announcements from Misa Nails and messages sent to you."
-msgstr "Misa Nailsin tiedotteet ja sinulle lähetetyt viestit."
+#, python-format
+msgid "Announcements from %(brand)s and messages sent to you."
+msgstr "%(brand)s-tiedotteet ja sinulle lähetetyt viestit."
 
 #: app/templates/customer/customer_notifications.html:32
 msgid "Mark all as read"
@@ -2440,7 +2239,7 @@ msgstr ""
 #: app/templates/customer/my_bookings.html:195
 #: app/templates/customer/redeem_confirm_modal.html:72
 #: app/templates/customer/reschedule.html:237
-#: app/templates/customer/view_booking_details.html:133
+#: app/templates/customer/view_booking_details.html:135
 msgid "Cancel"
 msgstr "Peruuta"
 
@@ -2652,19 +2451,9 @@ msgstr "Kopioi"
 msgid "Active"
 msgstr "Voimassa"
 
-#: app/templates/customer/loyalty_points.html:414
-msgid "Show this code to our staff at your next visit to redeem."
-msgstr ""
-"Näytä tämä koodi henkilökunnallemme seuraavalla käynnilläsi lunastaaksesi"
-" sen."
-
 #: app/templates/customer/loyalty_points.html:415
 msgid "This voucher has already been used."
 msgstr "Tämä kuponki on jo käytetty."
-
-#: app/templates/customer/loyalty_points.html:416
-msgid "This voucher has expired and is no longer valid."
-msgstr "Tämä kuponki on vanhentunut eikä ole enää voimassa."
 
 #: app/templates/customer/loyalty_points.html:419
 msgid "Copied"
@@ -2689,7 +2478,7 @@ msgstr "Tulevat"
 #: app/templates/customer/my_bookings.html:158
 #: app/templates/customer/reschedule.html:3
 #: app/templates/customer/reschedule.html:18
-#: app/templates/customer/view_booking_details.html:124
+#: app/templates/customer/view_booking_details.html:126
 msgid "Reschedule"
 msgstr "Muuta aikaa"
 
@@ -2731,52 +2520,52 @@ msgid "View All History"
 msgstr "Näytä koko historia"
 
 #: app/templates/customer/my_bookings.html:267
-#: app/templates/customer/view_booking_details.html:194
+#: app/templates/customer/view_booking_details.html:195
 msgid "Cancel appointment?"
 msgstr "Perutaanko aika?"
 
 #: app/templates/customer/my_bookings.html:287
-#: app/templates/customer/view_booking_details.html:214
+#: app/templates/customer/view_booking_details.html:215
 msgid "Cancellation Policy"
 msgstr "Peruutusehdot"
 
 #: app/templates/customer/my_bookings.html:292
-#: app/templates/customer/view_booking_details.html:219
+#: app/templates/customer/view_booking_details.html:220
 msgid "Reason for cancellation"
 msgstr "Peruutuksen syy"
 
 #: app/templates/customer/my_bookings.html:292
-#: app/templates/customer/view_booking_details.html:219
+#: app/templates/customer/view_booking_details.html:220
 msgid "(optional)"
 msgstr "(valinnainen)"
 
 #: app/templates/customer/my_bookings.html:295
-#: app/templates/customer/view_booking_details.html:222
+#: app/templates/customer/view_booking_details.html:223
 msgid "Select a reason..."
 msgstr "Valitse syy..."
 
 #: app/templates/customer/my_bookings.html:296
-#: app/templates/customer/view_booking_details.html:223
+#: app/templates/customer/view_booking_details.html:224
 msgid "Change of plans"
 msgstr "Suunnitelmat muuttuivat"
 
 #: app/templates/customer/my_bookings.html:297
-#: app/templates/customer/view_booking_details.html:224
+#: app/templates/customer/view_booking_details.html:225
 msgid "Feeling unwell"
 msgstr "Huono olo"
 
 #: app/templates/customer/my_bookings.html:298
-#: app/templates/customer/view_booking_details.html:225
+#: app/templates/customer/view_booking_details.html:226
 msgid "Want to reschedule instead"
 msgstr "Haluan muuttaa aikaa"
 
 #: app/templates/customer/my_bookings.html:299
-#: app/templates/customer/view_booking_details.html:226
+#: app/templates/customer/view_booking_details.html:227
 msgid "Other"
 msgstr "Muu"
 
 #: app/templates/customer/my_bookings.html:304
-#: app/templates/customer/view_booking_details.html:231
+#: app/templates/customer/view_booking_details.html:232
 msgid "Keep appointment"
 msgstr "Säilytä aika"
 
@@ -2817,14 +2606,6 @@ msgstr "Yhteysvirhe. Yritä uudelleen."
 msgid "APPOINTMENT MANAGEMENT"
 msgstr "AJANHALLINTA"
 
-#: app/templates/customer/reschedule.html:20
-msgid ""
-"Modify your session with ease. Please note our 24-hour rescheduling "
-"window to ensure we can accommodate all guests."
-msgstr ""
-"Muuta aikaasi vaivattomasti. Huomaathan 24 tunnin muutosaikamme, jotta "
-"voimme palvella kaikkia asiakkaita."
-
 #: app/templates/customer/reschedule.html:40
 msgid "Service image"
 msgstr "Palvelun kuva"
@@ -2854,7 +2635,7 @@ msgid "Session duration:"
 msgstr "Käynnin kesto:"
 
 #: app/templates/customer/reschedule.html:149
-#: app/templates/customer/view_booking_details.html:59
+#: app/templates/customer/view_booking_details.html:61
 #: app/templates/public/services.html:107
 #: app/templates/public/services.html:137
 msgid "mins"
@@ -2863,14 +2644,6 @@ msgstr "min"
 #: app/templates/customer/reschedule.html:166
 msgid "Policy Notice"
 msgstr "Ehtoilmoitus"
-
-#: app/templates/customer/reschedule.html:167
-msgid ""
-"Bookings can only be rescheduled at least 24 hours in advance and can "
-"only be changed once. Further changes may require a new deposit."
-msgstr ""
-"Varauksia voi siirtää vain vähintään 24 tuntia etukäteen ja vain kerran. "
-"Lisämuutokset voivat vaatia uuden ennakkomaksun."
 
 #: app/templates/customer/reschedule.html:183
 msgid "Comparison"
@@ -2902,7 +2675,7 @@ msgid "Confirm Reschedule"
 msgstr "Vahvista ajan muutos"
 
 #: app/templates/customer/view_booking_details.html:3
-#: app/templates/customer/view_booking_details.html:33
+#: app/templates/customer/view_booking_details.html:35
 msgid "Booking Details"
 msgstr "Varauksen tiedot"
 
@@ -2910,36 +2683,44 @@ msgstr "Varauksen tiedot"
 msgid "Confirmed"
 msgstr "Vahvistettu"
 
-#: app/templates/customer/view_booking_details.html:30
+#: app/templates/customer/view_booking_details.html:18
+msgid "In Progress"
+msgstr "Käynnissä"
+
+#: app/templates/customer/view_booking_details.html:21
+msgid "No Show"
+msgstr "Ei saapunut"
+
+#: app/templates/customer/view_booking_details.html:32
 msgid "Back to Appointments"
 msgstr "Takaisin varauksiin"
 
-#: app/templates/customer/view_booking_details.html:81
+#: app/templates/customer/view_booking_details.html:83
 msgid "Artist"
 msgstr "Artisti"
 
-#: app/templates/customer/view_booking_details.html:92
+#: app/templates/customer/view_booking_details.html:94
 msgid "Service Description"
 msgstr "Palvelun kuvaus"
 
-#: app/templates/customer/view_booking_details.html:105
+#: app/templates/customer/view_booking_details.html:107
 msgid "Demo video"
 msgstr "Esittelyvideo"
 
-#: app/templates/customer/view_booking_details.html:146
+#: app/templates/customer/view_booking_details.html:148
 msgid "Salon location map"
 msgstr "Salongin sijaintikartta"
 
-#: app/templates/customer/view_booking_details.html:153
-#: app/templates/public/index.html:267
+#: app/templates/customer/view_booking_details.html:155
+#: app/templates/public/index.html:268
 msgid "Address"
 msgstr "Osoite"
 
-#: app/templates/customer/view_booking_details.html:159
+#: app/templates/customer/view_booking_details.html:160
 msgid "Get Directions"
 msgstr "Näytä reitti"
 
-#: app/templates/customer/view_booking_details.html:167
+#: app/templates/customer/view_booking_details.html:168
 msgid "Salon Contact"
 msgstr "Salongin yhteystiedot"
 
@@ -2951,132 +2732,61 @@ msgstr "Keidas"
 msgid "Our Story"
 msgstr "Tarinamme"
 
-#: app/templates/public/about.html:21
-msgid ""
-"Redefining luxury wellness with precise, artisanal care in a sanctuary of"
-" soft mood and quiet elegance."
-msgstr ""
-"Määrittelemme ylellisen hyvinvoinnin uudelleen tarkalla, "
-"käsityöläismäisellä hoidolla pehmeän tunnelman ja hillityn eleganssin "
-"keitaassa."
-
 #: app/templates/public/about.html:37
 msgid "Crafted with intention"
 msgstr "Tehty huolella"
 
-#: app/templates/public/about.html:39
-msgid ""
-"At DahaCare, we believe that true luxury lies in the details. Founded on "
-"the principle of bringing atelier-level precision to daily wellness, our "
-"space was designed as a retreat from the noise of the city."
-msgstr ""
-"DahaCaressa uskomme, että todellinen ylellisyys piilee yksityiskohdissa. "
-"Periaatteenamme on tuoda ateljee-tason tarkkuus päivittäiseen "
-"hyvinvointiin, ja tilamme on suunniteltu pakopaikaksi kaupungin melulta."
-
-#: app/templates/public/about.html:40
-msgid ""
-"Every treatment is a careful composition of quality products, rigorous "
-"hygiene standards, and the trained hands of our artists. We don't just "
-"provide a service; we curate an experience that honors your time and "
-"elevates your personal care ritual."
-msgstr ""
-"Jokainen hoito on huolellinen yhdistelmä laadukkaita tuotteita, tiukkoja "
-"hygieniastandardeja ja artistiemme koulutettuja käsiä. Emme vain tarjoa "
-"palvelua; luomme kokemuksen, joka kunnioittaa aikaasi ja nostaa "
-"henkilökohtaisen hoitorituaalisi uudelle tasolle."
-
-#: app/templates/public/about.html:68
+#: app/templates/public/about.html:55
 msgid "Years of Excellence"
 msgstr "Vuotta huippuosaamista"
 
-#: app/templates/public/about.html:72
+#: app/templates/public/about.html:59
 msgid "Clients Served"
 msgstr "Palveltua asiakasta"
 
-#: app/templates/public/about.html:76
+#: app/templates/public/about.html:63
 msgid "Master Artists"
 msgstr "Mestariartistia"
 
-#: app/templates/public/about.html:80 app/templates/public/services.html:161
+#: app/templates/public/about.html:67 app/templates/public/services.html:161
 msgid "Average Rating"
 msgstr "Keskiarvosana"
 
-#: app/templates/public/about.html:118
+#: app/templates/public/about.html:105
 msgid "Meet the team"
 msgstr "Tutustu tiimiin"
 
-#: app/templates/public/about.html:148
+#: app/templates/public/about.html:135
 msgid "What we stand for"
 msgstr "Arvomme"
 
-#: app/templates/public/about.html:159
+#: app/templates/public/about.html:146
 msgid "Hygiene first"
 msgstr "Hygienia edellä"
 
-#: app/templates/public/about.html:160
-msgid ""
-"Medical-grade sterilization processes for every tool, ensuring your "
-"safety is never compromised."
-msgstr ""
-"Lääketieteellisen tason sterilointi jokaiselle työkalulle takaa, ettei "
-"turvallisuudestasi tingitä koskaan."
-
-#: app/templates/public/about.html:169
+#: app/templates/public/about.html:156
 msgid "Trained artists"
 msgstr "Koulutetut artistit"
 
-#: app/templates/public/about.html:170
-msgid ""
-"Continuous education and mastery of techniques mean you receive the "
-"pinnacle of modern care."
-msgstr ""
-"Jatkuva kouluttautuminen ja tekniikoiden hallinta takaavat, että saat "
-"modernin hoidon huipun."
-
-#: app/templates/public/about.html:179
+#: app/templates/public/about.html:166
 msgid "Quality products"
 msgstr "Laadukkaat tuotteet"
 
-#: app/templates/public/about.html:180
-msgid ""
-"We source only premium, non-toxic, and sustainable materials for long-"
-"lasting, brilliant results."
-msgstr ""
-"Käytämme vain premium-luokan, myrkyttömiä ja kestäviä materiaaleja "
-"pitkäkestoisiin, upeisiin tuloksiin."
-
-#: app/templates/public/about.html:189
+#: app/templates/public/about.html:176
 msgid "Client-first care"
 msgstr "Asiakas edellä"
 
-#: app/templates/public/about.html:190
-msgid ""
-"Your comfort is our priority. Enjoy a serene environment designed "
-"entirely around your relaxation."
-msgstr ""
-"Mukavuutesi on prioriteettimme. Nauti rauhallisesta ympäristöstä, joka on"
-" suunniteltu täysin rentoutumistasi varten."
-
-#: app/templates/public/about.html:204
+#: app/templates/public/about.html:191
 msgid "Come meet the team"
 msgstr "Tule tapaamaan tiimiä"
 
-#: app/templates/public/about.html:205
-msgid "Experience the DahaCare difference in person."
-msgstr "Koe DahaCaren ero paikan päällä."
-
-#: app/templates/public/about.html:207
+#: app/templates/public/about.html:194
 msgid "Book your visit"
 msgstr "Varaa käyntisi"
 
 #: app/templates/public/gallery.html:20
 msgid "Our Work"
 msgstr "Työmme"
-
-#: app/templates/public/gallery.html:21
-msgid "A glimpse into the artistry and precision behind every visit."
-msgstr "Katsaus jokaisen käynnin taiteeseen ja tarkkuuteen."
 
 #: app/templates/public/gallery.html:53
 msgid "No photos yet"
@@ -3131,124 +2841,72 @@ msgid "A glimpse of what we create every day"
 msgstr "Katsaus siihen, mitä luomme joka päivä"
 
 #: app/templates/public/index.html:133
-msgid "Why MisaNails?"
+#, python-format
+msgid "Why %(brand)s?"
 msgstr ""
 
 #: app/templates/public/index.html:139
 msgid "Happy clients"
 msgstr "Tyytyväistä asiakasta"
 
-#: app/templates/public/index.html:140
-msgid "Trusted by thousands of satisfied customers who love our work."
-msgstr "Tuhannet tyytyväiset asiakkaat luottavat työhömme."
-
 #: app/templates/public/index.html:144
 msgid "Safe products"
 msgstr "Turvalliset tuotteet"
-
-#: app/templates/public/index.html:145
-msgid "We use only premium, non-toxic products for your health and safety."
-msgstr ""
-"Käytämme vain premium-luokan myrkyttömiä tuotteita terveytesi ja "
-"turvallisuutesi vuoksi."
 
 #: app/templates/public/index.html:149
 msgid "Expert artists"
 msgstr "Asiantuntevat artistit"
 
-#: app/templates/public/index.html:150
-msgid "Our highly trained professionals bring your vision to life."
-msgstr "Osaavat ammattilaisemme herättävät visiosi eloon."
-
 #: app/templates/public/index.html:163
 msgid "What clients say"
 msgstr "Mitä asiakkaat sanovat"
 
-#: app/templates/public/index.html:176
-msgid ""
-"\"Absolutely wonderful experience! The attention to detail is unmatched, "
-"and my nails have never looked better. Highly recommend the gel "
-"extensions.\""
-msgstr ""
-"\"Aivan ihana kokemus! Yksityiskohtien huomiointi on vertaansa vailla, "
-"eivätkä kynteni ole koskaan näyttäneet paremmilta. Suosittelen lämpimästi"
-" geelipidennyksiä.\""
-
-#: app/templates/public/index.html:181
-msgid "Gold member"
-msgstr "Kulta-jäsen"
-
-#: app/templates/public/index.html:194
-msgid ""
-"\"The ambiance is so relaxing, and the staff is incredibly professional. "
-"I love the creative nail art options they offer. A true luxury "
-"experience.\""
-msgstr ""
-"\"Tunnelma on niin rentouttava ja henkilökunta uskomattoman "
-"ammattitaitoista. Rakastan heidän luovia kynsitaidevaihtoehtojaan. Aito "
-"ylellisyyskokemus.\""
-
-#: app/templates/public/index.html:199
-msgid "First-time client"
-msgstr "Ensikertalainen"
-
-#: app/templates/public/index.html:219
+#: app/templates/public/index.html:220
 msgid "New member offer"
 msgstr "Uuden jäsenen etu"
 
-#: app/templates/public/index.html:220
-#, python-format
-msgid "Create an account & get 15%% off your first visit"
-msgstr "Luo tili ja saat 15 %% alennuksen ensimmäisestä käynnistäsi"
-
-#: app/templates/public/index.html:221
-msgid ""
-"Join our community today and start enjoying the perks of premium nail "
-"care right away."
-msgstr "Liity yhteisöömme tänään ja ala nauttia premium-kynsihoidon eduista heti."
-
-#: app/templates/public/index.html:225
+#: app/templates/public/index.html:226
 msgid "Exclusive member updates"
 msgstr "Jäsenten eksklusiiviset uutiset"
 
-#: app/templates/public/index.html:229
+#: app/templates/public/index.html:230
 msgid "Easy online booking"
 msgstr "Helppo verkkovaraus"
 
-#: app/templates/public/index.html:233
+#: app/templates/public/index.html:234
 msgid "Earn rewards points"
 msgstr "Ansaitse etupisteitä"
 
-#: app/templates/public/index.html:239
+#: app/templates/public/index.html:240
 msgid "Already have one? Log in"
 msgstr "Onko sinulla jo tili? Kirjaudu"
 
-#: app/templates/public/index.html:245
+#: app/templates/public/index.html:246
 msgid "welcome discount"
 msgstr "tervetuloalennus"
 
-#: app/templates/public/index.html:261
+#: app/templates/public/index.html:262
 msgid "Find us"
 msgstr "Löydä meidät"
 
-#: app/templates/public/index.html:275
+#: app/templates/public/index.html:279
 msgid "Hours"
 msgstr "Aukioloajat"
 
-#: app/templates/public/index.html:283
+#: app/templates/public/index.html:287
 msgid "Phone"
 msgstr "Puhelin"
 
-#: app/templates/public/index.html:291
+#: app/templates/public/index.html:295
 #: app/templates/staff/staff_profile.html:276
 msgid "Email"
 msgstr "Sähköposti"
 
-#: app/templates/public/index.html:303
+#: app/templates/public/index.html:307
 msgid "Map to our salon"
 msgstr "Kartta salongillemme"
 
-#: app/templates/public/index.html:312
+#: app/templates/public/index.html:316
 msgid "Get directions"
 msgstr "Reittiohjeet"
 
@@ -3260,10 +2918,6 @@ msgstr "Tiedot"
 #: app/templates/public/public_booking.html:230
 msgid "Your Details"
 msgstr "Tietosi"
-
-#: app/templates/public/public_booking.html:231
-msgid "Please provide your contact information to secure the booking."
-msgstr "Anna yhteystietosi varmistaaksesi varauksen."
 
 #: app/templates/public/public_booking.html:255
 msgid "Booking Notes"
@@ -3281,23 +2935,9 @@ msgstr "Erityistoiveet tai allergiat..."
 msgid "Continue to Checkout"
 msgstr "Jatka maksuun"
 
-#: app/templates/public/public_booking.html:355
-msgid "Sign in to earn loyalty points with this booking."
-msgstr "Kirjaudu sisään ansaitaksesi kanta-asiakaspisteitä tästä varauksesta."
-
 #: app/templates/public/services.html:19
 msgid "Our Services"
 msgstr "Palvelumme"
-
-#: app/templates/public/services.html:20
-msgid ""
-"Discover a curated collection of premium nail care and aesthetic "
-"treatments designed for the modern individual. Precision meets "
-"tranquility in every session."
-msgstr ""
-"Tutustu valikoituun kokoelmaan premium-kynsihoitoja ja esteettisiä "
-"hoitoja, jotka on suunniteltu modernille yksilölle. Tarkkuus ja rauha "
-"kohtaavat jokaisella kerralla."
 
 #: app/templates/public/services.html:97 app/templates/public/services.html:131
 msgid "New"
@@ -3339,18 +2979,6 @@ msgstr "Varaus vahvistettu"
 msgid "Booking received"
 msgstr "Varaus vastaanotettu"
 
-#: app/templates/public/success.html:44
-msgid "We've reserved your spot. Get ready for some well-deserved pampering."
-msgstr "Olemme varanneet paikkasi. Valmistaudu ansaittuun hemmotteluun."
-
-#: app/templates/public/success.html:47
-msgid ""
-"We've got your request. We'll email you as soon as the salon confirms "
-"your appointment."
-msgstr ""
-"Olemme saaneet pyyntösi. Lähetämme sähköpostin heti kun salonki vahvistaa"
-" aikasi."
-
 #: app/templates/public/success.html:101
 msgid "Request received"
 msgstr "Pyyntö vastaanotettu"
@@ -3367,29 +2995,13 @@ msgstr "Salonki vahvistaa"
 msgid "Your time is locked in."
 msgstr "Aikasi on varmistettu."
 
-#: app/templates/public/success.html:116
-msgid "Usually within a few hours during opening times."
-msgstr "Yleensä muutamassa tunnissa aukioloaikoina."
-
 #: app/templates/public/success.html:125
 msgid "Your appointment"
 msgstr "Varattu aikasi"
 
-#: app/templates/public/success.html:126
-msgid "Arrive 5-10 minutes early to pick your shade."
-msgstr "Saavu 5-10 minuuttia etuajassa valitsemaan sävysi."
-
 #: app/templates/public/success.html:134
 msgid "Manage bookings easily"
 msgstr "Hallitse varauksia helposti"
-
-#: app/templates/public/success.html:135
-msgid ""
-"Create an account to track your loyalty points, reschedule appointments, "
-"and save your favorite colors."
-msgstr ""
-"Luo tili seurataksesi kanta-asiakaspisteitäsi, siirtääksesi aikoja ja "
-"tallentaaksesi suosikkivärisi."
 
 #: app/templates/public/success.html:136
 msgid "Create Account"
@@ -3408,8 +3020,9 @@ msgid "Find us at:"
 msgstr "Löydät meidät:"
 
 #: app/templates/public/success.html:152
-msgid "DahaCare studio"
-msgstr "DahaCare-salonki"
+#, python-format
+msgid "%(brand)s studio"
+msgstr "%(brand)s-salonki"
 
 #: app/templates/public/success.html:155
 msgid "Open in Maps"
@@ -4100,4 +3713,386 @@ msgstr "Verkkovirhe. Yritä uudelleen."
 
 #~ msgid "Map location"
 #~ msgstr "Kartan sijainti"
+
+#~ msgid "Verify your email – Daha Care"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your verification code is: %(code)s\n"
+#~ "\n"
+#~ "Please enter this code to confirm "
+#~ "your email address and complete your "
+#~ "registration.\n"
+#~ "\n"
+#~ "If you did not create an account"
+#~ " with Daha Care, please ignore this"
+#~ " email.\n"
+#~ msgstr ""
+
+#~ msgid "Password Change Request – Daha Care"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your verification code is: %(code)s\n"
+#~ "\n"
+#~ "Please enter this code to confirm your password change request.\n"
+#~ "\n"
+#~ "If you did not request this, "
+#~ "please ignore this email and your "
+#~ "password will remain unchanged.\n"
+#~ msgstr ""
+
+#~ msgid "Email Change Request – Daha Care"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your verification code is: %(code)s\n"
+#~ "\n"
+#~ "Please enter this code to confirm your email address change request.\n"
+#~ "\n"
+#~ "If you did not request this, "
+#~ "please ignore this email and your "
+#~ "email address will remain unchanged.\n"
+#~ msgstr ""
+
+#~ msgid "Reset Your Password – Daha Care"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your password reset code is: %(code)s\n"
+#~ "\n"
+#~ "Please enter this code to reset "
+#~ "your password. This code expires in "
+#~ "10 minutes.\n"
+#~ "\n"
+#~ "If you did not request a password reset, please ignore this email.\n"
+#~ msgstr ""
+
+#~ msgid "Your Booking Verification Code – Daha Care"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your verification code is: %(code)s\n"
+#~ "\n"
+#~ "Please enter this code on the "
+#~ "verification page to confirm your "
+#~ "booking.\n"
+#~ "\n"
+#~ "If you did not request this, please ignore this email.\n"
+#~ msgstr ""
+
+#~ msgid "Your booking request has been received"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Hi %(name)s,\n"
+#~ "\n"
+#~ "Thank you for your booking.\n"
+#~ "\n"
+#~ "We have received your booking request"
+#~ " and it is currently pending "
+#~ "confirmation.\n"
+#~ "\n"
+#~ "Booking details:\n"
+#~ "- Service: %(service)s\n"
+#~ "- Staff: %(staff)s\n"
+#~ "- Date: %(date)s\n"
+#~ "- Time: %(start)s - %(end)s\n"
+#~ "\n"
+#~ "We will contact you again once your booking has been confirmed.\n"
+#~ "\n"
+#~ "Best regards,\n"
+#~ "Dahacare\n"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Just one more step to secure your"
+#~ " account and unlock your personalized "
+#~ "beauty journey."
+#~ msgstr "Enää yksi askel: suojaa tilisi ja avaa oma kauneuspolkusi."
+
+#~ msgid "Choose from our curated selection of luxury treatments."
+#~ msgstr "Valitse valikoiduista ylellisyyshoidoistamme."
+
+#~ msgid "Select your preferred stylist or let us match you."
+#~ msgstr "Valitse haluamasi stylisti tai anna meidän valita puolestasi."
+
+#~ msgid ""
+#~ "You'll receive a verification email "
+#~ "after confirming. Your booking will be"
+#~ msgstr "Saat vahvistussähköpostin vahvistuksen jälkeen. Varauksesi on"
+
+#~ msgid "until the salon confirms your appointment."
+#~ msgstr "kunnes salonki vahvistaa aikasi."
+
+#~ msgid "By confirming, you agree to our 24h cancellation policy."
+#~ msgstr "Vahvistamalla hyväksyt 24 tunnin peruutusehtomme."
+
+#~ msgid "Earn base loyalty points on every visit"
+#~ msgstr "Ansaitse peruskanta-asiakaspisteitä joka käynnillä"
+
+#~ msgid "Birthday bonus points"
+#~ msgstr "Syntymäpäivän bonuspisteet"
+
+#~ msgid "Access to member-only promotions"
+#~ msgstr "Pääsy vain jäsenille tarkoitettuihin tarjouksiin"
+
+#~ msgid "Monthly reward voucher"
+#~ msgstr "Kuukausittainen palkintokuponki"
+
+#~ msgid "Priority booking (standard)"
+#~ msgstr "Etusijavaraus (perus)"
+
+#~ msgid "Everything in Silver"
+#~ msgstr "Kaikki Silverissä"
+
+#~ msgid "Early access to new services & seasonal offers"
+#~ msgstr "Ennakkopääsy uusiin palveluihin ja kausitarjouksiin"
+
+#~ msgid "Complimentary nail care kit (quarterly)"
+#~ msgstr "Maksuton kynsienhoitosetti (neljännesvuosittain)"
+
+#~ msgid "Dedicated booking slot on weekends"
+#~ msgstr "Oma varausaika viikonloppuisin"
+
+#~ msgid "Everything in Gold"
+#~ msgstr "Kaikki Goldissa"
+
+#~ msgid "Free add-on service every visit"
+#~ msgstr "Ilmainen lisäpalvelu joka käynnillä"
+
+#~ msgid "Personal nail stylist assignment"
+#~ msgstr "Oma henkilökohtainen kynsistylisti"
+
+#~ msgid "VIP lounge access & complimentary drinks"
+#~ msgstr "Pääsy VIP-loungeen ja maksuttomat juomat"
+
+#~ msgid ""
+#~ "Unlock exclusive perks, rewards, and "
+#~ "priority care tailored to your loyalty."
+#~ msgstr ""
+#~ "Avaa eksklusiiviset edut, palkinnot ja "
+#~ "etusijainen hoito uskollisuutesi mukaan."
+
+#~ msgid "Show this code to our staff at your next visit to redeem."
+#~ msgstr ""
+#~ "Näytä tämä koodi henkilökunnallemme "
+#~ "seuraavalla käynnilläsi lunastaaksesi sen."
+
+#~ msgid "This voucher has expired and is no longer valid."
+#~ msgstr "Tämä kuponki on vanhentunut eikä ole enää voimassa."
+
+#~ msgid ""
+#~ "Modify your session with ease. Please"
+#~ " note our 24-hour rescheduling window "
+#~ "to ensure we can accommodate all "
+#~ "guests."
+#~ msgstr ""
+#~ "Muuta aikaasi vaivattomasti. Huomaathan 24 "
+#~ "tunnin muutosaikamme, jotta voimme palvella"
+#~ " kaikkia asiakkaita."
+
+#~ msgid ""
+#~ "Bookings can only be rescheduled at "
+#~ "least 24 hours in advance and can"
+#~ " only be changed once. Further "
+#~ "changes may require a new deposit."
+#~ msgstr ""
+#~ "Varauksia voi siirtää vain vähintään 24"
+#~ " tuntia etukäteen ja vain kerran. "
+#~ "Lisämuutokset voivat vaatia uuden "
+#~ "ennakkomaksun."
+
+#~ msgid ""
+#~ "Redefining luxury wellness with precise, "
+#~ "artisanal care in a sanctuary of "
+#~ "soft mood and quiet elegance."
+#~ msgstr ""
+#~ "Määrittelemme ylellisen hyvinvoinnin uudelleen "
+#~ "tarkalla, käsityöläismäisellä hoidolla pehmeän "
+#~ "tunnelman ja hillityn eleganssin keitaassa."
+
+#~ msgid ""
+#~ "At DahaCare, we believe that true "
+#~ "luxury lies in the details. Founded "
+#~ "on the principle of bringing atelier-"
+#~ "level precision to daily wellness, our"
+#~ " space was designed as a retreat "
+#~ "from the noise of the city."
+#~ msgstr ""
+#~ "DahaCaressa uskomme, että todellinen "
+#~ "ylellisyys piilee yksityiskohdissa. Periaatteenamme"
+#~ " on tuoda ateljee-tason tarkkuus "
+#~ "päivittäiseen hyvinvointiin, ja tilamme on "
+#~ "suunniteltu pakopaikaksi kaupungin melulta."
+
+#~ msgid ""
+#~ "Every treatment is a careful composition"
+#~ " of quality products, rigorous hygiene "
+#~ "standards, and the trained hands of "
+#~ "our artists. We don't just provide "
+#~ "a service; we curate an experience "
+#~ "that honors your time and elevates "
+#~ "your personal care ritual."
+#~ msgstr ""
+#~ "Jokainen hoito on huolellinen yhdistelmä "
+#~ "laadukkaita tuotteita, tiukkoja hygieniastandardeja"
+#~ " ja artistiemme koulutettuja käsiä. Emme"
+#~ " vain tarjoa palvelua; luomme kokemuksen,"
+#~ " joka kunnioittaa aikaasi ja nostaa "
+#~ "henkilökohtaisen hoitorituaalisi uudelle tasolle."
+
+#~ msgid ""
+#~ "Medical-grade sterilization processes for "
+#~ "every tool, ensuring your safety is "
+#~ "never compromised."
+#~ msgstr ""
+#~ "Lääketieteellisen tason sterilointi jokaiselle "
+#~ "työkalulle takaa, ettei turvallisuudestasi "
+#~ "tingitä koskaan."
+
+#~ msgid ""
+#~ "Continuous education and mastery of "
+#~ "techniques mean you receive the pinnacle"
+#~ " of modern care."
+#~ msgstr ""
+#~ "Jatkuva kouluttautuminen ja tekniikoiden "
+#~ "hallinta takaavat, että saat modernin "
+#~ "hoidon huipun."
+
+#~ msgid ""
+#~ "We source only premium, non-toxic, "
+#~ "and sustainable materials for long-"
+#~ "lasting, brilliant results."
+#~ msgstr ""
+#~ "Käytämme vain premium-luokan, myrkyttömiä "
+#~ "ja kestäviä materiaaleja pitkäkestoisiin, "
+#~ "upeisiin tuloksiin."
+
+#~ msgid ""
+#~ "Your comfort is our priority. Enjoy "
+#~ "a serene environment designed entirely "
+#~ "around your relaxation."
+#~ msgstr ""
+#~ "Mukavuutesi on prioriteettimme. Nauti "
+#~ "rauhallisesta ympäristöstä, joka on "
+#~ "suunniteltu täysin rentoutumistasi varten."
+
+#~ msgid "Experience the DahaCare difference in person."
+#~ msgstr "Koe DahaCaren ero paikan päällä."
+
+#~ msgid "A glimpse into the artistry and precision behind every visit."
+#~ msgstr "Katsaus jokaisen käynnin taiteeseen ja tarkkuuteen."
+
+#~ msgid "Trusted by thousands of satisfied customers who love our work."
+#~ msgstr "Tuhannet tyytyväiset asiakkaat luottavat työhömme."
+
+#~ msgid "We use only premium, non-toxic products for your health and safety."
+#~ msgstr ""
+#~ "Käytämme vain premium-luokan myrkyttömiä "
+#~ "tuotteita terveytesi ja turvallisuutesi "
+#~ "vuoksi."
+
+#~ msgid "Our highly trained professionals bring your vision to life."
+#~ msgstr "Osaavat ammattilaisemme herättävät visiosi eloon."
+
+#~ msgid ""
+#~ "\"Absolutely wonderful experience! The "
+#~ "attention to detail is unmatched, and"
+#~ " my nails have never looked better."
+#~ " Highly recommend the gel extensions.\""
+#~ msgstr ""
+#~ "\"Aivan ihana kokemus! Yksityiskohtien "
+#~ "huomiointi on vertaansa vailla, eivätkä "
+#~ "kynteni ole koskaan näyttäneet paremmilta. "
+#~ "Suosittelen lämpimästi geelipidennyksiä.\""
+
+#~ msgid "Gold member"
+#~ msgstr "Kulta-jäsen"
+
+#~ msgid ""
+#~ "\"The ambiance is so relaxing, and "
+#~ "the staff is incredibly professional. I"
+#~ " love the creative nail art options"
+#~ " they offer. A true luxury "
+#~ "experience.\""
+#~ msgstr ""
+#~ "\"Tunnelma on niin rentouttava ja "
+#~ "henkilökunta uskomattoman ammattitaitoista. Rakastan"
+#~ " heidän luovia kynsitaidevaihtoehtojaan. Aito "
+#~ "ylellisyyskokemus.\""
+
+#~ msgid "First-time client"
+#~ msgstr "Ensikertalainen"
+
+#~ msgid "Create an account & get 15%% off your first visit"
+#~ msgstr "Luo tili ja saat 15 %% alennuksen ensimmäisestä käynnistäsi"
+
+#~ msgid ""
+#~ "Join our community today and start "
+#~ "enjoying the perks of premium nail "
+#~ "care right away."
+#~ msgstr ""
+#~ "Liity yhteisöömme tänään ja ala nauttia"
+#~ " premium-kynsihoidon eduista heti."
+
+#~ msgid "Please provide your contact information to secure the booking."
+#~ msgstr "Anna yhteystietosi varmistaaksesi varauksen."
+
+#~ msgid "Sign in to earn loyalty points with this booking."
+#~ msgstr "Kirjaudu sisään ansaitaksesi kanta-asiakaspisteitä tästä varauksesta."
+
+#~ msgid ""
+#~ "Discover a curated collection of premium"
+#~ " nail care and aesthetic treatments "
+#~ "designed for the modern individual. "
+#~ "Precision meets tranquility in every "
+#~ "session."
+#~ msgstr ""
+#~ "Tutustu valikoituun kokoelmaan premium-"
+#~ "kynsihoitoja ja esteettisiä hoitoja, jotka "
+#~ "on suunniteltu modernille yksilölle. Tarkkuus"
+#~ " ja rauha kohtaavat jokaisella kerralla."
+
+#~ msgid "We've reserved your spot. Get ready for some well-deserved pampering."
+#~ msgstr "Olemme varanneet paikkasi. Valmistaudu ansaittuun hemmotteluun."
+
+#~ msgid ""
+#~ "We've got your request. We'll email "
+#~ "you as soon as the salon confirms"
+#~ " your appointment."
+#~ msgstr ""
+#~ "Olemme saaneet pyyntösi. Lähetämme sähköpostin"
+#~ " heti kun salonki vahvistaa aikasi."
+
+#~ msgid "Usually within a few hours during opening times."
+#~ msgstr "Yleensä muutamassa tunnissa aukioloaikoina."
+
+#~ msgid "Arrive 5-10 minutes early to pick your shade."
+#~ msgstr "Saavu 5-10 minuuttia etuajassa valitsemaan sävysi."
+
+#~ msgid ""
+#~ "Create an account to track your "
+#~ "loyalty points, reschedule appointments, and"
+#~ " save your favorite colors."
+#~ msgstr ""
+#~ "Luo tili seurataksesi kanta-asiakaspisteitäsi,"
+#~ " siirtääksesi aikoja ja tallentaaksesi "
+#~ "suosikkivärisi."
+
+#~ msgid "Why MisaNails?"
+#~ msgstr ""
+
+#~ msgid "DahaCare studio"
+#~ msgstr "DahaCare-salonki"
 

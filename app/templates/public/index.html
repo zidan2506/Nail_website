@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}DahaCare - {{ _('Premium Nail Care & Art') }}{% endblock %}
+{% block title %}{{ biz.brand_name }} - {{ _('Premium Nail Care & Art') }}{% endblock %}
 
 {# Load homepage-specific CSS — base.css đã được load sẵn trong base.html #}
 {% block extra_css %}
@@ -124,30 +124,30 @@
 
 
 {# ═══════════════════════════════════════════════════════════════════════════
-   WHY DAHACARE SECTION
+   WHY US SECTION
    - Shaded background (surface-container-low)
    - 3 stat blocks: 5K+ clients / 100% safe products / 10+ expert artists
 ═══════════════════════════════════════════════════════════════════════════ #}
 <section class="home-section--shaded">
     <div class="home-section__header">
-        <h2 class="home-section__title">{{ _('Why MisaNails?') }}</h2>
+        <h2 class="home-section__title">{{ _('Why %(brand)s?', brand=biz.brand_name) }}</h2>
     </div>
 
     <div class="stats-grid">
         <div>
-            <div class="stat__number">5K+</div>
+            <div class="stat__number">{{ biz.home_stats.clients }}</div>
             <h3 class="stat__label">{{ _('Happy clients') }}</h3>
-            <p class="stat__desc">{{ _('Trusted by thousands of satisfied customers who love our work.') }}</p>
+            <p class="stat__desc">{{ txt('home.why_1_desc') }}</p>
         </div>
         <div>
-            <div class="stat__number">100%</div>
+            <div class="stat__number">{{ biz.home_stats.safe_products }}</div>
             <h3 class="stat__label">{{ _('Safe products') }}</h3>
-            <p class="stat__desc">{{ _('We use only premium, non-toxic products for your health and safety.') }}</p>
+            <p class="stat__desc">{{ txt('home.why_2_desc') }}</p>
         </div>
         <div>
-            <div class="stat__number">10+</div>
+            <div class="stat__number">{{ biz.home_stats.artists }}</div>
             <h3 class="stat__label">{{ _('Expert artists') }}</h3>
-            <p class="stat__desc">{{ _('Our highly trained professionals bring your vision to life.') }}</p>
+            <p class="stat__desc">{{ txt('home.why_3_desc') }}</p>
         </div>
     </div>
 </section>
@@ -173,12 +173,13 @@
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
             </div>
-            <p class="testimonial-card__quote">{{ _('"Absolutely wonderful experience! The attention to detail is unmatched, and my nails have never looked better. Highly recommend the gel extensions."') }}</p>
+            <p class="testimonial-card__quote">{{ txt('home.testimonial_1_quote') }}</p>
             <div class="testimonial-card__author">
-                <div class="testimonial-card__avatar">SJ</div>
+                {# Chữ cái đầu suy ra từ tên, để đổi tên trong business.py là avatar theo luôn #}
+                <div class="testimonial-card__avatar">{{ txt('home.testimonial_1_name').split() | map('first') | join }}</div>
                 <div>
-                    <div class="testimonial-card__name">Sarah Jenkins</div>
-                    <div class="testimonial-card__role testimonial-card__role--gold">{{ _('Gold member') }}</div>
+                    <div class="testimonial-card__name">{{ txt('home.testimonial_1_name') }}</div>
+                    <div class="testimonial-card__role testimonial-card__role--gold">{{ txt('home.testimonial_1_role') }}</div>
                 </div>
             </div>
         </div>
@@ -191,12 +192,12 @@
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
                 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">star</span>
             </div>
-            <p class="testimonial-card__quote">{{ _('"The ambiance is so relaxing, and the staff is incredibly professional. I love the creative nail art options they offer. A true luxury experience."') }}</p>
+            <p class="testimonial-card__quote">{{ txt('home.testimonial_2_quote') }}</p>
             <div class="testimonial-card__author">
-                <div class="testimonial-card__avatar">MR</div>
+                <div class="testimonial-card__avatar">{{ txt('home.testimonial_2_name').split() | map('first') | join }}</div>
                 <div>
-                    <div class="testimonial-card__name">Maria Rodriguez</div>
-                    <div class="testimonial-card__role testimonial-card__role--muted">{{ _('First-time client') }}</div>
+                    <div class="testimonial-card__name">{{ txt('home.testimonial_2_name') }}</div>
+                    <div class="testimonial-card__role testimonial-card__role--muted">{{ txt('home.testimonial_2_role') }}</div>
                 </div>
             </div>
         </div>
@@ -217,8 +218,8 @@
 
         <div class="promo-cta__body">
             <span class="promo-cta__tag">{{ _('New member offer') }}</span>
-            <h2 class="promo-cta__title">{{ _('Create an account & get 15%% off your first visit') }}</h2>
-            <p class="promo-cta__subtitle">{{ _('Join our community today and start enjoying the perks of premium nail care right away.') }}</p>
+            <h2 class="promo-cta__title">{{ txt('home.promo_title', pct=biz.first_visit_discount_pct) }}</h2>
+            <p class="promo-cta__subtitle">{{ txt('home.promo_sub') }}</p>
             <ul class="promo-cta__list">
                 <li>
                     <span class="material-symbols-outlined">star</span>
@@ -241,7 +242,7 @@
         </div>
 
         <div class="promo-cta__discount">
-            <div class="promo-cta__discount-number">15%</div>
+            <div class="promo-cta__discount-number">{{ biz.first_visit_discount_pct }}%</div>
             <div class="promo-cta__discount-label">{{ _('welcome discount') }}</div>
         </div>
 
@@ -265,15 +266,18 @@
                     <span class="material-symbols-outlined">location_on</span>
                     <div>
                         <div class="contact-info__label">{{ _('Address') }}</div>
-                        <div>Kyyhkysmäki 9<br>02650 Espoo, Finland</div>
+                        <div>{% for line in biz.address_lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</div>
                     </div>
                 </div>
 
                 <div class="contact-info__row">
                     <span class="material-symbols-outlined">schedule</span>
                     <div>
+                        {# Giờ lấy từ business.py, cùng nguồn với BUSINESS_OPEN/BUSINESS_CLOSE
+                           của booking_service — bản cũ ghi 9:00-20:00 trong khi wizard
+                           chỉ mở slot tới 18:00. #}
                         <div class="contact-info__label">{{ _('Hours') }}</div>
-                        <div>Mon-Fri: 9:00-20:00<br>Sat-Sun: 10:00-18:00</div>
+                        <div>{{ biz.hours.open }} - {{ biz.hours.close }}</div>
                     </div>
                 </div>
 
@@ -281,7 +285,7 @@
                     <span class="material-symbols-outlined">call</span>
                     <div>
                         <div class="contact-info__label">{{ _('Phone') }}</div>
-                        <div>+358 465 978 425</div>
+                        <div>{{ biz.phone }}</div>
                     </div>
                 </div>
 
@@ -289,7 +293,7 @@
                     <span class="material-symbols-outlined">mail</span>
                     <div>
                         <div class="contact-info__label">{{ _('Email') }}</div>
-                        <div>dahacaree@gmail.com</div>
+                        <div>{{ biz.email }}</div>
                     </div>
                 </div>
 
@@ -299,14 +303,14 @@
         <div>
             <div class="contact-map">
                 <iframe
-                    src="https://www.google.com/maps?q=Kyyhkysm%C3%A4ki+9+A,+02650+Espoo,+Finland&output=embed"
+                    src="https://www.google.com/maps?q={{ biz.address | urlencode }}&output=embed"
                     title="{{ _('Map to our salon') }}"
                     loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade"
                     allowfullscreen></iframe>
             </div>
             <a class="contact-map__link"
-               href="https://www.google.com/maps/dir/?api=1&destination=Kyyhkysm%C3%A4ki+9+A,+02650+Espoo,+Finland"
+               href="https://www.google.com/maps/dir/?api=1&destination={{ biz.address | urlencode }}"
                target="_blank" rel="noopener">
                 <span class="material-symbols-outlined">directions</span>
                 {{ _('Get directions') }}
@@ -321,11 +325,9 @@
    FOOTER
    - Footer đã được chuyển sang base.html ({% block footer %}) để dùng chung
      cho mọi public page, tránh trùng lặp / lệch UI giữa các trang.
-   - Data thật (địa chỉ, giờ mở cửa, SĐT, email) trước đây nằm cứng ở đây
-     cần được đưa vào context khi render base.html (xem base.html để biết
-     các biến: branches, business_id, current_year — và bổ sung thêm
-     contact_phone / contact_email / opening_hours nếu base.html footer
-     muốn hiển thị lại các thông tin này).
+   - Data thật (địa chỉ, giờ mở cửa, SĐT, email) nay lấy từ app/business.py
+     qua context processor inject_business (biến `biz`, `branches`,
+     `business_id`, `current_year`).
 ═══════════════════════════════════════════════════════════════════════════ #}
 
 {# ═══════════════════════════════════════════════════════════════════════════

@@ -2,6 +2,8 @@ from datetime import datetime, timedelta, UTC
 from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
+from app.business import BUSINESS
+
 HELSINKI_TZ = ZoneInfo("Europe/Helsinki")
 
 def now_helsinki():
@@ -111,11 +113,13 @@ def build_gg_calendar_url(title, date, start_time, end_time, details="", locatio
 def build_calendar_url( sevi_name, staff_name, date, start_time, end_time):
     
     
-    title = f"{sevi_name} - Misa Nails"
+    brand = BUSINESS["brand_name"]
 
-    details = f"Appointment with {staff_name} at Misa Nails"
+    title = f"{sevi_name} - {brand}"
 
-    location = "Kyyhkysmäki 9, 02650 Espoo"
+    details = f"Appointment with {staff_name} at {brand}"
+
+    location = BUSINESS["address"]
 
     return {
         "url": build_gg_calendar_url(title, date, start_time, end_time, details, location),

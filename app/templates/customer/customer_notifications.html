@@ -1,6 +1,6 @@
 {% extends "customer_base.html" %}
 
-{% block title %}{{ _('Notifications') }} - Daha Care{% endblock %}
+{% block title %}{{ _('Notifications') }} - {{ biz.brand_name }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/customer/customer_notifications.css') }}">
@@ -21,7 +21,7 @@
   <header class="nf-intro">
     <div class="nf-intro__text">
       <h1 class="nf-intro__title">{{ _('Notifications') }}</h1>
-      <p class="nf-intro__sub">{{ _('Announcements from Misa Nails and messages sent to you.') }}</p>
+      <p class="nf-intro__sub">{{ _('Announcements from %(brand)s and messages sent to you.', brand=biz.brand_name) }}</p>
     </div>
 
     {# Chỉ hiện khi còn tin chưa đọc: nút bấm vào không đổi gì thì không nên có. #}

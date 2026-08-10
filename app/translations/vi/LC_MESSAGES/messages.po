@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-10 18:31+0700\n"
+"POT-Creation-Date: 2026-08-10 20:26+0700\n"
 "PO-Revision-Date: 2026-07-10 19:40+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: vi\n"
@@ -18,20 +18,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes.py:55
+#: app/routes.py:56
 msgid "Chờ xác nhận"
 msgstr ""
 
-#: app/routes.py:55 app/templates/staff/staff_bookings.html:311
+#: app/routes.py:56 app/templates/staff/staff_bookings.html:311
 msgid "Đã xác nhận"
 msgstr ""
 
-#: app/routes.py:55 app/templates/staff/staff_bookings.html:312
+#: app/routes.py:56 app/templates/staff/staff_bookings.html:312
 #: app/templates/staff/staff_bookings.html:338
 msgid "Đang thực hiện"
 msgstr ""
 
-#: app/routes.py:56 app/templates/staff/staff_bookings.html:312
+#: app/routes.py:57 app/templates/staff/staff_bookings.html:312
 #: app/templates/staff/staff_bookings.html:342
 #: app/templates/staff/staff_bookings.html:409
 #: app/templates/staff/staff_bookings.html:487
@@ -41,450 +41,450 @@ msgstr ""
 msgid "Hoàn thành"
 msgstr ""
 
-#: app/routes.py:56 app/templates/staff/staff_history.html:260
+#: app/routes.py:57 app/templates/staff/staff_history.html:260
 #: app/templates/staff/staff_history.html:283
 #: app/templates/staff/staff_history.html:339
 #: app/templates/staff/staff_history.html:425
 msgid "Đã hủy"
 msgstr ""
 
-#: app/routes.py:56
+#: app/routes.py:57
 msgid "Không đến"
 msgstr ""
 
-#: app/routes.py:57
+#: app/routes.py:58
 msgid "hôm nay"
 msgstr ""
 
-#: app/routes.py:57
+#: app/routes.py:58
 msgid "trong tuần này"
 msgstr ""
 
-#: app/routes.py:57
+#: app/routes.py:58
 msgid "trong tháng này"
 msgstr ""
 
-#: app/routes.py:58
+#: app/routes.py:59
 msgid "trong tháng trước"
 msgstr ""
 
-#: app/routes.py:59 app/routes.py:2002
+#: app/routes.py:60 app/routes.py:2016
 msgid "✓ Claimed"
 msgstr "✓ Đã nhận"
 
-#: app/routes.py:59 app/routes.py:2004
+#: app/routes.py:60 app/routes.py:2018
 msgid "✓ All Reviewed"
 msgstr "✓ Đã đánh giá hết"
 
-#: app/routes.py:59
+#: app/routes.py:60
 msgid "Start"
 msgstr "Bắt đầu"
 
-#: app/routes.py:59
+#: app/routes.py:60
 msgid "Claim"
 msgstr "Nhận"
 
-#: app/routes.py:474
+#: app/routes.py:489
 msgid "Please login!"
 msgstr "Vui lòng đăng nhập!"
 
-#: app/routes.py:496
+#: app/routes.py:511
 msgid "Unauthorized."
 msgstr "Không có quyền truy cập."
 
-#: app/routes.py:501
+#: app/routes.py:516
 msgid "Session expired. Please log in again."
 msgstr "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
 
-#: app/routes.py:511
+#: app/routes.py:526
 msgid "You do not have access to this area."
 msgstr "Bạn không có quyền truy cập khu vực này."
 
-#: app/routes.py:547
+#: app/routes.py:562
 msgid "Today"
 msgstr "Hôm nay"
 
-#: app/routes.py:549
+#: app/routes.py:564
 msgid "Tomorrow"
 msgstr "Ngày mai"
 
-#: app/routes.py:559 app/routes.py:793 app/routes.py:861 app/routes.py:1118
-#: app/routes.py:1142 app/routes.py:1400 app/routes.py:1553 app/routes.py:1617
-#: app/routes.py:1648 app/routes.py:1716 app/routes.py:1805 app/routes.py:1844
+#: app/routes.py:574 app/routes.py:808 app/routes.py:875 app/routes.py:1132
+#: app/routes.py:1156 app/routes.py:1414 app/routes.py:1567 app/routes.py:1631
+#: app/routes.py:1662 app/routes.py:1730 app/routes.py:1819 app/routes.py:1858
 msgid "Customer profile not found!"
 msgstr "Không tìm thấy hồ sơ khách hàng!"
 
-#: app/routes.py:641 app/routes.py:4457
+#: app/routes.py:656 app/routes.py:4471
 msgid "That service is no longer available. Showing our full menu."
 msgstr "Dịch vụ đó không còn nữa. Đang hiển thị toàn bộ danh mục."
 
-#: app/routes.py:666 app/routes.py:865
+#: app/routes.py:681 app/routes.py:879
 msgid "Booking not found"
 msgstr "Không tìm thấy lịch hẹn"
 
-#: app/routes.py:673
+#: app/routes.py:688
 msgid "User not found!"
 msgstr "Không tìm thấy người dùng!"
 
-#: app/routes.py:677
+#: app/routes.py:692
 msgid "This booking cannot be cancelled"
 msgstr "Lịch hẹn này không thể huỷ"
 
-#: app/routes.py:683
+#: app/routes.py:698
 msgid "Booking cancelled successfully"
 msgstr "Đã huỷ lịch hẹn."
 
-#: app/routes.py:691
+#: app/routes.py:706
 msgid "Session Expired. Please login again."
 msgstr "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
 
-#: app/routes.py:697
+#: app/routes.py:712
 msgid "Customer profile not found by some how :D"
 msgstr "Không tìm thấy hồ sơ khách hàng."
 
-#: app/routes.py:787 app/routes.py:797 app/routes.py:855
+#: app/routes.py:802 app/routes.py:812 app/routes.py:869
 msgid "Booking not found!"
 msgstr "Không tìm thấy lịch hẹn!"
 
-#: app/routes.py:803 app/routes.py:871
+#: app/routes.py:818 app/routes.py:885
 msgid "Service data unavailable."
 msgstr "Không lấy được dữ liệu dịch vụ."
 
-#: app/routes.py:809 app/routes.py:877
+#: app/routes.py:824 app/routes.py:891
 msgid "Staff data unavailable."
 msgstr "Không lấy được dữ liệu nhân viên."
 
-#: app/routes.py:894
+#: app/routes.py:908
 msgid "Please select a new date and time"
 msgstr "Vui lòng chọn ngày và giờ mới"
 
-#: app/routes.py:900
+#: app/routes.py:914
 msgid "You can only reschedule within the next 14 days"
 msgstr "Chỉ đổi lịch được trong vòng 14 ngày tới"
 
-#: app/routes.py:906
+#: app/routes.py:920
 msgid "Invalid time format"
 msgstr "Định dạng giờ không hợp lệ"
 
-#: app/routes.py:933
+#: app/routes.py:947
 msgid "This time slot is no longer available."
 msgstr "Khung giờ này không còn trống."
 
-#: app/routes.py:934
+#: app/routes.py:948
 msgid "Please choose another time."
 msgstr "Vui lòng chọn giờ khác."
 
-#: app/routes.py:944
+#: app/routes.py:958
 msgid "Booking rescheduled successfully"
 msgstr "Đã đổi lịch hẹn."
 
-#: app/routes.py:1150
+#: app/routes.py:1164
 msgid "Name is required."
 msgstr "Vui lòng nhập họ tên."
 
-#: app/routes.py:1154
+#: app/routes.py:1168
 msgid "Profile updated successfully."
 msgstr "Đã cập nhật hồ sơ."
 
-#: app/routes.py:1171
+#: app/routes.py:1185
 msgid "No file selected."
 msgstr "Chưa chọn tệp nào."
 
-#: app/routes.py:1179
+#: app/routes.py:1193
 msgid "Profile picture updated."
 msgstr "Đã cập nhật ảnh đại diện."
 
-#: app/routes.py:1210 app/routes.py:1277
+#: app/routes.py:1224 app/routes.py:1291
 msgid "Verification session expired. Please request a new code."
 msgstr "Phiên xác thực đã hết hạn. Vui lòng yêu cầu mã mới."
 
-#: app/routes.py:1219 app/routes.py:1289
+#: app/routes.py:1233 app/routes.py:1303
 msgid "Verification code expired. Please request a new code."
 msgstr "Mã xác thực đã hết hạn. Vui lòng yêu cầu mã mới."
 
-#: app/routes.py:1226 app/routes.py:1296 app/routes.py:2496
+#: app/routes.py:1240 app/routes.py:1310 app/routes.py:2510
 msgid "Too many incorrect attempts. Please request a new code."
 msgstr "Nhập sai quá nhiều lần. Vui lòng yêu cầu mã mới."
 
-#: app/routes.py:1228 app/routes.py:1298 app/routes.py:2498
+#: app/routes.py:1242 app/routes.py:1312 app/routes.py:2512
 msgid "Incorrect verification code."
 msgstr "Mã xác thực không đúng."
 
-#: app/routes.py:1232 app/routes.py:2506 app/routes.py:4916
+#: app/routes.py:1246 app/routes.py:2520 app/routes.py:4930
 msgid "Passwords do not match."
 msgstr "Mật khẩu xác nhận không khớp."
 
-#: app/routes.py:1236
+#: app/routes.py:1250
 msgid "New password must be at least 8 characters."
 msgstr "Mật khẩu mới phải có ít nhất 8 ký tự."
 
-#: app/routes.py:1242
+#: app/routes.py:1256
 msgid "Password changed successfully."
 msgstr "Đã đổi mật khẩu."
 
-#: app/routes.py:1272 app/routes.py:3294 app/routes.py:3323 app/routes.py:3342
+#: app/routes.py:1286 app/routes.py:3308 app/routes.py:3337 app/routes.py:3356
 msgid "Customer not found."
 msgstr "Không tìm thấy khách hàng."
 
-#: app/routes.py:1284 app/routes.py:2765 app/routes.py:2794
+#: app/routes.py:1298 app/routes.py:2779 app/routes.py:2808
 msgid "Please fill in all fields."
 msgstr "Vui lòng điền đầy đủ thông tin."
 
-#: app/routes.py:1302
+#: app/routes.py:1316
 msgid "New email is the same as your current email."
 msgstr "Email mới trùng với email hiện tại."
 
-#: app/routes.py:1307
+#: app/routes.py:1321
 msgid "Email is already taken."
 msgstr "Email này đã được sử dụng."
 
-#: app/routes.py:1316
+#: app/routes.py:1330
 msgid "Email updated successfully."
 msgstr "Đã cập nhật email."
 
-#: app/routes.py:1326
+#: app/routes.py:1340
 msgid "User not found. Please login!"
 msgstr "Không tìm thấy người dùng. Vui lòng đăng nhập!"
 
-#: app/routes.py:1331
+#: app/routes.py:1345
 msgid "Customer profile not found."
 msgstr "Không tìm thấy hồ sơ khách hàng."
 
-#: app/routes.py:1405 app/routes.py:1410
+#: app/routes.py:1419 app/routes.py:1424
 msgid "Invoice not found!"
 msgstr "Không tìm thấy hoá đơn!"
 
-#: app/routes.py:1450
+#: app/routes.py:1464
 msgid "Could not start the payment session. Please try again."
 msgstr "Không tạo được phiên thanh toán. Vui lòng thử lại."
 
-#: app/routes.py:1462
+#: app/routes.py:1476
 msgid "Something went wrong. Please login again!"
 msgstr "Đã có lỗi xảy ra. Vui lòng đăng nhập lại!"
 
-#: app/routes.py:1467
+#: app/routes.py:1481
 msgid "Customer profile not found. Please login again!"
 msgstr "Không tìm thấy hồ sơ khách hàng. Vui lòng đăng nhập lại!"
 
-#: app/routes.py:1475 app/routes.py:4492
+#: app/routes.py:1489 app/routes.py:4506
 msgid "Please select a service, date, and time slot before confirming."
 msgstr "Vui lòng chọn dịch vụ, ngày và khung giờ trước khi xác nhận."
 
-#: app/routes.py:1490 app/routes.py:4506
+#: app/routes.py:1504 app/routes.py:4520
 msgid "Service not found. Please try again."
 msgstr "Không tìm thấy dịch vụ. Vui lòng thử lại."
 
-#: app/routes.py:1534 app/routes.py:4548 app/routes.py:4703 app/routes.py:4855
-#: app/routes.py:4886
+#: app/routes.py:1548 app/routes.py:4562 app/routes.py:4717 app/routes.py:4869
+#: app/routes.py:4900
 msgid "Could not send verification email. Please try again."
 msgstr "Không gửi được email xác thực. Vui lòng thử lại."
 
-#: app/routes.py:1558
+#: app/routes.py:1572
 msgid "Invalid plan selected."
 msgstr "Gói đã chọn không hợp lệ."
 
-#: app/routes.py:1563
+#: app/routes.py:1577
 msgid "Plan not found."
 msgstr "Không tìm thấy gói."
 
-#: app/routes.py:1578
+#: app/routes.py:1592
 msgid ""
 "Your paid membership will stop renewing and revert to Silver at the "
 "period end."
 msgstr "Gói trả phí của bạn sẽ ngừng gia hạn và trở về Silver khi hết kỳ."
 
-#: app/routes.py:1580
+#: app/routes.py:1594
 msgid "You're on the Silver plan."
 msgstr "Bạn đang dùng gói Silver."
 
-#: app/routes.py:1587
+#: app/routes.py:1601
 msgid ""
 "This plan isn't available for online payment right now. Please try again "
 "later."
 msgstr "Gói này hiện chưa thanh toán online được. Vui lòng thử lại sau."
 
-#: app/routes.py:1592
+#: app/routes.py:1606
 #, python-format
 msgid "You are already subscribed to %(tier)s."
 msgstr "Bạn đã đăng ký gói %(tier)s rồi."
 
-#: app/routes.py:1606
+#: app/routes.py:1620
 msgid "Could not start checkout. Please try again."
 msgstr "Không mở được trang thanh toán. Vui lòng thử lại."
 
-#: app/routes.py:1622
+#: app/routes.py:1636
 msgid "No active subscription to cancel."
 msgstr "Không có gói nào đang chạy để huỷ."
 
-#: app/routes.py:1626
+#: app/routes.py:1640
 msgid ""
 "Your membership will not renew. You keep your benefits until the current "
 "period ends."
 msgstr "Gói của bạn sẽ không gia hạn. Bạn vẫn giữ quyền lợi tới hết kỳ hiện tại."
 
-#: app/routes.py:1629
+#: app/routes.py:1643
 msgid "Could not cancel your membership. Please try again."
 msgstr "Không huỷ được gói. Vui lòng thử lại."
 
-#: app/routes.py:1656 app/routes.py:1660
+#: app/routes.py:1670 app/routes.py:1674
 msgid "Invalid reward."
 msgstr "Phần thưởng không hợp lệ."
 
-#: app/routes.py:1668
+#: app/routes.py:1682
 msgid "Reward not found."
 msgstr "Không tìm thấy phần thưởng."
 
-#: app/routes.py:1671 app/routes.py:1699
+#: app/routes.py:1685 app/routes.py:1713
 msgid "Not enough points."
 msgstr "Không đủ điểm."
 
-#: app/routes.py:1674
+#: app/routes.py:1688
 msgid "This reward is out of stock."
 msgstr "Phần thưởng này đã hết."
 
-#: app/routes.py:1692
+#: app/routes.py:1706
 #, python-format
 msgid "This reward resets in %(days)s day(s)."
 msgstr "Phần thưởng này sẽ mở lại sau %(days)s ngày."
 
-#: app/routes.py:1696
+#: app/routes.py:1710
 msgid "You have reached the redeem limit for this reward."
 msgstr "Bạn đã đổi phần thưởng này đủ số lần cho phép."
 
-#: app/routes.py:1700
+#: app/routes.py:1714
 #, python-format
 msgid "Successfully redeemed: %(name)s"
 msgstr "Đã đổi thành công: %(name)s"
 
-#: app/routes.py:1808
+#: app/routes.py:1822
 msgid "No billing account found."
 msgstr "Không tìm thấy tài khoản thanh toán."
 
-#: app/routes.py:1817
+#: app/routes.py:1831
 msgid "Could not open the billing portal. Please try again later."
 msgstr "Không mở được cổng thanh toán. Vui lòng thử lại sau."
 
-#: app/routes.py:1952
+#: app/routes.py:1966
 msgid "All rewards unlocked!"
 msgstr "Đã mở hết phần thưởng!"
 
-#: app/routes.py:1961
+#: app/routes.py:1975
 msgid "Booking"
 msgstr "Lịch hẹn"
 
-#: app/routes.py:1962
+#: app/routes.py:1976
 msgid "Double points"
 msgstr "Điểm nhân đôi"
 
-#: app/routes.py:1963
+#: app/routes.py:1977
 msgid "First booking"
 msgstr "Lịch hẹn đầu tiên"
 
-#: app/routes.py:1964
+#: app/routes.py:1978
 msgid "Streak bonus"
 msgstr "Thưởng chuỗi"
 
-#: app/routes.py:1965
+#: app/routes.py:1979
 msgid "Manual adjustment"
 msgstr "Điều chỉnh thủ công"
 
-#: app/routes.py:1966
+#: app/routes.py:1980
 msgid "Reward redemption"
 msgstr "Đổi phần thưởng"
 
-#: app/routes.py:1987
+#: app/routes.py:2001
 msgid "Earned on"
 msgstr "Nhận ngày"
 
-#: app/routes.py:1987 app/templates/customer/loyalty_points.html:315
+#: app/routes.py:2001 app/templates/customer/loyalty_points.html:315
 msgid "Redeemed on"
 msgstr "Đã đổi ngày"
 
-#: app/routes.py:2075 app/routes.py:4733
+#: app/routes.py:2089 app/routes.py:4747
 #, python-format
 msgid "Too many failed attempts. Try again in %(minutes)s minute(s)."
 msgstr "Sai quá nhiều lần. Vui lòng thử lại sau %(minutes)s phút."
 
-#: app/routes.py:2082 app/routes.py:4740
+#: app/routes.py:2096 app/routes.py:4754
 msgid "Please enter email or password!"
 msgstr "Vui lòng nhập email và mật khẩu!"
 
-#: app/routes.py:2089 app/routes.py:2096 app/routes.py:4747 app/routes.py:4758
+#: app/routes.py:2103 app/routes.py:2110 app/routes.py:4761 app/routes.py:4772
 msgid "Invalid email or password!"
 msgstr "Email hoặc mật khẩu không đúng!"
 
-#: app/routes.py:2100
+#: app/routes.py:2114
 msgid "Please use the customer login portal"
 msgstr "Vui lòng dùng cổng đăng nhập dành cho khách hàng"
 
-#: app/routes.py:2114
+#: app/routes.py:2128
 msgid "Staff profile not found!"
 msgstr "Không tìm thấy hồ sơ nhân viên!"
 
-#: app/routes.py:2118 app/routes.py:4771 app/routes.py:4834
+#: app/routes.py:2132 app/routes.py:4785 app/routes.py:4848
 #, python-format
 msgid "Logged in. Welcome, %(name)s."
 msgstr "Đăng nhập thành công. Chào %(name)s."
 
-#: app/routes.py:2126
+#: app/routes.py:2140
 msgid "Logged in. Welcome, master."
 msgstr "Đăng nhập thành công. Chào sếp."
 
-#: app/routes.py:2129
+#: app/routes.py:2143
 msgid "something went wrong :("
 msgstr "Đã có lỗi xảy ra."
 
-#: app/routes.py:2246 app/routes.py:2376
+#: app/routes.py:2260 app/routes.py:2390
 msgid "Staff profile not found."
 msgstr "Không tìm thấy hồ sơ nhân viên."
 
-#: app/routes.py:2288
+#: app/routes.py:2302
 #, python-format
 msgid "vào ngày %(date)s"
 msgstr ""
 
-#: app/routes.py:2289
+#: app/routes.py:2303
 #, python-format
 msgid "từ %(start)s đến %(end)s"
 msgstr ""
 
-#: app/routes.py:2448
+#: app/routes.py:2462
 msgid "Please select an image."
 msgstr "Vui lòng chọn ảnh."
 
-#: app/routes.py:2454
+#: app/routes.py:2468
 msgid "Profile photo updated."
 msgstr "Đã cập nhật ảnh đại diện."
 
-#: app/routes.py:2480
+#: app/routes.py:2494
 msgid "Your verification session has expired. Please request a new code."
 msgstr "Phiên xác thực đã hết hạn. Vui lòng yêu cầu mã mới."
 
-#: app/routes.py:2489
+#: app/routes.py:2503
 msgid "The verification code has expired. Please request a new one."
 msgstr "Mã xác thực đã hết hạn. Vui lòng yêu cầu mã mới."
 
-#: app/routes.py:2502
+#: app/routes.py:2516
 msgid "The new password must be at least 8 characters."
 msgstr "Mật khẩu mới phải có ít nhất 8 ký tự."
 
-#: app/routes.py:2512
+#: app/routes.py:2526
 msgid "Password changed."
 msgstr "Đổi mật khẩu thành công."
 
-#: app/routes.py:2531 app/routes.py:2548 app/routes.py:2569
+#: app/routes.py:2545 app/routes.py:2562 app/routes.py:2583
 msgid "You do not have permission to perform this action."
 msgstr "Không có quyền thực hiện hành động này."
 
-#: app/routes.py:2535
+#: app/routes.py:2549
 msgid "Service started."
 msgstr "Đã bắt đầu thực hiện dịch vụ."
 
-#: app/routes.py:2552
+#: app/routes.py:2566
 msgid "Marked as completed."
 msgstr "Đã đánh dấu hoàn thành."
 
-#: app/routes.py:2554 app/templates/Auth/email_verification.html:199
+#: app/routes.py:2568 app/templates/Auth/email_verification.html:199
 #: app/templates/Auth/email_verification.html:221
 #: app/templates/customer/customer_setting.html:1116
 #: app/templates/customer/customer_setting.html:1248
@@ -492,86 +492,86 @@ msgstr "Đã đánh dấu hoàn thành."
 msgid "Something went wrong. Please try again."
 msgstr "Có lỗi xảy ra. Vui lòng thử lại."
 
-#: app/routes.py:2573
+#: app/routes.py:2587
 msgid "Payment confirmed."
 msgstr "Đã xác nhận thanh toán."
 
-#: app/routes.py:2727
+#: app/routes.py:2741
 msgid "Invalid status."
 msgstr "Trạng thái không hợp lệ."
 
-#: app/routes.py:2732 app/routes.py:2799
+#: app/routes.py:2746 app/routes.py:2813
 msgid "Booking not found."
 msgstr "Booking không tồn tại."
 
-#: app/routes.py:2746
+#: app/routes.py:2760
 msgid "Could not complete the booking. Service or staff data is missing."
 msgstr "Không thể hoàn tất booking (thiếu dữ liệu dịch vụ/nhân viên)."
 
-#: app/routes.py:2750
+#: app/routes.py:2764
 #, python-format
 msgid "Booking #%(id)s status updated."
 msgstr "Đã cập nhật trạng thái booking #%(id)s."
 
-#: app/routes.py:2770 app/routes.py:2960
+#: app/routes.py:2784 app/routes.py:2974
 msgid "Service not found."
 msgstr "Dịch vụ không tồn tại."
 
-#: app/routes.py:2777
+#: app/routes.py:2791
 msgid "This stylist is already booked for that time. Please choose another slot."
 msgstr "Stylist đã có lịch trong khung giờ này. Vui lòng chọn giờ khác."
 
-#: app/routes.py:2781
+#: app/routes.py:2795
 msgid "Booking created."
 msgstr "Tạo booking thành công!"
 
-#: app/routes.py:2807
+#: app/routes.py:2821
 #, python-format
 msgid "Booking #%(id)s updated."
 msgstr "Đã cập nhật booking #%(id)s."
 
-#: app/routes.py:2842 app/routes.py:2870
+#: app/routes.py:2856 app/routes.py:2884
 msgid "Please enter both a full name and an email address."
 msgstr "Vui lòng điền đầy đủ họ tên và email."
 
-#: app/routes.py:2846
+#: app/routes.py:2860
 msgid "This email is already used by another account."
 msgstr "Email này đã được dùng cho một tài khoản khác."
 
-#: app/routes.py:2874
+#: app/routes.py:2888
 #, python-format
 msgid "Staff member #%(id)s updated."
 msgstr "Đã cập nhật nhân viên #%(id)s."
 
-#: app/routes.py:2883
+#: app/routes.py:2897
 msgid "Staff member deleted."
 msgstr "Đã xóa nhân viên."
 
-#: app/routes.py:2885
+#: app/routes.py:2899
 msgid "Cannot delete a staff member with linked appointments."
 msgstr "Không thể xóa nhân viên đang có lịch hẹn liên kết."
 
-#: app/routes.py:2893
+#: app/routes.py:2907
 msgid "Staff status updated."
 msgstr "Đã cập nhật trạng thái nhân viên."
 
-#: app/routes.py:2931 app/routes.py:2981
+#: app/routes.py:2945 app/routes.py:2995
 msgid "Please fill in all required fields."
 msgstr "Vui lòng điền đầy đủ thông tin bắt buộc."
 
-#: app/routes.py:2949
+#: app/routes.py:2963
 #, python-format
 msgid ""
 "Service %(name)s added. The video is processing and will appear in a few "
 "minutes."
 msgstr "Đã thêm dịch vụ %(name)s. Video đang được xử lý, vài phút nữa sẽ hiển thị."
 
-#: app/routes.py:2951
+#: app/routes.py:2965
 #, python-format
 msgid "Service %(name)s added."
 msgstr "Đã thêm dịch vụ %(name)s."
 
-#: app/routes.py:3017
+#: app/routes.py:3031
 #, python-format
 msgid ""
 "Service %(name)s updated. The video is processing and will appear in a "
@@ -580,52 +580,52 @@ msgstr ""
 "Đã cập nhật dịch vụ %(name)s. Video đang được xử lý, vài phút nữa sẽ hiển"
 " thị."
 
-#: app/routes.py:3019
+#: app/routes.py:3033
 msgid ""
 "The previous video for this service is still processing. Please wait "
 "until it finishes before uploading another."
 msgstr "Video trước của dịch vụ này đang được xử lý. Chờ xong rồi hãy upload tiếp."
 
-#: app/routes.py:3023
+#: app/routes.py:3037
 #, python-format
 msgid "Service %(name)s updated."
 msgstr "Đã cập nhật dịch vụ %(name)s."
 
-#: app/routes.py:3038
+#: app/routes.py:3052
 msgid "Service deleted."
 msgstr "Đã xóa dịch vụ."
 
-#: app/routes.py:3040
+#: app/routes.py:3054
 msgid "Cannot delete a service that has linked appointments."
 msgstr "Không thể xóa dịch vụ đang có lịch hẹn liên kết."
 
-#: app/routes.py:3048
+#: app/routes.py:3062
 msgid "Service status updated."
 msgstr "Đã cập nhật trạng thái dịch vụ."
 
-#: app/routes.py:3062 app/routes.py:3083
+#: app/routes.py:3076 app/routes.py:3097
 msgid "Please enter a category name."
 msgstr "Vui lòng nhập tên danh mục."
 
-#: app/routes.py:3067
+#: app/routes.py:3081
 #, python-format
 msgid "Category %(name)s added."
 msgstr "Đã thêm danh mục %(name)s."
 
-#: app/routes.py:3069 app/routes.py:3090
+#: app/routes.py:3083 app/routes.py:3104
 msgid "This slug already exists. Please choose another one."
 msgstr "Slug này đã tồn tại. Vui lòng chọn slug khác."
 
-#: app/routes.py:3088
+#: app/routes.py:3102
 #, python-format
 msgid "Category %(name)s updated."
 msgstr "Đã cập nhật danh mục %(name)s."
 
-#: app/routes.py:3099
+#: app/routes.py:3113
 msgid "Category deleted."
 msgstr "Đã xóa danh mục."
 
-#: app/routes.py:3101
+#: app/routes.py:3115
 msgid ""
 "Cannot delete a category that still has services. Move or delete those "
 "services first."
@@ -633,37 +633,37 @@ msgstr ""
 "Không thể xóa danh mục đang có dịch vụ. Vui lòng xóa hoặc chuyển dịch vụ "
 "sang danh mục khác trước."
 
-#: app/routes.py:3136
+#: app/routes.py:3150
 msgid "Please select at least one image."
 msgstr "Vui lòng chọn ít nhất 1 ảnh."
 
-#: app/routes.py:3149
+#: app/routes.py:3163
 #, python-format
 msgid "Uploaded %(count)s images."
 msgstr "Đã tải lên %(count)s ảnh thành công."
 
-#: app/routes.py:3158
+#: app/routes.py:3172
 msgid "Image not found."
 msgstr "Không tìm thấy ảnh."
 
-#: app/routes.py:3181
+#: app/routes.py:3195
 msgid "Image updated."
 msgstr "Đã cập nhật ảnh."
 
-#: app/routes.py:3192
+#: app/routes.py:3206
 msgid "Image deleted."
 msgstr "Đã xóa ảnh."
 
-#: app/routes.py:3218
+#: app/routes.py:3232
 #, python-format
 msgid "Deleted %(count)s images."
 msgstr "Đã xóa %(count)s ảnh."
 
-#: app/routes.py:3264 app/routes.py:3305
+#: app/routes.py:3278 app/routes.py:3319
 msgid "Please enter a full name."
 msgstr "Vui lòng điền họ và tên."
 
-#: app/routes.py:3268
+#: app/routes.py:3282
 msgid ""
 "Could not create the customer. This email already belongs to another "
 "account."
@@ -671,435 +671,270 @@ msgstr ""
 "Không thể tạo khách hàng: email này đã được dùng để tạo một tài khoản "
 "khác."
 
-#: app/routes.py:3278
+#: app/routes.py:3292
 msgid "Customer added."
 msgstr "Đã thêm khách hàng mới."
 
-#: app/routes.py:3309
+#: app/routes.py:3323
 #, python-format
 msgid "Customer #%(id)s updated."
 msgstr "Đã cập nhật khách hàng #%(id)s."
 
-#: app/routes.py:3314
+#: app/routes.py:3328
 msgid "The customer edit page has not been built yet."
 msgstr "Trang chỉnh sửa khách hàng chưa được xây dựng."
 
-#: app/routes.py:3328 app/routes.py:3550
+#: app/routes.py:3342 app/routes.py:3564
 msgid "Please enter a valid number of points."
 msgstr "Vui lòng nhập số điểm hợp lệ."
 
-#: app/routes.py:3333 app/routes.py:3422
+#: app/routes.py:3347 app/routes.py:3436
 #, python-format
 msgid "Adjusted %(points)s points for %(name)s."
 msgstr "Đã điều chỉnh %(points)s điểm cho %(name)s."
 
-#: app/routes.py:3347
+#: app/routes.py:3361
 #, python-format
 msgid "Deleted customer %(name)s."
 msgstr "Đã xóa khách hàng %(name)s."
 
-#: app/routes.py:3349
+#: app/routes.py:3363
 msgid "Cannot delete a customer with bookings or linked records."
 msgstr "Không thể xóa khách hàng đang có booking hoặc dữ liệu liên kết."
 
-#: app/routes.py:3417
+#: app/routes.py:3431
 msgid "Please fill in all point adjustment details."
 msgstr "Vui lòng nhập đầy đủ thông tin điều chỉnh điểm."
 
-#: app/routes.py:3436
+#: app/routes.py:3450
 msgid "Please fill in all membership details."
 msgstr "Vui lòng nhập đầy đủ thông tin membership."
 
-#: app/routes.py:3440
+#: app/routes.py:3454
 #, python-format
 msgid "Membership updated for %(name)s."
 msgstr "Đã cập nhật membership cho %(name)s."
 
-#: app/routes.py:3459 app/routes.py:3496
+#: app/routes.py:3473 app/routes.py:3510
 msgid "Please enter a name and point cost for the voucher."
 msgstr "Vui lòng nhập tên và chi phí điểm cho voucher."
 
-#: app/routes.py:3470
+#: app/routes.py:3484
 msgid "Voucher created."
 msgstr "Đã tạo voucher mới."
 
-#: app/routes.py:3479 app/routes.py:3526
+#: app/routes.py:3493 app/routes.py:3540
 msgid "Voucher not found."
 msgstr "Không tìm thấy voucher."
 
-#: app/routes.py:3517
+#: app/routes.py:3531
 msgid "Voucher updated."
 msgstr "Đã cập nhật voucher."
 
-#: app/routes.py:3531
+#: app/routes.py:3545
 #, python-format
 msgid ""
 "Voucher \"%(name)s\" has been redeemed by customers, so it was hidden "
 "instead of deleted."
 msgstr "Voucher \"%(name)s\" đã có khách đổi nên chỉ được ẩn, không xóa hẳn."
 
-#: app/routes.py:3535
+#: app/routes.py:3549
 #, python-format
 msgid "Deleted voucher \"%(name)s\"."
 msgstr "Đã xóa voucher \"%(name)s\"."
 
-#: app/routes.py:3544 app/routes.py:3814
+#: app/routes.py:3558 app/routes.py:3828
 msgid "Invalid mission."
 msgstr "Mission không hợp lệ."
 
-#: app/routes.py:3554 app/routes.py:3847
+#: app/routes.py:3568 app/routes.py:3861
 msgid "Mission updated."
 msgstr "Đã cập nhật mission."
 
-#: app/routes.py:3620 app/routes.py:3673 app/routes.py:3723 app/routes.py:3766
+#: app/routes.py:3634 app/routes.py:3687 app/routes.py:3737 app/routes.py:3780
 msgid "Please enter a slide title."
 msgstr "Vui lòng nhập tiêu đề slide."
 
-#: app/routes.py:3630
+#: app/routes.py:3644
 msgid "Please select an image for the slide."
 msgstr "Vui lòng chọn ảnh cho slide."
 
-#: app/routes.py:3638
+#: app/routes.py:3652
 msgid "Homepage slide created."
 msgstr "Đã tạo slide trang chủ mới."
 
-#: app/routes.py:3647 app/routes.py:3745 app/routes.py:3797
+#: app/routes.py:3661 app/routes.py:3759 app/routes.py:3811
 msgid "Slide not found."
 msgstr "Không tìm thấy slide."
 
-#: app/routes.py:3693
+#: app/routes.py:3707
 msgid "A slide needs an image."
 msgstr "Slide cần có ảnh."
 
-#: app/routes.py:3700
+#: app/routes.py:3714
 msgid "Slide updated."
 msgstr "Đã cập nhật slide."
 
-#: app/routes.py:3736
+#: app/routes.py:3750
 msgid "Offer slide added."
 msgstr "Đã thêm slide ưu đãi."
 
-#: app/routes.py:3788
+#: app/routes.py:3802
 msgid "Offer slide updated."
 msgstr "Đã cập nhật slide ưu đãi."
 
-#: app/routes.py:3800
+#: app/routes.py:3814
 msgid "Built-in missions cannot be deleted."
 msgstr "Không thể xóa mission cố định."
 
-#: app/routes.py:3806
+#: app/routes.py:3820
 msgid "Slide deleted."
 msgstr "Đã xóa slide."
 
-#: app/routes.py:3827
+#: app/routes.py:3841
 msgid "Please enter a mission name."
 msgstr "Vui lòng nhập tên mission."
 
-#: app/routes.py:3913 app/routes.py:3935
+#: app/routes.py:3927 app/routes.py:3949
 msgid "Notice content is required."
 msgstr "Vui lòng nhập nội dung thông báo."
 
-#: app/routes.py:3922
+#: app/routes.py:3936
 msgid "Notice created."
 msgstr "Đã tạo thông báo."
 
-#: app/routes.py:3930
+#: app/routes.py:3944
 msgid "Notice not found."
 msgstr "Không tìm thấy thông báo."
 
-#: app/routes.py:3946
+#: app/routes.py:3960
 msgid "Notice updated."
 msgstr "Đã cập nhật thông báo."
 
-#: app/routes.py:3961
+#: app/routes.py:3975
 msgid "Notice deleted."
 msgstr "Đã xóa thông báo."
 
-#: app/routes.py:3975
+#: app/routes.py:3989
 msgid "Title and message are required."
 msgstr "Vui lòng nhập tiêu đề và nội dung."
 
-#: app/routes.py:3978
+#: app/routes.py:3992
 msgid "Please choose a customer."
 msgstr "Vui lòng chọn khách hàng."
 
-#: app/routes.py:4003
+#: app/routes.py:4017
 #, python-format
 msgid "Notification sent. Emails are being delivered to %(count)s recipients."
 msgstr "Đã gửi thông báo. Email đang được gửi tới %(count)s người nhận."
 
-#: app/routes.py:4006
+#: app/routes.py:4020
 msgid "Notification sent."
 msgstr "Đã gửi thông báo."
 
-#: app/routes.py:4015
+#: app/routes.py:4029
 msgid "Notification deleted."
 msgstr "Đã xóa thông báo."
 
-#: app/routes.py:4675
+#: app/routes.py:4689
 msgid "Please enter required information!"
 msgstr "Vui lòng nhập đầy đủ thông tin bắt buộc!"
 
-#: app/routes.py:4679
+#: app/routes.py:4693
 msgid "Please enter a valid email address."
 msgstr "Vui lòng nhập địa chỉ email hợp lệ."
 
-#: app/routes.py:4683 app/routes.py:4920
+#: app/routes.py:4697 app/routes.py:4934
 msgid "Password must be at least 8 characters."
 msgstr "Mật khẩu phải có ít nhất 8 ký tự."
 
-#: app/routes.py:4690
+#: app/routes.py:4704
 msgid "Email existed! Please try again."
 msgstr "Email này đã tồn tại! Vui lòng thử lại."
 
-#: app/routes.py:4720
+#: app/routes.py:4734
 msgid "A verification code has been sent to your email."
 msgstr "Mã xác thực đã được gửi tới email của bạn."
 
-#: app/routes.py:4753
+#: app/routes.py:4767
 msgid "Profile not found! Please try again"
 msgstr "Không tìm thấy hồ sơ! Vui lòng thử lại"
 
-#: app/routes.py:4785
+#: app/routes.py:4799
 msgid "Google sign-in failed. Please try again."
 msgstr "Đăng nhập Google thất bại. Vui lòng thử lại."
 
-#: app/routes.py:4791
+#: app/routes.py:4805
 msgid "Could not verify your Google email. Please try again."
 msgstr "Không xác thực được email Google của bạn. Vui lòng thử lại."
 
-#: app/routes.py:4801
+#: app/routes.py:4815
 msgid "Please use the staff login portal."
 msgstr "Vui lòng dùng cổng đăng nhập dành cho nhân viên."
 
-#: app/routes.py:4845 app/routes.py:4876
+#: app/routes.py:4859 app/routes.py:4890
 msgid "Please enter your email address."
 msgstr "Vui lòng nhập địa chỉ email của bạn."
 
-#: app/routes.py:4904
+#: app/routes.py:4918
 msgid "Session expired. Please try again."
 msgstr "Phiên làm việc đã hết hạn. Vui lòng thử lại."
 
-#: app/routes.py:4926
+#: app/routes.py:4940
 msgid "Password reset successfully. Please log in."
 msgstr "Đã đặt lại mật khẩu. Vui lòng đăng nhập."
 
-#: app/routes.py:4932
+#: app/routes.py:4946
 msgid "Logged out successfully."
 msgstr "Đã đăng xuất."
 
-#: app/routes.py:4941 app/routes.py:5134
+#: app/routes.py:4955 app/routes.py:5148
 msgid "Your verification session has expired. Please start again."
 msgstr "Phiên xác thực đã hết hạn. Vui lòng bắt đầu lại."
 
-#: app/routes.py:5181
+#: app/routes.py:5195
 msgid "Register session expired. Please register again."
 msgstr "Phiên đăng ký đã hết hạn. Vui lòng đăng ký lại."
 
-#: app/routes.py:5207
+#: app/routes.py:5221
 msgid "Register successfully!"
 msgstr "Đăng ký thành công!"
 
-#: app/routes.py:5243
+#: app/routes.py:5257
 msgid "This slot has been booked by other customer! Please try again."
 msgstr "Khung giờ này vừa có khách khác đặt! Vui lòng chọn giờ khác."
 
-#: app/routes.py:5263
+#: app/routes.py:5277
 msgid "Your booking is processing!"
 msgstr "Lịch hẹn của bạn đang được xử lý!"
 
-#: app/template_filters.py:119
+#: app/template_filters.py:120
 msgid "Visa"
 msgstr ""
 
-#: app/template_filters.py:120
+#: app/template_filters.py:121
 msgid "Mastercard"
 msgstr ""
 
-#: app/template_filters.py:121
+#: app/template_filters.py:122
 msgid "Mobile Pay"
 msgstr ""
 
-#: app/template_filters.py:122
+#: app/template_filters.py:123
 msgid "Apple Pay"
 msgstr ""
 
-#: app/template_filters.py:123
+#: app/template_filters.py:124
 msgid "Google Pay"
 msgstr ""
 
-#: app/template_filters.py:124 app/templates/customer/customer_history.html:141
+#: app/template_filters.py:125 app/templates/customer/customer_history.html:141
 msgid "Cash"
 msgstr "Tiền mặt"
 
-#: app/template_filters.py:125 app/templates/customer/customer_history.html:142
+#: app/template_filters.py:126 app/templates/customer/customer_history.html:142
 msgid "Bank Transfer"
 msgstr "Chuyển khoản"
-
-#: app/services/email_system.py:81
-msgid "Verify your email – Daha Care"
-msgstr "Xác minh email của bạn – Daha Care"
-
-#: app/services/email_system.py:83
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code to confirm your email address and complete your "
-"registration.\n"
-"\n"
-"If you did not create an account with Daha Care, please ignore this "
-"email.\n"
-msgstr ""
-"Xin chào,\n"
-"\n"
-"Mã xác minh của bạn là: %(code)s\n"
-"\n"
-"Vui lòng nhập mã này để xác nhận địa chỉ email và hoàn tất đăng ký.\n"
-"\n"
-"Nếu bạn không tạo tài khoản tại Daha Care, vui lòng bỏ qua email này.\n"
-
-#: app/services/email_system.py:89
-msgid "Password Change Request – Daha Care"
-msgstr "Yêu cầu đổi mật khẩu – Daha Care"
-
-#: app/services/email_system.py:91
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code to confirm your password change request.\n"
-"\n"
-"If you did not request this, please ignore this email and your password "
-"will remain unchanged.\n"
-msgstr ""
-"Xin chào,\n"
-"\n"
-"Mã xác minh của bạn là: %(code)s\n"
-"\n"
-"Vui lòng nhập mã này để xác nhận yêu cầu đổi mật khẩu.\n"
-"\n"
-"Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email và mật khẩu "
-"của bạn sẽ được giữ nguyên.\n"
-
-#: app/services/email_system.py:97
-msgid "Email Change Request – Daha Care"
-msgstr "Yêu cầu đổi email – Daha Care"
-
-#: app/services/email_system.py:99
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code to confirm your email address change request.\n"
-"\n"
-"If you did not request this, please ignore this email and your email "
-"address will remain unchanged.\n"
-msgstr ""
-"Xin chào,\n"
-"\n"
-"Mã xác minh của bạn là: %(code)s\n"
-"\n"
-"Vui lòng nhập mã này để xác nhận yêu cầu đổi địa chỉ email.\n"
-"\n"
-"Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email và địa chỉ "
-"email của bạn sẽ được giữ nguyên.\n"
-
-#: app/services/email_system.py:105
-msgid "Reset Your Password – Daha Care"
-msgstr "Đặt lại mật khẩu – Daha Care"
-
-#: app/services/email_system.py:107
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your password reset code is: %(code)s\n"
-"\n"
-"Please enter this code to reset your password. This code expires in 10 "
-"minutes.\n"
-"\n"
-"If you did not request a password reset, please ignore this email.\n"
-msgstr ""
-"Xin chào,\n"
-"\n"
-"Mã đặt lại mật khẩu của bạn là: %(code)s\n"
-"\n"
-"Vui lòng nhập mã này để đặt lại mật khẩu. Mã sẽ hết hạn sau 10 phút.\n"
-"\n"
-"Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n"
-
-#: app/services/email_system.py:113
-msgid "Your Booking Verification Code – Daha Care"
-msgstr "Mã xác nhận đặt lịch của bạn – Daha Care"
-
-#: app/services/email_system.py:115
-#, python-format
-msgid ""
-"Hello,\n"
-"\n"
-"Your verification code is: %(code)s\n"
-"\n"
-"Please enter this code on the verification page to confirm your booking.\n"
-"\n"
-"If you did not request this, please ignore this email.\n"
-msgstr ""
-"Xin chào,\n"
-"\n"
-"Mã xác minh của bạn là: %(code)s\n"
-"\n"
-"Vui lòng nhập mã này trên trang xác minh để xác nhận đặt lịch.\n"
-"\n"
-"Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.\n"
-
-#: app/services/email_system.py:132
-msgid "Your booking request has been received"
-msgstr "Chúng tôi đã nhận được yêu cầu đặt lịch của bạn"
-
-#: app/services/email_system.py:134
-#, python-format
-msgid ""
-"Hi %(name)s,\n"
-"\n"
-"Thank you for your booking.\n"
-"\n"
-"We have received your booking request and it is currently pending "
-"confirmation.\n"
-"\n"
-"Booking details:\n"
-"- Service: %(service)s\n"
-"- Staff: %(staff)s\n"
-"- Date: %(date)s\n"
-"- Time: %(start)s - %(end)s\n"
-"\n"
-"We will contact you again once your booking has been confirmed.\n"
-"\n"
-"Best regards,\n"
-"Dahacare\n"
-msgstr ""
-"Xin chào %(name)s,\n"
-"\n"
-"Cảm ơn bạn đã đặt lịch.\n"
-"\n"
-"Chúng tôi đã nhận được yêu cầu đặt lịch của bạn và hiện đang chờ xác "
-"nhận.\n"
-"\n"
-"Chi tiết đặt lịch:\n"
-"- Dịch vụ: %(service)s\n"
-"- Nhân viên: %(staff)s\n"
-"- Ngày: %(date)s\n"
-"- Giờ: %(start)s - %(end)s\n"
-"\n"
-"Chúng tôi sẽ liên hệ lại khi đặt lịch của bạn được xác nhận.\n"
-"\n"
-"Trân trọng,\n"
-"Dahacare\n"
 
 #: app/templates/auth_base.html:43
 msgid "Where precision meets care."
@@ -1134,8 +969,8 @@ msgstr "Đăng ký"
 
 #: app/templates/base.html:40 app/templates/base.html:49
 #: app/templates/base.html:72 app/templates/base.html:81
-#: app/templates/customer_base.html:99 app/templates/public/about.html:225
-#: app/templates/public/gallery.html:87 app/templates/public/index.html:339
+#: app/templates/customer_base.html:99 app/templates/public/about.html:212
+#: app/templates/public/gallery.html:87 app/templates/public/index.html:341
 msgid "Book Now"
 msgstr "Đặt lịch"
 
@@ -1391,7 +1226,7 @@ msgid "At least 8 characters"
 msgstr "Ít nhất 8 ký tự"
 
 #: app/templates/Auth/customer_register.html:96
-#: app/templates/public/index.html:238
+#: app/templates/public/index.html:239
 msgid "Create account"
 msgstr "Tạo tài khoản"
 
@@ -1409,14 +1244,6 @@ msgstr "Xác thực email của bạn"
 #: app/templates/Auth/set_new_password.html:6
 msgid "Almost there."
 msgstr "Sắp xong rồi."
-
-#: app/templates/Auth/email_verification.html:7
-msgid ""
-"Just one more step to secure your account and unlock your personalized "
-"beauty journey."
-msgstr ""
-"Chỉ còn một bước nữa để bảo vệ tài khoản và mở khoá hành trình làm đẹp "
-"của bạn."
 
 #: app/templates/Auth/email_verification.html:62
 msgid "We sent a 6-digit code to"
@@ -1517,7 +1344,7 @@ msgid "Currently in development"
 msgstr "Đang trong quá trình phát triển"
 
 #: app/templates/customer/coming_soon.html:138
-#: app/templates/customer/customer_membership.html:191
+#: app/templates/customer/customer_membership.html:169
 msgid "Coming soon"
 msgstr "Sắp có"
 
@@ -1588,11 +1415,6 @@ msgstr "Thanh toán"
 msgid "Select a Service"
 msgstr "Chọn dịch vụ"
 
-#: app/templates/customer/customer_booking.html:67
-#: app/templates/public/public_booking.html:67
-msgid "Choose from our curated selection of luxury treatments."
-msgstr "Lựa chọn từ bộ sưu tập liệu trình cao cấp của chúng tôi."
-
 #: app/templates/customer/customer_booking.html:72
 #: app/templates/public/public_booking.html:72
 msgid "All Services"
@@ -1623,11 +1445,6 @@ msgstr "Tiếp tục"
 #: app/templates/public/public_booking.html:133
 msgid "Choose a Professional"
 msgstr "Chọn chuyên viên"
-
-#: app/templates/customer/customer_booking.html:135
-#: app/templates/public/public_booking.html:134
-msgid "Select your preferred stylist or let us match you."
-msgstr "Chọn thợ bạn thích hoặc để chúng tôi ghép cho bạn."
 
 #: app/templates/customer/customer_booking.html:141
 #: app/templates/customer/customer_booking.html:147
@@ -1768,20 +1585,8 @@ msgstr "Thanh toán ngay an toàn bằng thẻ"
 
 #: app/templates/customer/customer_booking.html:271
 #: app/templates/public/public_booking.html:316
-msgid "You'll receive a verification email after confirming. Your booking will be"
-msgstr ""
-"Bạn sẽ nhận email xác minh sau khi xác nhận. Lịch đặt của bạn sẽ ở trạng "
-"thái"
-
-#: app/templates/customer/customer_booking.html:271
-#: app/templates/public/public_booking.html:316
 msgid "pending"
 msgstr "chờ duyệt"
-
-#: app/templates/customer/customer_booking.html:271
-#: app/templates/public/public_booking.html:316
-msgid "until the salon confirms your appointment."
-msgstr "cho đến khi salon xác nhận lịch hẹn của bạn."
 
 #: app/templates/customer/customer_booking.html:277
 #: app/templates/public/public_booking.html:322
@@ -1825,11 +1630,6 @@ msgstr "Bạn sẽ nhận được"
 #: app/templates/customer/customer_booking.html:310
 msgid "loyalty points with this booking."
 msgstr "điểm thưởng cho lần đặt này."
-
-#: app/templates/customer/customer_booking.html:312
-#: app/templates/public/public_booking.html:357
-msgid "By confirming, you agree to our 24h cancellation policy."
-msgstr "Bằng việc xác nhận, bạn đồng ý với chính sách hủy trong 24 giờ."
 
 #: app/templates/customer/customer_booking.html:323
 #: app/templates/public/public_booking.html:368
@@ -1942,7 +1742,7 @@ msgstr "Lịch hẹn sắp tới"
 
 #: app/templates/customer/customer_dashboard.html:884
 #: app/templates/customer/my_bookings.html:100
-#: app/templates/customer/view_booking_details.html:69
+#: app/templates/customer/view_booking_details.html:71
 #: app/templates/public/success.html:89
 msgid "Add to Calendar"
 msgstr "Thêm vào lịch"
@@ -2160,7 +1960,7 @@ msgstr "Hoàn thành"
 
 #: app/templates/customer/customer_history.html:322
 #: app/templates/customer/my_bookings.html:138
-#: app/templates/customer/view_booking_details.html:18
+#: app/templates/customer/view_booking_details.html:20
 msgid "Cancelled"
 msgstr "Đã hủy"
 
@@ -2170,7 +1970,7 @@ msgid "Paid"
 msgstr "Đã thanh toán"
 
 #: app/templates/customer/customer_membership.html:3
-#: app/templates/customer/customer_membership.html:129
+#: app/templates/customer/customer_membership.html:107
 msgid "Membership Plans"
 msgstr "Gói thành viên"
 
@@ -2186,168 +1986,109 @@ msgstr "Dành cho khách hàng gắn bó"
 msgid "For our most valued guests"
 msgstr "Dành cho khách hàng quý giá nhất"
 
-#: app/templates/customer/customer_membership.html:35
-msgid "Earn base loyalty points on every visit"
-msgstr "Nhận điểm thưởng cơ bản mỗi lần ghé"
-
 #: app/templates/customer/customer_membership.html:36
-msgid "Birthday bonus points"
-msgstr "Điểm thưởng sinh nhật"
-
-#: app/templates/customer/customer_membership.html:37
-msgid "Access to member-only promotions"
-msgstr "Truy cập ưu đãi dành riêng cho thành viên"
-
-#: app/templates/customer/customer_membership.html:38
-msgid "Monthly reward voucher"
-msgstr "Voucher thưởng hàng tháng"
-
-#: app/templates/customer/customer_membership.html:39
-msgid "Priority booking (standard)"
-msgstr "Đặt lịch ưu tiên (tiêu chuẩn)"
-
-#: app/templates/customer/customer_membership.html:42
-msgid "Everything in Silver"
-msgstr "Mọi thứ trong Silver"
-
-#: app/templates/customer/customer_membership.html:43
-msgid "Early access to new services & seasonal offers"
-msgstr "Truy cập sớm dịch vụ mới & ưu đãi theo mùa"
-
-#: app/templates/customer/customer_membership.html:44
-msgid "Complimentary nail care kit (quarterly)"
-msgstr "Bộ chăm sóc móng miễn phí (hàng quý)"
-
-#: app/templates/customer/customer_membership.html:45
-msgid "Dedicated booking slot on weekends"
-msgstr "Khung giờ đặt riêng cuối tuần"
-
-#: app/templates/customer/customer_membership.html:48
-msgid "Everything in Gold"
-msgstr "Mọi thứ trong Gold"
-
-#: app/templates/customer/customer_membership.html:49
-msgid "Free add-on service every visit"
-msgstr "Dịch vụ bổ sung miễn phí mỗi lần ghé"
-
-#: app/templates/customer/customer_membership.html:50
-msgid "Personal nail stylist assignment"
-msgstr "Chỉ định thợ móng riêng"
-
-#: app/templates/customer/customer_membership.html:51
-msgid "VIP lounge access & complimentary drinks"
-msgstr "Vào phòng chờ VIP & đồ uống miễn phí"
-
-#: app/templates/customer/customer_membership.html:58
 msgid "Choose your plan"
 msgstr "Chọn gói của bạn"
 
-#: app/templates/customer/customer_membership.html:59
-msgid ""
-"Unlock exclusive perks, rewards, and priority care tailored to your "
-"loyalty."
-msgstr ""
-"Mở khóa đặc quyền, phần thưởng và ưu tiên chăm sóc riêng cho sự gắn bó "
-"của bạn."
-
-#: app/templates/customer/customer_membership.html:71
+#: app/templates/customer/customer_membership.html:49
 msgid "Your last payment failed."
 msgstr "Lần thanh toán gần nhất thất bại."
 
-#: app/templates/customer/customer_membership.html:72
+#: app/templates/customer/customer_membership.html:50
 msgid "Update your card"
 msgstr "Cập nhật thẻ của bạn"
 
-#: app/templates/customer/customer_membership.html:73
+#: app/templates/customer/customer_membership.html:51
 msgid "to keep your membership active."
 msgstr "để giữ thành viên của bạn hoạt động."
 
-#: app/templates/customer/customer_membership.html:79
-#: app/templates/customer/customer_membership.html:107
+#: app/templates/customer/customer_membership.html:57
+#: app/templates/customer/customer_membership.html:85
 msgid "Update payment method"
 msgstr "Cập nhật phương thức thanh toán"
 
-#: app/templates/customer/customer_membership.html:97
-#: app/templates/customer/customer_membership.html:251
+#: app/templates/customer/customer_membership.html:75
+#: app/templates/customer/customer_membership.html:229
 #, python-format
 msgid "Your %(plan)s membership will not renew · active until %(date)s."
 msgstr "Thành viên %(plan)s của bạn sẽ không gia hạn · còn hiệu lực đến %(date)s."
 
-#: app/templates/customer/customer_membership.html:99
+#: app/templates/customer/customer_membership.html:77
 #, python-format
 msgid "Your %(plan)s membership renews on %(date)s."
 msgstr "Thành viên %(plan)s của bạn gia hạn vào %(date)s."
 
-#: app/templates/customer/customer_membership.html:116
-#: app/templates/customer/customer_membership.html:230
+#: app/templates/customer/customer_membership.html:94
+#: app/templates/customer/customer_membership.html:208
 msgid "Cancel renewal"
 msgstr "Hủy gia hạn"
 
-#: app/templates/customer/customer_membership.html:156
+#: app/templates/customer/customer_membership.html:134
 #: app/templates/public/services.html:95 app/templates/public/services.html:129
 msgid "Popular"
 msgstr "Phổ biến"
 
-#: app/templates/customer/customer_membership.html:163
+#: app/templates/customer/customer_membership.html:141
 msgid "per year"
 msgstr "mỗi năm"
 
-#: app/templates/customer/customer_membership.html:165
+#: app/templates/customer/customer_membership.html:143
 msgid "Free"
 msgstr "Miễn phí"
 
-#: app/templates/customer/customer_membership.html:174
+#: app/templates/customer/customer_membership.html:152
 msgid "points on all services"
 msgstr "điểm cho mọi dịch vụ"
 
-#: app/templates/customer/customer_membership.html:186
+#: app/templates/customer/customer_membership.html:164
 msgid "Current plan"
 msgstr "Gói hiện tại"
 
-#: app/templates/customer/customer_membership.html:202
+#: app/templates/customer/customer_membership.html:180
 msgid "Upgrade to Gold"
 msgstr "Nâng lên Gold"
 
-#: app/templates/customer/customer_membership.html:202
+#: app/templates/customer/customer_membership.html:180
 msgid "Upgrade to Diamond"
 msgstr "Nâng lên Diamond"
 
-#: app/templates/customer/customer_membership.html:204
+#: app/templates/customer/customer_membership.html:182
 msgid "Switch to Gold"
 msgstr "Chuyển sang Gold"
 
-#: app/templates/customer/customer_membership.html:204
+#: app/templates/customer/customer_membership.html:182
 msgid "Switch to Silver"
 msgstr "Chuyển về Silver"
 
-#: app/templates/customer/customer_membership.html:231
+#: app/templates/customer/customer_membership.html:209
 #: app/templates/customer/customer_notifications.html:98
 #: app/templates/customer/customer_setting.html:921
 #: app/templates/customer/customer_setting.html:990
 #: app/templates/customer/loyalty_points.html:303
 #: app/templates/customer/my_bookings.html:268
-#: app/templates/customer/view_booking_details.html:195
+#: app/templates/customer/view_booking_details.html:196
 #: app/templates/public/gallery.html:102 app/templates/public/services.html:197
 msgid "Close"
 msgstr "Đóng"
 
-#: app/templates/customer/customer_membership.html:243
+#: app/templates/customer/customer_membership.html:221
 msgid "Renews on"
 msgstr "Gia hạn ngày"
 
-#: app/templates/customer/customer_membership.html:255
+#: app/templates/customer/customer_membership.html:233
 msgid "Keep renewal"
 msgstr "Giữ gia hạn"
 
-#: app/templates/customer/customer_membership.html:256
+#: app/templates/customer/customer_membership.html:234
 #: app/templates/customer/my_bookings.html:305
-#: app/templates/customer/view_booking_details.html:232
+#: app/templates/customer/view_booking_details.html:233
 msgid "Yes, cancel"
 msgstr "Có, hủy"
 
 #: app/templates/customer/customer_notifications.html:24
-msgid "Announcements from Misa Nails and messages sent to you."
-msgstr "Thông báo từ Misa Nails và tin nhắn gửi riêng cho bạn."
+#, python-format
+msgid "Announcements from %(brand)s and messages sent to you."
+msgstr "Thông báo từ %(brand)s và tin nhắn gửi riêng cho bạn."
 
 #: app/templates/customer/customer_notifications.html:32
 msgid "Mark all as read"
@@ -2490,7 +2231,7 @@ msgstr ""
 #: app/templates/customer/my_bookings.html:195
 #: app/templates/customer/redeem_confirm_modal.html:72
 #: app/templates/customer/reschedule.html:237
-#: app/templates/customer/view_booking_details.html:133
+#: app/templates/customer/view_booking_details.html:135
 msgid "Cancel"
 msgstr "Hủy"
 
@@ -2702,17 +2443,9 @@ msgstr "Sao chép"
 msgid "Active"
 msgstr "Đang hoạt động"
 
-#: app/templates/customer/loyalty_points.html:414
-msgid "Show this code to our staff at your next visit to redeem."
-msgstr "Xuất trình mã này cho nhân viên trong lần ghé tiếp theo để đổi."
-
 #: app/templates/customer/loyalty_points.html:415
 msgid "This voucher has already been used."
 msgstr "Voucher này đã được sử dụng."
-
-#: app/templates/customer/loyalty_points.html:416
-msgid "This voucher has expired and is no longer valid."
-msgstr "Voucher này đã hết hạn và không còn hiệu lực."
 
 #: app/templates/customer/loyalty_points.html:419
 msgid "Copied"
@@ -2737,7 +2470,7 @@ msgstr "Sắp tới"
 #: app/templates/customer/my_bookings.html:158
 #: app/templates/customer/reschedule.html:3
 #: app/templates/customer/reschedule.html:18
-#: app/templates/customer/view_booking_details.html:124
+#: app/templates/customer/view_booking_details.html:126
 msgid "Reschedule"
 msgstr "Đổi lịch"
 
@@ -2779,52 +2512,52 @@ msgid "View All History"
 msgstr "Xem toàn bộ lịch sử"
 
 #: app/templates/customer/my_bookings.html:267
-#: app/templates/customer/view_booking_details.html:194
+#: app/templates/customer/view_booking_details.html:195
 msgid "Cancel appointment?"
 msgstr "Hủy lịch hẹn?"
 
 #: app/templates/customer/my_bookings.html:287
-#: app/templates/customer/view_booking_details.html:214
+#: app/templates/customer/view_booking_details.html:215
 msgid "Cancellation Policy"
 msgstr "Chính sách hủy"
 
 #: app/templates/customer/my_bookings.html:292
-#: app/templates/customer/view_booking_details.html:219
+#: app/templates/customer/view_booking_details.html:220
 msgid "Reason for cancellation"
 msgstr "Lý do hủy"
 
 #: app/templates/customer/my_bookings.html:292
-#: app/templates/customer/view_booking_details.html:219
+#: app/templates/customer/view_booking_details.html:220
 msgid "(optional)"
 msgstr "(tùy chọn)"
 
 #: app/templates/customer/my_bookings.html:295
-#: app/templates/customer/view_booking_details.html:222
+#: app/templates/customer/view_booking_details.html:223
 msgid "Select a reason..."
 msgstr "Chọn lý do..."
 
 #: app/templates/customer/my_bookings.html:296
-#: app/templates/customer/view_booking_details.html:223
+#: app/templates/customer/view_booking_details.html:224
 msgid "Change of plans"
 msgstr "Thay đổi kế hoạch"
 
 #: app/templates/customer/my_bookings.html:297
-#: app/templates/customer/view_booking_details.html:224
+#: app/templates/customer/view_booking_details.html:225
 msgid "Feeling unwell"
 msgstr "Cảm thấy không khỏe"
 
 #: app/templates/customer/my_bookings.html:298
-#: app/templates/customer/view_booking_details.html:225
+#: app/templates/customer/view_booking_details.html:226
 msgid "Want to reschedule instead"
 msgstr "Muốn đổi lịch thay vì hủy"
 
 #: app/templates/customer/my_bookings.html:299
-#: app/templates/customer/view_booking_details.html:226
+#: app/templates/customer/view_booking_details.html:227
 msgid "Other"
 msgstr "Khác"
 
 #: app/templates/customer/my_bookings.html:304
-#: app/templates/customer/view_booking_details.html:231
+#: app/templates/customer/view_booking_details.html:232
 msgid "Keep appointment"
 msgstr "Giữ lịch hẹn"
 
@@ -2865,14 +2598,6 @@ msgstr "Lỗi kết nối. Vui lòng thử lại."
 msgid "APPOINTMENT MANAGEMENT"
 msgstr "QUẢN LÝ LỊCH HẸN"
 
-#: app/templates/customer/reschedule.html:20
-msgid ""
-"Modify your session with ease. Please note our 24-hour rescheduling "
-"window to ensure we can accommodate all guests."
-msgstr ""
-"Đổi buổi hẹn của bạn dễ dàng. Vui lòng lưu ý khung 24 giờ để đổi lịch "
-"nhằm đảm bảo phục vụ mọi khách hàng."
-
 #: app/templates/customer/reschedule.html:40
 msgid "Service image"
 msgstr "Ảnh dịch vụ"
@@ -2902,7 +2627,7 @@ msgid "Session duration:"
 msgstr "Thời lượng buổi hẹn:"
 
 #: app/templates/customer/reschedule.html:149
-#: app/templates/customer/view_booking_details.html:59
+#: app/templates/customer/view_booking_details.html:61
 #: app/templates/public/services.html:107
 #: app/templates/public/services.html:137
 msgid "mins"
@@ -2911,14 +2636,6 @@ msgstr "phút"
 #: app/templates/customer/reschedule.html:166
 msgid "Policy Notice"
 msgstr "Thông báo chính sách"
-
-#: app/templates/customer/reschedule.html:167
-msgid ""
-"Bookings can only be rescheduled at least 24 hours in advance and can "
-"only be changed once. Further changes may require a new deposit."
-msgstr ""
-"Lịch chỉ có thể đổi trước ít nhất 24 giờ và chỉ đổi được một lần. Thay "
-"đổi thêm có thể cần đặt cọc mới."
 
 #: app/templates/customer/reschedule.html:183
 msgid "Comparison"
@@ -2950,7 +2667,7 @@ msgid "Confirm Reschedule"
 msgstr "Xác nhận đổi lịch"
 
 #: app/templates/customer/view_booking_details.html:3
-#: app/templates/customer/view_booking_details.html:33
+#: app/templates/customer/view_booking_details.html:35
 msgid "Booking Details"
 msgstr "Chi tiết đặt lịch"
 
@@ -2958,36 +2675,44 @@ msgstr "Chi tiết đặt lịch"
 msgid "Confirmed"
 msgstr "Đã xác nhận"
 
-#: app/templates/customer/view_booking_details.html:30
+#: app/templates/customer/view_booking_details.html:18
+msgid "In Progress"
+msgstr "Đang thực hiện"
+
+#: app/templates/customer/view_booking_details.html:21
+msgid "No Show"
+msgstr "Không đến"
+
+#: app/templates/customer/view_booking_details.html:32
 msgid "Back to Appointments"
 msgstr "Về danh sách lịch hẹn"
 
-#: app/templates/customer/view_booking_details.html:81
+#: app/templates/customer/view_booking_details.html:83
 msgid "Artist"
 msgstr "Nghệ nhân"
 
-#: app/templates/customer/view_booking_details.html:92
+#: app/templates/customer/view_booking_details.html:94
 msgid "Service Description"
 msgstr "Mô tả dịch vụ"
 
-#: app/templates/customer/view_booking_details.html:105
+#: app/templates/customer/view_booking_details.html:107
 msgid "Demo video"
 msgstr "Video minh họa"
 
-#: app/templates/customer/view_booking_details.html:146
+#: app/templates/customer/view_booking_details.html:148
 msgid "Salon location map"
 msgstr "Bản đồ vị trí salon"
 
-#: app/templates/customer/view_booking_details.html:153
-#: app/templates/public/index.html:267
+#: app/templates/customer/view_booking_details.html:155
+#: app/templates/public/index.html:268
 msgid "Address"
 msgstr "Địa chỉ"
 
-#: app/templates/customer/view_booking_details.html:159
+#: app/templates/customer/view_booking_details.html:160
 msgid "Get Directions"
 msgstr "Chỉ đường"
 
-#: app/templates/customer/view_booking_details.html:167
+#: app/templates/customer/view_booking_details.html:168
 msgid "Salon Contact"
 msgstr "Liên hệ salon"
 
@@ -2999,132 +2724,61 @@ msgstr "Ốc đảo thư giãn"
 msgid "Our Story"
 msgstr "Câu chuyện của chúng tôi"
 
-#: app/templates/public/about.html:21
-msgid ""
-"Redefining luxury wellness with precise, artisanal care in a sanctuary of"
-" soft mood and quiet elegance."
-msgstr ""
-"Định nghĩa lại sự chăm sóc sang trọng bằng liệu trình tỉ mỉ, thủ công "
-"trong một không gian nhẹ nhàng và thanh lịch."
-
 #: app/templates/public/about.html:37
 msgid "Crafted with intention"
 msgstr "Chăm chút trong từng chi tiết"
 
-#: app/templates/public/about.html:39
-msgid ""
-"At DahaCare, we believe that true luxury lies in the details. Founded on "
-"the principle of bringing atelier-level precision to daily wellness, our "
-"space was designed as a retreat from the noise of the city."
-msgstr ""
-"Tại DahaCare, chúng tôi tin rằng sự sang trọng thực sự nằm ở từng chi "
-"tiết. Được xây dựng trên nguyên tắc mang sự tỉ mỉ đẳng cấp atelier vào "
-"việc chăm sóc hằng ngày, không gian của chúng tôi được thiết kế như một "
-"chốn nghỉ ngơi khỏi sự ồn ào của phố thị."
-
-#: app/templates/public/about.html:40
-msgid ""
-"Every treatment is a careful composition of quality products, rigorous "
-"hygiene standards, and the trained hands of our artists. We don't just "
-"provide a service; we curate an experience that honors your time and "
-"elevates your personal care ritual."
-msgstr ""
-"Mỗi liệu trình là sự kết hợp cẩn thận giữa sản phẩm chất lượng, tiêu "
-"chuẩn vệ sinh nghiêm ngặt và đôi tay lành nghề của các nghệ nhân. Chúng "
-"tôi không chỉ cung cấp dịch vụ; chúng tôi tạo nên trải nghiệm tôn trọng "
-"thời gian của bạn và nâng tầm nghi thức chăm sóc bản thân."
-
-#: app/templates/public/about.html:68
+#: app/templates/public/about.html:55
 msgid "Years of Excellence"
 msgstr "Năm kinh nghiệm đỉnh cao"
 
-#: app/templates/public/about.html:72
+#: app/templates/public/about.html:59
 msgid "Clients Served"
 msgstr "Khách hàng đã phục vụ"
 
-#: app/templates/public/about.html:76
+#: app/templates/public/about.html:63
 msgid "Master Artists"
 msgstr "Nghệ nhân bậc thầy"
 
-#: app/templates/public/about.html:80 app/templates/public/services.html:161
+#: app/templates/public/about.html:67 app/templates/public/services.html:161
 msgid "Average Rating"
 msgstr "Đánh giá trung bình"
 
-#: app/templates/public/about.html:118
+#: app/templates/public/about.html:105
 msgid "Meet the team"
 msgstr "Gặp gỡ đội ngũ"
 
-#: app/templates/public/about.html:148
+#: app/templates/public/about.html:135
 msgid "What we stand for"
 msgstr "Giá trị của chúng tôi"
 
-#: app/templates/public/about.html:159
+#: app/templates/public/about.html:146
 msgid "Hygiene first"
 msgstr "Vệ sinh hàng đầu"
 
-#: app/templates/public/about.html:160
-msgid ""
-"Medical-grade sterilization processes for every tool, ensuring your "
-"safety is never compromised."
-msgstr ""
-"Quy trình tiệt trùng đạt chuẩn y tế cho mọi dụng cụ, đảm bảo an toàn của "
-"bạn không bao giờ bị đánh đổi."
-
-#: app/templates/public/about.html:169
+#: app/templates/public/about.html:156
 msgid "Trained artists"
 msgstr "Nghệ nhân được đào tạo"
 
-#: app/templates/public/about.html:170
-msgid ""
-"Continuous education and mastery of techniques mean you receive the "
-"pinnacle of modern care."
-msgstr ""
-"Việc học hỏi liên tục và tinh thông kỹ thuật đảm bảo bạn nhận được sự "
-"chăm sóc hiện đại đỉnh cao."
-
-#: app/templates/public/about.html:179
+#: app/templates/public/about.html:166
 msgid "Quality products"
 msgstr "Sản phẩm chất lượng"
 
-#: app/templates/public/about.html:180
-msgid ""
-"We source only premium, non-toxic, and sustainable materials for long-"
-"lasting, brilliant results."
-msgstr ""
-"Chúng tôi chỉ chọn vật liệu cao cấp, không độc hại và bền vững để mang "
-"lại kết quả rực rỡ, lâu dài."
-
-#: app/templates/public/about.html:189
+#: app/templates/public/about.html:176
 msgid "Client-first care"
 msgstr "Khách hàng là trên hết"
 
-#: app/templates/public/about.html:190
-msgid ""
-"Your comfort is our priority. Enjoy a serene environment designed "
-"entirely around your relaxation."
-msgstr ""
-"Sự thoải mái của bạn là ưu tiên của chúng tôi. Hãy tận hưởng không gian "
-"yên tĩnh được thiết kế hoàn toàn cho sự thư giãn của bạn."
-
-#: app/templates/public/about.html:204
+#: app/templates/public/about.html:191
 msgid "Come meet the team"
 msgstr "Đến gặp gỡ đội ngũ"
 
-#: app/templates/public/about.html:205
-msgid "Experience the DahaCare difference in person."
-msgstr "Trải nghiệm sự khác biệt DahaCare trực tiếp."
-
-#: app/templates/public/about.html:207
+#: app/templates/public/about.html:194
 msgid "Book your visit"
 msgstr "Đặt lịch hẹn"
 
 #: app/templates/public/gallery.html:20
 msgid "Our Work"
 msgstr "Tác phẩm của chúng tôi"
-
-#: app/templates/public/gallery.html:21
-msgid "A glimpse into the artistry and precision behind every visit."
-msgstr "Thoáng nhìn nghệ thuật và sự tỉ mỉ trong mỗi lần ghé thăm."
 
 #: app/templates/public/gallery.html:53
 msgid "No photos yet"
@@ -3179,126 +2833,72 @@ msgid "A glimpse of what we create every day"
 msgstr "Thoáng nhìn những gì chúng tôi tạo ra mỗi ngày"
 
 #: app/templates/public/index.html:133
-msgid "Why MisaNails?"
+#, python-format
+msgid "Why %(brand)s?"
 msgstr ""
 
 #: app/templates/public/index.html:139
 msgid "Happy clients"
 msgstr "Khách hàng hài lòng"
 
-#: app/templates/public/index.html:140
-msgid "Trusted by thousands of satisfied customers who love our work."
-msgstr "Được hàng nghìn khách hàng hài lòng yêu thích tin tưởng."
-
 #: app/templates/public/index.html:144
 msgid "Safe products"
 msgstr "Sản phẩm an toàn"
-
-#: app/templates/public/index.html:145
-msgid "We use only premium, non-toxic products for your health and safety."
-msgstr ""
-"Chúng tôi chỉ dùng sản phẩm cao cấp, không độc hại vì sức khỏe và an toàn"
-" của bạn."
 
 #: app/templates/public/index.html:149
 msgid "Expert artists"
 msgstr "Nghệ nhân chuyên nghiệp"
 
-#: app/templates/public/index.html:150
-msgid "Our highly trained professionals bring your vision to life."
-msgstr "Đội ngũ chuyên gia lành nghề biến ý tưởng của bạn thành hiện thực."
-
 #: app/templates/public/index.html:163
 msgid "What clients say"
 msgstr "Khách hàng nói gì"
 
-#: app/templates/public/index.html:176
-msgid ""
-"\"Absolutely wonderful experience! The attention to detail is unmatched, "
-"and my nails have never looked better. Highly recommend the gel "
-"extensions.\""
-msgstr ""
-"\"Trải nghiệm tuyệt vời! Sự tỉ mỉ đến từng chi tiết không đâu sánh bằng, "
-"và móng của tôi chưa bao giờ đẹp đến thế. Rất khuyến khích dịch vụ nối "
-"móng gel.\""
-
-#: app/templates/public/index.html:181
-msgid "Gold member"
-msgstr "Thành viên Vàng"
-
-#: app/templates/public/index.html:194
-msgid ""
-"\"The ambiance is so relaxing, and the staff is incredibly professional. "
-"I love the creative nail art options they offer. A true luxury "
-"experience.\""
-msgstr ""
-"\"Không gian thật thư giãn, và nhân viên vô cùng chuyên nghiệp. Tôi thích"
-" những lựa chọn nghệ thuật móng sáng tạo của họ. Một trải nghiệm sang "
-"trọng đích thực.\""
-
-#: app/templates/public/index.html:199
-msgid "First-time client"
-msgstr "Khách hàng lần đầu"
-
-#: app/templates/public/index.html:219
+#: app/templates/public/index.html:220
 msgid "New member offer"
 msgstr "Ưu đãi thành viên mới"
 
-#: app/templates/public/index.html:220
-#, python-format
-msgid "Create an account & get 15%% off your first visit"
-msgstr "Tạo tài khoản & giảm 15%% cho lần ghé thăm đầu tiên"
-
-#: app/templates/public/index.html:221
-msgid ""
-"Join our community today and start enjoying the perks of premium nail "
-"care right away."
-msgstr ""
-"Tham gia cộng đồng của chúng tôi hôm nay và bắt đầu tận hưởng ưu đãi chăm"
-" sóc móng cao cấp ngay lập tức."
-
-#: app/templates/public/index.html:225
+#: app/templates/public/index.html:226
 msgid "Exclusive member updates"
 msgstr "Cập nhật độc quyền cho thành viên"
 
-#: app/templates/public/index.html:229
+#: app/templates/public/index.html:230
 msgid "Easy online booking"
 msgstr "Đặt lịch trực tuyến dễ dàng"
 
-#: app/templates/public/index.html:233
+#: app/templates/public/index.html:234
 msgid "Earn rewards points"
 msgstr "Tích điểm thưởng"
 
-#: app/templates/public/index.html:239
+#: app/templates/public/index.html:240
 msgid "Already have one? Log in"
 msgstr "Đã có tài khoản? Đăng nhập"
 
-#: app/templates/public/index.html:245
+#: app/templates/public/index.html:246
 msgid "welcome discount"
 msgstr "giảm giá chào mừng"
 
-#: app/templates/public/index.html:261
+#: app/templates/public/index.html:262
 msgid "Find us"
 msgstr "Tìm chúng tôi"
 
-#: app/templates/public/index.html:275
+#: app/templates/public/index.html:279
 msgid "Hours"
 msgstr "Giờ mở cửa"
 
-#: app/templates/public/index.html:283
+#: app/templates/public/index.html:287
 msgid "Phone"
 msgstr "Điện thoại"
 
-#: app/templates/public/index.html:291
+#: app/templates/public/index.html:295
 #: app/templates/staff/staff_profile.html:276
 msgid "Email"
 msgstr "Email"
 
-#: app/templates/public/index.html:303
+#: app/templates/public/index.html:307
 msgid "Map to our salon"
 msgstr "Bản đồ tới salon"
 
-#: app/templates/public/index.html:312
+#: app/templates/public/index.html:316
 msgid "Get directions"
 msgstr "Chỉ đường"
 
@@ -3310,10 +2910,6 @@ msgstr "Thông tin"
 #: app/templates/public/public_booking.html:230
 msgid "Your Details"
 msgstr "Thông tin của bạn"
-
-#: app/templates/public/public_booking.html:231
-msgid "Please provide your contact information to secure the booking."
-msgstr "Vui lòng cung cấp thông tin liên hệ để xác nhận đặt lịch."
 
 #: app/templates/public/public_booking.html:255
 msgid "Booking Notes"
@@ -3331,23 +2927,9 @@ msgstr "Yêu cầu đặc biệt hoặc dị ứng..."
 msgid "Continue to Checkout"
 msgstr "Tiếp tục đến thanh toán"
 
-#: app/templates/public/public_booking.html:355
-msgid "Sign in to earn loyalty points with this booking."
-msgstr "Đăng nhập để tích điểm thưởng cho lần đặt này."
-
 #: app/templates/public/services.html:19
 msgid "Our Services"
 msgstr "Dịch vụ của chúng tôi"
-
-#: app/templates/public/services.html:20
-msgid ""
-"Discover a curated collection of premium nail care and aesthetic "
-"treatments designed for the modern individual. Precision meets "
-"tranquility in every session."
-msgstr ""
-"Khám phá bộ sưu tập chọn lọc các liệu trình chăm sóc móng và làm đẹp cao "
-"cấp dành cho người hiện đại. Sự tỉ mỉ hòa quyện cùng sự thư thái trong "
-"mỗi buổi hẹn."
 
 #: app/templates/public/services.html:97 app/templates/public/services.html:131
 msgid "New"
@@ -3389,20 +2971,6 @@ msgstr "Đã xác nhận lịch hẹn"
 msgid "Booking received"
 msgstr "Đã nhận lịch hẹn"
 
-#: app/templates/public/success.html:44
-msgid "We've reserved your spot. Get ready for some well-deserved pampering."
-msgstr ""
-"Chúng tôi đã giữ chỗ cho bạn. Hãy sẵn sàng cho giây phút chăm sóc xứng "
-"đáng."
-
-#: app/templates/public/success.html:47
-msgid ""
-"We've got your request. We'll email you as soon as the salon confirms "
-"your appointment."
-msgstr ""
-"Chúng tôi đã nhận yêu cầu của bạn. Bạn sẽ nhận được email ngay khi salon "
-"xác nhận lịch hẹn."
-
 #: app/templates/public/success.html:101
 msgid "Request received"
 msgstr "Đã nhận yêu cầu"
@@ -3419,29 +2987,13 @@ msgstr "Salon xác nhận"
 msgid "Your time is locked in."
 msgstr "Giờ hẹn của bạn đã được giữ."
 
-#: app/templates/public/success.html:116
-msgid "Usually within a few hours during opening times."
-msgstr "Thường trong vài giờ, vào khung giờ mở cửa."
-
 #: app/templates/public/success.html:125
 msgid "Your appointment"
 msgstr "Buổi hẹn của bạn"
 
-#: app/templates/public/success.html:126
-msgid "Arrive 5-10 minutes early to pick your shade."
-msgstr "Đến sớm 5-10 phút để chọn màu ưng ý."
-
 #: app/templates/public/success.html:134
 msgid "Manage bookings easily"
 msgstr "Quản lý lịch đặt dễ dàng"
-
-#: app/templates/public/success.html:135
-msgid ""
-"Create an account to track your loyalty points, reschedule appointments, "
-"and save your favorite colors."
-msgstr ""
-"Tạo tài khoản để theo dõi điểm thưởng, đổi lịch hẹn và lưu những màu yêu "
-"thích của bạn."
 
 #: app/templates/public/success.html:136
 msgid "Create Account"
@@ -3460,8 +3012,9 @@ msgid "Find us at:"
 msgstr "Tìm chúng tôi tại:"
 
 #: app/templates/public/success.html:152
-msgid "DahaCare studio"
-msgstr "Tiệm DahaCare"
+#, python-format
+msgid "%(brand)s studio"
+msgstr "Tiệm %(brand)s"
 
 #: app/templates/public/success.html:155
 msgid "Open in Maps"
@@ -4156,4 +3709,475 @@ msgstr ""
 
 #~ msgid "Map location"
 #~ msgstr "Vị trí trên bản đồ"
+
+#~ msgid "Verify your email – Daha Care"
+#~ msgstr "Xác minh email của bạn – Daha Care"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your verification code is: %(code)s\n"
+#~ "\n"
+#~ "Please enter this code to confirm "
+#~ "your email address and complete your "
+#~ "registration.\n"
+#~ "\n"
+#~ "If you did not create an account"
+#~ " with Daha Care, please ignore this"
+#~ " email.\n"
+#~ msgstr ""
+#~ "Xin chào,\n"
+#~ "\n"
+#~ "Mã xác minh của bạn là: %(code)s\n"
+#~ "\n"
+#~ "Vui lòng nhập mã này để xác nhận địa chỉ email và hoàn tất đăng ký.\n"
+#~ "\n"
+#~ "Nếu bạn không tạo tài khoản tại Daha Care, vui lòng bỏ qua email này.\n"
+
+#~ msgid "Password Change Request – Daha Care"
+#~ msgstr "Yêu cầu đổi mật khẩu – Daha Care"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your verification code is: %(code)s\n"
+#~ "\n"
+#~ "Please enter this code to confirm your password change request.\n"
+#~ "\n"
+#~ "If you did not request this, "
+#~ "please ignore this email and your "
+#~ "password will remain unchanged.\n"
+#~ msgstr ""
+#~ "Xin chào,\n"
+#~ "\n"
+#~ "Mã xác minh của bạn là: %(code)s\n"
+#~ "\n"
+#~ "Vui lòng nhập mã này để xác nhận yêu cầu đổi mật khẩu.\n"
+#~ "\n"
+#~ "Nếu bạn không thực hiện yêu cầu"
+#~ " này, vui lòng bỏ qua email và"
+#~ " mật khẩu của bạn sẽ được giữ"
+#~ " nguyên.\n"
+
+#~ msgid "Email Change Request – Daha Care"
+#~ msgstr "Yêu cầu đổi email – Daha Care"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your verification code is: %(code)s\n"
+#~ "\n"
+#~ "Please enter this code to confirm your email address change request.\n"
+#~ "\n"
+#~ "If you did not request this, "
+#~ "please ignore this email and your "
+#~ "email address will remain unchanged.\n"
+#~ msgstr ""
+#~ "Xin chào,\n"
+#~ "\n"
+#~ "Mã xác minh của bạn là: %(code)s\n"
+#~ "\n"
+#~ "Vui lòng nhập mã này để xác nhận yêu cầu đổi địa chỉ email.\n"
+#~ "\n"
+#~ "Nếu bạn không thực hiện yêu cầu"
+#~ " này, vui lòng bỏ qua email và"
+#~ " địa chỉ email của bạn sẽ được"
+#~ " giữ nguyên.\n"
+
+#~ msgid "Reset Your Password – Daha Care"
+#~ msgstr "Đặt lại mật khẩu – Daha Care"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your password reset code is: %(code)s\n"
+#~ "\n"
+#~ "Please enter this code to reset "
+#~ "your password. This code expires in "
+#~ "10 minutes.\n"
+#~ "\n"
+#~ "If you did not request a password reset, please ignore this email.\n"
+#~ msgstr ""
+#~ "Xin chào,\n"
+#~ "\n"
+#~ "Mã đặt lại mật khẩu của bạn là: %(code)s\n"
+#~ "\n"
+#~ "Vui lòng nhập mã này để đặt lại mật khẩu. Mã sẽ hết hạn sau 10 phút.\n"
+#~ "\n"
+#~ "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n"
+
+#~ msgid "Your Booking Verification Code – Daha Care"
+#~ msgstr "Mã xác nhận đặt lịch của bạn – Daha Care"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your verification code is: %(code)s\n"
+#~ "\n"
+#~ "Please enter this code on the "
+#~ "verification page to confirm your "
+#~ "booking.\n"
+#~ "\n"
+#~ "If you did not request this, please ignore this email.\n"
+#~ msgstr ""
+#~ "Xin chào,\n"
+#~ "\n"
+#~ "Mã xác minh của bạn là: %(code)s\n"
+#~ "\n"
+#~ "Vui lòng nhập mã này trên trang xác minh để xác nhận đặt lịch.\n"
+#~ "\n"
+#~ "Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.\n"
+
+#~ msgid "Your booking request has been received"
+#~ msgstr "Chúng tôi đã nhận được yêu cầu đặt lịch của bạn"
+
+#~ msgid ""
+#~ "Hi %(name)s,\n"
+#~ "\n"
+#~ "Thank you for your booking.\n"
+#~ "\n"
+#~ "We have received your booking request"
+#~ " and it is currently pending "
+#~ "confirmation.\n"
+#~ "\n"
+#~ "Booking details:\n"
+#~ "- Service: %(service)s\n"
+#~ "- Staff: %(staff)s\n"
+#~ "- Date: %(date)s\n"
+#~ "- Time: %(start)s - %(end)s\n"
+#~ "\n"
+#~ "We will contact you again once your booking has been confirmed.\n"
+#~ "\n"
+#~ "Best regards,\n"
+#~ "Dahacare\n"
+#~ msgstr ""
+#~ "Xin chào %(name)s,\n"
+#~ "\n"
+#~ "Cảm ơn bạn đã đặt lịch.\n"
+#~ "\n"
+#~ "Chúng tôi đã nhận được yêu cầu "
+#~ "đặt lịch của bạn và hiện đang "
+#~ "chờ xác nhận.\n"
+#~ "\n"
+#~ "Chi tiết đặt lịch:\n"
+#~ "- Dịch vụ: %(service)s\n"
+#~ "- Nhân viên: %(staff)s\n"
+#~ "- Ngày: %(date)s\n"
+#~ "- Giờ: %(start)s - %(end)s\n"
+#~ "\n"
+#~ "Chúng tôi sẽ liên hệ lại khi đặt lịch của bạn được xác nhận.\n"
+#~ "\n"
+#~ "Trân trọng,\n"
+#~ "Dahacare\n"
+
+#~ msgid ""
+#~ "Just one more step to secure your"
+#~ " account and unlock your personalized "
+#~ "beauty journey."
+#~ msgstr ""
+#~ "Chỉ còn một bước nữa để bảo "
+#~ "vệ tài khoản và mở khoá hành "
+#~ "trình làm đẹp của bạn."
+
+#~ msgid "Choose from our curated selection of luxury treatments."
+#~ msgstr "Lựa chọn từ bộ sưu tập liệu trình cao cấp của chúng tôi."
+
+#~ msgid "Select your preferred stylist or let us match you."
+#~ msgstr "Chọn thợ bạn thích hoặc để chúng tôi ghép cho bạn."
+
+#~ msgid ""
+#~ "You'll receive a verification email "
+#~ "after confirming. Your booking will be"
+#~ msgstr ""
+#~ "Bạn sẽ nhận email xác minh sau "
+#~ "khi xác nhận. Lịch đặt của bạn "
+#~ "sẽ ở trạng thái"
+
+#~ msgid "until the salon confirms your appointment."
+#~ msgstr "cho đến khi salon xác nhận lịch hẹn của bạn."
+
+#~ msgid "By confirming, you agree to our 24h cancellation policy."
+#~ msgstr "Bằng việc xác nhận, bạn đồng ý với chính sách hủy trong 24 giờ."
+
+#~ msgid "Earn base loyalty points on every visit"
+#~ msgstr "Nhận điểm thưởng cơ bản mỗi lần ghé"
+
+#~ msgid "Birthday bonus points"
+#~ msgstr "Điểm thưởng sinh nhật"
+
+#~ msgid "Access to member-only promotions"
+#~ msgstr "Truy cập ưu đãi dành riêng cho thành viên"
+
+#~ msgid "Monthly reward voucher"
+#~ msgstr "Voucher thưởng hàng tháng"
+
+#~ msgid "Priority booking (standard)"
+#~ msgstr "Đặt lịch ưu tiên (tiêu chuẩn)"
+
+#~ msgid "Everything in Silver"
+#~ msgstr "Mọi thứ trong Silver"
+
+#~ msgid "Early access to new services & seasonal offers"
+#~ msgstr "Truy cập sớm dịch vụ mới & ưu đãi theo mùa"
+
+#~ msgid "Complimentary nail care kit (quarterly)"
+#~ msgstr "Bộ chăm sóc móng miễn phí (hàng quý)"
+
+#~ msgid "Dedicated booking slot on weekends"
+#~ msgstr "Khung giờ đặt riêng cuối tuần"
+
+#~ msgid "Everything in Gold"
+#~ msgstr "Mọi thứ trong Gold"
+
+#~ msgid "Free add-on service every visit"
+#~ msgstr "Dịch vụ bổ sung miễn phí mỗi lần ghé"
+
+#~ msgid "Personal nail stylist assignment"
+#~ msgstr "Chỉ định thợ móng riêng"
+
+#~ msgid "VIP lounge access & complimentary drinks"
+#~ msgstr "Vào phòng chờ VIP & đồ uống miễn phí"
+
+#~ msgid ""
+#~ "Unlock exclusive perks, rewards, and "
+#~ "priority care tailored to your loyalty."
+#~ msgstr ""
+#~ "Mở khóa đặc quyền, phần thưởng và"
+#~ " ưu tiên chăm sóc riêng cho sự"
+#~ " gắn bó của bạn."
+
+#~ msgid "Show this code to our staff at your next visit to redeem."
+#~ msgstr "Xuất trình mã này cho nhân viên trong lần ghé tiếp theo để đổi."
+
+#~ msgid "This voucher has expired and is no longer valid."
+#~ msgstr "Voucher này đã hết hạn và không còn hiệu lực."
+
+#~ msgid ""
+#~ "Modify your session with ease. Please"
+#~ " note our 24-hour rescheduling window "
+#~ "to ensure we can accommodate all "
+#~ "guests."
+#~ msgstr ""
+#~ "Đổi buổi hẹn của bạn dễ dàng. "
+#~ "Vui lòng lưu ý khung 24 giờ "
+#~ "để đổi lịch nhằm đảm bảo phục "
+#~ "vụ mọi khách hàng."
+
+#~ msgid ""
+#~ "Bookings can only be rescheduled at "
+#~ "least 24 hours in advance and can"
+#~ " only be changed once. Further "
+#~ "changes may require a new deposit."
+#~ msgstr ""
+#~ "Lịch chỉ có thể đổi trước ít "
+#~ "nhất 24 giờ và chỉ đổi được "
+#~ "một lần. Thay đổi thêm có thể "
+#~ "cần đặt cọc mới."
+
+#~ msgid ""
+#~ "Redefining luxury wellness with precise, "
+#~ "artisanal care in a sanctuary of "
+#~ "soft mood and quiet elegance."
+#~ msgstr ""
+#~ "Định nghĩa lại sự chăm sóc sang"
+#~ " trọng bằng liệu trình tỉ mỉ, "
+#~ "thủ công trong một không gian nhẹ"
+#~ " nhàng và thanh lịch."
+
+#~ msgid ""
+#~ "At DahaCare, we believe that true "
+#~ "luxury lies in the details. Founded "
+#~ "on the principle of bringing atelier-"
+#~ "level precision to daily wellness, our"
+#~ " space was designed as a retreat "
+#~ "from the noise of the city."
+#~ msgstr ""
+#~ "Tại DahaCare, chúng tôi tin rằng "
+#~ "sự sang trọng thực sự nằm ở "
+#~ "từng chi tiết. Được xây dựng trên"
+#~ " nguyên tắc mang sự tỉ mỉ đẳng"
+#~ " cấp atelier vào việc chăm sóc "
+#~ "hằng ngày, không gian của chúng "
+#~ "tôi được thiết kế như một chốn "
+#~ "nghỉ ngơi khỏi sự ồn ào của "
+#~ "phố thị."
+
+#~ msgid ""
+#~ "Every treatment is a careful composition"
+#~ " of quality products, rigorous hygiene "
+#~ "standards, and the trained hands of "
+#~ "our artists. We don't just provide "
+#~ "a service; we curate an experience "
+#~ "that honors your time and elevates "
+#~ "your personal care ritual."
+#~ msgstr ""
+#~ "Mỗi liệu trình là sự kết hợp "
+#~ "cẩn thận giữa sản phẩm chất lượng,"
+#~ " tiêu chuẩn vệ sinh nghiêm ngặt "
+#~ "và đôi tay lành nghề của các "
+#~ "nghệ nhân. Chúng tôi không chỉ "
+#~ "cung cấp dịch vụ; chúng tôi tạo"
+#~ " nên trải nghiệm tôn trọng thời "
+#~ "gian của bạn và nâng tầm nghi "
+#~ "thức chăm sóc bản thân."
+
+#~ msgid ""
+#~ "Medical-grade sterilization processes for "
+#~ "every tool, ensuring your safety is "
+#~ "never compromised."
+#~ msgstr ""
+#~ "Quy trình tiệt trùng đạt chuẩn y"
+#~ " tế cho mọi dụng cụ, đảm bảo"
+#~ " an toàn của bạn không bao giờ"
+#~ " bị đánh đổi."
+
+#~ msgid ""
+#~ "Continuous education and mastery of "
+#~ "techniques mean you receive the pinnacle"
+#~ " of modern care."
+#~ msgstr ""
+#~ "Việc học hỏi liên tục và tinh "
+#~ "thông kỹ thuật đảm bảo bạn nhận"
+#~ " được sự chăm sóc hiện đại đỉnh"
+#~ " cao."
+
+#~ msgid ""
+#~ "We source only premium, non-toxic, "
+#~ "and sustainable materials for long-"
+#~ "lasting, brilliant results."
+#~ msgstr ""
+#~ "Chúng tôi chỉ chọn vật liệu cao"
+#~ " cấp, không độc hại và bền vững"
+#~ " để mang lại kết quả rực rỡ,"
+#~ " lâu dài."
+
+#~ msgid ""
+#~ "Your comfort is our priority. Enjoy "
+#~ "a serene environment designed entirely "
+#~ "around your relaxation."
+#~ msgstr ""
+#~ "Sự thoải mái của bạn là ưu "
+#~ "tiên của chúng tôi. Hãy tận hưởng"
+#~ " không gian yên tĩnh được thiết "
+#~ "kế hoàn toàn cho sự thư giãn "
+#~ "của bạn."
+
+#~ msgid "Experience the DahaCare difference in person."
+#~ msgstr "Trải nghiệm sự khác biệt DahaCare trực tiếp."
+
+#~ msgid "A glimpse into the artistry and precision behind every visit."
+#~ msgstr "Thoáng nhìn nghệ thuật và sự tỉ mỉ trong mỗi lần ghé thăm."
+
+#~ msgid "Trusted by thousands of satisfied customers who love our work."
+#~ msgstr "Được hàng nghìn khách hàng hài lòng yêu thích tin tưởng."
+
+#~ msgid "We use only premium, non-toxic products for your health and safety."
+#~ msgstr ""
+#~ "Chúng tôi chỉ dùng sản phẩm cao"
+#~ " cấp, không độc hại vì sức khỏe"
+#~ " và an toàn của bạn."
+
+#~ msgid "Our highly trained professionals bring your vision to life."
+#~ msgstr "Đội ngũ chuyên gia lành nghề biến ý tưởng của bạn thành hiện thực."
+
+#~ msgid ""
+#~ "\"Absolutely wonderful experience! The "
+#~ "attention to detail is unmatched, and"
+#~ " my nails have never looked better."
+#~ " Highly recommend the gel extensions.\""
+#~ msgstr ""
+#~ "\"Trải nghiệm tuyệt vời! Sự tỉ mỉ"
+#~ " đến từng chi tiết không đâu "
+#~ "sánh bằng, và móng của tôi chưa"
+#~ " bao giờ đẹp đến thế. Rất "
+#~ "khuyến khích dịch vụ nối móng "
+#~ "gel.\""
+
+#~ msgid "Gold member"
+#~ msgstr "Thành viên Vàng"
+
+#~ msgid ""
+#~ "\"The ambiance is so relaxing, and "
+#~ "the staff is incredibly professional. I"
+#~ " love the creative nail art options"
+#~ " they offer. A true luxury "
+#~ "experience.\""
+#~ msgstr ""
+#~ "\"Không gian thật thư giãn, và "
+#~ "nhân viên vô cùng chuyên nghiệp. "
+#~ "Tôi thích những lựa chọn nghệ "
+#~ "thuật móng sáng tạo của họ. Một"
+#~ " trải nghiệm sang trọng đích thực.\""
+
+#~ msgid "First-time client"
+#~ msgstr "Khách hàng lần đầu"
+
+#~ msgid "Create an account & get 15%% off your first visit"
+#~ msgstr "Tạo tài khoản & giảm 15%% cho lần ghé thăm đầu tiên"
+
+#~ msgid ""
+#~ "Join our community today and start "
+#~ "enjoying the perks of premium nail "
+#~ "care right away."
+#~ msgstr ""
+#~ "Tham gia cộng đồng của chúng tôi"
+#~ " hôm nay và bắt đầu tận hưởng"
+#~ " ưu đãi chăm sóc móng cao cấp"
+#~ " ngay lập tức."
+
+#~ msgid "Please provide your contact information to secure the booking."
+#~ msgstr "Vui lòng cung cấp thông tin liên hệ để xác nhận đặt lịch."
+
+#~ msgid "Sign in to earn loyalty points with this booking."
+#~ msgstr "Đăng nhập để tích điểm thưởng cho lần đặt này."
+
+#~ msgid ""
+#~ "Discover a curated collection of premium"
+#~ " nail care and aesthetic treatments "
+#~ "designed for the modern individual. "
+#~ "Precision meets tranquility in every "
+#~ "session."
+#~ msgstr ""
+#~ "Khám phá bộ sưu tập chọn lọc "
+#~ "các liệu trình chăm sóc móng và"
+#~ " làm đẹp cao cấp dành cho người"
+#~ " hiện đại. Sự tỉ mỉ hòa quyện"
+#~ " cùng sự thư thái trong mỗi "
+#~ "buổi hẹn."
+
+#~ msgid "We've reserved your spot. Get ready for some well-deserved pampering."
+#~ msgstr ""
+#~ "Chúng tôi đã giữ chỗ cho bạn. "
+#~ "Hãy sẵn sàng cho giây phút chăm"
+#~ " sóc xứng đáng."
+
+#~ msgid ""
+#~ "We've got your request. We'll email "
+#~ "you as soon as the salon confirms"
+#~ " your appointment."
+#~ msgstr ""
+#~ "Chúng tôi đã nhận yêu cầu của "
+#~ "bạn. Bạn sẽ nhận được email ngay"
+#~ " khi salon xác nhận lịch hẹn."
+
+#~ msgid "Usually within a few hours during opening times."
+#~ msgstr "Thường trong vài giờ, vào khung giờ mở cửa."
+
+#~ msgid "Arrive 5-10 minutes early to pick your shade."
+#~ msgstr "Đến sớm 5-10 phút để chọn màu ưng ý."
+
+#~ msgid ""
+#~ "Create an account to track your "
+#~ "loyalty points, reschedule appointments, and"
+#~ " save your favorite colors."
+#~ msgstr ""
+#~ "Tạo tài khoản để theo dõi điểm "
+#~ "thưởng, đổi lịch hẹn và lưu những"
+#~ " màu yêu thích của bạn."
+
+#~ msgid "Why MisaNails?"
+#~ msgstr ""
+
+#~ msgid "DahaCare studio"
+#~ msgstr "Tiệm DahaCare"
 

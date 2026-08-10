@@ -18,6 +18,7 @@ import stripe
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from app import create_app
+from app.business import BUSINESS
 from app.database.db import get_connection
 
 
@@ -34,7 +35,7 @@ def setup():
             if t["stripe_price_id"]:
                 print(f"skip {t['name']} (da co {t['stripe_price_id']})")
                 continue
-            product = stripe.Product.create(name=f"DahaCare {t['name']} Membership")
+            product = stripe.Product.create(name=f"{BUSINESS['brand_name']} {t['name']} Membership")
             price = stripe.Price.create(
                 product=product.id,
                 currency="eur",

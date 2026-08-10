@@ -1,10 +1,10 @@
 {% extends "auth_base.html" %}
 
-{% block title %}{{ _('Verify your email') }} | DahaCare{% endblock %}
+{% block title %}{{ _('Verify your email') }} | {{ biz.brand_name }}{% endblock %}
 
 {% block auth_panel_text %}
 <h1 class="auth-panel__title">{{ _('Almost there.') }}</h1>
-<p class="auth-panel__subtitle">{{ _('Just one more step to secure your account and unlock your personalized beauty journey.') }}</p>
+<p class="auth-panel__subtitle">{{ txt('auth.verify_sub') }}</p>
 {% endblock %}
 
 {% block extra_css %}

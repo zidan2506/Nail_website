@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Book an Appointment') }} | DahaCare{% endblock %}
+{% block title %}{{ _('Book an Appointment') }} | {{ biz.brand_name }}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/public/public_booking.css') }}">
@@ -64,7 +64,7 @@
       <section class="bk-step bk-step--active" id="step-1">
         <div class="bk-step-head">
           <h1 class="bk-step-title">{{ _('Select a Service') }}</h1>
-          <p class="bk-step-sub">{{ _('Choose from our curated selection of luxury treatments.') }}</p>
+          <p class="bk-step-sub">{{ txt('booking.step_service_sub') }}</p>
         </div>
 
         <div class="bk-chips">
@@ -131,7 +131,7 @@
       <section class="bk-step" id="step-2">
         <div class="bk-step-head">
           <h2 class="bk-step-title">{{ _('Choose a Professional') }}</h2>
-          <p class="bk-step-sub">{{ _('Select your preferred stylist or let us match you.') }}</p>
+          <p class="bk-step-sub">{{ txt('booking.step_staff_sub') }}</p>
         </div>
 
         <div class="bk-staff-grid">
@@ -228,7 +228,7 @@
       <section class="bk-step" id="step-4">
         <div class="bk-step-head">
           <h2 class="bk-step-title">{{ _('Your Details') }}</h2>
-          <p class="bk-step-sub">{{ _('Please provide your contact information to secure the booking.') }}</p>
+          <p class="bk-step-sub">{{ txt('booking.step_contact_sub') }}</p>
         </div>
 
         <div class="bk-info-card">
@@ -313,7 +313,7 @@
 
             <div class="bk-info-note">
               <span class="material-symbols-outlined bk-info-note-icon">info</span>
-              <span>{{ _("You'll receive a verification email after confirming. Your booking will be") }} <strong>{{ _('pending') }}</strong> {{ _('until the salon confirms your appointment.') }}</span>
+              <span>{{ txt('booking.email_note_before') }} <strong>{{ _('pending') }}</strong> {{ txt('booking.email_note_after') }}</span>
             </div>
           </div>
 
@@ -352,9 +352,9 @@
               </div>
               <div class="bk-summary-points-nudge">
                 <span class="material-symbols-outlined">stars</span>
-                <span>{{ _('Sign in to earn loyalty points with this booking.') }}</span>
+                <span>{{ txt('booking.signin_hint') }}</span>
               </div>
-              <p class="bk-summary-policy">{{ _('By confirming, you agree to our 24h cancellation policy.') }}</p>
+              <p class="bk-summary-policy">{{ txt('booking.cancel_policy') }}</p>
             </div>
           </div>
 

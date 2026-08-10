@@ -13,10 +13,12 @@
 {#  Trạng thái từ DB là chuỗi thô, phải map sang msgid mới dịch được.
     Bản cũ in thẳng `{{ status }}` nên luôn ra tiếng Anh kể cả UI là FI/VI. #}
 {% set status_labels = {
-     'confirmed': _('Confirmed'),
-     'pending':   _('Pending'),
-     'cancelled': _('Cancelled'),
-     'completed': _('Completed')
+     'confirmed':   _('Confirmed'),
+     'pending':     _('Pending'),
+     'in-progress': _('In Progress'),
+     'done':        _('Completed'),
+     'cancelled':   _('Cancelled'),
+     'no-show':     _('No Show')
    } %}
 
 {#  Lịch còn hiệu lực = còn hành động để làm, và là thứ duy nhất được
@@ -145,15 +147,14 @@
           <img src="{{ url_for('static', filename='images/public/nail_studio.jpg') }}"
                alt="{{ _('Salon location map') }}">
           <div class="bd-place__stamp">
-            <p class="bd-place__salon">DahaCare</p>
+            <p class="bd-place__salon">{{ biz.brand_name }}</p>
           </div>
         </div>
 
         <div class="bd-place__body">
           <p class="bd-label">{{ _('Address') }}</p>
           <p class="bd-place__addr">
-            Kyykysmäki 9 A,<br>
-            02650 Espoo, Finland
+            {% for line in biz.address_lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}
           </p>
           <a href="{{ map_url }}" target="_blank" rel="noopener" class="bd-btn bd-btn--outline">
             {{ _('Get Directions') }}
@@ -166,14 +167,14 @@
       <section class="bd-contact" style="--bd-i: 3">
         <p class="bd-label">{{ _('Salon Contact') }}</p>
 
-        <a href="tel:+358465978425" class="bd-contact__row">
+        <a href="tel:{{ biz.phone | replace(' ', '') }}" class="bd-contact__row">
           <span class="material-symbols-outlined">call</span>
-          <span>+358 465 978 425</span>
+          <span>{{ biz.phone }}</span>
         </a>
 
-        <a href="mailto:dahacaree@gmail.com" class="bd-contact__row">
+        <a href="mailto:{{ biz.email }}" class="bd-contact__row">
           <span class="material-symbols-outlined">mail</span>
-          <span>dahacaree@gmail.com</span>
+          <span>{{ biz.email }}</span>
         </a>
       </section>
 
