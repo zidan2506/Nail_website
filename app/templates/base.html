@@ -85,6 +85,24 @@
     </header>
     {% endblock %}
 
+    {# Dòng thông báo chung của hệ thống. Đặt SAU <header> để hai phần tử sticky
+       xếp đúng thứ tự: header dính ở top 0, dải này dính ngay dưới nó
+       (top = --nav-height). Nhóm thứ hai là bản sao để chạy vòng liền mạch
+       (translateX -50%), aria-hidden để screen reader không đọc hai lần. #}
+    {% if public_notices %}
+    <div class="notice-bar" aria-label="{{ _('Announcements') }}">
+        <div class="notice-bar__track" style="--notice-duration: {{ 8 + public_notices | length * 6 }}s;">
+            {% for _pass in [1, 2] %}
+            <div class="notice-bar__group" {% if _pass == 2 %}aria-hidden="true"{% endif %}>
+                {% for n in public_notices %}
+                <span class="notice-bar__item">{{ tr(n, 'message') }}</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <div class="flash-wrapper">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}

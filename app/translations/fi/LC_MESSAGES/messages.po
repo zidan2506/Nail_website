@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-08-09 17:41+0700\n"
+"POT-Creation-Date: 2026-08-10 18:31+0700\n"
 "PO-Revision-Date: 2026-07-10 19:40+0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fi\n"
@@ -18,20 +18,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes.py:45
+#: app/routes.py:55
 msgid "Chờ xác nhận"
 msgstr "Odottaa vahvistusta"
 
-#: app/routes.py:45 app/templates/staff/staff_bookings.html:311
+#: app/routes.py:55 app/templates/staff/staff_bookings.html:311
 msgid "Đã xác nhận"
 msgstr "Vahvistettu"
 
-#: app/routes.py:45 app/templates/staff/staff_bookings.html:312
+#: app/routes.py:55 app/templates/staff/staff_bookings.html:312
 #: app/templates/staff/staff_bookings.html:338
 msgid "Đang thực hiện"
 msgstr "Käynnissä"
 
-#: app/routes.py:46 app/templates/staff/staff_bookings.html:312
+#: app/routes.py:56 app/templates/staff/staff_bookings.html:312
 #: app/templates/staff/staff_bookings.html:342
 #: app/templates/staff/staff_bookings.html:409
 #: app/templates/staff/staff_bookings.html:487
@@ -41,253 +41,253 @@ msgstr "Käynnissä"
 msgid "Hoàn thành"
 msgstr "Valmis"
 
-#: app/routes.py:46 app/templates/staff/staff_history.html:260
+#: app/routes.py:56 app/templates/staff/staff_history.html:260
 #: app/templates/staff/staff_history.html:283
 #: app/templates/staff/staff_history.html:339
 #: app/templates/staff/staff_history.html:425
 msgid "Đã hủy"
 msgstr "Peruttu"
 
-#: app/routes.py:46
+#: app/routes.py:56
 msgid "Không đến"
 msgstr "Ei saapunut"
 
-#: app/routes.py:47
+#: app/routes.py:57
 msgid "hôm nay"
 msgstr "tänään"
 
-#: app/routes.py:47
+#: app/routes.py:57
 msgid "trong tuần này"
 msgstr "tällä viikolla"
 
-#: app/routes.py:47
+#: app/routes.py:57
 msgid "trong tháng này"
 msgstr "tässä kuussa"
 
-#: app/routes.py:48
+#: app/routes.py:58
 msgid "trong tháng trước"
 msgstr "viime kuussa"
 
-#: app/routes.py:49 app/routes.py:1912
+#: app/routes.py:59 app/routes.py:2002
 msgid "✓ Claimed"
 msgstr "✓ Lunastettu"
 
-#: app/routes.py:49 app/routes.py:1914
+#: app/routes.py:59 app/routes.py:2004
 msgid "✓ All Reviewed"
 msgstr "✓ Kaikki arvosteltu"
 
-#: app/routes.py:49
+#: app/routes.py:59
 msgid "Start"
 msgstr "Aloita"
 
-#: app/routes.py:49
+#: app/routes.py:59
 msgid "Claim"
 msgstr "Lunasta"
 
-#: app/routes.py:441
+#: app/routes.py:474
 msgid "Please login!"
 msgstr "Kirjaudu sisään!"
 
-#: app/routes.py:463
+#: app/routes.py:496
 msgid "Unauthorized."
 msgstr "Ei käyttöoikeutta."
 
-#: app/routes.py:468
+#: app/routes.py:501
 msgid "Session expired. Please log in again."
 msgstr "Istunto on vanhentunut. Kirjaudu uudelleen."
 
-#: app/routes.py:478
+#: app/routes.py:511
 msgid "You do not have access to this area."
 msgstr "Sinulla ei ole pääsyä tälle alueelle."
 
-#: app/routes.py:514
+#: app/routes.py:547
 msgid "Today"
 msgstr "Tänään"
 
-#: app/routes.py:516
+#: app/routes.py:549
 msgid "Tomorrow"
 msgstr "Huomenna"
 
-#: app/routes.py:526 app/routes.py:760 app/routes.py:828 app/routes.py:1028
-#: app/routes.py:1052 app/routes.py:1310 app/routes.py:1463 app/routes.py:1527
-#: app/routes.py:1558 app/routes.py:1626 app/routes.py:1715 app/routes.py:1754
+#: app/routes.py:559 app/routes.py:793 app/routes.py:861 app/routes.py:1118
+#: app/routes.py:1142 app/routes.py:1400 app/routes.py:1553 app/routes.py:1617
+#: app/routes.py:1648 app/routes.py:1716 app/routes.py:1805 app/routes.py:1844
 msgid "Customer profile not found!"
 msgstr "Asiakasprofiilia ei löytynyt!"
 
-#: app/routes.py:608 app/routes.py:4208
+#: app/routes.py:641 app/routes.py:4457
 msgid "That service is no longer available. Showing our full menu."
 msgstr "Palvelu ei ole enää saatavilla. Näytetään koko valikoima."
 
-#: app/routes.py:633 app/routes.py:832
+#: app/routes.py:666 app/routes.py:865
 msgid "Booking not found"
 msgstr "Varausta ei löytynyt"
 
-#: app/routes.py:640
+#: app/routes.py:673
 msgid "User not found!"
 msgstr "Käyttäjää ei löytynyt!"
 
-#: app/routes.py:644
+#: app/routes.py:677
 msgid "This booking cannot be cancelled"
 msgstr "Tätä varausta ei voi perua"
 
-#: app/routes.py:650
+#: app/routes.py:683
 msgid "Booking cancelled successfully"
 msgstr "Varaus peruttu."
 
-#: app/routes.py:658
+#: app/routes.py:691
 msgid "Session Expired. Please login again."
 msgstr "Istunto on vanhentunut. Kirjaudu uudelleen."
 
-#: app/routes.py:664
+#: app/routes.py:697
 msgid "Customer profile not found by some how :D"
 msgstr "Asiakasprofiilia ei löytynyt."
 
-#: app/routes.py:754 app/routes.py:764 app/routes.py:822
+#: app/routes.py:787 app/routes.py:797 app/routes.py:855
 msgid "Booking not found!"
 msgstr "Varausta ei löytynyt!"
 
-#: app/routes.py:770 app/routes.py:838
+#: app/routes.py:803 app/routes.py:871
 msgid "Service data unavailable."
 msgstr "Palvelutietoja ei ole saatavilla."
 
-#: app/routes.py:776 app/routes.py:844
+#: app/routes.py:809 app/routes.py:877
 msgid "Staff data unavailable."
 msgstr "Henkilökunnan tietoja ei ole saatavilla."
 
-#: app/routes.py:861
+#: app/routes.py:894
 msgid "Please select a new date and time"
 msgstr "Valitse uusi päivä ja aika"
 
-#: app/routes.py:867
+#: app/routes.py:900
 msgid "You can only reschedule within the next 14 days"
 msgstr "Voit siirtää varausta vain seuraavien 14 päivän sisällä"
 
-#: app/routes.py:873
+#: app/routes.py:906
 msgid "Invalid time format"
 msgstr "Virheellinen aikamuoto"
 
-#: app/routes.py:900
+#: app/routes.py:933
 msgid "This time slot is no longer available."
 msgstr "Tämä aika ei ole enää vapaa."
 
-#: app/routes.py:901
+#: app/routes.py:934
 msgid "Please choose another time."
 msgstr "Valitse toinen aika."
 
-#: app/routes.py:911
+#: app/routes.py:944
 msgid "Booking rescheduled successfully"
 msgstr "Varaus siirretty."
 
-#: app/routes.py:1060
+#: app/routes.py:1150
 msgid "Name is required."
 msgstr "Nimi on pakollinen."
 
-#: app/routes.py:1064
+#: app/routes.py:1154
 msgid "Profile updated successfully."
 msgstr "Profiili päivitetty."
 
-#: app/routes.py:1081
+#: app/routes.py:1171
 msgid "No file selected."
 msgstr "Tiedostoa ei valittu."
 
-#: app/routes.py:1089
+#: app/routes.py:1179
 msgid "Profile picture updated."
 msgstr "Profiilikuva päivitetty."
 
-#: app/routes.py:1120 app/routes.py:1187
+#: app/routes.py:1210 app/routes.py:1277
 msgid "Verification session expired. Please request a new code."
 msgstr "Vahvistusistunto on vanhentunut. Pyydä uusi koodi."
 
-#: app/routes.py:1129 app/routes.py:1199
+#: app/routes.py:1219 app/routes.py:1289
 msgid "Verification code expired. Please request a new code."
 msgstr "Vahvistuskoodi on vanhentunut. Pyydä uusi koodi."
 
-#: app/routes.py:1136 app/routes.py:1206 app/routes.py:2406
+#: app/routes.py:1226 app/routes.py:1296 app/routes.py:2496
 msgid "Too many incorrect attempts. Please request a new code."
 msgstr "Liian monta väärää yritystä. Pyydä uusi koodi."
 
-#: app/routes.py:1138 app/routes.py:1208 app/routes.py:2408
+#: app/routes.py:1228 app/routes.py:1298 app/routes.py:2498
 msgid "Incorrect verification code."
 msgstr "Virheellinen vahvistuskoodi."
 
-#: app/routes.py:1142 app/routes.py:2416 app/routes.py:4667
+#: app/routes.py:1232 app/routes.py:2506 app/routes.py:4916
 msgid "Passwords do not match."
 msgstr "Salasanat eivät täsmää."
 
-#: app/routes.py:1146
+#: app/routes.py:1236
 msgid "New password must be at least 8 characters."
 msgstr "Uuden salasanan on oltava vähintään 8 merkkiä."
 
-#: app/routes.py:1152
+#: app/routes.py:1242
 msgid "Password changed successfully."
 msgstr "Salasana vaihdettu."
 
-#: app/routes.py:1182 app/routes.py:3204 app/routes.py:3233 app/routes.py:3252
+#: app/routes.py:1272 app/routes.py:3294 app/routes.py:3323 app/routes.py:3342
 msgid "Customer not found."
 msgstr "Asiakasta ei löytynyt."
 
-#: app/routes.py:1194 app/routes.py:2675 app/routes.py:2704
+#: app/routes.py:1284 app/routes.py:2765 app/routes.py:2794
 msgid "Please fill in all fields."
 msgstr "Täytä kaikki kentät."
 
-#: app/routes.py:1212
+#: app/routes.py:1302
 msgid "New email is the same as your current email."
 msgstr "Uusi sähköposti on sama kuin nykyinen."
 
-#: app/routes.py:1217
+#: app/routes.py:1307
 msgid "Email is already taken."
 msgstr "Sähköposti on jo käytössä."
 
-#: app/routes.py:1226
+#: app/routes.py:1316
 msgid "Email updated successfully."
 msgstr "Sähköposti päivitetty."
 
-#: app/routes.py:1236
+#: app/routes.py:1326
 msgid "User not found. Please login!"
 msgstr "Käyttäjää ei löytynyt. Kirjaudu sisään!"
 
-#: app/routes.py:1241
+#: app/routes.py:1331
 msgid "Customer profile not found."
 msgstr "Asiakasprofiilia ei löytynyt."
 
-#: app/routes.py:1315 app/routes.py:1320
+#: app/routes.py:1405 app/routes.py:1410
 msgid "Invoice not found!"
 msgstr "Laskua ei löytynyt!"
 
-#: app/routes.py:1360
+#: app/routes.py:1450
 msgid "Could not start the payment session. Please try again."
 msgstr "Maksusession aloitus epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:1372
+#: app/routes.py:1462
 msgid "Something went wrong. Please login again!"
 msgstr "Jotain meni pieleen. Kirjaudu uudelleen!"
 
-#: app/routes.py:1377
+#: app/routes.py:1467
 msgid "Customer profile not found. Please login again!"
 msgstr "Asiakasprofiilia ei löytynyt. Kirjaudu uudelleen!"
 
-#: app/routes.py:1385 app/routes.py:4243
+#: app/routes.py:1475 app/routes.py:4492
 msgid "Please select a service, date, and time slot before confirming."
 msgstr "Valitse palvelu, päivä ja aika ennen vahvistusta."
 
-#: app/routes.py:1400 app/routes.py:4257
+#: app/routes.py:1490 app/routes.py:4506
 msgid "Service not found. Please try again."
 msgstr "Palvelua ei löytynyt. Yritä uudelleen."
 
-#: app/routes.py:1444 app/routes.py:4299 app/routes.py:4454 app/routes.py:4606
-#: app/routes.py:4637
+#: app/routes.py:1534 app/routes.py:4548 app/routes.py:4703 app/routes.py:4855
+#: app/routes.py:4886
 msgid "Could not send verification email. Please try again."
 msgstr "Vahvistussähköpostin lähetys epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:1468
+#: app/routes.py:1558
 msgid "Invalid plan selected."
 msgstr "Virheellinen paketti."
 
-#: app/routes.py:1473
+#: app/routes.py:1563
 msgid "Plan not found."
 msgstr "Pakettia ei löytynyt."
 
-#: app/routes.py:1488
+#: app/routes.py:1578
 msgid ""
 "Your paid membership will stop renewing and revert to Silver at the "
 "period end."
@@ -295,200 +295,200 @@ msgstr ""
 "Maksullinen jäsenyytesi ei uusiudu ja palautuu Silver-tasolle kauden "
 "lopussa."
 
-#: app/routes.py:1490
+#: app/routes.py:1580
 msgid "You're on the Silver plan."
 msgstr "Sinulla on Silver-paketti."
 
-#: app/routes.py:1497
+#: app/routes.py:1587
 msgid ""
 "This plan isn't available for online payment right now. Please try again "
 "later."
 msgstr "Tätä pakettia ei voi juuri nyt maksaa verkossa. Yritä myöhemmin uudelleen."
 
-#: app/routes.py:1502
+#: app/routes.py:1592
 #, python-format
 msgid "You are already subscribed to %(tier)s."
 msgstr "Sinulla on jo %(tier)s-paketti."
 
-#: app/routes.py:1516
+#: app/routes.py:1606
 msgid "Could not start checkout. Please try again."
 msgstr "Kassalle siirtyminen epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:1532
+#: app/routes.py:1622
 msgid "No active subscription to cancel."
 msgstr "Ei aktiivista tilausta peruttavaksi."
 
-#: app/routes.py:1536
+#: app/routes.py:1626
 msgid ""
 "Your membership will not renew. You keep your benefits until the current "
 "period ends."
 msgstr "Jäsenyytesi ei uusiudu. Edut säilyvät nykyisen kauden loppuun."
 
-#: app/routes.py:1539
+#: app/routes.py:1629
 msgid "Could not cancel your membership. Please try again."
 msgstr "Jäsenyyden peruutus epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:1566 app/routes.py:1570
+#: app/routes.py:1656 app/routes.py:1660
 msgid "Invalid reward."
 msgstr "Virheellinen palkinto."
 
-#: app/routes.py:1578
+#: app/routes.py:1668
 msgid "Reward not found."
 msgstr "Palkintoa ei löytynyt."
 
-#: app/routes.py:1581 app/routes.py:1609
+#: app/routes.py:1671 app/routes.py:1699
 msgid "Not enough points."
 msgstr "Ei tarpeeksi pisteitä."
 
-#: app/routes.py:1584
+#: app/routes.py:1674
 msgid "This reward is out of stock."
 msgstr "Tämä palkinto on loppunut."
 
-#: app/routes.py:1602
+#: app/routes.py:1692
 #, python-format
 msgid "This reward resets in %(days)s day(s)."
 msgstr "Tämä palkinto avautuu uudelleen %(days)s päivän kuluttua."
 
-#: app/routes.py:1606
+#: app/routes.py:1696
 msgid "You have reached the redeem limit for this reward."
 msgstr "Olet jo lunastanut tämän palkinnon sallitun määrän."
 
-#: app/routes.py:1610
+#: app/routes.py:1700
 #, python-format
 msgid "Successfully redeemed: %(name)s"
 msgstr "Lunastettu: %(name)s"
 
-#: app/routes.py:1718
+#: app/routes.py:1808
 msgid "No billing account found."
 msgstr "Laskutustiliä ei löytynyt."
 
-#: app/routes.py:1727
+#: app/routes.py:1817
 msgid "Could not open the billing portal. Please try again later."
 msgstr "Laskutusportaalin avaus epäonnistui. Yritä myöhemmin uudelleen."
 
-#: app/routes.py:1862
+#: app/routes.py:1952
 msgid "All rewards unlocked!"
 msgstr "Kaikki palkinnot avattu!"
 
-#: app/routes.py:1871
+#: app/routes.py:1961
 msgid "Booking"
 msgstr "Varaus"
 
-#: app/routes.py:1872
+#: app/routes.py:1962
 msgid "Double points"
 msgstr "Tuplapisteet"
 
-#: app/routes.py:1873
+#: app/routes.py:1963
 msgid "First booking"
 msgstr "Ensimmäinen varaus"
 
-#: app/routes.py:1874
+#: app/routes.py:1964
 msgid "Streak bonus"
 msgstr "Putkibonus"
 
-#: app/routes.py:1875
+#: app/routes.py:1965
 msgid "Manual adjustment"
 msgstr "Manuaalinen korjaus"
 
-#: app/routes.py:1876
+#: app/routes.py:1966
 msgid "Reward redemption"
 msgstr "Palkinnon lunastus"
 
-#: app/routes.py:1897
+#: app/routes.py:1987
 msgid "Earned on"
 msgstr "Ansaittu"
 
-#: app/routes.py:1897 app/templates/customer/loyalty_points.html:315
+#: app/routes.py:1987 app/templates/customer/loyalty_points.html:315
 msgid "Redeemed on"
 msgstr "Lunastettu"
 
-#: app/routes.py:1985 app/routes.py:4484
+#: app/routes.py:2075 app/routes.py:4733
 #, python-format
 msgid "Too many failed attempts. Try again in %(minutes)s minute(s)."
 msgstr ""
 "Liian monta epäonnistunutta yritystä. Yritä uudelleen %(minutes)s "
 "minuutin kuluttua."
 
-#: app/routes.py:1992 app/routes.py:4491
+#: app/routes.py:2082 app/routes.py:4740
 msgid "Please enter email or password!"
 msgstr "Syötä sähköposti ja salasana!"
 
-#: app/routes.py:1999 app/routes.py:2006 app/routes.py:4498 app/routes.py:4509
+#: app/routes.py:2089 app/routes.py:2096 app/routes.py:4747 app/routes.py:4758
 msgid "Invalid email or password!"
 msgstr "Virheellinen sähköposti tai salasana!"
 
-#: app/routes.py:2010
+#: app/routes.py:2100
 msgid "Please use the customer login portal"
 msgstr "Käytä asiakkaiden kirjautumissivua"
 
-#: app/routes.py:2024
+#: app/routes.py:2114
 msgid "Staff profile not found!"
 msgstr "Henkilökunnan profiilia ei löytynyt!"
 
-#: app/routes.py:2028 app/routes.py:4522 app/routes.py:4585
+#: app/routes.py:2118 app/routes.py:4771 app/routes.py:4834
 #, python-format
 msgid "Logged in. Welcome, %(name)s."
 msgstr "Kirjauduit sisään. Tervetuloa, %(name)s."
 
-#: app/routes.py:2036
+#: app/routes.py:2126
 msgid "Logged in. Welcome, master."
 msgstr "Kirjauduit sisään. Tervetuloa, pomo."
 
-#: app/routes.py:2039
+#: app/routes.py:2129
 msgid "something went wrong :("
 msgstr "Jotain meni pieleen."
 
-#: app/routes.py:2156 app/routes.py:2286
+#: app/routes.py:2246 app/routes.py:2376
 msgid "Staff profile not found."
 msgstr "Henkilökunnan profiilia ei löytynyt."
 
-#: app/routes.py:2198
+#: app/routes.py:2288
 #, python-format
 msgid "vào ngày %(date)s"
 msgstr "päivänä %(date)s"
 
-#: app/routes.py:2199
+#: app/routes.py:2289
 #, python-format
 msgid "từ %(start)s đến %(end)s"
 msgstr "%(start)s – %(end)s"
 
-#: app/routes.py:2358
+#: app/routes.py:2448
 msgid "Please select an image."
 msgstr "Valitse kuva."
 
-#: app/routes.py:2364
+#: app/routes.py:2454
 msgid "Profile photo updated."
 msgstr "Profiilikuva päivitetty."
 
-#: app/routes.py:2390
+#: app/routes.py:2480
 msgid "Your verification session has expired. Please request a new code."
 msgstr "Vahvistusistunto on vanhentunut. Pyydä uusi koodi."
 
-#: app/routes.py:2399
+#: app/routes.py:2489
 msgid "The verification code has expired. Please request a new one."
 msgstr "Vahvistuskoodi on vanhentunut. Pyydä uusi."
 
-#: app/routes.py:2412
+#: app/routes.py:2502
 msgid "The new password must be at least 8 characters."
 msgstr "Uuden salasanan on oltava vähintään 8 merkkiä."
 
-#: app/routes.py:2422
+#: app/routes.py:2512
 msgid "Password changed."
 msgstr "Salasana vaihdettu."
 
-#: app/routes.py:2441 app/routes.py:2458 app/routes.py:2479
+#: app/routes.py:2531 app/routes.py:2548 app/routes.py:2569
 msgid "You do not have permission to perform this action."
 msgstr "Sinulla ei ole oikeutta tähän toimintoon."
 
-#: app/routes.py:2445
+#: app/routes.py:2535
 msgid "Service started."
 msgstr "Palvelu aloitettu."
 
-#: app/routes.py:2462
+#: app/routes.py:2552
 msgid "Marked as completed."
 msgstr "Merkitty valmiiksi."
 
-#: app/routes.py:2464 app/templates/Auth/email_verification.html:199
+#: app/routes.py:2554 app/templates/Auth/email_verification.html:199
 #: app/templates/Auth/email_verification.html:221
 #: app/templates/customer/customer_setting.html:1116
 #: app/templates/customer/customer_setting.html:1248
@@ -496,74 +496,74 @@ msgstr "Merkitty valmiiksi."
 msgid "Something went wrong. Please try again."
 msgstr "Jokin meni pieleen. Yritä uudelleen."
 
-#: app/routes.py:2483
+#: app/routes.py:2573
 msgid "Payment confirmed."
 msgstr "Maksu vahvistettu."
 
-#: app/routes.py:2637
+#: app/routes.py:2727
 msgid "Invalid status."
 msgstr "Virheellinen tila."
 
-#: app/routes.py:2642 app/routes.py:2709
+#: app/routes.py:2732 app/routes.py:2799
 msgid "Booking not found."
 msgstr "Varausta ei löytynyt."
 
-#: app/routes.py:2656
+#: app/routes.py:2746
 msgid "Could not complete the booking. Service or staff data is missing."
 msgstr "Varausta ei voitu viimeistellä. Palvelu- tai henkilökuntatiedot puuttuvat."
 
-#: app/routes.py:2660
+#: app/routes.py:2750
 #, python-format
 msgid "Booking #%(id)s status updated."
 msgstr "Varauksen #%(id)s tila päivitetty."
 
-#: app/routes.py:2680 app/routes.py:2870
+#: app/routes.py:2770 app/routes.py:2960
 msgid "Service not found."
 msgstr "Palvelua ei löytynyt."
 
-#: app/routes.py:2687
+#: app/routes.py:2777
 msgid "This stylist is already booked for that time. Please choose another slot."
 msgstr "Tällä työntekijällä on jo varaus kyseiselle ajalle. Valitse toinen aika."
 
-#: app/routes.py:2691
+#: app/routes.py:2781
 msgid "Booking created."
 msgstr "Varaus luotu."
 
-#: app/routes.py:2717
+#: app/routes.py:2807
 #, python-format
 msgid "Booking #%(id)s updated."
 msgstr "Varaus #%(id)s päivitetty."
 
-#: app/routes.py:2752 app/routes.py:2780
+#: app/routes.py:2842 app/routes.py:2870
 msgid "Please enter both a full name and an email address."
 msgstr "Syötä sekä koko nimi että sähköpostiosoite."
 
-#: app/routes.py:2756
+#: app/routes.py:2846
 msgid "This email is already used by another account."
 msgstr "Tämä sähköposti on jo toisen tilin käytössä."
 
-#: app/routes.py:2784
+#: app/routes.py:2874
 #, python-format
 msgid "Staff member #%(id)s updated."
 msgstr "Työntekijä #%(id)s päivitetty."
 
-#: app/routes.py:2793
+#: app/routes.py:2883
 msgid "Staff member deleted."
 msgstr "Työntekijä poistettu."
 
-#: app/routes.py:2795
+#: app/routes.py:2885
 msgid "Cannot delete a staff member with linked appointments."
 msgstr "Työntekijää, jolla on varauksia, ei voi poistaa."
 
-#: app/routes.py:2803
+#: app/routes.py:2893
 msgid "Staff status updated."
 msgstr "Työntekijän tila päivitetty."
 
-#: app/routes.py:2841 app/routes.py:2891
+#: app/routes.py:2931 app/routes.py:2981
 msgid "Please fill in all required fields."
 msgstr "Täytä kaikki pakolliset kentät."
 
-#: app/routes.py:2859
+#: app/routes.py:2949
 #, python-format
 msgid ""
 "Service %(name)s added. The video is processing and will appear in a few "
@@ -572,12 +572,12 @@ msgstr ""
 "Palvelu %(name)s lisätty. Video käsitellään ja näkyy muutaman minuutin "
 "kuluttua."
 
-#: app/routes.py:2861
+#: app/routes.py:2951
 #, python-format
 msgid "Service %(name)s added."
 msgstr "Palvelu %(name)s lisätty."
 
-#: app/routes.py:2927
+#: app/routes.py:3017
 #, python-format
 msgid ""
 "Service %(name)s updated. The video is processing and will appear in a "
@@ -586,7 +586,7 @@ msgstr ""
 "Palvelu %(name)s päivitetty. Video käsitellään ja näkyy muutaman minuutin"
 " kuluttua."
 
-#: app/routes.py:2929
+#: app/routes.py:3019
 msgid ""
 "The previous video for this service is still processing. Please wait "
 "until it finishes before uploading another."
@@ -594,46 +594,46 @@ msgstr ""
 "Tämän palvelun edellinen video on vielä käsittelyssä. Odota sen "
 "valmistumista ennen uuden lataamista."
 
-#: app/routes.py:2933
+#: app/routes.py:3023
 #, python-format
 msgid "Service %(name)s updated."
 msgstr "Palvelu %(name)s päivitetty."
 
-#: app/routes.py:2948
+#: app/routes.py:3038
 msgid "Service deleted."
 msgstr "Palvelu poistettu."
 
-#: app/routes.py:2950
+#: app/routes.py:3040
 msgid "Cannot delete a service that has linked appointments."
 msgstr "Palvelua, johon liittyy varauksia, ei voi poistaa."
 
-#: app/routes.py:2958
+#: app/routes.py:3048
 msgid "Service status updated."
 msgstr "Palvelun tila päivitetty."
 
-#: app/routes.py:2972 app/routes.py:2993
+#: app/routes.py:3062 app/routes.py:3083
 msgid "Please enter a category name."
 msgstr "Syötä kategorian nimi."
 
-#: app/routes.py:2977
+#: app/routes.py:3067
 #, python-format
 msgid "Category %(name)s added."
 msgstr "Kategoria %(name)s lisätty."
 
-#: app/routes.py:2979 app/routes.py:3000
+#: app/routes.py:3069 app/routes.py:3090
 msgid "This slug already exists. Please choose another one."
 msgstr "Tämä tunnus on jo olemassa. Valitse toinen."
 
-#: app/routes.py:2998
+#: app/routes.py:3088
 #, python-format
 msgid "Category %(name)s updated."
 msgstr "Kategoria %(name)s päivitetty."
 
-#: app/routes.py:3009
+#: app/routes.py:3099
 msgid "Category deleted."
 msgstr "Kategoria poistettu."
 
-#: app/routes.py:3011
+#: app/routes.py:3101
 msgid ""
 "Cannot delete a category that still has services. Move or delete those "
 "services first."
@@ -641,103 +641,103 @@ msgstr ""
 "Kategoriaa, jossa on vielä palveluita, ei voi poistaa. Siirrä tai poista "
 "palvelut ensin."
 
-#: app/routes.py:3046
+#: app/routes.py:3136
 msgid "Please select at least one image."
 msgstr "Valitse vähintään yksi kuva."
 
-#: app/routes.py:3059
+#: app/routes.py:3149
 #, python-format
 msgid "Uploaded %(count)s images."
 msgstr "Ladattiin %(count)s kuvaa."
 
-#: app/routes.py:3068
+#: app/routes.py:3158
 msgid "Image not found."
 msgstr "Kuvaa ei löytynyt."
 
-#: app/routes.py:3091
+#: app/routes.py:3181
 msgid "Image updated."
 msgstr "Kuva päivitetty."
 
-#: app/routes.py:3102
+#: app/routes.py:3192
 msgid "Image deleted."
 msgstr "Kuva poistettu."
 
-#: app/routes.py:3128
+#: app/routes.py:3218
 #, python-format
 msgid "Deleted %(count)s images."
 msgstr "Poistettiin %(count)s kuvaa."
 
-#: app/routes.py:3174 app/routes.py:3215
+#: app/routes.py:3264 app/routes.py:3305
 msgid "Please enter a full name."
 msgstr "Syötä koko nimi."
 
-#: app/routes.py:3178
+#: app/routes.py:3268
 msgid ""
 "Could not create the customer. This email already belongs to another "
 "account."
 msgstr "Asiakasta ei voitu luoda. Sähköposti kuuluu jo toiselle tilille."
 
-#: app/routes.py:3188
+#: app/routes.py:3278
 msgid "Customer added."
 msgstr "Asiakas lisätty."
 
-#: app/routes.py:3219
+#: app/routes.py:3309
 #, python-format
 msgid "Customer #%(id)s updated."
 msgstr "Asiakas #%(id)s päivitetty."
 
-#: app/routes.py:3224
+#: app/routes.py:3314
 msgid "The customer edit page has not been built yet."
 msgstr "Asiakkaan muokkaussivua ei ole vielä toteutettu."
 
-#: app/routes.py:3238 app/routes.py:3460
+#: app/routes.py:3328 app/routes.py:3550
 msgid "Please enter a valid number of points."
 msgstr "Syötä kelvollinen pistemäärä."
 
-#: app/routes.py:3243 app/routes.py:3332
+#: app/routes.py:3333 app/routes.py:3422
 #, python-format
 msgid "Adjusted %(points)s points for %(name)s."
 msgstr "Säädettiin %(points)s pistettä asiakkaalle %(name)s."
 
-#: app/routes.py:3257
+#: app/routes.py:3347
 #, python-format
 msgid "Deleted customer %(name)s."
 msgstr "Asiakas %(name)s poistettu."
 
-#: app/routes.py:3259
+#: app/routes.py:3349
 msgid "Cannot delete a customer with bookings or linked records."
 msgstr "Asiakasta, jolla on varauksia tai liitettyjä tietoja, ei voi poistaa."
 
-#: app/routes.py:3327
+#: app/routes.py:3417
 msgid "Please fill in all point adjustment details."
 msgstr "Täytä kaikki pistesäädön tiedot."
 
-#: app/routes.py:3346
+#: app/routes.py:3436
 msgid "Please fill in all membership details."
 msgstr "Täytä kaikki jäsenyystiedot."
 
-#: app/routes.py:3350
+#: app/routes.py:3440
 #, python-format
 msgid "Membership updated for %(name)s."
 msgstr "Asiakkaan %(name)s jäsenyys päivitetty."
 
-#: app/routes.py:3369 app/routes.py:3406
+#: app/routes.py:3459 app/routes.py:3496
 msgid "Please enter a name and point cost for the voucher."
 msgstr "Syötä etusetelin nimi ja pistehinta."
 
-#: app/routes.py:3380
+#: app/routes.py:3470
 msgid "Voucher created."
 msgstr "Etuseteli luotu."
 
-#: app/routes.py:3389 app/routes.py:3436
+#: app/routes.py:3479 app/routes.py:3526
 msgid "Voucher not found."
 msgstr "Etuseteliä ei löytynyt."
 
-#: app/routes.py:3427
+#: app/routes.py:3517
 msgid "Voucher updated."
 msgstr "Etuseteli päivitetty."
 
-#: app/routes.py:3441
+#: app/routes.py:3531
 #, python-format
 msgid ""
 "Voucher \"%(name)s\" has been redeemed by customers, so it was hidden "
@@ -746,132 +746,173 @@ msgstr ""
 "Etusetelin \"%(name)s\" ovat asiakkaat jo lunastaneet, joten se "
 "piilotettiin poistamisen sijaan."
 
-#: app/routes.py:3445
+#: app/routes.py:3535
 #, python-format
 msgid "Deleted voucher \"%(name)s\"."
 msgstr "Etuseteli \"%(name)s\" poistettu."
 
-#: app/routes.py:3454 app/routes.py:3724
+#: app/routes.py:3544 app/routes.py:3814
 msgid "Invalid mission."
 msgstr "Virheellinen tehtävä."
 
-#: app/routes.py:3464 app/routes.py:3757
+#: app/routes.py:3554 app/routes.py:3847
 msgid "Mission updated."
 msgstr "Tehtävä päivitetty."
 
-#: app/routes.py:3530 app/routes.py:3583 app/routes.py:3633 app/routes.py:3676
+#: app/routes.py:3620 app/routes.py:3673 app/routes.py:3723 app/routes.py:3766
 msgid "Please enter a slide title."
 msgstr "Syötä dian otsikko."
 
-#: app/routes.py:3540
+#: app/routes.py:3630
 msgid "Please select an image for the slide."
 msgstr "Valitse dialle kuva."
 
-#: app/routes.py:3548
+#: app/routes.py:3638
 msgid "Homepage slide created."
 msgstr "Etusivun dia luotu."
 
-#: app/routes.py:3557 app/routes.py:3655 app/routes.py:3707
+#: app/routes.py:3647 app/routes.py:3745 app/routes.py:3797
 msgid "Slide not found."
 msgstr "Diaa ei löytynyt."
 
-#: app/routes.py:3603
+#: app/routes.py:3693
 msgid "A slide needs an image."
 msgstr "Dia tarvitsee kuvan."
 
-#: app/routes.py:3610
+#: app/routes.py:3700
 msgid "Slide updated."
 msgstr "Dia päivitetty."
 
-#: app/routes.py:3646
+#: app/routes.py:3736
 msgid "Offer slide added."
 msgstr "Tarjousdia lisätty."
 
-#: app/routes.py:3698
+#: app/routes.py:3788
 msgid "Offer slide updated."
 msgstr "Tarjousdia päivitetty."
 
-#: app/routes.py:3710
+#: app/routes.py:3800
 msgid "Built-in missions cannot be deleted."
 msgstr "Kiinteitä tehtäviä ei voi poistaa."
 
-#: app/routes.py:3716
+#: app/routes.py:3806
 msgid "Slide deleted."
 msgstr "Dia poistettu."
 
-#: app/routes.py:3737
+#: app/routes.py:3827
 msgid "Please enter a mission name."
 msgstr "Syötä tehtävän nimi."
 
-#: app/routes.py:4426
+#: app/routes.py:3913 app/routes.py:3935
+msgid "Notice content is required."
+msgstr "Tiedotteen sisältö on pakollinen."
+
+#: app/routes.py:3922
+msgid "Notice created."
+msgstr "Tiedote luotu."
+
+#: app/routes.py:3930
+msgid "Notice not found."
+msgstr "Tiedotetta ei löytynyt."
+
+#: app/routes.py:3946
+msgid "Notice updated."
+msgstr "Tiedote päivitetty."
+
+#: app/routes.py:3961
+msgid "Notice deleted."
+msgstr "Tiedote poistettu."
+
+#: app/routes.py:3975
+msgid "Title and message are required."
+msgstr "Otsikko ja viesti ovat pakollisia."
+
+#: app/routes.py:3978
+msgid "Please choose a customer."
+msgstr "Valitse asiakas."
+
+#: app/routes.py:4003
+#, python-format
+msgid "Notification sent. Emails are being delivered to %(count)s recipients."
+msgstr "Ilmoitus lähetetty. Sähköpostit toimitetaan %(count)s vastaanottajalle."
+
+#: app/routes.py:4006
+msgid "Notification sent."
+msgstr "Ilmoitus lähetetty."
+
+#: app/routes.py:4015
+msgid "Notification deleted."
+msgstr "Ilmoitus poistettu."
+
+#: app/routes.py:4675
 msgid "Please enter required information!"
 msgstr "Täytä pakolliset tiedot!"
 
-#: app/routes.py:4430
+#: app/routes.py:4679
 msgid "Please enter a valid email address."
 msgstr "Syötä kelvollinen sähköpostiosoite."
 
-#: app/routes.py:4434 app/routes.py:4671
+#: app/routes.py:4683 app/routes.py:4920
 msgid "Password must be at least 8 characters."
 msgstr "Salasanan on oltava vähintään 8 merkkiä."
 
-#: app/routes.py:4441
+#: app/routes.py:4690
 msgid "Email existed! Please try again."
 msgstr "Sähköposti on jo olemassa! Yritä uudelleen."
 
-#: app/routes.py:4471
+#: app/routes.py:4720
 msgid "A verification code has been sent to your email."
 msgstr "Vahvistuskoodi on lähetetty sähköpostiisi."
 
-#: app/routes.py:4504
+#: app/routes.py:4753
 msgid "Profile not found! Please try again"
 msgstr "Profiilia ei löytynyt! Yritä uudelleen"
 
-#: app/routes.py:4536
+#: app/routes.py:4785
 msgid "Google sign-in failed. Please try again."
 msgstr "Google-kirjautuminen epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:4542
+#: app/routes.py:4791
 msgid "Could not verify your Google email. Please try again."
 msgstr "Google-sähköpostisi vahvistus epäonnistui. Yritä uudelleen."
 
-#: app/routes.py:4552
+#: app/routes.py:4801
 msgid "Please use the staff login portal."
 msgstr "Käytä henkilökunnan kirjautumissivua."
 
-#: app/routes.py:4596 app/routes.py:4627
+#: app/routes.py:4845 app/routes.py:4876
 msgid "Please enter your email address."
 msgstr "Syötä sähköpostiosoitteesi."
 
-#: app/routes.py:4655
+#: app/routes.py:4904
 msgid "Session expired. Please try again."
 msgstr "Istunto on vanhentunut. Yritä uudelleen."
 
-#: app/routes.py:4677
+#: app/routes.py:4926
 msgid "Password reset successfully. Please log in."
 msgstr "Salasana vaihdettu. Kirjaudu sisään."
 
-#: app/routes.py:4683
+#: app/routes.py:4932
 msgid "Logged out successfully."
 msgstr "Kirjauduit ulos."
 
-#: app/routes.py:4692 app/routes.py:4885
+#: app/routes.py:4941 app/routes.py:5134
 msgid "Your verification session has expired. Please start again."
 msgstr "Vahvistusistunto on vanhentunut. Aloita alusta."
 
-#: app/routes.py:4932
+#: app/routes.py:5181
 msgid "Register session expired. Please register again."
 msgstr "Rekisteröitymisistunto on vanhentunut. Rekisteröidy uudelleen."
 
-#: app/routes.py:4958
+#: app/routes.py:5207
 msgid "Register successfully!"
 msgstr "Rekisteröityminen onnistui!"
 
-#: app/routes.py:4994
+#: app/routes.py:5243
 msgid "This slot has been booked by other customer! Please try again."
 msgstr "Toinen asiakas ehti varata tämän ajan! Valitse toinen aika."
 
-#: app/routes.py:5014
+#: app/routes.py:5263
 msgid "Your booking is processing!"
 msgstr "Varaustasi käsitellään!"
 
@@ -1023,12 +1064,12 @@ msgid "Experience the pinnacle of luxury nail and beauty treatments."
 msgstr "Koe ylellisimmät kynsi- ja kauneushoidot."
 
 #: app/templates/base.html:28 app/templates/base.html:61
-#: app/templates/base.html:176 app/templates/public/services.html:3
+#: app/templates/base.html:194 app/templates/public/services.html:3
 msgid "Services"
 msgstr "Palvelut"
 
 #: app/templates/base.html:29 app/templates/base.html:62
-#: app/templates/base.html:177 app/templates/public/gallery.html:3
+#: app/templates/base.html:195 app/templates/public/gallery.html:3
 msgid "Gallery"
 msgstr "Galleria"
 
@@ -1037,7 +1078,7 @@ msgid "About"
 msgstr "Tietoa"
 
 #: app/templates/base.html:31 app/templates/base.html:64
-#: app/templates/base.html:185
+#: app/templates/base.html:203
 msgid "Contact"
 msgstr "Yhteystiedot"
 
@@ -1047,7 +1088,7 @@ msgstr "Rekisteröidy"
 
 #: app/templates/base.html:40 app/templates/base.html:49
 #: app/templates/base.html:72 app/templates/base.html:81
-#: app/templates/customer_base.html:108 app/templates/public/about.html:225
+#: app/templates/customer_base.html:99 app/templates/public/about.html:225
 #: app/templates/public/gallery.html:87 app/templates/public/index.html:339
 msgid "Book Now"
 msgstr "Varaa nyt"
@@ -1064,39 +1105,43 @@ msgstr "Oma aikataulu"
 msgid "Management"
 msgstr "Hallinta"
 
-#: app/templates/base.html:53 app/templates/customer_base.html:20
+#: app/templates/base.html:53 app/templates/customer_base.html:119
 msgid "Open menu"
 msgstr "Avaa valikko"
 
-#: app/templates/base.html:170
+#: app/templates/base.html:93
+msgid "Announcements"
+msgstr "Tiedotteet"
+
+#: app/templates/base.html:188
 msgid "Business ID:"
 msgstr "Y-tunnus:"
 
-#: app/templates/base.html:174
+#: app/templates/base.html:192
 msgid "Explore"
 msgstr "Tutustu"
 
-#: app/templates/base.html:182
+#: app/templates/base.html:200
 msgid "Support"
 msgstr "Tuki"
 
-#: app/templates/base.html:184 app/templates/public/about.html:3
+#: app/templates/base.html:202 app/templates/public/about.html:3
 msgid "About Us"
 msgstr "Tietoa meistä"
 
-#: app/templates/base.html:186
+#: app/templates/base.html:204
 msgid "FAQs"
 msgstr "UKK"
 
-#: app/templates/base.html:193
+#: app/templates/base.html:211
 msgid "All rights reserved."
 msgstr "Kaikki oikeudet pidätetään."
 
-#: app/templates/base.html:195
+#: app/templates/base.html:213
 msgid "Privacy Policy"
 msgstr "Tietosuojakäytäntö"
 
-#: app/templates/base.html:196
+#: app/templates/base.html:214
 msgid "Terms of Service"
 msgstr "Käyttöehdot"
 
@@ -1105,12 +1150,12 @@ msgid "Customer Portal"
 msgstr "Asiakasportaali"
 
 #: app/templates/customer/customer_dashboard.html:2
-#: app/templates/customer_base.html:48
+#: app/templates/customer_base.html:39
 msgid "Dashboard"
 msgstr "Kojelauta"
 
 #: app/templates/customer/my_bookings.html:3
-#: app/templates/customer_base.html:56
+#: app/templates/customer_base.html:47
 msgid "My bookings"
 msgstr "Varaukseni"
 
@@ -1119,35 +1164,54 @@ msgstr "Varaukseni"
 #: app/templates/customer/my_bookings.html:62
 #: app/templates/customer/my_bookings.html:112
 #: app/templates/customer/my_bookings.html:173
-#: app/templates/customer_base.html:61
+#: app/templates/customer_base.html:52
 msgid "Book appointment"
 msgstr "Varaa aika"
 
 #: app/templates/customer/customer_history.html:3
 #: app/templates/customer/customer_history.html:15
 #: app/templates/customer/my_bookings.html:143
-#: app/templates/customer_base.html:69
+#: app/templates/customer_base.html:60
 msgid "History"
 msgstr "Historia"
 
-#: app/templates/customer/customer_dashboard.html:898
+#: app/templates/customer/customer_dashboard.html:901
 #: app/templates/customer/loyalty_points.html:3
 #: app/templates/customer/loyalty_points.html:29
-#: app/templates/customer_base.html:77
+#: app/templates/customer_base.html:68
 msgid "Loyalty Points"
 msgstr "Kanta-asiakaspisteet"
 
-#: app/templates/customer_base.html:92
+#: app/templates/customer_base.html:83
 msgid "Membership"
 msgstr "Jäsenyys"
 
-#: app/templates/customer_base.html:100
+#: app/templates/customer_base.html:91
 msgid "Setting"
 msgstr "Asetukset"
 
-#: app/templates/customer_base.html:113
+#: app/templates/customer_base.html:104
 msgid "Logout"
 msgstr "Kirjaudu ulos"
+
+#: app/templates/customer/customer_notifications.html:3
+#: app/templates/customer/customer_notifications.html:23
+#: app/templates/customer_base.html:134 app/templates/customer_base.html:146
+msgid "Notifications"
+msgstr "Ilmoitukset"
+
+#: app/templates/customer_base.html:148
+msgid "unread"
+msgstr "lukematonta"
+
+#: app/templates/customer/customer_notifications.html:83
+#: app/templates/customer_base.html:167
+msgid "No notifications yet"
+msgstr "Ei vielä ilmoituksia"
+
+#: app/templates/customer_base.html:171
+msgid "Show all"
+msgstr "Näytä kaikki"
 
 #: app/templates/Auth/customer_forgot_password.html:3
 #: app/templates/Auth/set_new_password.html:48
@@ -1795,85 +1859,85 @@ msgstr "Vahvista"
 msgid "Pick a time slot"
 msgstr "Valitse aika"
 
-#: app/templates/customer/customer_dashboard.html:805
+#: app/templates/customer/customer_dashboard.html:808
 msgid "Customer Dashboard"
 msgstr "Asiakkaan kojelauta"
 
-#: app/templates/customer/customer_dashboard.html:806
+#: app/templates/customer/customer_dashboard.html:809
 #, python-format
 msgid "Good morning, %(name)s!"
 msgstr "Hyvää huomenta, %(name)s!"
 
-#: app/templates/customer/customer_dashboard.html:807
+#: app/templates/customer/customer_dashboard.html:810
 msgid "Ready for your next glow up?"
 msgstr "Valmiina seuraavaan hemmotteluun?"
 
-#: app/templates/customer/customer_dashboard.html:809
+#: app/templates/customer/customer_dashboard.html:812
 msgid "Book Appointment"
 msgstr "Varaa aika"
 
-#: app/templates/customer/customer_dashboard.html:836
+#: app/templates/customer/customer_dashboard.html:839
 #, fuzzy
 msgid "Previous slide"
 msgstr "Edellinen kuva"
 
-#: app/templates/customer/customer_dashboard.html:839
+#: app/templates/customer/customer_dashboard.html:842
 #, fuzzy
 msgid "Next slide"
 msgstr "Seuraava kuva"
 
-#: app/templates/customer/customer_dashboard.html:854
+#: app/templates/customer/customer_dashboard.html:857
 msgid "Upcoming Appointment"
 msgstr "Tuleva aika"
 
-#: app/templates/customer/customer_dashboard.html:881
+#: app/templates/customer/customer_dashboard.html:884
 #: app/templates/customer/my_bookings.html:100
 #: app/templates/customer/view_booking_details.html:69
 #: app/templates/public/success.html:89
 msgid "Add to Calendar"
 msgstr "Lisää kalenteriin"
 
-#: app/templates/customer/customer_dashboard.html:882
+#: app/templates/customer/customer_dashboard.html:885
 #: app/templates/customer/my_bookings.html:101
 msgid "View Details"
 msgstr "Näytä tiedot"
 
-#: app/templates/customer/customer_dashboard.html:887
+#: app/templates/customer/customer_dashboard.html:890
 #: app/templates/customer/my_bookings.html:109
 msgid "No upcoming visits scheduled"
 msgstr "Ei tulevia varauksia"
 
-#: app/templates/customer/customer_dashboard.html:888
+#: app/templates/customer/customer_dashboard.html:891
 #: app/templates/customer/my_bookings.html:110
 msgid "Ready for a new look? Book your next treatment today."
 msgstr "Valmiina uuteen tyyliin? Varaa seuraava hoitosi tänään."
 
-#: app/templates/customer/customer_dashboard.html:890
+#: app/templates/customer/customer_dashboard.html:893
 msgid "Book new appointment"
 msgstr "Varaa uusi aika"
 
-#: app/templates/customer/customer_dashboard.html:903
+#: app/templates/customer/customer_dashboard.html:906
 msgid "Keep blooming,"
 msgstr "Jatka kukoistamista,"
 
-#: app/templates/customer/customer_dashboard.html:903
+#: app/templates/customer/customer_dashboard.html:906
 msgid "your next treat is almost here!"
 msgstr "seuraava herkkusi on jo lähellä!"
 
-#: app/templates/customer/customer_dashboard.html:909
+#: app/templates/customer/customer_dashboard.html:912
 msgid "Complete"
 msgstr "Valmis"
 
-#: app/templates/customer/customer_dashboard.html:914
+#: app/templates/customer/customer_dashboard.html:917
 #, python-format
 msgid "%(points)s points to %(reward)s"
 msgstr "%(points)s pistettä palkintoon %(reward)s"
 
-#: app/templates/customer/customer_dashboard.html:918
+#: app/templates/customer/customer_dashboard.html:921
 msgid "You've unlocked all rewards! 🎉"
 msgstr "Olet avannut kaikki palkinnot! 🎉"
 
-#: app/templates/customer/customer_dashboard.html:922
+#: app/templates/customer/customer_dashboard.html:925
 msgid "View All Rewards"
 msgstr "Näytä kaikki palkinnot"
 
@@ -2207,6 +2271,7 @@ msgid "Switch to Silver"
 msgstr "Vaihda Silveriin"
 
 #: app/templates/customer/customer_membership.html:231
+#: app/templates/customer/customer_notifications.html:98
 #: app/templates/customer/customer_setting.html:921
 #: app/templates/customer/customer_setting.html:990
 #: app/templates/customer/loyalty_points.html:303
@@ -2229,6 +2294,45 @@ msgstr "Säilytä uusiutuminen"
 #: app/templates/customer/view_booking_details.html:232
 msgid "Yes, cancel"
 msgstr "Kyllä, peruuta"
+
+#: app/templates/customer/customer_notifications.html:24
+msgid "Announcements from Misa Nails and messages sent to you."
+msgstr "Misa Nailsin tiedotteet ja sinulle lähetetyt viestit."
+
+#: app/templates/customer/customer_notifications.html:32
+msgid "Mark all as read"
+msgstr "Merkitse kaikki luetuiksi"
+
+#: app/templates/customer/customer_notifications.html:51
+#: app/templates/customer/customer_notifications.html:136
+msgid "Read"
+msgstr "Luettu"
+
+#: app/templates/customer/customer_notifications.html:51
+msgid "Unread"
+msgstr "Lukematon"
+
+#: app/templates/customer/customer_notifications.html:60
+msgid "Pagination"
+msgstr "Sivutus"
+
+#: app/templates/customer/customer_notifications.html:63
+#: app/templates/customer/customer_notifications.html:65
+msgid "Previous"
+msgstr "Edellinen"
+
+#: app/templates/customer/customer_notifications.html:72
+#: app/templates/customer/customer_notifications.html:74
+msgid "Next"
+msgstr "Seuraava"
+
+#: app/templates/customer/customer_notifications.html:84
+msgid "Announcements and messages from the salon will appear here."
+msgstr "Salongin tiedotteet ja viestit näkyvät täällä."
+
+#: app/templates/customer/customer_notifications.html:118
+msgid "For you"
+msgstr "Sinulle"
 
 #: app/templates/customer/customer_setting.html:51
 #: app/templates/customer/customer_setting.html:622

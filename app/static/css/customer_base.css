@@ -592,8 +592,207 @@ body {
    Chỉ thêm; override hành vi stack cũ ở ≤860px
 ================================================================ */
 
-/* Desktop: ẩn topbar + overlay */
-.customer-topbar { display: none; }
+/* Cột nội dung: topbar dính trên + trang cuộn dưới. min-width:0 để trang con
+   có bảng/grid rộng không phá vỡ cột 1fr của .customer-dashboard. */
+.dashboard-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Topbar hiện ở MỌI kích thước.
+   Desktop: chỉ còn chuông sát mép phải (hamburger + brand ẩn vì sidebar đã có
+   cả hai). Mobile: hamburger trái, brand giữa, chuông phải. */
+.customer-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 56px;
+    padding: 0 22px;
+    background: #ffffff;
+    border-bottom: 1px solid #ece3e7;
+    position: sticky;
+    top: 0;
+    z-index: 120;
+}
+
+.customer-burger { display: none; }
+.customer-topbar__brand { display: none; }
+
+/* Bọc chuông + panel. margin-left auto đẩy cả cụm sát mép phải bất kể bên
+   trái có gì; panel neo theo cụm này. */
+.customer-bell-wrap {
+    position: relative;
+    margin-left: auto;
+}
+
+.customer-bell {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;                /* nó là <button>, phải tự dọn style mặc định */
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 12px;
+    color: #6B5560;
+    transition: background 0.18s ease, color 0.18s ease;
+}
+
+.customer-bell svg { width: 21px; height: 21px; }
+.customer-bell:hover { background: var(--cp-wash); color: var(--cp-accent); }
+.customer-bell:active { transform: scale(0.94); }
+.customer-bell--active,
+.customer-bell-wrap--open .customer-bell { background: var(--cp-wash); color: var(--cp-accent); }
+
+.customer-bell:focus-visible {
+    outline: 2px solid var(--cp-accent);
+    outline-offset: 2px;
+}
+
+/* ── Dropdown chuông ──────────────────────────────────────────
+   Neo dưới chuông, dính mép phải. Danh sách ở đây cố ý CHỈ có tiêu đề + ngày:
+   nó là bản xem lướt, đọc kỹ thì sang hòm thư.
+   ──────────────────────────────────────────────────────────── */
+.bell-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 330px;
+    max-width: calc(100vw - 28px);
+    background: #ffffff;
+    border: 1px solid var(--cp-line);
+    border-radius: 16px;
+    box-shadow: 0 18px 44px rgba(42, 21, 32, 0.14);
+    overflow: hidden;
+    z-index: 160;
+}
+
+/* [hidden] cần thắng display:block mặc định của div */
+.bell-panel[hidden] { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .bell-panel { animation: bell-drop 0.16s cubic-bezier(0.16, 1, 0.3, 1) both; }
+}
+
+@keyframes bell-drop {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.bell-panel__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 16px 10px;
+}
+
+.bell-panel__title { font-size: 0.9rem; font-weight: 800; color: #2A1520; }
+.bell-panel__count { font-size: 0.75rem; font-weight: 600; color: var(--cp-accent); }
+
+.bell-panel__list { list-style: none; margin: 0; padding: 0; }
+.bell-panel__list li + li { border-top: 1px solid var(--cp-line); }
+
+.bell-item {
+    display: block;
+    padding: 11px 16px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.bell-item:hover { background: var(--cp-wash); }
+
+.bell-item:focus-visible {
+    outline: 2px solid var(--cp-accent);
+    outline-offset: -2px;
+}
+
+.bell-item__title {
+    display: block;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #2A1520;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bell-item--unread .bell-item__title { font-weight: 800; }
+
+.bell-item__date {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.74rem;
+    color: #9C8A93;
+}
+
+/* Vạch accent bên trái cho tin chưa đọc, cùng ngôn ngữ với hòm thư. */
+.bell-item--unread {
+    position: relative;
+    background: var(--cp-wash);
+}
+
+.bell-item--unread::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    border-radius: 0 999px 999px 0;
+    background: var(--cp-accent);
+}
+
+.bell-panel__empty {
+    margin: 0;
+    padding: 4px 16px 16px;
+    font-size: 0.84rem;
+    color: #6B5560;
+}
+
+.bell-panel__cta {
+    display: block;
+    padding: 12px 16px;
+    border-top: 1px solid var(--cp-line);
+    background: #ffffff;
+    color: var(--cp-accent);
+    font-size: 0.84rem;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.bell-panel__cta:hover { background: var(--cp-wash); }
+
+.bell-panel__cta:focus-visible {
+    outline: 2px solid var(--cp-accent);
+    outline-offset: -2px;
+}
+
+/* Badge số tin chưa đọc. Viền trắng để con số không dính vào icon chuông. */
+.customer-bell__badge {
+    position: absolute;
+    top: 2px;
+    right: 1px;
+    min-width: 17px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--cp-accent);
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 15px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
 .customer-navbg { display: none; }
 
 @media (max-width: 860px) {
@@ -602,19 +801,8 @@ body {
     /* Bỏ grid, main chiếm full width */
     .customer-dashboard { display: block; min-height: 0; }
 
-    /* Top bar chứa hamburger */
-    .customer-topbar {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        height: 56px;
-        padding: 0 14px;
-        background: #ffffff;
-        border-bottom: 1px solid #ece3e7;
-        position: sticky;
-        top: 0;
-        z-index: 120;
-    }
+    .customer-topbar { padding: 0 14px; }
+
     .customer-burger {
         width: 44px;
         height: 44px;
@@ -630,7 +818,7 @@ body {
         padding: 0;
     }
     .customer-burger:hover { background: var(--cp-wash); }
-    .customer-topbar__brand { font-size: 1.05rem; font-weight: 800; color: #23161c; }
+    .customer-topbar__brand { display: block; font-size: 1.05rem; font-weight: 800; color: #23161c; }
 
     /* Sidebar thành ngăn kéo trượt từ trái */
     .dashboard-sidebar {

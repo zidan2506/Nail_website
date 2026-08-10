@@ -10,7 +10,7 @@ import unicodedata
 import calendar
 import threading
 import subprocess
-from flask import Blueprint, flash,render_template, request, jsonify, redirect, url_for, session, Response
+from flask import Blueprint, flash,render_template, request, jsonify, redirect, url_for, session, Response, current_app
 from markupsafe import escape
 from app.database.db import (
     get_report_totals, get_report_revenue_by_day, get_report_revenue_by_hour, get_report_booking_status,
@@ -22,9 +22,19 @@ from app.database.db import (
     try_claim_video_job, set_video_ready, set_video_failed,
     clear_service_video, reset_stuck_video_jobs,
 )
+from app.database.db import (
+    get_active_public_notices, get_public_notices_admin, get_public_notice_by_id,
+    create_public_notice, update_public_notice, toggle_public_notice, delete_public_notice,
+    create_customer_notification, get_customer_notifications_admin,
+    delete_customer_notification, get_notifications_for_customer,
+    count_notifications_for_customer, get_notification_for_customer,
+    count_unread_notifications, mark_notification_read,
+    mark_all_notifications_read, set_notification_email_result,
+    get_notification_recipients,
+)
 from contextlib import contextmanager
 from datetime import datetime, timedelta, date
-from app.services.email_system import send_verification_email, send_thank_you_email, generate_verification_code, is_valid_email, EmailSendError
+from app.services.email_system import send_email, send_verification_email, send_thank_you_email, generate_verification_code, is_valid_email, EmailSendError
 from app.services.booking_service import GuestService, BookingService, BookingValidatorError, GuestInfoMissingError,get_available_slots, get_following_days, complete_booking_txn, revert_booking_txn
 from app.services.loyalty import get_active_multiplier, get_config_value, already_awarded, award_points, check_streak
 from app.services.payment_service import create_booking_checkout_session, construct_event, handle_event, fulfill_from_session, create_subscription_checkout_session, cancel_subscription, create_billing_portal_session
@@ -430,6 +440,29 @@ def inject_customer_sidebar():
         "avatar_bg": bg,
         "avatar_color": fg,
     }}
+
+
+@main.app_context_processor
+def inject_public_notices():
+    """Dòng thông báo chạy ngang cho base.html (public pages). Chạy mọi request
+    nhưng chỉ là 1 SELECT có index trên bảng vài dòng."""
+    return {"public_notices": get_active_public_notices()}
+
+
+@main.app_context_processor
+def inject_customer_notifications():
+    """Chuông ở topbar customer: badge số tin chưa đọc + 5 tin gần nhất cho
+    dropdown. Render sẵn ở server nên bấm chuông là hiện ngay, không cần
+    endpoint AJAX lẫn trạng thái đang tải. Trả {} cho request không phải customer."""
+    if session.get("role") != "customer":
+        return {}
+    customer_id = session.get("customer_id")
+    if not customer_id:
+        return {}
+    return {
+        "unread_notifications": count_unread_notifications(customer_id),
+        "recent_notifications": get_notifications_for_customer(customer_id, limit=5),
+    }
 
 #Server config
 def customer_login_required(view_func):
@@ -1018,7 +1051,64 @@ def get_reschedule_available_slots(booking_id):
         "success": True,
         "slots": slots
     })
-    
+
+
+@main.route("/customer/notifications")
+@customer_login_required
+def customer_notifications():
+    """Hòm thư dạng danh sách dọc. Chi tiết mở trong modal.
+
+    ?n=<id> mở sẵn modal của tin đó ngay từ server. Nhờ vậy modal vẫn là một URL
+    thật: dán link ra được, và khi tắt JS thì bấm vào row cũng vẫn đọc được tin.
+    Đường đi này đánh dấu luôn tin đó đã đọc."""
+    customer_id = session.get("customer_id")
+    page = max(1, request.args.get("page", 1, type=int))
+    per_page = 15
+
+    total = count_notifications_for_customer(customer_id)
+    pages = max(1, (total + per_page - 1) // per_page)
+    page = min(page, pages)
+    notifications = get_notifications_for_customer(
+        customer_id, limit=per_page, offset=(page - 1) * per_page
+    )
+
+    open_notification = None
+    open_id = request.args.get("n", type=int)
+    if open_id:
+        open_notification = get_notification_for_customer(open_id, customer_id)
+        if open_notification:
+            mark_notification_read(open_id, customer_id)
+
+    return render_template(
+        "/customer/customer_notifications.html",
+        notifications=notifications,
+        open_notification=open_notification,
+        pagination={
+            "total":    total,
+            "page":     page,
+            "pages":    pages,
+            "has_prev": page > 1,
+            "has_next": page < pages,
+        },
+    )
+
+
+@main.route("/customer/notifications/read-all", methods=["POST"])
+@customer_login_required
+def mark_all_customer_notifications_read():
+    mark_all_notifications_read(session.get("customer_id"))
+    return redirect(url_for("main.customer_notifications",
+                           page=request.form.get("page", type=int)))
+
+
+@main.route("/customer/notifications/<int:notification_id>/read", methods=["POST"])
+@customer_login_required
+def mark_customer_notification_read(notification_id):
+    """Đánh dấu đã đọc khi modal được mở bằng JS (không tải lại trang)."""
+    mark_notification_read(notification_id, session.get("customer_id"))
+    return jsonify({"success": True})
+
+
 @main.route("/customer/setting")
 @customer_login_required
 def customer_setting():
@@ -3765,6 +3855,165 @@ def admin_carousel_reorder():
     order = data.get("order", [])
     reorder_carousel_slides([(item["sort_order"], item["id"]) for item in order])
     return jsonify({"success": True})
+
+
+# ── Notifications ────────────────────────────────────────────
+def _notif_text(notif, field, lang):
+    """Bản dịch của `field` theo lang, fallback về bản gốc (EN). Không dùng
+    translate_field() vì hàm đó đọc session, còn đây chạy trong thread nền."""
+    if lang in ("fi", "vi"):
+        val = notif.get(f"{field}_{lang}")
+        if val:
+            return val
+    return notif[field]
+
+
+def _send_notification_emails(app, notification_id, recipients, notif):
+    """Chạy trong thread nền: send_email() blocking 10s/mail nên broadcast sẽ
+    treo request của admin nếu gửi đồng bộ. Một địa chỉ lỗi không chặn phần còn lại.
+
+    Ghi kết quả vào DB ở cuối để admin xem được ở trang Thông báo, thay vì phải
+    mở log server mới biết có tới nơi hay không. finally: kể cả thread chết giữa
+    chừng vẫn ghi lại số đã gửi được, không để trạng thái treo ở 'đang gửi'."""
+    with app.app_context():
+        sent = 0
+        try:
+            for email, lang in recipients:
+                try:
+                    send_email(
+                        _notif_text(notif, "title", lang),
+                        _notif_text(notif, "body", lang),
+                        email,
+                    )
+                    sent += 1
+                except EmailSendError:
+                    continue
+        finally:
+            set_notification_email_result(notification_id, sent, len(recipients))
+            logger.info("Gửi email thông báo #%s: %s/%s thành công",
+                        notification_id, sent, len(recipients))
+
+
+@main.route("/admin/notifications")
+@admin_required
+def admin_notifications():
+    return render_template(
+        "/admin/admin_notifications.html",
+        notices=get_public_notices_admin(),
+        sent=get_customer_notifications_admin(),
+        customers=get_all_customers(),
+    )
+
+
+@main.route("/admin/notifications/public/create", methods=["POST"])
+@admin_required
+def admin_notice_create():
+    message = request.form.get("message", "").strip()
+    if not message:
+        flash(gettext("Notice content is required."), "error")
+        return redirect(url_for("main.admin_notifications"))
+
+    create_public_notice(
+        message,
+        request.form.get("message_fi", "").strip() or None,
+        request.form.get("message_vi", "").strip() or None,
+        request.form.get("sort_order", type=int) or 0,
+    )
+    flash(gettext("Notice created."), "success")
+    return redirect(url_for("main.admin_notifications"))
+
+
+@main.route("/admin/notifications/public/<int:notice_id>/update", methods=["POST"])
+@admin_required
+def admin_notice_update(notice_id):
+    if not get_public_notice_by_id(notice_id):
+        flash(gettext("Notice not found."), "error")
+        return redirect(url_for("main.admin_notifications"))
+
+    message = request.form.get("message", "").strip()
+    if not message:
+        flash(gettext("Notice content is required."), "error")
+        return redirect(url_for("main.admin_notifications"))
+
+    update_public_notice(
+        notice_id,
+        message,
+        request.form.get("message_fi", "").strip() or None,
+        request.form.get("message_vi", "").strip() or None,
+        request.form.get("sort_order", type=int) or 0,
+        1 if request.form.get("is_active") == "1" else 0,
+    )
+    flash(gettext("Notice updated."), "success")
+    return redirect(url_for("main.admin_notifications"))
+
+
+@main.route("/admin/notifications/public/<int:notice_id>/toggle", methods=["POST"])
+@admin_required
+def admin_notice_toggle(notice_id):
+    toggle_public_notice(notice_id)
+    return redirect(url_for("main.admin_notifications"))
+
+
+@main.route("/admin/notifications/public/<int:notice_id>/delete", methods=["POST"])
+@admin_required
+def admin_notice_delete(notice_id):
+    delete_public_notice(notice_id)
+    flash(gettext("Notice deleted."), "success")
+    return redirect(url_for("main.admin_notifications"))
+
+
+@main.route("/admin/notifications/customer/send", methods=["POST"])
+@admin_required
+def admin_notification_send():
+    target = "customer" if request.form.get("target") == "customer" else "all"
+    customer_id = request.form.get("customer_id", type=int) if target == "customer" else None
+    title = request.form.get("title", "").strip()
+    body = request.form.get("body", "").strip()
+    with_email = request.form.get("with_email") == "1"
+
+    if not title or not body:
+        flash(gettext("Title and message are required."), "error")
+        return redirect(url_for("main.admin_notifications"))
+    if target == "customer" and not customer_id:
+        flash(gettext("Please choose a customer."), "error")
+        return redirect(url_for("main.admin_notifications"))
+
+    notif = {
+        "title":    title,
+        "title_fi": request.form.get("title_fi", "").strip() or None,
+        "title_vi": request.form.get("title_vi", "").strip() or None,
+        "body":     body,
+        "body_fi":  request.form.get("body_fi", "").strip() or None,
+        "body_vi":  request.form.get("body_vi", "").strip() or None,
+    }
+    notification_id = create_customer_notification(
+        target, customer_id,
+        notif["title"], notif["title_fi"], notif["title_vi"],
+        notif["body"], notif["body_fi"], notif["body_vi"],
+        1 if with_email else 0,
+    )
+
+    if with_email:
+        recipients = get_notification_recipients(target, customer_id)
+        threading.Thread(
+            target=_send_notification_emails,
+            args=(current_app._get_current_object(), notification_id, recipients, notif),
+            daemon=True,
+        ).start()
+        flash(gettext("Notification sent. Emails are being delivered to %(count)s recipients.",
+                      count=len(recipients)), "success")
+    else:
+        flash(gettext("Notification sent."), "success")
+
+    return redirect(url_for("main.admin_notifications"))
+
+
+@main.route("/admin/notifications/customer/<int:notification_id>/delete", methods=["POST"])
+@admin_required
+def admin_notification_delete(notification_id):
+    delete_customer_notification(notification_id)
+    flash(gettext("Notification deleted."), "success")
+    return redirect(url_for("main.admin_notifications"))
 
 
 # ── Reports helpers ──────────────────────────────────────────

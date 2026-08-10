@@ -23,6 +23,9 @@
     --color-surface-mid:     #fbeaf0;   /* footer / container bg */
     --color-surface-variant: #efdee4;   /* dividers, skeleton */
     --color-stone-white:     #F8F9FA;   /* nav background */
+    --color-pearl:           #FBF4F8;   /* chữ khi nằm TRÊN nền plum (hồng trên
+                                           plum chỉ ~1.7:1, không đọc được).
+                                           Cùng giá trị với --cp-pearl của portal */
 
     /* Text */
     --color-text-primary:    #22191d;   /* main body text */
@@ -85,6 +88,116 @@ button {
     font-family: var(--font-base);
     border: none;
     background: none;
+}
+
+
+/* ─── NOTICE BAR ─────────────────────────────────────────────────────────────
+   Dòng thông báo chung chạy ngang, do admin bật/tắt ở /admin/notifications.
+
+   BỀ MẶT: plum (--color-deep-plum) + chữ pearl, không dùng hồng.
+   Hồng là màu của nút bấm trên toàn site; một dải hồng đặc chạy suốt sẽ tranh
+   chỗ với CTA "Book Now" ngay phía trên. Plum là bề mặt sang của chính brand
+   (portal đã dùng đúng cặp plum/pearl), tương phản ~13:1 nên đọc rất rõ.
+
+   STICKY: header dính ở top 0, dải này dính ngay dưới ở top = --nav-height.
+   Thứ tự DOM phải là header trước, dải sau, nếu không hai lớp sẽ chồng nhau.
+
+   CHUYỂN ĐỘNG: track chứa 2 nhóm giống hệt nhau; chạy tới -50% là vừa đúng
+   một nhóm nên vòng lặp liền mạch. min-width 50vw mỗi nhóm để khi chỉ có 1
+   dòng ngắn thì thanh vẫn phủ kín bề ngang thay vì hở một khoảng trống.
+   Hai mép: chữ mờ dần khi vào/ra thay vì bị cắt cụt ở cạnh thanh. Làm bằng
+   hai lớp phủ gradient MÀU PLUM, không dùng mask-image: mask khoét thủng cả
+   nền của thanh nên hai mép sẽ lộ trang phía sau.
+   ─────────────────────────────────────────────────────────────────────────── */
+.notice-bar {
+    position: sticky;
+    top: var(--nav-height);
+    /* Dưới .site-header (1000) để header luôn đè lên khi cả hai cùng dính,
+       trên nội dung trang. */
+    z-index: 900;
+    overflow: hidden;
+    background: var(--color-deep-plum);
+    color: var(--color-pearl);
+    border-bottom: 0.5px solid rgba(251, 244, 248, 0.14);
+}
+
+.notice-bar::before,
+.notice-bar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 72px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.notice-bar::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--color-deep-plum) 15%, rgba(62, 31, 71, 0));
+}
+
+.notice-bar::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--color-deep-plum) 15%, rgba(62, 31, 71, 0));
+}
+
+.notice-bar__track {
+    display: flex;
+    width: max-content;
+    animation: notice-scroll var(--notice-duration, 20s) linear infinite;
+    will-change: transform;
+}
+
+/* Dừng khi rê chuột hoặc khi bàn phím focus vào thanh: dòng dài đọc chưa hết
+   thì người dùng có cách giữ nó lại. */
+.notice-bar:hover .notice-bar__track,
+.notice-bar:focus-within .notice-bar__track {
+    animation-play-state: paused;
+}
+
+.notice-bar__group {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex: 0 0 auto;
+    min-width: 50vw;
+    gap: 30px;
+    padding: 9px 20px;
+}
+
+.notice-bar__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.055em;
+    white-space: nowrap;
+}
+
+/* Dấu ngăn giữa các dòng là ✦ của logo Misa Nails, không phải chấm trang trí.
+   Đặt ::after trên MỌI item để dòng cuối nhóm 1 vẫn có dấu ngăn với dòng đầu
+   nhóm 2 khi vòng lặp khép lại. */
+.notice-bar__item::after {
+    content: "\2726";
+    font-size: 10px;
+    line-height: 1;
+    opacity: 0.55;
+}
+
+@keyframes notice-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+@media (max-width: 768px) {
+    .notice-bar__group { gap: 22px; padding: 8px 14px; }
+    .notice-bar__item { gap: 22px; font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .notice-bar__track { animation: none; }
 }
 
 

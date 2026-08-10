@@ -1,0 +1,413 @@
+/* =========================================================
+   CUSTOMER NOTIFICATIONS PAGE  (prefix: nf-)
+   ---------------------------------------------------------
+   Cùng ngôn ngữ với customer_history.css (ch-) và my_bookings.css
+   (bk-). Token lấy đúng GIÁ TRỊ, không import chéo: mỗi trang nạp
+   một file CSS rời nhau.
+
+   THANG ĐO CỐ ĐỊNH  (giống ch- / bk-)
+     bo góc   surface 20 · media 14 · control 12 · pill 999
+     accent   #ab2261 trên mọi bề mặt sáng
+
+   HÌNH THỨC: danh sách dọc, mỗi tin một row phẳng. Cả khối là MỘT
+   bề mặt trắng có đường kẻ ngăn giữa các row, không phải mấy chục
+   thẻ card rời: nội dung là danh sách đồng hạng, card rời chỉ làm
+   nhiễu. Chi tiết đọc trong modal.
+   ========================================================= */
+
+.nf {
+  --nf-ink:        #2A1520;
+  --nf-ink-2:      #6B5560;
+  --nf-ink-3:      #9C8A93;
+
+  --nf-accent:     #ab2261;
+  --nf-wash:       #FBEEF4;
+  --nf-wash-2:     #F6E4EC;
+
+  --nf-surface:    #ffffff;
+  --nf-line:       #EDE3E8;
+
+  --nf-r-surface:  20px;
+  --nf-r-control:  12px;
+
+  --nf-ease:       cubic-bezier(0.16, 1, 0.3, 1);
+
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 36px 32px 56px;
+  font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+  color: var(--nf-ink);
+}
+
+.nf *,
+.nf *::before,
+.nf *::after { box-sizing: border-box; }
+
+
+/* =========================================================
+   INTRO
+   ========================================================= */
+.nf-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.nf-intro__title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.nf-intro__sub {
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+  color: var(--nf-ink-2);
+}
+
+/* Hành động phụ, không phải CTA của trang: viền mảnh chứ không tô đặc, để
+   không tranh chỗ với nút "Đặt lịch" ở sidebar. */
+.nf-readall {
+  padding: 8px 16px;
+  border: 1px solid var(--nf-line);
+  border-radius: var(--nf-r-control);
+  background: var(--nf-surface);
+  color: var(--nf-accent);
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s var(--nf-ease), border-color 0.15s var(--nf-ease);
+}
+
+.nf-readall:hover { background: var(--nf-wash); border-color: var(--nf-wash-2); }
+.nf-readall:active { transform: scale(0.98); }
+
+.nf-readall:focus-visible {
+  outline: 2px solid var(--nf-accent);
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   LIST
+   ========================================================= */
+.nf-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--nf-surface);
+  border: 1px solid var(--nf-line);
+  border-radius: var(--nf-r-surface);
+  overflow: hidden;   /* cắt góc cho row đầu và row cuối */
+}
+
+/* Chỉ kẻ GIỮA các row, không kẻ trên row đầu và dưới row cuối. */
+.nf-list li + li { border-top: 1px solid var(--nf-line); }
+
+.nf-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.15s var(--nf-ease);
+}
+
+.nf-row:hover { background: var(--nf-wash); }
+
+.nf-row:focus-visible {
+  outline: 2px solid var(--nf-accent);
+  outline-offset: -2px;
+}
+
+.nf-row__title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tin chưa đọc: vạch accent bên trái + tiêu đề đậm hơn. Dùng ::before thay
+   border-left để không phải bù padding của cả row. */
+.nf-row--unread::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: var(--nf-accent);
+}
+
+.nf-row--unread .nf-row__title { font-weight: 800; }
+
+.nf-row__date {
+  font-size: 0.82rem;
+  color: var(--nf-ink-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.nf-row__status {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.nf-row__status--unread { background: var(--nf-accent); color: #ffffff; }
+.nf-row__status--read   { background: var(--nf-wash-2); color: var(--nf-ink-2); }
+
+
+/* =========================================================
+   PAGER
+   ========================================================= */
+.nf-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.nf-pager__btn {
+  padding: 8px 16px;
+  border: 1px solid var(--nf-line);
+  border-radius: var(--nf-r-control);
+  background: var(--nf-surface);
+  color: var(--nf-accent);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s var(--nf-ease);
+}
+
+.nf-pager__btn:hover { background: var(--nf-wash); }
+
+.nf-pager__btn:focus-visible {
+  outline: 2px solid var(--nf-accent);
+  outline-offset: 2px;
+}
+
+/* Đầu/cuối danh sách: giữ nguyên chỗ nút để hàng không nhảy, nhưng làm mờ và
+   bỏ hover cho rõ là bấm không được. */
+.nf-pager__btn--off {
+  color: var(--nf-ink-3);
+  background: transparent;
+  cursor: default;
+}
+
+.nf-pager__info {
+  min-width: 64px;
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--nf-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================================
+   MODAL
+   Nền tối để tách hẳn khỏi danh sách phía sau. Dialog cố định
+   chiều rộng đọc được (60ch) chứ không giãn theo màn hình.
+   ========================================================= */
+.nf-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 300;      /* trên topbar customer (120) và dropdown chuông (160) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.nf-modal[hidden] { display: none; }
+
+.nf-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(42, 21, 32, 0.42);
+}
+
+.nf-modal__dialog {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  padding: 28px 30px 30px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 26px 70px rgba(42, 21, 32, 0.26);
+  font-family: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+  color: #2A1520;
+}
+
+.nf-modal__dialog *,
+.nf-modal__dialog *::before,
+.nf-modal__dialog *::after { box-sizing: border-box; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .nf-modal__backdrop { animation: nf-fade 0.18s ease both; }
+  .nf-modal__dialog { animation: nf-rise 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+}
+
+@keyframes nf-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes nf-rise {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.nf-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 0;
+  border-radius: 10px;
+  color: #9C8A93;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nf-modal__close svg { width: 20px; height: 20px; }
+.nf-modal__close:hover { background: #FBEEF4; color: #ab2261; }
+.nf-modal__close:active { transform: scale(0.94); }
+
+.nf-modal__close:focus-visible {
+  outline: 2px solid #ab2261;
+  outline-offset: 2px;
+}
+
+.nf-modal__date {
+  display: block;
+  font-size: 0.78rem;
+  color: #9C8A93;
+  font-variant-numeric: tabular-nums;
+}
+
+.nf-modal__title {
+  margin: 6px 44px 0 0;   /* chừa chỗ cho nút đóng */
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.nf-modal__body {
+  margin-top: 14px;
+  max-width: 60ch;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #6B5560;
+  white-space: pre-line;   /* admin xuống dòng trong textarea thì giữ nguyên */
+}
+
+.nf-modal__tag {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #F6E4EC;
+  color: #ab2261;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.nf-modal__tag[hidden] { display: none; }
+
+/* Khoá cuộn nền khi modal mở, nếu không trang sau lưng vẫn trôi. */
+body.nf-modal-open { overflow: hidden; }
+
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+.nf-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 56px 24px;
+  background: var(--nf-surface);
+  border: 1px solid var(--nf-line);
+  border-radius: var(--nf-r-surface);
+}
+
+.nf-empty__icon {
+  width: 34px;
+  height: 34px;
+  color: var(--nf-ink-3);
+  opacity: 0.45;
+}
+
+.nf-empty__title {
+  margin: 14px 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.nf-empty__sub {
+  margin: 6px 0 0;
+  font-size: 0.88rem;
+  color: var(--nf-ink-2);
+}
+
+
+/* =========================================================
+   MOBILE
+   Row gói lại: tiêu đề nguyên hàng trên (xuống dòng thay vì cắt
+   cụt), ngày + trạng thái xuống hàng dưới.
+   ========================================================= */
+@media (max-width: 640px) {
+  .nf { padding: 24px 16px 44px; }
+  .nf-intro__title { font-size: 1.45rem; }
+
+  .nf-row {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "title title"
+      "date  status";
+    gap: 8px 12px;
+    padding: 14px 16px;
+  }
+
+  .nf-row__title {
+    grid-area: title;
+    white-space: normal;
+    overflow: visible;
+    line-height: 1.4;
+  }
+
+  .nf-row__date   { grid-area: date; }
+  .nf-row__status { grid-area: status; justify-self: start; }
+
+  .nf-modal { padding: 16px; }
+  .nf-modal__dialog { padding: 24px 20px 26px; }
+  .nf-modal__title { font-size: 1.08rem; }
+}

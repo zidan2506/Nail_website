@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS notification_reads;
+DROP TABLE IF EXISTS customer_notifications;
+DROP TABLE IF EXISTS public_notices;
 DROP TABLE IF EXISTS carousel_slides;
 DROP TABLE IF EXISTS reward_redemptions;
 DROP TABLE IF EXISTS referrals;
@@ -309,6 +312,54 @@ CREATE TABLE gallery_images (
     uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Dòng thông báo chạy ngang ở public pages. Nhiều dòng active -> nối tiếp nhau chạy.
+CREATE TABLE public_notices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message TEXT NOT NULL,
+    message_fi TEXT,
+    message_vi TEXT,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tin gửi vào hòm thư customer.
+--   target = 'all'      -> mọi customer, customer_id NULL
+--   target = 'customer' -> chỉ customer_id
+-- KHÔNG fan-out: 1 broadcast = 1 dòng, trạng thái đọc nằm ở notification_reads.
+CREATE TABLE customer_notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    target TEXT NOT NULL DEFAULT 'all',
+    customer_id INTEGER,
+    title TEXT NOT NULL,
+    title_fi TEXT,
+    title_vi TEXT,
+    body TEXT NOT NULL,
+    body_fi TEXT,
+    body_vi TEXT,
+    -- emailed   : admin có tick "gửi kèm email" hay không
+    -- email_sent / email_total : kết quả thật do thread nền ghi lại khi gửi xong.
+    --   NULL khi emailed=1 nghĩa là đang gửi dở. Không có hai cột này thì admin
+    --   chỉ biết mình đã bấm gửi, không biết có tới nơi hay không.
+    emailed INTEGER NOT NULL DEFAULT 0,
+    email_sent INTEGER DEFAULT NULL,
+    email_total INTEGER DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+-- Ai đã đọc tin nào. Vắng dòng = chưa đọc.
+CREATE TABLE notification_reads (
+    notification_id INTEGER NOT NULL,
+    customer_id INTEGER NOT NULL,
+    read_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (notification_id, customer_id),
+    FOREIGN KEY (notification_id) REFERENCES customer_notifications(id) ON DELETE CASCADE,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
 -- Indexes
 CREATE INDEX idx_reviews_booking_id ON reviews(booking_id);
 CREATE INDEX idx_reviews_customer_id ON reviews(customer_id);
@@ -324,3 +375,5 @@ CREATE INDEX idx_customer_memberships_customer_id ON customer_memberships(custom
 -- Mỗi Stripe subscription chỉ 1 dòng (NULL vẫn cho nhiều dòng cấp tay). Chống race fallback+webhook.
 CREATE UNIQUE INDEX idx_cm_stripe_sub ON customer_memberships(stripe_subscription_id);
 CREATE INDEX idx_carousel_slides_key ON carousel_slides(carousel_key);
+CREATE INDEX idx_public_notices_active ON public_notices(is_active, sort_order);
+CREATE INDEX idx_cust_notif_target ON customer_notifications(target, customer_id);

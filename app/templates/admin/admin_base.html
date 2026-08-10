@@ -230,6 +230,7 @@ body {
     color: #44474c;
     cursor: pointer;
     position: relative;
+    text-decoration: none;   /* nút Thông báo là <a>, không phải <button> */
     transition: background 0.15s;
 }
 
@@ -240,14 +241,7 @@ body {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-.adm-notif-dot {
-    position: absolute;
-    top: 7px; right: 7px;
-    width: 8px; height: 8px;
-    background: #ba1a1a;
-    border-radius: 50%;
-    border: 2px solid #f7f9fb;
-}
+.adm-topbar__icon-btn--active { background: #eef5fc; color: #1a5ea8; }
 
 .adm-topbar__divider {
     width: 1px;
@@ -429,6 +423,11 @@ body {
             <span class="material-symbols-outlined">view_carousel</span>
             Carousels
         </a>
+        <a href="{{ url_for('main.admin_notifications') }}"
+           class="adm-nav-item {% if request.endpoint == 'main.admin_notifications' %}adm-nav-item--active{% endif %}">
+            <span class="material-symbols-outlined">campaign</span>
+            Notifications
+        </a>
         <a href="{{ url_for('main.admin_reports') }}"
            class="adm-nav-item {% if request.endpoint == 'main.admin_reports' %}adm-nav-item--active{% endif %}">
             <span class="material-symbols-outlined">assessment</span>
@@ -470,12 +469,14 @@ body {
         <span class="adm-topbar__title">{% block page_title %}Dashboard{% endblock %}</span>
 
         <div class="adm-topbar__actions">
-            {# Notification bell #}
-            <button class="adm-topbar__icon-btn" title="Notifications">
-                <span class="material-symbols-outlined">notifications</span>
-                {# Flask: ẩn dot nếu không có notif #}
-                <span class="adm-notif-dot"></span>
-            </button>
+            {# Lối tắt tới trang Thông báo. KHÔNG có chấm báo: hệ thống thông báo
+               là một chiều admin -> customer, admin không có hòm thư nên không có
+               gì để "chưa đọc". Chấm đỏ trước đây là hard-code, luôn sáng. #}
+            <a href="{{ url_for('main.admin_notifications') }}"
+               class="adm-topbar__icon-btn {% if request.endpoint == 'main.admin_notifications' %}adm-topbar__icon-btn--active{% endif %}"
+               title="Thông báo">
+                <span class="material-symbols-outlined">campaign</span>
+            </a>
 
             {# Settings #}
             <button class="adm-topbar__icon-btn" title="Settings">
@@ -519,17 +520,6 @@ body {
 </main>
 
 <script>
-// Micro-interaction: notification dot scale on hover
-document.addEventListener('DOMContentLoaded', () => {
-    const notifBtn = document.querySelector('.adm-topbar__icon-btn[title="Notifications"]');
-    const dot = notifBtn ? notifBtn.querySelector('.adm-notif-dot') : null;
-    if (notifBtn && dot) {
-        notifBtn.addEventListener('mouseenter', () => dot.style.transform = 'scale(1.4)');
-        notifBtn.addEventListener('mouseleave', () => dot.style.transform = 'scale(1)');
-        dot.style.transition = 'transform 0.15s ease';
-    }
-});
-
 // Flash messages: auto-dismiss after 4s, or on manual close
 function admDismissFlash(el) {
     if (!el || el.classList.contains('adm-flash--fade-out')) return;

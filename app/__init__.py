@@ -17,7 +17,13 @@ LANGUAGES = ["fi", "en", "vi"]
 
 
 def select_locale():
-    """Chọn ngôn ngữ theo session (do route /set-language set). Fallback về 'fi'."""
+    """Chọn ngôn ngữ theo session (do route /set-language set). Fallback về 'fi'.
+
+    Riêng /admin luôn là 'vi': toàn bộ template admin viết cứng tiếng Việt, nên
+    nếu để flash message chạy theo bộ chọn ngôn ngữ của khách thì admin sẽ thấy
+    thông báo tiếng Phần Lan xen giữa giao diện tiếng Việt."""
+    if request.path.startswith("/admin"):
+        return "vi"
     lang = session.get("lang")
     if lang in LANGUAGES:
         return lang

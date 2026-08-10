@@ -2580,3 +2580,239 @@ def reorder_carousel_slides(order):
     conn.executemany("UPDATE carousel_slides SET sort_order = ? WHERE id = ?", order)
     conn.commit()
     conn.close()
+
+
+# ==========================================
+#            Notifications
+# ==========================================
+# Hai kênh tách riêng:
+#   public_notices         -> dòng chạy ngang ở public pages (không có người nhận)
+#   customer_notifications -> hòm thư customer (+ notification_reads giữ trạng thái đọc)
+
+def get_active_public_notices():
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT * FROM public_notices WHERE is_active = 1 ORDER BY sort_order ASC, id ASC"
+    ).fetchall()
+    conn.close()
+    return rows
+
+
+def get_public_notices_admin():
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT * FROM public_notices ORDER BY sort_order ASC, id ASC"
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_public_notice_by_id(notice_id):
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM public_notices WHERE id = ?", (notice_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def create_public_notice(message, message_fi, message_vi, sort_order):
+    conn = get_connection()
+    conn.execute(
+        """INSERT INTO public_notices (message, message_fi, message_vi, sort_order)
+           VALUES (?, ?, ?, ?)""",
+        (message, message_fi, message_vi, sort_order)
+    )
+    conn.commit()
+    conn.close()
+
+
+def update_public_notice(notice_id, message, message_fi, message_vi, sort_order, is_active):
+    conn = get_connection()
+    conn.execute(
+        """UPDATE public_notices
+           SET message = ?, message_fi = ?, message_vi = ?, sort_order = ?, is_active = ?
+           WHERE id = ?""",
+        (message, message_fi, message_vi, sort_order, is_active, notice_id)
+    )
+    conn.commit()
+    conn.close()
+
+
+def toggle_public_notice(notice_id):
+    conn = get_connection()
+    conn.execute("UPDATE public_notices SET is_active = 1 - is_active WHERE id = ?", (notice_id,))
+    conn.commit()
+    conn.close()
+
+
+def delete_public_notice(notice_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM public_notices WHERE id = ?", (notice_id,))
+    conn.commit()
+    conn.close()
+
+
+def create_customer_notification(target, customer_id, title, title_fi, title_vi,
+                                 body, body_fi, body_vi, emailed):
+    conn = get_connection()
+    cur = conn.execute(
+        """INSERT INTO customer_notifications
+           (target, customer_id, title, title_fi, title_vi, body, body_fi, body_vi, emailed)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (target, customer_id, title, title_fi, title_vi, body, body_fi, body_vi, emailed)
+    )
+    notification_id = cur.lastrowid
+    conn.commit()
+    conn.close()
+    return notification_id
+
+
+def get_customer_notifications_admin():
+    """Lịch sử đã gửi cho trang admin: tên người nhận, số đã đọc và MẪU SỐ.
+
+    recipient_total = số khách tin này tới được: broadcast thì là toàn bộ khách
+    hiện có, gửi riêng thì là 1. Không có mẫu số thì '3 lượt đọc' vô nghĩa."""
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT n.*,
+               c.full_name AS recipient_name,
+               (SELECT COUNT(*) FROM notification_reads r
+                 WHERE r.notification_id = n.id) AS read_count,
+               CASE WHEN n.target = 'all'
+                    THEN (SELECT COUNT(*) FROM customers)
+                    ELSE 1
+               END AS recipient_total
+        FROM customer_notifications n
+        LEFT JOIN customers c ON c.id = n.customer_id
+        ORDER BY n.created_at DESC, n.id DESC
+    """).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def set_notification_email_result(notification_id, sent, total):
+    """Thread nền ghi lại kết quả gửi email khi chạy xong."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE customer_notifications SET email_sent = ?, email_total = ? WHERE id = ?",
+        (sent, total, notification_id)
+    )
+    conn.commit()
+    conn.close()
+
+
+def delete_customer_notification(notification_id):
+    """notification_reads có ON DELETE CASCADE, PRAGMA foreign_keys đã bật ở
+    get_connection() nên các dòng đã đọc tự dọn theo."""
+    conn = get_connection()
+    conn.execute("DELETE FROM customer_notifications WHERE id = ?", (notification_id,))
+    conn.commit()
+    conn.close()
+
+
+def get_notifications_for_customer(customer_id, limit=None, offset=0):
+    """Hòm thư của 1 customer: tin chung (target='all') + tin gửi riêng.
+    read_at NULL = chưa đọc. limit dùng cho dropdown chuông (5 tin gần nhất)
+    và cho phân trang hòm thư."""
+    conn = get_connection()
+    sql = """
+        SELECT n.*, r.read_at
+        FROM customer_notifications n
+        LEFT JOIN notification_reads r
+               ON r.notification_id = n.id AND r.customer_id = ?
+        WHERE n.target = 'all' OR n.customer_id = ?
+        ORDER BY n.created_at DESC, n.id DESC
+    """
+    params = [customer_id, customer_id]
+    if limit is not None:
+        sql += " LIMIT ? OFFSET ?"
+        params += [limit, offset]
+    rows = conn.execute(sql, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def count_notifications_for_customer(customer_id):
+    """Tổng số tin trong hòm thư, để tính số trang."""
+    conn = get_connection()
+    total = conn.execute("""
+        SELECT COUNT(*) FROM customer_notifications
+        WHERE target = 'all' OR customer_id = ?
+    """, (customer_id,)).fetchone()[0]
+    conn.close()
+    return total
+
+
+def get_notification_for_customer(notification_id, customer_id):
+    """Một tin cụ thể, ĐÃ lọc theo quyền: customer chỉ lấy được tin chung hoặc
+    tin gửi riêng cho mình. Trả None nếu tin không thuộc về họ."""
+    conn = get_connection()
+    row = conn.execute("""
+        SELECT n.*, r.read_at
+        FROM customer_notifications n
+        LEFT JOIN notification_reads r
+               ON r.notification_id = n.id AND r.customer_id = ?
+        WHERE n.id = ? AND (n.target = 'all' OR n.customer_id = ?)
+    """, (customer_id, notification_id, customer_id)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def count_unread_notifications(customer_id):
+    conn = get_connection()
+    count = conn.execute("""
+        SELECT COUNT(*)
+        FROM customer_notifications n
+        LEFT JOIN notification_reads r
+               ON r.notification_id = n.id AND r.customer_id = ?
+        WHERE (n.target = 'all' OR n.customer_id = ?)
+          AND r.notification_id IS NULL
+    """, (customer_id, customer_id)).fetchone()[0]
+    conn.close()
+    return count
+
+
+def mark_all_notifications_read(customer_id):
+    """Nút 'Đánh dấu đã đọc tất cả' ở hòm thư."""
+    conn = get_connection()
+    conn.execute("""
+        INSERT OR IGNORE INTO notification_reads (notification_id, customer_id)
+        SELECT id, ? FROM customer_notifications
+        WHERE target = 'all' OR customer_id = ?
+    """, (customer_id, customer_id))
+    conn.commit()
+    conn.close()
+
+
+def mark_notification_read(notification_id, customer_id):
+    """Đánh dấu ĐÚNG một tin đã đọc. Câu WHERE lọc lại quyền để không thể ghi
+    dấu đọc lên tin của người khác kể cả khi id bị sửa tay trên URL."""
+    conn = get_connection()
+    conn.execute("""
+        INSERT OR IGNORE INTO notification_reads (notification_id, customer_id)
+        SELECT id, ? FROM customer_notifications
+        WHERE id = ? AND (target = 'all' OR customer_id = ?)
+    """, (customer_id, notification_id, customer_id))
+    conn.commit()
+    conn.close()
+
+
+def get_notification_recipients(target, customer_id):
+    """(email, lang) của người nhận, để gửi email nền. lang lấy từ users vì
+    customer đăng ký qua khách vãng lai có thể chưa gắn user."""
+    conn = get_connection()
+    if target == "all":
+        rows = conn.execute("""
+            SELECT c.email, u.lang
+            FROM customers c
+            LEFT JOIN users u ON u.id = c.user_id
+            WHERE c.email IS NOT NULL AND c.email != ''
+        """).fetchall()
+    else:
+        rows = conn.execute("""
+            SELECT c.email, u.lang
+            FROM customers c
+            LEFT JOIN users u ON u.id = c.user_id
+            WHERE c.id = ? AND c.email IS NOT NULL AND c.email != ''
+        """, (customer_id,)).fetchall()
+    conn.close()
+    return [(r["email"], r["lang"]) for r in rows]

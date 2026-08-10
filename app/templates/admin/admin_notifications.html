@@ -1,0 +1,791 @@
+{% extends "admin/admin_base.html" %}
+
+{#
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  ADMIN NOTIFICATIONS PAGE — admin_notifications.html                ║
+  ║  Extends: admin/admin_base.html                                     ║
+  ║  Blocks used: title, extra_css, page_title, content, extra_js       ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  CONTEXT VARIABLES (main.admin_notifications trong routes.py):      ║
+  ║    notices   : list dict — id, message, message_fi, message_vi,     ║
+  ║                is_active, sort_order, created_at                     ║
+  ║    sent      : list dict — id, target, customer_id, recipient_name,  ║
+  ║                title*, body*, emailed, read_count, created_at        ║
+  ║    customers : list dict — id, full_name, phone (dropdown gửi riêng) ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  HAI KÊNH ĐỘC LẬP:                                                   ║
+  ║    Tab 1 — Public: dòng chạy ngang ở public pages (base.html).       ║
+  ║      Nhiều dòng active nối tiếp nhau chạy, sắp theo sort_order.      ║
+  ║    Tab 2 — Customer: tin vào hòm thư customer. 1 broadcast = 1 dòng  ║
+  ║      DB, trạng thái đọc nằm ở bảng notification_reads. Tuỳ chọn      ║
+  ║      gửi kèm email (chạy thread nền, không chặn request này).        ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+#}
+
+{% block title %}Quản lý Thông báo - MisaNails Admin{% endblock %}
+{% block page_title %}Quản lý Thông báo{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════
+   nt- BEM prefix — Notifications Management
+   Palette + spacing khớp admin_carousels.html
+   ═══════════════════════════════════════════ */
+
+.nt-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.nt-page-header__title { font-size: 20px; font-weight: 700; color: #191c1e; letter-spacing: -0.3px; }
+.nt-page-header__subtitle { font-size: 13px; color: #6b7280; margin-top: 2px; }
+
+/* ── Main tabs ── */
+.nt-maintabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-bottom: 1px solid #e4e6ea;
+    margin-bottom: 20px;
+}
+
+.nt-maintab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 16px;
+    border: none;
+    background: none;
+    border-bottom: 2px solid transparent;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #6b7280;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: color 0.15s;
+    margin-bottom: -1px;
+}
+
+.nt-maintab:hover { color: #191c1e; }
+.nt-maintab--active { color: #4a90d9; border-bottom-color: #4a90d9; }
+.nt-maintab .material-symbols-outlined { font-size: 18px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+.nt-maintab__count {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 20px;
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.nt-tab-panel { display: none; }
+.nt-tab-panel--active { display: block; }
+
+.nt-tab-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.nt-tab-note { font-size: 12.5px; color: #6b7280; }
+
+/* ── Buttons ── */
+.nt-btn-create {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: #4a90d9;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.nt-btn-create:hover { background: #3a7bc8; }
+.nt-btn-create:active { transform: scale(0.98); }
+.nt-btn-create .material-symbols-outlined { font-size: 18px; font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24; }
+
+.nt-btn-primary {
+    padding: 8px 18px; border: none; border-radius: 8px;
+    background: #4a90d9; color: #ffffff; font-size: 13.5px; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+.nt-btn-primary:hover { background: #3a7bc8; }
+.nt-btn-primary:active { transform: scale(0.98); }
+
+.nt-btn-secondary {
+    padding: 8px 18px; border: 1px solid #e4e6ea; border-radius: 8px;
+    background: #ffffff; color: #374151; font-size: 13.5px; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.nt-btn-secondary:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+.nt-btn-danger {
+    padding: 8px 18px; border: none; border-radius: 8px;
+    background: #fef2f2; color: #991b1b; font-size: 13.5px; font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: background 0.15s;
+}
+.nt-btn-danger:hover { background: #fee2e2; }
+
+.nt-icon-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border: none;
+    color: #6b7280;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.nt-icon-btn:hover { background: #e5e7eb; color: #374151; }
+.nt-icon-btn--danger:hover { background: #fee2e2; color: #991b1b; }
+.nt-icon-btn .material-symbols-outlined { font-size: 17px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+/* ── Card list (dùng chung 2 tab) ── */
+.nt-list { display: flex; flex-direction: column; gap: 10px; }
+
+.nt-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+}
+
+.nt-card--inactive { background: #fbfcfd; }
+.nt-card--inactive .nt-card__text { color: #9ca3af; }
+
+.nt-card__order {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: #f3f4f6;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.nt-card__body { flex: 1; min-width: 0; }
+.nt-card__text { font-size: 14px; font-weight: 600; color: #191c1e; line-height: 1.45; }
+.nt-card__sub {
+    font-size: 12.5px;
+    color: #6b7280;
+    margin-top: 4px;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+.nt-card__meta { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.nt-card__actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.nt-inline-form { display: inline-flex; }
+
+.nt-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.nt-tag--all { background: #EEF5FC; color: #1a5ea8; }
+.nt-tag--one { background: #FEF3C7; color: #92400E; }
+.nt-tag--email { background: #E1F5EE; color: #085041; }
+.nt-tag--warn { background: #FBF0D8; color: #7A5A11; }
+.nt-tag .material-symbols-outlined { font-size: 13px; font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20; }
+
+.nt-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.nt-status-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.nt-status-pill--active { background: #E1F5EE; color: #085041; }
+.nt-status-pill--active::before { background: #1D9E75; }
+.nt-status-pill--hidden { background: #F3F4F6; color: #6b7280; }
+.nt-status-pill--hidden::before { background: #9ca3af; }
+
+/* ── Empty state ── */
+.nt-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    gap: 10px;
+    text-align: center;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+}
+
+.nt-empty .material-symbols-outlined { font-size: 36px; color: #d1d5db; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48; }
+.nt-empty__title { font-size: 14px; font-weight: 600; color: #6b7280; }
+.nt-empty__hint { font-size: 12.5px; color: #9ca3af; }
+
+/* ── Compose panel (tab 2) ── */
+.nt-compose {
+    padding: 20px;
+    background: #ffffff;
+    border: 0.5px solid #e4e6ea;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.nt-compose__title { font-size: 15px; font-weight: 700; color: #191c1e; margin-bottom: 4px; }
+.nt-compose__hint { font-size: 12.5px; color: #6b7280; margin-bottom: 18px; }
+.nt-compose__footer { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+
+.nt-history-title { font-size: 13px; font-weight: 700; color: #191c1e; margin-bottom: 12px; }
+
+/* ── Target picker ── */
+.nt-target { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+
+.nt-target__option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid #e4e6ea;
+    border-radius: 10px;
+    background: #f7f9fb;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.nt-target__option:hover { border-color: #c9d3dd; }
+.nt-target__option--selected { border-color: #4a90d9; background: #eef5fc; }
+.nt-target__option input { margin-top: 2px; accent-color: #4a90d9; flex-shrink: 0; }
+.nt-target__label { display: block; font-size: 13.5px; font-weight: 600; color: #191c1e; }
+.nt-target__desc { display: block; font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+/* ── Form fields ── */
+.nt-form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.nt-form-group:last-child { margin-bottom: 0; }
+.nt-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.nt-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+.nt-form-label { font-size: 12.5px; font-weight: 600; color: #374151; }
+
+.nt-form-input, .nt-form-textarea, .nt-form-select {
+    padding: 8px 12px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #191c1e;
+    background: #f7f9fb;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+}
+
+.nt-form-textarea { resize: vertical; min-height: 76px; line-height: 1.5; }
+.nt-form-input:focus, .nt-form-textarea:focus, .nt-form-select:focus { border-color: #4a90d9; background: #ffffff; }
+.nt-form-input::placeholder, .nt-form-textarea::placeholder { color: #9ca3af; }
+.nt-form-hint { font-size: 12px; color: #9ca3af; }
+
+.nt-form-divider { height: 1px; background: #f3f4f6; margin: 16px 0; }
+.nt-section-title { font-size: 12.5px; font-weight: 700; color: #191c1e; margin-bottom: 10px; }
+
+.nt-check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #f7f9fb;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+}
+
+.nt-check-row input { margin-top: 2px; accent-color: #4a90d9; flex-shrink: 0; }
+.nt-check-row__label { display: block; font-size: 13px; font-weight: 600; color: #374151; }
+.nt-check-row__desc { display: block; font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+.nt-form-toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; background: #f7f9fb; border: 1px solid #e4e6ea; border-radius: 8px;
+}
+.nt-form-toggle-row__label { font-size: 13px; font-weight: 600; color: #374151; }
+
+/* ── Modal (khớp cr-modal của admin_carousels.html) ── */
+.nt-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(25, 28, 30, 0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.nt-modal-overlay--open { display: flex; }
+
+.nt-modal {
+    background: #ffffff;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+}
+
+.nt-modal__header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 0; flex-shrink: 0; }
+.nt-modal__title { font-size: 16px; font-weight: 700; color: #191c1e; }
+
+.nt-modal__close {
+    width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+    background: none; border: none; border-radius: 6px; color: #9ca3af; cursor: pointer; transition: background 0.15s;
+}
+.nt-modal__close:hover { background: #f3f4f6; color: #374151; }
+.nt-modal__close .material-symbols-outlined { font-size: 20px; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+.nt-modal__body { padding: 20px 24px; flex: 1; overflow-y: auto; }
+.nt-modal__footer { padding: 0 24px 20px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+
+@media (max-width: 640px) {
+    .nt-form-row, .nt-form-row-3, .nt-target { grid-template-columns: 1fr; }
+    .nt-card { flex-wrap: wrap; }
+    .nt-card__actions { width: 100%; justify-content: flex-end; }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+{# ══════════════════════════════════════════
+   1. PAGE HEADER
+   ══════════════════════════════════════════ #}
+<div class="nt-page-header">
+    <div>
+        <div class="nt-page-header__title">Quản lý Thông báo</div>
+        <div class="nt-page-header__subtitle">Dòng chạy ngang ở trang công khai và hòm thư của khách hàng</div>
+    </div>
+</div>
+
+
+{# ══════════════════════════════════════════
+   2. MAIN TABS
+   ══════════════════════════════════════════ #}
+<div class="nt-maintabs">
+    <button type="button" class="nt-maintab nt-maintab--active" data-tab="public" onclick="ntSwitchTab('public')">
+        <span class="material-symbols-outlined">campaign</span>
+        Thông báo công khai
+        <span class="nt-maintab__count">{{ notices | length }}</span>
+    </button>
+    <button type="button" class="nt-maintab" data-tab="customer" onclick="ntSwitchTab('customer')">
+        <span class="material-symbols-outlined">mail</span>
+        Thông báo khách hàng
+        <span class="nt-maintab__count">{{ sent | length }}</span>
+    </button>
+</div>
+
+
+{# ══════════════════════════════════════════
+   TAB 1 — PUBLIC
+   Dòng chạy ngang ở base.html. Nhiều dòng bật
+   cùng lúc sẽ nối tiếp nhau chạy theo sort_order.
+   ══════════════════════════════════════════ #}
+<div class="nt-tab-panel nt-tab-panel--active" id="ntTabPublic">
+
+    <div class="nt-tab-toolbar">
+        <span class="nt-tab-note">Hiện ở đầu mọi trang công khai. Các dòng đang bật chạy nối tiếp nhau theo thứ tự.</span>
+        <button class="nt-btn-create" onclick="ntOpenNoticeModal()">
+            <span class="material-symbols-outlined">add</span>
+            Thêm thông báo
+        </button>
+    </div>
+
+    {% if notices %}
+    <div class="nt-list">
+        {% for n in notices %}
+        <div class="nt-card {{ 'nt-card--inactive' if not n.is_active }}"
+             data-id="{{ n.id }}"
+             data-message="{{ n.message | e }}"
+             data-message-fi="{{ n.message_fi or '' | e }}"
+             data-message-vi="{{ n.message_vi or '' | e }}"
+             data-sort-order="{{ n.sort_order }}"
+             data-active="{{ n.is_active }}">
+
+            <div class="nt-card__order">{{ n.sort_order }}</div>
+
+            <div class="nt-card__body">
+                <div class="nt-card__text">{{ n.message }}</div>
+                <div class="nt-card__meta">
+                    <span class="nt-status-pill {{ 'nt-status-pill--active' if n.is_active else 'nt-status-pill--hidden' }}">
+                        {{ 'Đang chạy' if n.is_active else 'Đã tắt' }}
+                    </span>
+                    {% if n.message_fi %}<span class="nt-tag">FI</span>{% endif %}
+                    {% if n.message_vi %}<span class="nt-tag">VI</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="nt-card__actions">
+                <button type="button" class="nt-icon-btn" title="Chỉnh sửa"
+                        onclick="ntOpenNoticeModal(this.closest('.nt-card'))">
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+
+                <form class="nt-inline-form" method="post"
+                      action="{{ url_for('main.admin_notice_toggle', notice_id=n.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="nt-icon-btn"
+                            title="{{ 'Tắt thông báo' if n.is_active else 'Bật thông báo' }}">
+                        <span class="material-symbols-outlined">{{ 'visibility_off' if n.is_active else 'visibility' }}</span>
+                    </button>
+                </form>
+
+                <form class="nt-inline-form" method="post"
+                      action="{{ url_for('main.admin_notice_delete', notice_id=n.id) }}"
+                      onsubmit="return confirm('Xóa thông báo này?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="nt-icon-btn nt-icon-btn--danger" title="Xóa">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="nt-empty">
+        <span class="material-symbols-outlined">campaign</span>
+        <div class="nt-empty__title">Chưa có thông báo công khai nào</div>
+        <div class="nt-empty__hint">Thêm một dòng để hiện ở đầu các trang công khai.</div>
+    </div>
+    {% endif %}
+
+</div>
+
+
+{# ══════════════════════════════════════════
+   TAB 2 — CUSTOMER
+   Soạn tin + lịch sử đã gửi.
+   ══════════════════════════════════════════ #}
+<div class="nt-tab-panel" id="ntTabCustomer">
+
+    <form class="nt-compose" method="post" action="{{ url_for('main.admin_notification_send') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="nt-compose__title">Soạn thông báo</div>
+        <div class="nt-compose__hint">Tin sẽ nằm trong hòm thư của khách trên portal. Bỏ trống bản FI/VI thì khách xem ngôn ngữ đó thấy bản tiếng Anh.</div>
+
+        {# Người nhận #}
+        <div class="nt-section-title">Người nhận</div>
+        <div class="nt-target">
+            <label class="nt-target__option nt-target__option--selected" id="ntTargetAll">
+                <input type="radio" name="target" value="all" checked onchange="ntSyncTarget()">
+                <span>
+                    <span class="nt-target__label">Tất cả khách hàng</span>
+                    <span class="nt-target__desc">Kể cả khách đăng ký sau này</span>
+                </span>
+            </label>
+            <label class="nt-target__option" id="ntTargetOne">
+                <input type="radio" name="target" value="customer" onchange="ntSyncTarget()">
+                <span>
+                    <span class="nt-target__label">Một khách hàng</span>
+                    <span class="nt-target__desc">Chọn từ danh sách bên dưới</span>
+                </span>
+            </label>
+        </div>
+
+        <div class="nt-form-group" id="ntCustomerPicker" style="display: none;">
+            <label class="nt-form-label" for="ntCustomerSelect">Chọn khách hàng</label>
+            <select class="nt-form-select" id="ntCustomerSelect" name="customer_id">
+                <option value="">Chưa chọn</option>
+                {% for c in customers %}
+                <option value="{{ c.id }}">{{ c.full_name }}{% if c.phone %} · {{ c.phone }}{% endif %}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="nt-form-divider"></div>
+
+        {# Tiêu đề #}
+        <div class="nt-section-title">Tiêu đề</div>
+        <div class="nt-form-row-3">
+            <div class="nt-form-group">
+                <label class="nt-form-label" for="ntTitle">English</label>
+                <input class="nt-form-input" id="ntTitle" type="text" name="title" required
+                       placeholder="Holiday opening hours">
+            </div>
+            <div class="nt-form-group">
+                <label class="nt-form-label" for="ntTitleFi">Suomi</label>
+                <input class="nt-form-input" id="ntTitleFi" type="text" name="title_fi"
+                       placeholder="Juhlapyhien aukioloajat">
+            </div>
+            <div class="nt-form-group">
+                <label class="nt-form-label" for="ntTitleVi">Tiếng Việt</label>
+                <input class="nt-form-input" id="ntTitleVi" type="text" name="title_vi"
+                       placeholder="Giờ mở cửa dịp lễ">
+            </div>
+        </div>
+
+        {# Nội dung #}
+        <div class="nt-section-title">Nội dung</div>
+        <div class="nt-form-group">
+            <label class="nt-form-label" for="ntBody">English</label>
+            <textarea class="nt-form-textarea" id="ntBody" name="body" required
+                      placeholder="We are open from 10:00 to 16:00 on 24 December."></textarea>
+        </div>
+        <div class="nt-form-row">
+            <div class="nt-form-group">
+                <label class="nt-form-label" for="ntBodyFi">Suomi</label>
+                <textarea class="nt-form-textarea" id="ntBodyFi" name="body_fi"></textarea>
+            </div>
+            <div class="nt-form-group">
+                <label class="nt-form-label" for="ntBodyVi">Tiếng Việt</label>
+                <textarea class="nt-form-textarea" id="ntBodyVi" name="body_vi"></textarea>
+            </div>
+        </div>
+
+        <div class="nt-form-divider"></div>
+
+        <label class="nt-check-row">
+            <input type="checkbox" name="with_email" value="1">
+            <span>
+                <span class="nt-check-row__label">Gửi kèm email</span>
+                <span class="nt-check-row__desc">Email chạy ngầm sau khi bấm gửi, dùng bản dịch theo ngôn ngữ của từng khách.</span>
+            </span>
+        </label>
+
+        <div class="nt-compose__footer">
+            <button type="reset" class="nt-btn-secondary">Xóa nội dung</button>
+            <button type="submit" class="nt-btn-primary">Gửi thông báo</button>
+        </div>
+    </form>
+
+    {# Lịch sử #}
+    <div class="nt-history-title">Đã gửi</div>
+
+    {% if sent %}
+    <div class="nt-list">
+        {% for s in sent %}
+        <div class="nt-card">
+            <div class="nt-card__body">
+                <div class="nt-card__text">{{ s.title }}</div>
+                <div class="nt-card__sub">{{ s.body }}</div>
+                <div class="nt-card__meta">
+                    {% if s.target == 'all' %}
+                    <span class="nt-tag nt-tag--all">
+                        <span class="material-symbols-outlined">group</span>
+                        Tất cả khách hàng
+                    </span>
+                    {% else %}
+                    <span class="nt-tag nt-tag--one">
+                        <span class="material-symbols-outlined">person</span>
+                        {{ s.recipient_name or 'Khách đã bị xóa' }}
+                    </span>
+                    {% endif %}
+
+                    {# Trạng thái email THẬT, do thread nền ghi lại khi gửi xong.
+                       email_sent NULL = đang gửi dở. #}
+                    {% if s.emailed %}
+                        {% if s.email_sent is none %}
+                        <span class="nt-tag">
+                            <span class="material-symbols-outlined">schedule</span>
+                            Đang gửi email
+                        </span>
+                        {% elif s.email_sent == s.email_total %}
+                        <span class="nt-tag nt-tag--email">
+                            <span class="material-symbols-outlined">mail</span>
+                            Đã gửi email {{ s.email_sent }}/{{ s.email_total }}
+                        </span>
+                        {% else %}
+                        <span class="nt-tag nt-tag--warn">
+                            <span class="material-symbols-outlined">error</span>
+                            Email lỗi {{ s.email_total - s.email_sent }}/{{ s.email_total }}
+                        </span>
+                        {% endif %}
+                    {% endif %}
+
+                    <span class="nt-tag">{{ s.read_count }}/{{ s.recipient_total }} đã đọc</span>
+                    <span class="nt-tag">{{ s.created_at }}</span>
+                </div>
+            </div>
+
+            <div class="nt-card__actions">
+                <form class="nt-inline-form" method="post"
+                      action="{{ url_for('main.admin_notification_delete', notification_id=s.id) }}"
+                      onsubmit="return confirm('Xóa thông báo này khỏi hòm thư của khách?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="nt-icon-btn nt-icon-btn--danger" title="Xóa">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="nt-empty">
+        <span class="material-symbols-outlined">mail</span>
+        <div class="nt-empty__title">Chưa gửi thông báo nào</div>
+        <div class="nt-empty__hint">Dùng form phía trên để gửi tin đầu tiên.</div>
+    </div>
+    {% endif %}
+
+</div>
+
+
+{# ══════════════════════════════════════════
+   MODAL — Thêm / sửa thông báo công khai
+   Dùng chung 1 modal, action đổi theo chế độ.
+   ══════════════════════════════════════════ #}
+<div id="ntNoticeModal" class="nt-modal-overlay" onclick="ntCloseModalOnBackdrop(event)">
+    <div class="nt-modal" onclick="event.stopPropagation()">
+        <div class="nt-modal__header">
+            <span class="nt-modal__title" id="ntNoticeModalTitle">Thêm thông báo</span>
+            <button type="button" class="nt-modal__close" onclick="ntCloseNoticeModal()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <form id="ntNoticeForm" method="post" action="{{ url_for('main.admin_notice_create') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="nt-modal__body">
+                <div class="nt-form-group">
+                    <label class="nt-form-label" for="ntMessage">Nội dung (English)</label>
+                    <input class="nt-form-input" id="ntMessage" type="text" name="message" required
+                           placeholder="Closed on 24 December.">
+                    <span class="nt-form-hint">Giữ ngắn gọn, dòng này chạy ngang nên câu dài sẽ khó đọc.</span>
+                </div>
+
+                <div class="nt-form-row">
+                    <div class="nt-form-group">
+                        <label class="nt-form-label" for="ntMessageFi">Suomi</label>
+                        <input class="nt-form-input" id="ntMessageFi" type="text" name="message_fi">
+                    </div>
+                    <div class="nt-form-group">
+                        <label class="nt-form-label" for="ntMessageVi">Tiếng Việt</label>
+                        <input class="nt-form-input" id="ntMessageVi" type="text" name="message_vi">
+                    </div>
+                </div>
+
+                <div class="nt-form-group">
+                    <label class="nt-form-label" for="ntSortOrder">Thứ tự</label>
+                    <input class="nt-form-input" id="ntSortOrder" type="number" name="sort_order" value="0">
+                    <span class="nt-form-hint">Số nhỏ chạy trước.</span>
+                </div>
+
+                <div class="nt-form-group" id="ntActiveRow" style="display: none;">
+                    <div class="nt-form-toggle-row">
+                        <span class="nt-form-toggle-row__label">Đang chạy</span>
+                        <input type="checkbox" id="ntIsActive" name="is_active" value="1" style="accent-color:#4a90d9;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="nt-modal__footer">
+                <button type="button" class="nt-btn-secondary" onclick="ntCloseNoticeModal()">Hủy</button>
+                <button type="submit" class="nt-btn-primary" id="ntNoticeSubmit">Thêm thông báo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+/* ── Tabs ── */
+function ntSwitchTab(name) {
+    document.querySelectorAll('.nt-maintab').forEach((el) =>
+        el.classList.toggle('nt-maintab--active', el.dataset.tab === name));
+    document.querySelectorAll('.nt-tab-panel').forEach((el) =>
+        el.classList.toggle('nt-tab-panel--active',
+            el.id === 'ntTab' + name.charAt(0).toUpperCase() + name.slice(1)));
+}
+
+/* ── Modal thông báo công khai ──
+   Không truyền card -> chế độ thêm mới; truyền card -> chế độ sửa. */
+const NT_CREATE_ACTION = "{{ url_for('main.admin_notice_create') }}";
+const NT_UPDATE_ACTION = "{{ url_for('main.admin_notice_update', notice_id=0) }}";
+
+function ntOpenNoticeModal(card) {
+    const form = document.getElementById('ntNoticeForm');
+    const activeRow = document.getElementById('ntActiveRow');
+
+    if (card) {
+        document.getElementById('ntNoticeModalTitle').textContent = 'Chỉnh sửa thông báo';
+        document.getElementById('ntNoticeSubmit').textContent = 'Lưu thay đổi';
+        form.action = NT_UPDATE_ACTION.replace(/0(\/update)$/, card.dataset.id + '$1');
+        document.getElementById('ntMessage').value = card.dataset.message;
+        document.getElementById('ntMessageFi').value = card.dataset.messageFi;
+        document.getElementById('ntMessageVi').value = card.dataset.messageVi;
+        document.getElementById('ntSortOrder').value = card.dataset.sortOrder;
+        document.getElementById('ntIsActive').checked = card.dataset.active === '1';
+        activeRow.style.display = 'flex';
+    } else {
+        document.getElementById('ntNoticeModalTitle').textContent = 'Thêm thông báo';
+        document.getElementById('ntNoticeSubmit').textContent = 'Thêm thông báo';
+        form.action = NT_CREATE_ACTION;
+        form.reset();
+        activeRow.style.display = 'none';
+    }
+
+    document.getElementById('ntNoticeModal').classList.add('nt-modal-overlay--open');
+    document.body.style.overflow = 'hidden';
+}
+
+function ntCloseNoticeModal() {
+    document.getElementById('ntNoticeModal').classList.remove('nt-modal-overlay--open');
+    document.body.style.overflow = '';
+}
+
+function ntCloseModalOnBackdrop(event) {
+    if (event.target === event.currentTarget) ntCloseNoticeModal();
+}
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') ntCloseNoticeModal();
+});
+
+/* ── Người nhận: chỉ hiện dropdown khi chọn "Một khách hàng" ── */
+function ntSyncTarget() {
+    const one = document.querySelector('input[name="target"][value="customer"]').checked;
+    document.getElementById('ntCustomerPicker').style.display = one ? 'flex' : 'none';
+    document.getElementById('ntCustomerSelect').required = one;
+    document.getElementById('ntTargetOne').classList.toggle('nt-target__option--selected', one);
+    document.getElementById('ntTargetAll').classList.toggle('nt-target__option--selected', !one);
+}
+</script>
+{% endblock %}

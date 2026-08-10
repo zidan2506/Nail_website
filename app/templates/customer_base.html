@@ -14,15 +14,6 @@
 </head>
 <body>
 
-    {# Mobile top bar (chỉ hiện < 860px) #}
-    <div class="customer-topbar">
-        <button type="button" class="customer-burger" id="customerBurger"
-                aria-label="{{ _('Open menu') }}" aria-controls="customerSidebar" aria-expanded="false">
-            <span class="material-symbols-outlined">menu</span>
-        </button>
-        <span class="customer-topbar__brand">✦ Misa Nails </span>
-    </div>
-
     {# Lớp phủ nền khi mở drawer #}
     <div class="customer-navbg" id="customerNavbg"></div>
 
@@ -117,9 +108,77 @@
 
         </aside>
 
-        <main class="dashboard-main">
-            {% block customer_content %}{% endblock %}
-        </main>
+        {# Cột nội dung = topbar dính trên + trang.
+           Topbar nằm TRONG cột (không phải trên toàn trang) để ở desktop nó
+           chỉ trải ngang phần nội dung, không đè lên sidebar. #}
+        <div class="dashboard-col">
+
+            <div class="customer-topbar">
+                {# Hamburger + brand chỉ có nghĩa ở mobile, nơi sidebar là drawer. #}
+                <button type="button" class="customer-burger" id="customerBurger"
+                        aria-label="{{ _('Open menu') }}" aria-controls="customerSidebar" aria-expanded="false">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <span class="customer-topbar__brand">✦ Misa Nails</span>
+
+                {# Hòm thư: thông báo chung của tiệm + thông báo gửi riêng.
+                   Badge + 5 tin gần nhất do inject_customer_notifications() cấp,
+                   render sẵn ở server nên bấm chuông là hiện ngay.
+
+                   Chuông là <button> chứ không phải <a>: nó mở/đóng một panel
+                   chứ không điều hướng. Lối đi tới trang hòm thư nằm ở CTA cuối
+                   dropdown. #}
+                <div class="customer-bell-wrap" id="customerBellWrap">
+                    <button type="button" id="customerBellBtn"
+                            class="customer-bell {% if request.endpoint == 'main.customer_notifications' %}customer-bell--active{% endif %}"
+                            aria-label="{{ _('Notifications') }}"
+                            aria-haspopup="true" aria-expanded="false" aria-controls="customerBellPanel">
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                        </svg>
+                        {% if unread_notifications %}
+                        <span class="customer-bell__badge">{{ unread_notifications }}</span>
+                        {% endif %}
+                    </button>
+
+                    <div class="bell-panel" id="customerBellPanel" role="menu" hidden>
+                        <div class="bell-panel__head">
+                            <span class="bell-panel__title">{{ _('Notifications') }}</span>
+                            {% if unread_notifications %}
+                            <span class="bell-panel__count">{{ unread_notifications }} {{ _('unread') }}</span>
+                            {% endif %}
+                        </div>
+
+                        {% if recent_notifications %}
+                        <ul class="bell-panel__list">
+                            {% for n in recent_notifications %}
+                            <li>
+                                {# Trỏ thẳng vào ?n=<id>: dán link ra được, và tắt JS
+                                   vẫn mở đúng tin. #}
+                                <a class="bell-item {% if not n.read_at %}bell-item--unread{% endif %}"
+                                   href="{{ url_for('main.customer_notifications', n=n.id) }}" role="menuitem">
+                                    <span class="bell-item__title">{{ tr(n, 'title') }}</span>
+                                    <span class="bell-item__date">{{ n.created_at[:10] | format_date }}</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="bell-panel__empty">{{ _('No notifications yet') }}</p>
+                        {% endif %}
+
+                        <a class="bell-panel__cta" href="{{ url_for('main.customer_notifications') }}" role="menuitem">
+                            {{ _('Show all') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <main class="dashboard-main">
+                {% block customer_content %}{% endblock %}
+            </main>
+
+        </div>
 
     </div>
 
@@ -165,6 +224,36 @@
         });
         if (overlay) overlay.addEventListener("click", function () { setOpen(false); });
         document.addEventListener("keydown", function (e) { if (e.key === "Escape") setOpen(false); });
+    });
+    </script>
+
+    {# Dropdown chuông. Nội dung đã render sẵn ở server, JS chỉ đóng/mở. #}
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var btn = document.getElementById("customerBellBtn");
+        var panel = document.getElementById("customerBellPanel");
+        var wrap = document.getElementById("customerBellWrap");
+        if (!btn || !panel) return;
+
+        function setOpen(open) {
+            panel.hidden = !open;
+            wrap.classList.toggle("customer-bell-wrap--open", open);
+            btn.setAttribute("aria-expanded", open ? "true" : "false");
+        }
+
+        btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            setOpen(panel.hidden);
+        });
+
+        // Bấm ra ngoài hoặc Escape thì đóng. Bấm trong panel thì không, để link
+        // vẫn điều hướng bình thường.
+        document.addEventListener("click", function (e) {
+            if (!panel.hidden && !wrap.contains(e.target)) setOpen(false);
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && !panel.hidden) { setOpen(false); btn.focus(); }
+        });
     });
     </script>
 

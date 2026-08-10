@@ -1,0 +1,220 @@
+{% extends "customer_base.html" %}
+
+{% block title %}{{ _('Notifications') }} - Daha Care{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer/customer_notifications.css') }}">
+{% endblock %}
+
+{% block customer_content %}
+{# Danh sách dọc: mỗi tin một row (tiêu đề + ngày + trạng thái). Bấm row thì mở
+   modal đọc chi tiết.
+
+   Row là <a href="?n=<id>"> chứ không phải <button>: modal nhờ vậy vẫn là một URL
+   thật, dán link ra được, và khi tắt JS thì bấm vào row vẫn tải trang có sẵn modal
+   mở. Có JS thì chặn điều hướng, mở modal tại chỗ và pushState cho URL khớp.
+
+   Nội dung tin nằm sẵn ở data-body nên mở modal không cần gọi thêm request.
+   Thông báo vốn ngắn, đánh đổi này rẻ hơn một endpoint chi tiết. #}
+<div class="nf">
+
+  <header class="nf-intro">
+    <div class="nf-intro__text">
+      <h1 class="nf-intro__title">{{ _('Notifications') }}</h1>
+      <p class="nf-intro__sub">{{ _('Announcements from Misa Nails and messages sent to you.') }}</p>
+    </div>
+
+    {# Chỉ hiện khi còn tin chưa đọc: nút bấm vào không đổi gì thì không nên có. #}
+    {% if unread_notifications %}
+    <form method="post" action="{{ url_for('main.mark_all_customer_notifications_read') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="page" value="{{ pagination.page }}">
+      <button type="submit" class="nf-readall">{{ _('Mark all as read') }}</button>
+    </form>
+    {% endif %}
+  </header>
+
+  {% if notifications %}
+  <ul class="nf-list">
+    {% for n in notifications %}
+    <li>
+      <a class="nf-row {% if not n.read_at %}nf-row--unread{% endif %}"
+         href="{{ url_for('main.customer_notifications', n=n.id) }}"
+         data-id="{{ n.id }}"
+         data-title="{{ tr(n, 'title') }}"
+         data-body="{{ tr(n, 'body') }}"
+         data-date="{{ n.created_at[:10] | format_date }}"
+         data-personal="{{ '1' if n.target == 'customer' else '' }}">
+        <span class="nf-row__title">{{ tr(n, 'title') }}</span>
+        <time class="nf-row__date">{{ n.created_at[:10] | format_date }}</time>
+        <span class="nf-row__status {% if n.read_at %}nf-row__status--read{% else %}nf-row__status--unread{% endif %}">
+          {{ _('Read') if n.read_at else _('Unread') }}
+        </span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+
+  {# Phân trang: chỉ hiện khi thực sự có nhiều hơn một trang. #}
+  {% if pagination.pages > 1 %}
+  <nav class="nf-pager" aria-label="{{ _('Pagination') }}">
+    {% if pagination.has_prev %}
+    <a class="nf-pager__btn" href="{{ url_for('main.customer_notifications', page=pagination.page - 1) }}"
+       rel="prev">{{ _('Previous') }}</a>
+    {% else %}
+    <span class="nf-pager__btn nf-pager__btn--off">{{ _('Previous') }}</span>
+    {% endif %}
+
+    <span class="nf-pager__info">{{ pagination.page }} / {{ pagination.pages }}</span>
+
+    {% if pagination.has_next %}
+    <a class="nf-pager__btn" href="{{ url_for('main.customer_notifications', page=pagination.page + 1) }}"
+       rel="next">{{ _('Next') }}</a>
+    {% else %}
+    <span class="nf-pager__btn nf-pager__btn--off">{{ _('Next') }}</span>
+    {% endif %}
+  </nav>
+  {% endif %}
+  {% else %}
+  <div class="nf-empty">
+    <svg class="nf-empty__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+    </svg>
+    <p class="nf-empty__title">{{ _('No notifications yet') }}</p>
+    <p class="nf-empty__sub">{{ _('Announcements and messages from the salon will appear here.') }}</p>
+  </div>
+  {% endif %}
+
+</div>
+
+
+{# Modal. Có ?n=<id> hợp lệ thì server render sẵn nội dung và bỏ [hidden],
+   nên đường không-JS cũng đọc được tin. #}
+<div class="nf-modal" id="nfModal" {% if not open_notification %}hidden{% endif %}>
+  <div class="nf-modal__backdrop" data-nf-close></div>
+
+  <div class="nf-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="nfModalTitle">
+    <button type="button" class="nf-modal__close" id="nfModalClose"
+            data-nf-close aria-label="{{ _('Close') }}">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+    </button>
+
+    <time class="nf-modal__date" id="nfModalDate">
+      {%- if open_notification %}{{ open_notification.created_at[:10] | format_date }}{% endif -%}
+    </time>
+
+    <h2 class="nf-modal__title" id="nfModalTitle">
+      {%- if open_notification %}{{ tr(open_notification, 'title') }}{% endif -%}
+    </h2>
+
+    <div class="nf-modal__body" id="nfModalBody">
+      {%- if open_notification %}{{ tr(open_notification, 'body') }}{% endif -%}
+    </div>
+
+    <span class="nf-modal__tag" id="nfModalTag"
+          {% if not (open_notification and open_notification.target == 'customer') %}hidden{% endif %}>
+      {{ _('For you') }}
+    </span>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+(function () {
+    var modal   = document.getElementById('nfModal');
+    var dialog  = modal.querySelector('.nf-modal__dialog');
+    var elDate  = document.getElementById('nfModalDate');
+    var elTitle = document.getElementById('nfModalTitle');
+    var elBody  = document.getElementById('nfModalBody');
+    var elTag   = document.getElementById('nfModalTag');
+    var closeBtn = document.getElementById('nfModalClose');
+    var CSRF = "{{ csrf_token() }}";
+    var LABEL_READ = "{{ _('Read') }}";
+    var lastFocused = null;
+
+    function openModal(row) {
+        elDate.textContent  = row.dataset.date;
+        elTitle.textContent = row.dataset.title;
+        elBody.textContent  = row.dataset.body;
+        elTag.hidden = !row.dataset.personal;
+
+        lastFocused = row;
+        modal.hidden = false;
+        document.body.classList.add('nf-modal-open');
+        closeBtn.focus();
+    }
+
+    function closeModal(restoreUrl) {
+        modal.hidden = true;
+        document.body.classList.remove('nf-modal-open');
+        if (restoreUrl) history.pushState({}, '', window.location.pathname);
+        if (lastFocused) { lastFocused.focus(); lastFocused = null; }
+    }
+
+    // Đánh dấu đã đọc ở server, rồi cập nhật row + badge chuông ngay tại chỗ
+    // để người dùng không phải tải lại trang mới thấy trạng thái mới.
+    function markRead(row) {
+        if (!row.classList.contains('nf-row--unread')) return;
+
+        fetch('/customer/notifications/' + row.dataset.id + '/read', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': CSRF }
+        }).catch(function () { /* mất mạng thì lần tải sau vẫn hiện chưa đọc */ });
+
+        row.classList.remove('nf-row--unread');
+        var status = row.querySelector('.nf-row__status');
+        status.classList.remove('nf-row__status--unread');
+        status.classList.add('nf-row__status--read');
+        status.textContent = LABEL_READ;
+
+        var badge = document.querySelector('.customer-bell__badge');
+        if (badge) {
+            var left = parseInt(badge.textContent, 10) - 1;
+            if (left > 0) { badge.textContent = left; } else { badge.remove(); }
+        }
+    }
+
+    document.querySelectorAll('.nf-row').forEach(function (row) {
+        row.addEventListener('click', function (e) {
+            e.preventDefault();
+            openModal(row);
+            history.pushState({}, '', row.getAttribute('href'));
+            markRead(row);
+        });
+    });
+
+    modal.addEventListener('click', function (e) {
+        if (e.target.closest('[data-nf-close]')) closeModal(true);
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !modal.hidden) closeModal(true);
+    });
+
+    // Bấm Back khi modal đang mở thì đóng modal thay vì rời trang.
+    window.addEventListener('popstate', function () {
+        if (!modal.hidden) closeModal(false);
+    });
+
+    // Modal do server mở sẵn (?n=<id>): giữ bẫy focus và Escape như trên.
+    if (!modal.hidden) {
+        document.body.classList.add('nf-modal-open');
+        closeBtn.focus();
+    }
+
+    // Bẫy Tab trong dialog khi modal mở.
+    dialog.addEventListener('keydown', function (e) {
+        if (e.key !== 'Tab') return;
+        var focusable = dialog.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])');
+        if (!focusable.length) return;
+        var first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+})();
+</script>
+{% endblock %}
